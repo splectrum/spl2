@@ -1,0 +1,21 @@
+{
+    "headers": 
+    {
+        "header": 
+        [
+            { "header": "gp/test/report" },
+            { "content": "Standalone formatter - generates reports from any analysis/run data in workspace." },
+            { "content": "{bold syntax}: {italic ./spl_execute <app> test/report <options>}" },
+            { "content": "" },
+            { "content": "{bold Reusable}: Works with discovery, analysis, and execution data" },
+            { "content": "{bold Formats}: Summary, detailed, with recommendations" },
+            { "content": "{bold Auto-detection}: Automatically finds available test data" }
+        ]
+    },
+    "value": 
+    [ 
+        { "name": "help", "alias": "h", "type": "Boolean", "description": "show help information", "typeLabel": "flag" },
+        
+        { "name": "summaryOnly", "alias": "s", "type": "Boolean", "description": "Show only RUN results (summary mode)", "typeLabel": "flag" }
+    ]
+}
