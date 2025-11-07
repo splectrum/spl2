@@ -374,6 +374,36 @@ resolve: {
 
 **Confirms:** Our WOW.md TDC approach is validated by real implementation
 
+### Exploration-Driven Development Validation
+
+**Contrast: SPL1 vs product-poc methodology**
+
+**product-poc (SUCCESSFUL):**
+- Multiple explorations (prototype-1, 2, 2b, 3)
+- Each validated specific aspects
+- Iterative refinement through practice
+- Converged on good implementations
+
+**SPL1 (PROBLEMATIC):**
+- Insufficient exploration before committing
+- Locked into patterns too early
+- Less iteration and learning
+
+**Lesson Validated:**
+- **Do numerous explorations** - zoom in on implementation through practice
+- **Sprint-sized projects** - test alternatives, learn what works
+- **Code explores better than design** - validate through implementation
+- **Iterate and converge** - each exploration informs the next
+
+**SPL2 Approach (Already Aligned):**
+- Sprint-sized exploration projects ✓
+- TDC through code validation ✓
+- "Fail fast, fix fast" ✓
+- Multiple explorations before "production" ✓
+- Learn through practice not theory ✓
+
+**Confirmation:** Our chosen methodology matches what worked in product-poc
+
 ### Development Workflow Patterns
 
 **npm script conventions proven:**

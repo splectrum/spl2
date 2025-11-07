@@ -194,6 +194,35 @@ read file → copy file → move file
 - Simple implementation that achieves the goal
 - No artificial limitations
 
+### Methodological Lesson: Insufficient Exploration ❌
+
+**THE PROBLEM:** SPL1 didn't do enough exploration before committing to implementations.
+
+**Contrast with product-poc:**
+- Multiple prototypes (prototype-1, 2, 2b, 3)
+- Each prototype validated specific aspects
+- Exploration → learning → better implementation
+- Iterative refinement through practice
+
+**SPL1 Approach:**
+- Committed to implementation patterns too early
+- Insufficient validation through exploration
+- Less iteration and refinement
+- Locked into decisions without testing alternatives
+
+**The Lesson:**
+- **Exploration is valuable** - it helps zoom in on good implementations
+- **Multiple explorations** - don't commit after first attempt
+- **Validate through practice** - code explores better than design docs
+- **Learn and iterate** - each exploration informs the next
+
+**For SPL2:**
+- Do numerous explorations before "production" implementation
+- Sprint-sized exploration projects
+- Test alternatives, learn what works
+- Converge on implementation through validated practice
+- Match product-poc's successful exploration-driven approach
+
 ### What Wasn't Implemented ❌
 
 1. **AVRO schema validation** - Mentioned as "future", never done
