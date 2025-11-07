@@ -85,33 +85,35 @@
 - Carry over unnecessary complexity
 - Create documentation without code validation
 
-## Tooling Decisions Needed
+## Tooling Stack (Validated)
 
-**Categories where early technology choices enable rather than constrain:**
+**Testing - PROVEN in product-poc prototypes:**
+- **Unit/Integration:** Vitest (fast, excellent DX, 194+ tests validated)
+- **Component Testing:** React Testing Library (user-centric, proven with Vitest)
+- **E2E/Browser:** Playwright (cross-browser, excellent debugging)
+- **API Testing:** Supertest (HTTP endpoint testing)
+- **Coverage:** @vitest/coverage-v8
 
-**Testing:**
-- JS/Node testing framework
-- React component testing
-- Browser/E2E testing
-- Test runners and utilities
+**Development - VALIDATED:**
+- **Build:** Vite (proven with AVRO polyfills - Bare compatibility to be explored)
+- **Linting:** ESLint (with React plugins)
+- **Dev Workflow:** Concurrently (parallel client/server development)
+- **Code Formatting:** To be decided (Prettier not in prototypes)
 
-**Development:**
-- Build/bundling tools (considering Bare/Pear compatibility)
-- Linting and code quality
-- Code formatting
-- Development server/hot reload
+**AVRO Tooling - PROVEN:**
+- **Library:** avsc (works client + server)
+- **Browser Polyfills:** buffer, stream, util, process, events, path, zlib
+- **Bundle Impact:** ~80 kB gzipped (acceptable for functionality)
+- **Client-side AVRO validated:** Single source of truth across stack
 
-**Debugging:**
-- Browser debugging tools
-- Node/Bare debugging approach
-- State inspection tools
+**React Ecosystem - VALIDATED:**
+- **React Hook Form:** Proven for complex forms (optional, not mandatory)
+- **Modular Components:** Component architecture validated
 
-**Schema/Type tooling:**
-- AVRO schema tooling for JavaScript
-- Schema validation utilities
-- Type checking (if appropriate)
-
-**Note:** Prototype exists with React + AVRO in browser. Work plan will include evaluating those tool choices.
+**Exploration Items:**
+- Bare runtime compatibility (tooling may need adaptation/abstraction)
+- P2P layer tooling (may differ from application layer)
+- Code formatting standards
 
 ## Quality Standard
 
