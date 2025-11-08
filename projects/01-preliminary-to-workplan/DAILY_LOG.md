@@ -6,10 +6,24 @@ Project log capturing decisions, issues, and lessons as they emerge.
 
 ## 2025-11-08
 
-**Decision:** Created PRINCE2 living artifacts system
-**Why:** Need lightweight structure that captures learning without bureaucracy. Each project should improve the system for next project.
-**Files:** PRINCE2_WOW.md, LESSONS_LEARNED.md, INDEX.md, this DAILY_LOG.md, RISKS.md
+**Product 3 Complete:** TDC template/framework ✅
+**Deliverable:** TDC_FRAMEWORK.md with comprehensive templates and examples
+**Coverage:** Work item template, validation criteria for all artifact types, validation results template, Red/Yellow/Green scoring, PRINCE2 integration
+**Quality:** Validates itself - TDC framework created using TDC approach
+**Reference:** Commit 8df2876
 
+**Product 2 Complete:** Lightweight PRINCE2 setup ✅
+**Deliverables:** PRINCE2_WOW.md, INDEX.md, DAILY_LOG.md, RISKS.md, LESSONS_LEARNED.md templates
+**Key Innovation:** Foundation maintenance built into project close - re-validation required before project completion
+**Approach:** Lessons stay in projects, foundations get constraints + references
+**Reference:** Commit ada1819
+
+**Decision:** LESSONS_LEARNED.md location changed from global to per-project
+**Why:** Better preserves context, foundations stay minimal, traceability maintained
+**Impact:** Project close process includes extracting constraints to foundations with project references
+**Application:** Each project has full detail, foundations have decision + reference
+
+**Product 1 Complete:** Repository Review & Foundation Update ✅
 **Validation:** Product 1 re-validated - all 8 tests now Green (improved from 3 Green, 5 Yellow)
 **Result:** Foundations are solid. Fresh Context, Completeness, Simplicity, Actionability, and Structure all improved from Yellow to Green.
 **Reference:** VALIDATION_RESULTS.md, commit 68348ac
@@ -17,6 +31,7 @@ Project log capturing decisions, issues, and lessons as they emerge.
 **Decision:** Pushed commits to GitHub after committing
 **Why:** Keep GitHub in sync with local commits for backup and collaboration
 **Application:** Will push after every commit going forward
+**Status:** Applied - all commits pushed
 
 ---
 
