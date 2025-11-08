@@ -15,10 +15,45 @@
 - Iterate based on actual usage
 - "Good enough" quality standard, not perfection
 
-**Status:** Active → Mitigating through Product 2 and 3 design
+**Status:** Mitigated ✅
 
 **Updates:**
 - 2025-11-08: Creating lightweight templates. Focus on living artifacts that learn. Skipping heavy PRINCE2 elements (stage plans, exception reports, etc.). Looking good so far.
+- 2025-11-08: Products 2 and 3 complete. Methodology proven lightweight and usable through project execution. Successfully applied PRINCE2 + TDC without bureaucracy. Risk mitigated through actual practice.
+
+---
+
+### R03: Foundation Documents Drift from "Minimal and Complete"
+**Identified:** 2025-11-08
+**Probability:** Medium
+**Impact:** Medium
+
+**Description:** Over time, foundation documents may accumulate content and lose their "concise overview" quality. Without systematic evaluation techniques, they could become bloated (not minimal) or miss essential information (not complete), defeating their purpose.
+
+**Evidence of Risk:**
+- PRINCIPLES.md initially grew to 288 lines, had to refactor to 120 lines
+- Tension between adding necessary information and staying concise
+- Fresh Context Test depends on foundations being scannable
+
+**Current Mitigation:**
+- Pattern established: detail lives in projects, foundations have constraints + references
+- Re-validation required at project close (REQUIREMENTS.md 8 tests)
+- DAILY_LOG captures decision to move LESSONS_LEARNED and TEMPLATE_GUIDANCE to project folders
+
+**Gap:**
+- No systematic evaluation techniques beyond REQUIREMENTS.md tests
+- Need criteria to answer: "Is this minimal enough?" and "Is this still complete?"
+- Need techniques for: detecting bloat, measuring scanability, identifying what can move to projects
+
+**Future Mitigation:**
+- Exploration project to develop foundation evaluation methodology
+- Products: Evaluation checklist, refactoring patterns, "health check" process
+- Integrate enhanced evaluation into project close validation
+
+**Status:** Active - pattern established, techniques needed
+
+**Updates:**
+- 2025-11-08: Risk identified during project close discussion. Pattern for decluttering established (detail to projects), but evaluation methodology needed for systematic quality maintenance.
 
 ---
 

@@ -1,106 +1,219 @@
-# Lessons Learned
+# Lessons Learned: Preliminary to Workplan
 
-Cross-project learnings that improve our foundations and approach.
+Project learnings synthesized at close. Key constraints extracted to foundations with references back to this document.
 
-**Last Updated:** 2025-11-08
+**Project:** 01-preliminary-to-workplan
+**Completed:** 2025-11-08
 
 ---
 
 ## Methodology
 
-### Exploration-Driven Development Works
+### Bootstrap Pattern: Don't Create Templates Upfront
 
-**Source:** SPL1 and product-poc analysis
-**Date:** 2025-11-07
+**From:** Product 3 pivot during project execution
+**Date Discovered:** 2025-11-08
 
 **What we learned:**
-Multiple exploration iterations before "production" implementation leads to better outcomes. product-poc did this well (prototypes 1, 2, 2b, 3) and converged on good implementations. SPL1 committed too early without sufficient exploration.
+Initially Product 3 was specified as "create TDC templates for all work types." Through discussion about AI+TDC paradigm, we realized creating templates upfront violates our exploration-driven principle. We pivoted to creating **guidance** on template creation plus establishing the **bootstrap pattern**: templates are created while doing the actual work (explorative project produces the deliverable + the template).
 
 **Why it matters:**
-Code explores better than design documents. Trying multiple approaches reveals what actually works vs. what sounds good in theory.
+- Creating templates upfront = guessing what works, not learning
+- Bootstrap pattern = templates validate themselves through actual use
+- Aligns perfectly with exploration-driven development
+- Templates start "good enough" and improve through real usage
 
-**Application:**
-- Sprint-sized exploration projects before production implementation
-- Test alternatives, learn what works
-- Iterate and converge through validated practice
-- Don't commit to implementations too early
+**Evidence:**
+- Original PROJECT_BRIEF.md implied creating multiple templates
+- Discussion revealed better approach
+- Deliverable changed to TEMPLATE_GUIDANCE.md (how to create templates) not templates themselves
+- Template will be created in Project 02 while creating actual workplan
 
-**Action taken:**
-- Documented in PRINCIPLES_DETAILED.md
-- Project structure supports sprint-sized explorations
-- "Good enough" quality standard encourages iteration
+**Application going forward:**
+- Apply bootstrap pattern to all methodology components
+- Guidance + explorative project pattern for anything new
+- Don't build methodology upfront, discover through practice
+
+**Foundation update:**
+- Added "Methodology Evolution" section to WOW.md
+- TEMPLATE_GUIDANCE.md documents bootstrap pattern
+- TDC_FRAMEWORK.md references template creation approach
 
 ---
 
-### Test Driven Creation (TDC) Extends Beyond Code
+### Foundation Maintenance as Project Responsibility
 
-**Source:** Project 01 - preliminary-to-workplan
-**Date:** 2025-11-08
+**From:** PRINCE2 setup (Product 2) and discussion about LESSONS_LEARNED.md location
+**Date Discovered:** 2025-11-08
 
 **What we learned:**
-TDC validation framework works for non-code artifacts (documentation, findings documents). Repository reviews with findings documents demonstrated TDC applied to research/analysis work.
+Initially created LESSONS_LEARNED.md in foundations/ as global cross-project document. Realized this violates "minimal foundations" principle. Better pattern: **foundations contain constraints + references, projects contain detailed context**. Foundation maintenance is built into project close process (not a separate central task).
 
 **Why it matters:**
-Same quality approach works across all work types - code, documentation, designs, research. Creates consistent quality standard.
+- Preserves full context where it was discovered (traceability)
+- Keeps foundations minimal and scannable
+- Foundation quality maintained through project lifecycle
+- Each project improves foundations without bloating them
 
-**Application:**
-- Define quality criteria for any artifact type
-- Validation criteria = "tests" for that artifact
-- Document findings = validation results
-- Iterate until criteria pass
+**Evidence:**
+- Moved LESSONS_LEARNED.md and TEMPLATE_GUIDANCE.md from foundations/ to project folder
+- PRINCE2_WOW.md project close process includes foundation update + re-validation
+- Pattern already applied: foundations reference "see project 01/..." for detail
 
-**Action taken:**
-- TDC framework applies to all products in PROJECT_BRIEF
-- VALIDATION_RESULTS.md demonstrates TDC for documentation
-- PRODUCT-POC-FINDINGS.md and SPL1-FINDINGS.md show TDC for research
+**Application going forward:**
+- All detailed documentation lives in project folders
+- Foundations get brief constraint + project reference
+- Project close includes: synthesize lessons → extract constraints → update foundations → re-validate
+- Foundation quality gates are part of every project close
+
+**Foundation update:**
+- PRINCE2_WOW.md "Close Project" section includes 6-step process
+- Step 3: Update foundations with constraints + references
+- Step 4: Re-validate foundations (REQUIREMENTS.md tests)
+- Pattern documented and will be followed by all future projects
+
+---
+
+### Exploration + Evidence-Based Development (Core Pillars)
+
+**From:** Repository reviews (Product 1) and overall project approach
+**Date Discovered:** 2025-11-07
+
+**What we learned:**
+**Exploration and Evidence are the two core pillars** of our approach. Exploration projects produce real deliverables + evidence + methodology (not throwaway spikes). Evidence from real implementations validates methodology decisions much stronger than theoretical design. Different types of exploration projects serve different purposes (technology validation, architecture patterns, methodology creation, feature development).
+
+**Why it matters:**
+- Our approach is more valuable than typical spikes (which are often discarded)
+- Real data from implementations (194+ tests, performance metrics, actual usage) provides concrete validation
+- Distinguishes our approach from both heavy upfront design AND undisciplined iteration
+- Each exploration produces lasting value: deliverable + evidence + learned patterns + foundation updates
+
+**Evidence:**
+- product-poc: Multiple prototypes → success (194+ tests, performance data)
+- spl1: Committed too early → problems (over-restriction, insufficient exploration)
+- Project 01: Repository reviews produced findings documents with real evidence
+- Foundation improvements: 3 Green/5 Yellow → 8 Green/0 Yellow after adding concrete evidence
+
+**Application going forward:**
+- Continue sprint-sized exploration projects
+- Capture evidence systematically (findings documents, metrics, validation results)
+- Use evidence to improve foundations
+- Every significant methodology decision backed by exploration producing evidence
+
+**Foundation update:**
+- Already in PRINCIPLES_DETAILED.md (exploration-driven validated from spl1/product-poc contrast)
+- Now proven through Project 01 execution
+- This lesson captures WHY these are our core pillars
+
+---
+
+### Documentation Validation Framework Works
+
+**From:** Product 1 foundation validation
+**Date Discovered:** 2025-11-08
+
+**What we learned:**
+REQUIREMENTS.md 8-test framework successfully applied TDC to documentation. Red/Yellow/Green scoring extends beyond code effectively. Objective criteria (Fresh Context Test, Completeness Test, etc.) made documentation quality measurable and improvable.
+
+**Why it matters:**
+- Proves TDC works for non-code artifacts
+- Provides concrete framework for documentation quality
+- Yellow → Green improvements show framework drives actual quality gains
+- Pattern is reusable for all documentation validation
+
+**Evidence:**
+- Initial validation: 3 Green, 5 Yellow, 0 Red ("good enough" to proceed)
+- After improvements: 8 Green, 0 Yellow, 0 Red (strongly validated)
+- Framework identified exactly what needed improvement
+- Repository reviews strengthened completeness and actionability
+
+**Application going forward:**
+- Use REQUIREMENTS.md pattern for all critical documentation
+- Red/Yellow/Green scoring for multi-criteria validation
+- Validation at project close to ensure foundations stay healthy
+
+**Foundation update:**
+- Pattern already documented in REQUIREMENTS.md
+- VALIDATION_RESULTS.md demonstrates successful application
+- PRINCE2_WOW.md includes foundation re-validation in project close
+
+---
+
+### Living Artifacts Over Static Documentation
+
+**From:** PRINCE2 living artifacts design (Product 2)
+**Date Discovered:** 2025-11-08
+
+**What we learned:**
+Documents that evolve during project (DAILY_LOG, RISKS, LESSONS_LEARNED) capture more value than static docs written once. Living artifacts: capture decisions as they happen, preserve context, evolve with reality, feed improvements after project close.
+
+**Why it matters:**
+- Context preserved (why decisions were made)
+- Reality captured (how risks actually evolved)
+- Learning enabled (patterns emerge through documentation)
+- Contrast with compliance docs that nobody updates
+
+**Evidence:**
+- DAILY_LOG captures decisions with "why" at time of decision
+- RISKS.md evolved: R01 status Active → Mitigated, R03 added during close
+- Template documents designed to evolve (maturity ratings, improvement sections)
+
+**Application going forward:**
+- All project artifacts should be "living"
+- Update during project, not just at end
+- Capture reality, not aspirations
+- Synthesize at project close
+
+**Foundation update:**
+- PRINCE2_WOW.md emphasizes living documents principle
+- Templates designed for evolution
+- None needed - principle already established
 
 ---
 
 ## Technology
 
-### AVRO Client-Side is Viable and Preferred
+### AVRO Client-Side Validated
 
-**Source:** product-poc prototype-2b review
-**Date:** 2025-11-07
+**From:** product-poc prototype-2b review (Product 1)
+**Date Discovered:** 2025-11-07
 
 **What we learned:**
-AVRO works client-side with acceptable bundle size (~80KB gzipped). Performance is excellent (<1ms validation). Single source of truth across client and server is achievable.
+AVRO works client-side with acceptable bundle size (~80KB gzipped), excellent performance (<1ms validation), and enables single source of truth across client and server.
 
 **Why it matters:**
-Eliminates need for separate client-side validation (like Zod) plus server AVRO. Simpler architecture, one schema language, offline capability.
+Eliminates need for separate client-side validation library. Simpler architecture, one schema language, offline capability.
 
-**Application:**
-- Use AVRO for all schema validation (client + server)
-- Configure Vite with required polyfills (documented in PRINCIPLES_DETAILED.md)
-- 80KB gzipped is acceptable for functionality provided
+**Evidence:**
+194+ tests in product-poc, performance metrics documented, Vite polyfill configuration proven.
 
-**Action taken:**
-- Added to PRINCIPLES.md as validated approach
-- Documented Vite configuration in PRINCIPLES_DETAILED.md
-- Marked as "Established" maturity (🔵)
+**Application going forward:**
+Use AVRO for all schema validation (client + server).
+
+**Foundation update:**
+Added to PRINCIPLES.md as validated approach. Documented in PRINCIPLES_DETAILED.md. Marked as "Established" maturity (🔵).
 
 ---
 
-### Proven Testing Stack: Vitest + Playwright
+### Testing Stack Validated
 
-**Source:** product-poc prototypes
-**Date:** 2025-11-07
+**From:** product-poc prototypes review (Product 1)
+**Date Discovered:** 2025-11-07
 
 **What we learned:**
-Vitest (unit/integration) + Playwright (E2E) + React Testing Library (components) works exceptionally well. 194+ tests in prototype-2b validated this stack.
+Vitest + Playwright + React Testing Library stack proven through 194+ tests.
 
 **Why it matters:**
-Proven through extensive real use. Fast execution, excellent DX, comprehensive coverage. No need to experiment with alternatives.
+No need to experiment with alternatives - stack is proven.
 
-**Application:**
-- Use this testing stack for all SPL2 projects
-- Vitest for unit and integration tests
-- Playwright for E2E and browser testing
-- React Testing Library for component testing
+**Evidence:**
+Extensive real use in product-poc prototypes, fast execution, excellent DX.
 
-**Action taken:**
-- Documented in PRINCIPLES.md as validated tooling
-- Marked as "Established" maturity (🔵)
+**Application going forward:**
+Use this testing stack for all SPL2 projects.
+
+**Foundation update:**
+Documented in PRINCIPLES.md as validated tooling. Marked as "Established" maturity (🔵).
 
 ---
 
@@ -108,49 +221,47 @@ Proven through extensive real use. Fast execution, excellent DX, comprehensive c
 
 ### Avoid Over-Restriction Without Purpose
 
-**Source:** SPL1 analysis
-**Date:** 2025-11-07
+**From:** SPL1 analysis (Product 1)
+**Date Discovered:** 2025-11-07
 
 **What we learned:**
-SPL1 implementation was "too restrictive without reason due to poor design." Unnecessary constraints (5-layer config hierarchy, rigid patterns) created complexity without benefit.
+SPL1 was "too restrictive without reason due to poor design." Unnecessary constraints (5-layer config hierarchy, rigid patterns) created complexity without benefit.
 
 **Why it matters:**
-Constraints should serve the goals (completeness, correctness), not restrict unnecessarily. Minimal implementation = only constrain what MUST be constrained.
+Constraints should serve goals (completeness, correctness), not restrict unnecessarily. Minimal implementation = only constrain what MUST be constrained.
 
-**Application:**
+**Evidence:**
+SPL1 review revealed complex implementation, spl1/SPL1-FINDINGS.md documents the lesson.
+
+**Application going forward:**
 - Question every constraint: "Is this necessary for completeness?"
 - Default to freedom, constrain only when required
-- Simple implementation that achieves the goal
 - Maximum freedom for AI implementation choices
 
-**Action taken:**
-- Made explicit in PRINCIPLES.md: "Maximum AI Freedom"
-- SPL1-FINDINGS.md documents this lesson
-- Core principle: Minimal implementation, complete output
+**Foundation update:**
+Made explicit in PRINCIPLES.md: "Maximum AI Freedom." SPL1-FINDINGS.md documents this lesson. Core principle: Minimal implementation, complete output.
 
 ---
 
-### API-Centric Design Pattern Works
+### API-Centric Design Validated
 
-**Source:** SPL1 analysis
-**Date:** 2025-11-07
+**From:** SPL1 analysis (Product 1)
+**Date Discovered:** 2025-11-07
 
 **What we learned:**
 API-centric pattern (all methods in API work on same structure) enables natural composition and pipelining. Validated through SPL1 implementation.
 
 **Why it matters:**
-Right abstraction level for DSL building. Methods compose naturally within API, type compatibility implicit.
+Right abstraction level for DSL building. Methods compose naturally within API.
 
-**Application:**
-- Adopt API-centric design for SPL2
-- All methods in an API operate on shared data structure
-- Clear domain boundaries (API = domain)
-- State-backed APIs for execution context
+**Evidence:**
+SPL1 implementation demonstrated pattern working.
 
-**Action taken:**
-- Documented in SPL1-FINDINGS.md
-- Will inform pipelining mechanism design
-- Marked as pattern to adopt
+**Application going forward:**
+Adopt API-centric design for SPL2.
+
+**Foundation update:**
+Documented in SPL1-FINDINGS.md. Will inform pipelining mechanism design.
 
 ---
 
@@ -158,60 +269,78 @@ Right abstraction level for DSL building. Methods compose naturally within API, 
 
 ### Lightweight PRINCE2 Provides Value
 
-**Source:** Project 01 - preliminary-to-workplan
-**Date:** 2025-11-08
+**From:** Product 2 execution
+**Date Discovered:** 2025-11-08
 
 **What we learned:**
-Living artifacts approach (Daily Log, Risk Register, Lessons Learned) provides structure without bureaucracy. Self-improving system where each project makes next one better.
+Living artifacts approach (Daily Log, Risk Register, Lessons Learned) provides structure without bureaucracy. Successfully applied PRINCE2 + TDC without heaviness.
 
 **Why it matters:**
-Visibility and learning without overhead. Documents serve purpose (enable work, capture learning) not compliance.
+Visibility and learning without overhead.
 
-**Application:**
-- Use core PRINCE2 artifacts only (skip heavy ones)
-- Focus on living documents that evolve
-- Extract lessons to improve templates
-- Each project feeds wisdom to next
+**Evidence:**
+Project 01 executed successfully with lightweight approach. Risk R01 (methodology too complex) mitigated through practice.
 
-**Action taken:**
-- Created PRINCE2_WOW.md documenting approach
-- Templates provided for living artifacts
-- Integration with TDC defined
+**Application going forward:**
+Use core PRINCE2 artifacts only, skip heavy ones.
+
+**Foundation update:**
+PRINCE2_WOW.md documents approach. Templates provided. Integration with TDC defined.
 
 ---
 
-## Documentation
+### Three-Tier Documentation Structure
 
-### Three-Tier Documentation Works Well
-
-**Source:** Project 01 foundations validation
-**Date:** 2025-11-08
+**From:** Foundation validation (Product 1)
+**Date Discovered:** 2025-11-08
 
 **What we learned:**
-Concise overview (PRINCIPLES.md) + detailed explanations (PRINCIPLES_DETAILED.md) + project-specific (findings) provides good balance.
+Concise overview (PRINCIPLES.md 120 lines) + detailed explanations (PRINCIPLES_DETAILED.md) + project-specific (findings, lessons) provides good balance.
 
 **Why it matters:**
-Quick reference available, deep context when needed, project learnings preserved. Different needs served by appropriate document level.
+Quick reference available, deep context when needed, project learnings preserved.
 
-**Application:**
-- Keep overview docs concise (120 lines or less)
-- Create _DETAILED versions when extended context needed
-- Project-specific findings separate from principles
-- Maturity ratings show confidence levels
+**Evidence:**
+PRINCIPLES.md reduced from 288 → 120 lines. All 8 validation tests Green.
 
-**Action taken:**
-- Restructured foundations to follow this pattern
-- All 8 validation tests now Green
-- Pattern documented in REQUIREMENTS.md
+**Application going forward:**
+Keep overview docs concise. Create _DETAILED versions when needed. Project-specific findings separate from principles.
+
+**Foundation update:**
+Restructured foundations to follow this pattern. Pattern documented in REQUIREMENTS.md.
 
 ---
 
-## Notes
+## Summary
 
-This document grows with each project. Add lessons that:
-- Affect how we work going forward
-- Would have helped if we knew it earlier
-- Change our understanding of what works
-- Improve templates or foundations
+**What worked well:**
+- Repository reviews with evidence-based findings (real data validates decisions)
+- Living artifacts that evolved during project (DAILY_LOG, RISKS, this document)
+- Bootstrap pattern discovery (don't create templates upfront)
+- Foundation maintenance as project responsibility (not separate task)
+- Lightweight PRINCE2 + TDC integration (structure without bureaucracy)
+- Three-tier documentation (concise, detailed, project-specific)
 
-Not every project produces lessons - that's fine. Quality over quantity.
+**What didn't work:**
+- Initial plan to create TDC templates upfront (pivoted to guidance + bootstrap)
+- Global LESSONS_LEARNED.md in foundations/ (moved to project folders)
+
+**What to change:**
+- Continue bootstrap pattern for all methodology components
+- Maintain foundation quality through project close process
+- Develop evaluation techniques for "minimal and complete" (Risk R03)
+- Apply exploration + evidence pillars systematically
+
+**Key insights:**
+- **Methodology evolves through practice, not planning** (bootstrap pattern discovered while creating TDC framework)
+- **Evidence beats theory** (repository reviews provided concrete validation)
+- **Foundations stay minimal by keeping detail in projects** (constraints + references pattern)
+- **Project close maintains foundation quality** (re-validation required before close)
+
+---
+
+**Next project should benefit from:**
+- Bootstrap pattern for creating workplan template
+- Foundation update process proven
+- Living artifacts approach validated
+- Evidence-based decision making established
