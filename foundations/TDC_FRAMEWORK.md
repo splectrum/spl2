@@ -472,3 +472,12 @@ For complex artifacts with multiple criteria, use scoring:
 - Traditional TDD (extends beyond code)
 - Agile (definition of done)
 - Our WOW (how we work together)
+
+## Creating TDC Templates
+
+**Templates for different work types are created using the bootstrap pattern:**
+- Don't create templates upfront
+- Create while doing the work (explorative project)
+- Evolve through real usage and lessons learned
+
+**See:** `projects/01-preliminary-to-workplan/TEMPLATE_GUIDANCE.md` for detailed guidance on creating and evolving TDC templates for different work types.

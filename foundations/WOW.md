@@ -44,6 +44,30 @@
 
 **Together:** PRINCE2 provides structure and visibility, TDC provides the execution mechanism for quality
 
+## Methodology Evolution
+
+**Our methodology itself evolves through practice.**
+
+**Pattern: Guidance + Explorative Project**
+
+When we need something new (template, process, pattern):
+1. **Create guidance** - Document what we're trying to achieve, not how
+2. **Explorative project** - Produce TWO products:
+   - Product 1: The thing we actually need
+   - Product 2: The methodology/template for creating it (bootstrap)
+3. **Use in practice** - Apply to real work
+4. **Capture lessons** - What worked, what didn't (LESSONS_LEARNED)
+5. **Improve** - Update based on evidence
+6. **Repeat** - Continuous evolution
+
+**Examples:**
+- Templates created while doing the work (see TEMPLATE_GUIDANCE.md)
+- Foundations validated through projects
+- PRINCE2 artifacts refined based on what helps
+- TDC framework itself improved through application
+
+**Key insight:** We don't design perfect methodology upfront. We create "good enough" and improve through practice.
+
 ## Roles & Responsibilities
 
 **AI (Claude):**
