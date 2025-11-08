@@ -4,13 +4,13 @@
 
 | Code | Name | Status | Started | Products |
 |------|------|--------|---------|----------|
-| 01-preliminary-to-workplan | Preliminary to Workplan | In Progress | 2025-11-07 | 3 |
+| - | - | - | - | - |
 
 ## Completed Projects
 
 | Code | Name | Completed | Key Outcomes |
 |------|------|-----------|--------------|
-| - | - | - | - |
+| 01-preliminary-to-workplan | Preliminary to Workplan | 2025-11-08 | Validated foundations, established PRINCE2+TDC methodology, bootstrap pattern |
 
 ## Planned Projects
 
@@ -26,11 +26,19 @@
 **Objective:** Establish validated foundations and working methodology (PRINCE2 + TDC)
 
 **Products:**
-1. Repository Review & Foundation Update (Complete ✅)
-2. Lightweight PRINCE2 Setup (In Progress)
-3. TDC Template/Framework (Pending)
+1. Repository Review & Foundation Update ✅
+2. Lightweight PRINCE2 Setup ✅
+3. TDC Template/Framework ✅
 
-**Status:** Product 1 complete with all validation tests Green. Working on Products 2 and 3.
+**Status:** Complete - All products delivered and validated
+
+**Key Learnings:**
+- Bootstrap pattern for templates (don't create upfront)
+- Foundation maintenance as project responsibility
+- Exploration + Evidence as core pillars
+- Living artifacts over static documentation
+
+**See:** `projects/01-preliminary-to-workplan/LESSONS_LEARNED.md` for full details
 
 ---
 

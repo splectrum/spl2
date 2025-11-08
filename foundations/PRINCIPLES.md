@@ -31,6 +31,13 @@
 - Complete history preserved, transitions replayable
 - Event sourcing naturally
 
+**Exploration + Evidence (Core Pillars):**
+- Exploration: Sprint-sized projects, iterate before committing, discover through doing
+- Evidence: Real implementations validate decisions (not theory or planning)
+- Exploration projects produce: deliverables + evidence + methodology + foundation updates
+- Every significant decision backed by evidence from actual use
+- See: `projects/01-preliminary-to-workplan/LESSONS_LEARNED.md` for validation
+
 ## Technology Stack
 
 **Data & Schema:**
