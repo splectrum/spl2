@@ -9,6 +9,39 @@ Lightweight capture of improvement ideas that emerge during project work. CIPs a
 
 ## Active CIPs
 
+### CIP-000: Document CIP Register in Methodology
+
+**Type:** Methodology/Process
+**Status:** Captured
+**Priority:** TBD (to be assessed during dependency analysis)
+**Source:** Project 02 - discovery during work
+**Date Captured:** 2025-11-08
+
+**Description:**
+Add CIP Register to PRINCE2_WOW.md as a standard living artifact. Document:
+- Purpose: Lightweight idea capture following ITIL Continual Improvement practice
+- When to use: Projects capture CIPs as ideas emerge
+- Integration with project close: CIP maintenance as part of closure process
+- Workflow: Capture → Review → Assess → Implement/Defer/Reject
+
+**Rationale:**
+CIP Register proves useful in Project 02 for capturing improvement ideas. Should be formalized in methodology so future projects can use it. Aligns with ITIL Continual Improvement practice.
+
+**Additional consideration:**
+Add "CIP Maintenance" to project close process in PRINCE2_WOW.md:
+- Review project CIPs
+- Update CIP status
+- Promote relevant CIPs to global register
+- Close implemented CIPs with outcomes
+- Follows pattern of projects being responsible for maintenance (foundations, CIPs)
+
+**Next Steps:**
+- Assess during Product 5 (Dependency & Priority Analysis)
+- Could be part of Product 2 (Foundation Update Methodology) scope
+- Or separate quick update to PRINCE2_WOW.md
+
+---
+
 ### CIP-001: Product Register for Project Tracking
 
 **Type:** Process/Tool
