@@ -105,6 +105,68 @@ We're already doing ITIL-ish things (living artifacts, foundation maintenance, l
 
 ---
 
+### CIP-003: Home Automation P2P Application
+
+**Type:** Feature/Application
+**Status:** Captured
+**Priority:** TBD (to be assessed during dependency analysis)
+**Source:** Existing in PRINCIPLES.md
+**Date Captured:** 2025-11-10
+
+**Description:**
+Build P2P home automation application on Splectrum platform:
+- Self-contained P2P network (PCs, tablets, mobile, servers)
+- Local-first, no cloud dependency
+- Conventional distributed apps on P2P infrastructure
+- Integration with existing tools (Home Assistant, etc.)
+
+**Rationale:**
+Initial real-world application to validate SPL2 platform capabilities. Demonstrates P2P architecture, local-first design, and integration patterns.
+
+**Considerations:**
+- Requires Bare runtime compatibility
+- P2P layer implementation needed
+- Integration patterns with existing tools
+- Device ecosystem support
+
+**Next Steps:**
+- Assess during Product 5 (Dependency & Priority Analysis)
+- May become exploration project or feature development project
+- Dependencies on core platform capabilities
+
+---
+
+### CIP-004: Splectrum Core - AI Tooling Platform
+
+**Type:** Feature/Platform
+**Status:** Captured
+**Priority:** TBD (to be assessed during dependency analysis)
+**Source:** Existing in PRINCIPLES.md
+**Date Captured:** 2025-11-10
+
+**Description:**
+Develop Splectrum as platform for Claude's task automation and problem-solving:
+- Platform for creating task-optimized DSLs
+- Claude decides what tooling is needed
+- Growing library of reusable components
+- DSL creation for task-specific languages
+
+**Rationale:**
+Primary purpose of SPL2 - enabling AI to create and use custom tooling. DSL engine for building layers of APIs that compose into optimal solutions.
+
+**Considerations:**
+- What DSL capabilities are needed?
+- How does Claude discover and use tools?
+- Component library structure and reusability
+- Balance between flexibility and usability
+
+**Next Steps:**
+- Assess during Product 5 (Dependency & Priority Analysis)
+- Likely multiple exploration projects needed
+- Core platform work before applications
+
+---
+
 ## Implemented CIPs
 
 *(None yet)*

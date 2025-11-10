@@ -1,23 +1,20 @@
+**Requirements:** See `projects/01-preliminary-to-workplan/Principles_requirements_v1.0.0.md`
+
 # SPL2 Core Principles
 
-## What is Splectrum/SPL2?
+## What is Splectrum?
 
-**Splectrum (SPL2)** is Claude's central tooling platform - a DSL engine for creating task-optimized languages and tools. It enables building P2P applications using AI-friendly, composable APIs with complete audit trails.
+**Splectrum (SPL2)** is a platform that allows AI to create and manage software solutions with a focus on P2P applications.
 
-**Core concept:** Platform for creating layers of APIs that compose into optimal DSLs for solving problems.
+**Architecture:** DSL engine for creating task-optimized languages and composable APIs.
 
-## Primary Goals
+**Goals:** Simplest implementation, complete output, AI-friendly design.
 
-1. **Simplest Implementation** - No unnecessary complexity, clear straightforward code
-2. **Complete Output** - All data and metadata captured in raw form, fully accessible
-3. **AI-Friendly Design** - Maximum implementation freedom, optimized for AI discovery and use
+**Approach:** Start simple, validate with code, iterate based on evidence.
 
-## Core Principles
+**Detail emerges through exploration** - see individual exploration project findings.
 
-**Minimal and Complete:**
-- Code is simplest implementation that passes tests
-- Captures sufficient metadata to reconstruct what happened (initial state, executed code, input, output, logging, external dependencies)
-- Core provides raw materials, separate tools process them (lazy functional approach)
+## Design Principles
 
 **Stateless with State Backing:**
 - Code itself is stateless (no internal state)
@@ -31,68 +28,34 @@
 - Complete history preserved, transitions replayable
 - Event sourcing naturally
 
-**Exploration + Evidence (Core Pillars):**
-- Exploration: Sprint-sized projects, iterate before committing, discover through doing
-- Evidence: Real implementations validate decisions (not theory or planning)
-- Exploration projects produce: deliverables + evidence + methodology + foundation updates
-- Every significant decision backed by evidence from actual use
-- See: `projects/01-preliminary-to-workplan/LESSONS_LEARNED.md` for validation
+**Detail:** See `projects/02-initial-workplan/Data_architecture_v1.0.0.md` for Kafka-compatible records, process structure, and lazy functional approach
+
+**DSL Engine & API Pipelining:** See `projects/02-initial-workplan/DSL_engine_v1.0.0.md` and `projects/02-initial-workplan/API_pipelining_v1.0.0.md` for architecture vision
 
 ## Technology Stack
 
-**Data & Schema:**
+**Kafka Compatibility / Streaming Architecture:**
 - Kafka-compatible record format (all data follows this structure)
-- AVRO defines all schemas (client and server)
 - Immutable records (write once, never modify)
 - Streaming architecture at heart
+
+**AVRO for Schema and RPC:**
+- AVRO defines all schemas (client and server)
+- AVRO RPC for client-server communication
 
 **Code & Runtime:**
 - JavaScript everywhere (isomorphic - runs client and server)
 - Bare runtime for P2P (Pear platform)
 - Can develop in Node.js if Bare-compatible
 
+**Detail:** See `projects/02-initial-workplan/Pear_platform_v1.0.0.md` for Bare runtime and P2P characteristics
+
 **UI:**
 - React for all interfaces
 - PWA for mobile support
 - Stateless components, immutable data flow
 
-**Communication:**
-- AVRO RPC for client-server communication
-- Abstract integration patterns (not tool-specific)
-
-**AI Freedom:**
-- AI decides what runs where (client vs server)
-- AI chooses implementation approaches within constraints
-
-## Primary Use Cases
-
-**Splectrum Core: AI Tooling**
-- Platform for Claude's task automation and problem-solving
-- Claude decides what tooling is needed
-- Growing library of reusable components
-- DSL creation for task-specific languages
-
-**Initial P2P Application: Home Automation**
-- Self-contained P2P network (PCs, tablets, mobile, servers)
-- Local-first, no cloud dependency
-- Conventional distributed apps on P2P infrastructure
-- Integration with existing tools (Home Assistant, etc.)
-
-## Design Philosophy
-
-**Do:**
-- Start from scratch, design for the goal
-- Choose simplest approach that works
-- Complete over clever
-- Explore and validate with code
-
-**Don't:**
-- Over-engineer or optimize prematurely
-- Add features not in requirements
-- Carry over unnecessary complexity
-- Create documentation without code validation
-
-## Tooling Stack (Validated)
+## Technology Constraints - Tooling Stack (Validated)
 
 **Testing - PROVEN in product-poc prototypes:**
 - **Unit/Integration:** Vitest (fast, excellent DX, 194+ tests validated)
@@ -122,6 +85,4 @@
 - P2P layer tooling (may differ from application layer)
 - Code formatting standards
 
-## Quality Standard
-
-"Good enough" (PRINCE2) - fit for purpose, enables work, can improve through usage.
+**Detail:** See `projects/02-initial-workplan/Technology_validation_v1.0.0.md` for full validation results from product-poc prototypes

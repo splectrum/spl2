@@ -112,6 +112,35 @@
 
 ---
 
+### R06: AI Falls into Execution Mode Instead of Collaborative Discovery
+
+**Identified:** 2025-11-08
+**Probability:** Medium
+**Impact:** High
+
+**Description:** Explorative projects, especially those touching WOW and foundations, require tight collaboration for creative cross-pollination. Risk of AI falling into autonomous execution mode instead of collaborative discovery. This loses the key benefit: maximizing creative output through human-AI collaboration and kindling new ideas together.
+
+**Why it matters:**
+- Explorative work needs collaborative discovery, not solo execution
+- Cross-pollination between human and AI IS the methodology
+- AI creative interventions are as important as human ones
+- Completeness and minimal principles safeguard creative freedom within boundaries
+- Working alone misses opportunities for better solutions
+
+**Mitigation:**
+- AI asks questions and proposes options rather than executing alone
+- Present multiple approaches for discussion
+- Seek human intuition and ideas before proceeding
+- Document collaborative insights in DAILY_LOG
+- Remember: exploration = discovery together, not delivery alone
+
+**Status:** Active - critical throughout all explorative work
+
+**Updates:**
+- 2025-11-08: Risk identified when AI started to execute Foundation Analysis alone. Caught early and corrected to collaborative approach.
+
+---
+
 ## Closed Risks
 
 *(None yet)*

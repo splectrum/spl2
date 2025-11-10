@@ -27,4 +27,39 @@ Project log capturing decisions, issues, and lessons as they emerge.
 
 ---
 
+## 2025-11-10
+
+**Methodology Discovery:** Artifact-to-Requirements Pinning Pattern
+
+**What we discovered:**
+Each artifact type needs its own versioned requirements document. Artifacts reference the requirements version active when created. This prevents forced upgrades and maintains quality assessment over time.
+
+**Pattern:**
+1. Each artifact type has versioned requirements (e.g., WOW_requirements_v1.0.0.md)
+2. **Artifacts reference their requirements as mandatory first line**
+3. Requirements evolve independently of artifacts
+4. Artifacts only judged against their referenced requirements
+5. No forced upgrades - only upgrade artifact when deliberately choosing new requirements
+6. Without requirements reference, no way to assess artifact quality
+
+**Implementation:**
+- Created WOW_requirements_v1.0.0.md (requirements for WOW.md)
+- Created Principles_requirements_v1.0.0.md (requirements for PRINCIPLES.md)
+- Both in projects/01-preliminary-to-workplan/ (where they were created)
+- WOW.md references WOW_requirements_v1.0.0.md
+- PRINCIPLES.md references Principles_requirements_v1.0.0.md
+
+**Why it matters:**
+- TDC principle: artifacts need requirements to define "done"
+- Versioning enables evolution without breaking existing artifacts
+- Clear quality assessment at any point in time
+- Preserves validity of older artifacts against their requirements
+
+**Application going forward:**
+- All artifacts should reference their requirements document
+- Requirements documents are versioned and live in project folders
+- Artifact validity is always relative to its referenced requirements
+
+---
+
 *Entries will be added as work progresses*
