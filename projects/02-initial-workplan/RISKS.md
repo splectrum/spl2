@@ -141,6 +141,44 @@
 
 ---
 
+### R07: Tendency to Over-Engineer
+
+**Identified:** 2025-11-10
+**Probability:** High
+**Impact:** Medium
+
+**Description:** Throughout Project 02, consistent pattern of over-engineering emerged. We add structure, tests, documentation, and complexity before validating it's needed. Examples: elaborate validation frameworks, premature product types, unnecessary templates, excessive detail. Don't yet understand "minimal but complete" in practice - tendency is to build more than necessary.
+
+**Why it matters:**
+- Wastes effort on unnecessary work
+- Creates maintenance burden
+- Obscures what actually matters
+- Contradicts "minimal and complete" core principle
+- Slows down progress with premature optimization
+
+**Pattern observed:**
+- Foundation analysis: Too much detail initially
+- Twin Pair 2: Planned but unnecessary (skipped)
+- Backlog requirements: 8 tests → simplified to 2
+- Twin Pair 3 template: Thought we needed separate doc, requirements sufficient
+- Product types: Added prematurely
+
+**Mitigation:**
+- Question every addition: is this actually needed NOW?
+- Start minimal, add based on evidence (not speculation)
+- Trust "good enough" really is good enough
+- Catch ourselves when adding premature structure
+- Practice "comfort with imperfection"
+- Collaborative checkpoints: ask "are we over-engineering this?"
+- Evidence-based evolution: only add when pain is felt
+
+**Status:** Active - ongoing risk requiring active management
+
+**Updates:**
+- 2025-11-10: Risk identified after multiple instances during Project 02. Mindset change required. Added to lessons learned.
+
+---
+
 ## Closed Risks
 
 *(None yet)*

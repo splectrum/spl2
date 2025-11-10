@@ -4,13 +4,14 @@
 
 | Code | Name | Status | Started | Products |
 |------|------|--------|---------|----------|
-| 02-initial-workplan | Initial Workplan | Initiated | 2025-11-08 | 8 |
+| - | - | - | - | - |
 
 ## Completed Projects
 
 | Code | Name | Completed | Key Outcomes |
 |------|------|-----------|--------------|
 | 01-preliminary-to-workplan | Preliminary to Workplan | 2025-11-08 | Validated foundations, established PRINCE2+TDC methodology, bootstrap pattern |
+| 02-initial-workplan | Initial Workplan | 2025-11-10 | Simplified foundations, backlog structure with 9 projects, artifact-to-requirements pattern, minimal+complete practice guidance |
 
 ## Planned Projects
 
@@ -43,25 +44,36 @@
 ### 02-initial-workplan
 **Objective:** Create initial headline workplan for SPL2 development
 
-**Project Type:** Explorative Project (4 twin pairs: deliverable + template in parallel)
+**Project Type:** Explorative Project (4 twin pairs planned, adaptive execution)
 
-**Products:**
-1. Foundation Analysis & Restructuring
-2. Foundation Analysis Template
-3. Foundation Update Methodology
-4. Foundation Update Template
-5. Dependency & Priority Analysis
-6. Dependency & Priority Analysis Template
-7. Headline Workplan
-8. Workplan Template
+**Products Delivered:**
+1. Foundation Analysis & Restructuring ✅
+2. Foundation Analysis Template ✅
+3. ~~Foundation Update Methodology~~ (skipped - emerged naturally)
+4. ~~Foundation Update Template~~ (skipped - emerged naturally)
+5. Dependency & Priority Analysis ✅ (backlog with 9 projects)
+6. Dependency & Priority Analysis Template ✅ (built into requirements)
+7. ~~Headline Workplan~~ (redundant - BACKLOG.md serves this purpose)
+8. ~~Workplan Template~~ (redundant - BACKLOG.md serves this purpose)
 
-**Status:** Initiated - Ready to begin
+**Status:** Complete - 2 twin pairs delivered, 2 skipped as unnecessary
 
-**Key Characteristics:**
-- First full explorative project with multiple twin pairs
-- Parallel creation with cross-pollination between instance and pattern
-- Addresses Risk R03 from Project 01 (foundation drift)
-- Establishes foundation maintenance process
+**Key Outcomes:**
+- Foundations simplified to ~5KB (headline/detail separation)
+- Backlog structure with 9 projects (execution order, priorities, dependencies)
+- Artifact-to-requirements pinning pattern (mandatory for quality assessment)
+- Philosophy v1.1.0 (practicing minimal+complete with concrete guidance)
+- TDC v1.1.0 (artifact-to-requirements pattern documented)
+- PRINCE2 v1.1.0 (backlog artifacts added)
+
+**Key Learnings:**
+- Twin pair redundancy is feature, not bug (explorative methodology validates what's needed)
+- Over-engineering tendency requires active management (R07)
+- "Minimal and complete" understanding vs practice gap
+- Comfort with imperfection enables progress
+- Table format sufficient for dependency visibility (diagrams can wait)
+
+**See:** `projects/02-initial-workplan/LESSONS_LEARNED.md` for full details
 
 ---
 
