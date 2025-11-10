@@ -1,66 +1,77 @@
-# CLAUDE.md - SPL2 Project
+# CLAUDE.md - SPL2 Project Navigation
 
 ## Project Purpose
 
-SPL2 is a simplified, AI-friendly reimplementation of the SPL1 project. This is a clean restart designed to remove unnecessary internal implementation constraints while maintaining complete output data and metadata.
+SPL2 is a platform for AI to create and manage software solutions with a focus on P2P applications. Clean restart from spl1 - simplified, AI-optimized, with maximum freedom of implementation.
 
-## Core Principles
+## Start Here (New Session)
 
-**Primary Goals:**
-- **Simplest Implementation**: Remove overly complicated constraints on internal implementation
-- **Complete Output**: Ensure all output data and metadata is complete in raw form
-- **Maximum AI Freedom**: Allow AI maximal freedom of implementation choices
+**Understand how we work:**
+- Read `foundations/WOW.md` - Philosophy, PRINCE2, TDC methodologies
+- Read `foundations/PRINCIPLES.md` - What SPL2 is, design principles
 
-**Approach:**
-- Clean start from scratch (not a migration or refactor)
-- Reference spl1 archive only for proven good solutions
-- No legacy constraints or technical debt
-- AI-optimized structure and patterns
+**Understand current state:**
+- Read `projects/INDEX.md` - Completed projects and current status
+- Read `projects/BACKLOG.md` - Next work to do (9 projects with priorities)
+
+**Everything else references from these foundation documents.**
 
 ## Repository Structure
 
 ```
 spl2/
-├── archive/
-│   ├── spl1-docs/        # Reference: documentation from spl1
-│   └── spl1-spl-dev/     # Reference: implementation from spl1
-├── CLAUDE.md             # This file - operational guidance
-├── README.md             # Project overview
-└── [new implementation]  # To be designed based on user notes
+├── foundations/          # How we work (WOW) and what we build (PRINCIPLES)
+│   ├── WOW.md           # References versioned detail files in projects/
+│   └── PRINCIPLES.md    # References versioned detail files in projects/
+├── projects/            # All project work
+│   ├── INDEX.md         # Project status register
+│   ├── BACKLOG.md       # Work to do (with priorities/dependencies)
+│   ├── backlog/         # Individual backlog item details
+│   ├── 01-*/            # Completed project 01 with artifacts
+│   └── 02-*/            # Completed project 02 with artifacts
+├── archive/             # Reference: spl1 materials (legacy)
+├── CLAUDE.md            # This file - navigation guide
+└── README.md            # Project overview
 ```
 
-## Archive Contents
+## How Documentation Works
 
-The `archive/` folder contains reference materials from spl1:
-- **spl1-docs/**: All documentation, guides, and specifications from spl1
-- **spl1-spl-dev/**: Complete implementation code from spl1
+**Living documents pattern:**
+- Foundations (WOW.md, PRINCIPLES.md) are **headlines** - concise, stable
+- Detail files live in project folders - **versioned** (e.g., Philosophy_v1.1.0.md)
+- Foundations reference current version of detail files
+- Each project folder contains artifacts created during that project
+- All artifacts reference their requirements document (first line)
 
-**Important**: The archive is for reference only. Selectively adopt what worked well, but don't feel constrained by spl1's architecture or patterns.
+**Example:** WOW.md says "See Philosophy_v1.1.0.md for current philosophy" - that file lives in the project folder where it was created/evolved.
 
-## Next Steps
+## Key Patterns Established
 
-1. Review user's notes on new implementation approach (location TBD)
-2. Design minimal core structure based on requirements
-3. Implement with maximum freedom for AI decision-making
-4. Reference spl1 archive when specific proven solutions are needed
+**Artifact-to-requirements pinning:**
+- All artifacts reference their requirements version (first line)
+- Enables quality assessment and versioned evolution
+- See TDC_framework_v1.1.0.md for full pattern
 
-## Working in SPL2
+**Minimal and complete:**
+- Start minimal, add based on evidence
+- Over-engineering is ongoing risk (see Philosophy_v1.1.0.md)
+- Question every addition: is this needed NOW?
 
-- All work should be done in the spl2 repository
-- spl1 is legacy - refer to archive/ when needed
-- Focus on simplicity and AI-friendliness over matching spl1 patterns
-- Complete output/metadata is mandatory; implementation approach is flexible
+**Explorative projects:**
+- Discover through doing, not planning upfront
+- Twin pair pattern (deliverable + template in parallel)
+- Skip work when discovery reveals it's unnecessary
 
-## Context from Initial Conversation
+## Where to Find Things
 
-**User Requirements:**
-- Wants to recreate spl1 project but simplified and more AI-friendly
-- Finds spl1 overly complicated due to unnecessary internal constraints
-- Primary goal: Most simple implementation that is complete in terms of output data and metadata
-- Wants to allow AI maximal freedom of implementation
+**How we work:** `foundations/WOW.md` → references detail files
+**What we're building:** `foundations/PRINCIPLES.md` → references detail files
+**Project status:** `projects/INDEX.md`
+**Next work:** `projects/BACKLOG.md`
+**Completed project artifacts:** `projects/01-*/`, `projects/02-*/`
+**Lessons learned:** `projects/XX-*/LESSONS_LEARNED.md` in each project folder
+**Detailed methodology:** Follow references from WOW.md to versioned files
 
-**Decision Made:**
-- Created fresh spl2 repository
-- Archived spl1 materials for reference
-- Starting clean to avoid legacy baggage
-- Will define new structure based on user's design notes
+## Archive (Reference Only)
+
+`archive/spl1-docs/` and `archive/spl1-spl-dev/` contain legacy spl1 materials. Reference when specific proven solutions are needed, but don't feel constrained by spl1's architecture.
