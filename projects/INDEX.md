@@ -4,7 +4,7 @@
 
 | Code | Name | Status | Started | Products |
 |------|------|--------|---------|----------|
-| - | - | - | - | - |
+| 03-runtime-hello-world | Runtime Structure "Hello World" | Initiated | 2025-11-10 | 8 products in 4 twin pairs |
 
 ## Completed Projects
 
@@ -74,6 +74,29 @@
 - Table format sufficient for dependency visibility (diagrams can wait)
 
 **See:** `projects/02-initial-workplan/LESSONS_LEARNED.md` for full details
+
+### 03-runtime-hello-world
+**Objective:** Validate SPL2's core runtime execution model through minimal "hello world" implementation
+
+**Project Type:** Explorative Project (4 twin pairs)
+
+**Products:**
+1. Development Setup (Node.js environment) + Setup Template
+2. State-Backed API Implementation + API Design Template
+3. Runtime State Stack Implementation + Runtime Structure Template
+4. Working Hello World Code + Implementation Templates
+
+**Status:** Initiated - Project planning complete, ready to execute
+
+**Key Focus:**
+- Validate core architecture (invocation → context → pipeline → execution)
+- Prove state-backed APIs work in practice
+- Establish development patterns and templates
+- Critical path project - unlocks all downstream work
+
+**Risk:** HIGH - Architectural validation. If execution model doesn't work, pivot needed.
+
+**See:** `projects/03-runtime-hello-world/PROJECT_BRIEF.md` for full details
 
 ---
 

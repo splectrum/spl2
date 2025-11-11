@@ -1,0 +1,14 @@
+{
+  "name": "runtime-poc",
+  "version": "0.1.0",
+  "description": "SPL2 runtime structure proof of concept",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "teardown": "node scripts/teardown.js",
+    "validate": "node scripts/validate.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
