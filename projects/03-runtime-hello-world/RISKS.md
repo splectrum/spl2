@@ -186,6 +186,37 @@
 
 ---
 
+### R09: Lack of Glossary Tooling During Development
+
+**Identified:** 2025-11-11
+**Probability:** High
+**Impact:** Medium-High
+
+**Description:** Consistent vocabulary is foundational for SPL2 (semantic consistency, compositional reasoning, type safety, requirement generation). Without glossary management tooling, manual maintenance is error-prone and doesn't scale. Inconsistent naming established early becomes expensive to fix later. Risk of vocabulary drift, duplicate terms, schema mismatches across APIs.
+
+**Mitigation:**
+- Start manually managed glossary immediately in Project 03
+- Document glossary entries as APIs/methods/properties are created
+- Capture tooling requirements during manual use (pain points, needs)
+- Review glossary entries during collaborative check-ins
+- Enforce consistency through code review (temporary manual process)
+- Create high-priority CIP at project closure for glossary tooling
+- Tooling requirements: validation, enforcement, schema integration, requirement generation
+
+**Impact if not addressed:**
+- Vocabulary drift across APIs (same concept, different names)
+- Breaking changes required to fix inconsistencies later
+- Type safety compromised (mismatched schemas for "same" concept)
+- AI composition harder (ambiguous vocabulary)
+- Manual overhead increases with API count
+
+**Status:** Active - high priority, addressed through manual process until tooling exists
+
+**Updates:**
+- 2025-11-11: Risk identified during Twin Pair 4 planning. Recognized as foundational infrastructure gap. Manual glossary started, tooling deferred to CIP.
+
+---
+
 ## Resolved Risks
 
 _(None yet)_
@@ -196,10 +227,11 @@ _(None yet)_
 
 **Critical Risks:** 1 (R01 - core architecture)
 **High Risks:** 3 (R02, R03, R04)
+**Medium-High Risks:** 1 (R09 - glossary tooling)
 **Medium Risks:** 4 (R05, R06, R07, R08)
 
 **Overall Project Risk:** HIGH
 
 This is an architectural validation project - high risk is expected and appropriate. The risks are the point - we're discovering whether the architecture works.
 
-**Mitigation Strategy:** Incremental validation, fail fast, collaborative exploration, evidence-based decisions.
+**Mitigation Strategy:** Incremental validation, fail fast, collaborative exploration, evidence-based decisions, manual processes for infrastructure gaps.

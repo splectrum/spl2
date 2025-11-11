@@ -392,3 +392,370 @@ Every API method has three AVRO schema components:
 **Status:** API architecture comprehensive - ready for Twin Pair 2 implementation
 
 ---
+
+## 2025-11-11
+
+### Twin Pair 4: Implementation Planning Initiated
+
+**Decision:** Begin Twin Pair 4 (Hello World Implementation + Implementation Templates)
+**Context:** Twin Pairs 1-3 complete (deployment scripts, API design comprehensive documentation, runtime state stack design)
+**Approach:** Collaborative discussion-first to define execution model before implementation
+
+### Code Organization - Folder Structure
+
+**Decision:** Keep spl1's proven `[package]/[api]/[method]` hierarchy
+**Context:** Evaluating spl1 structure for spl2 - what to keep, what to improve
+**Rationale:** Three-level hierarchy proven, clean, predictable
+
+**Decision:** Use `_` prefix for auxiliary folders (not in method path)
+**Examples:** `_schemas/`, `_tests/`, `_help/`, `_lib/`
+**Rationale:** Clear separation - path items are invokable, `_` folders are resources
+
+**Decision:** camelCase for multi-word names (if needed)
+**Context:** `_` already used for `/` replacement in scripting contexts
+**Rationale:** Avoids ambiguity, AI-friendly for DSL generation, JavaScript standard
+**For Project 03:** Keep single words (`hello` not `helloWorld`) - simplicity
+
+**Decision:** Requirements at all levels (package/API/method)
+**Context:** Initially considered API-level only, recognized need for granularity
+**Rationale:** Single concern - each level has focused requirements, associated test suites at same level
+**Structure:** `requirements_v1.0.0.md` at package/, api/, and method/ levels
+**Code references:** `// Requirements: requirements_v1.0.0.md` (same folder)
+
+**Decision:** Auxiliary folders created as needed (minimal approach)
+**Rationale:** Start minimal, add structure when required during implementation
+**Pattern documented:** Full structure known, applied incrementally
+
+### API Structure and Naming
+
+**Decision:** Three APIs for hello world demonstration
+**APIs:**
+1. `spl/runtime` - Runtime Context API (infrastructure, will be deployed)
+2. `spl/execution` - Execution Context API (infrastructure, will be deployed)
+3. `pr03/hello` - Hello World API (internal evaluation only)
+
+**Decision:** `spl` package for core Splectrum infrastructure
+**Rationale:** Runtime and execution context are foundational infrastructure APIs
+
+**Decision:** `pr03` package for Project 03 evaluation code
+**Rationale:** Clear traceability - package tied to project that created it
+**Note:** Proper external-facing apps would use different package naming
+
+**Decision:** Full names over abbreviations (`runtime` not `rtctx`, `execution` not `exctx`)
+**Rationale:** Self-documenting, clear, emphasizes design over brevity
+
+**Method naming:**
+- `spl/runtime/run` - Initialize and run runtime context
+- `spl/execution/invoke` - Invoke a single method with context
+- `pr03/hello/greet` - Output hello world greeting
+
+### Method Execution Model Design - Refined to Single Parameter
+
+**Decision:** Single parameter signature with unified context object
+**Signature:**
+```javascript
+function method(context) {
+  return outputBag;
+}
+```
+
+**Evolution:** Started with three parameters (apiState, inputBag, context), refined to single context parameter for simplicity and extensibility
+
+**Context Structure:**
+```javascript
+context = {
+  apiState: {
+    get(path),      // Navigate hierarchical Kafka record with dot notation
+    set(path, value),
+    getKey(),
+    setKey(key),
+    getValue(),
+    setValue(data)
+  },
+  args: {
+    get(key)        // Access flat method arguments
+  },
+  runtime: {
+    get(path)       // Read-only hierarchical access to runtime state
+  },
+  execution: {
+    get(path)       // Read-only hierarchical access to execution state
+  }
+  // Future: data, security, logging, etc. - infinitely extensible
+}
+```
+
+**Key Design Decisions:**
+
+**Hierarchical Kafka Records:**
+- Full hierarchical structure for key/headers/value (not flat with dotted keys)
+- Headers stored as nested objects: `{ spl: { runtime: { version: "0.1.0" } } }`
+- Dot notation navigation: `get('spl.runtime.version')` returns `"0.1.0"`
+- Subtree access: `get('spl.runtime')` returns `{ version: "0.1.0", nodeVersion: "..." }`
+- AVRO/Kafka compatible (nested schemas supported)
+- Can transform to flat if needed, but hierarchy is native format
+
+**Generic Hierarchical Getter/Setter:**
+- One implementation works on any nested structure
+- Navigates object trees using dot notation
+- Filters by returning subtrees
+- Minimal overhead (function wrappers around record manipulation)
+
+**context.apiState (read/write):**
+- Full access to own API state Kafka record
+- Methods can get/set headers hierarchically
+- Can modify value, key as needed
+- Direct manipulation through generic accessor
+
+**context.args (read-only, flat):**
+- Method arguments from CLI or previous output
+- Flat JSON object: `{ version: '0.1.0', name: 'hello' }`
+- Access via `context.args.get('version')`
+- Simple key-value lookup
+
+**context.runtime / context.execution (read-only, hierarchical):**
+- Parent context state access
+- Hierarchical navigation like apiState
+- Read-only through getter interface
+- Controlled partial access (not full record exposure)
+
+**Access rules (critical architectural decision):**
+- **Own API state:** Full read/write via context.apiState getter/setter
+- **Parent contexts:** Read-only via context.runtime / context.execution getters
+- **Arguments:** Read-only via context.args getter
+- **Data layer:** Through dedicated API (future) for persistence abstraction
+
+**Benefits of Single Parameter:**
+- Ultimate simplicity - one parameter to pass
+- Uniform interface - everything accessed via get/set pattern
+- Infinitely extensible - add context.data, context.security without signature changes
+- Consistent semantics - clear read/write vs read-only boundaries
+- Clean for DSL generation - predictable access patterns
+
+**Rationale for no change archiving:**
+- During execution: Only keep what's needed for output (no history tracking)
+- On failure: Extract complete footprint (code + input + data + config) for reconstruction
+- Reconstruction: Replay request from scratch to see all intermediate states
+- Benefits: Simple, fast, complete when needed, clear boundaries
+
+**Data Layer API:**
+- Separate abstraction for persistence (Kafka-like: publish/consume + conventional methods)
+- MVP: Simple filesystem implementation
+- Future: Seamless access across different repositories (DB, cloud, etc.)
+- Not needed for hello world (deferred)
+
+**Execution Context Responsibilities:**
+- Store previous method output
+- Retrieve as input for next method
+- Merge with method-specific arguments
+- Validate type compatibility (AVRO schemas - future)
+- Provide ctx getter/setter abstractions
+- Orchestrate pipeline execution
+
+### Implementation Strategy - Three Steps
+
+**Decision:** Incremental validation approach
+**Context:** Prove execution model works through progressive complexity
+
+**Step 1: Runtime context only**
+- Standalone `spl/runtime/run` method
+- Create runtime record, initialize properties
+- Validate runtime structure works
+
+**Step 2: Runtime + execution context**
+- Add `spl/execution/invoke` method
+- Runtime invokes execution context
+- Prove nested structure (execution context record inside runtime value)
+- Validate two-layer stack
+
+**Step 3: Runtime + execution + hello world**
+- Add `pr03/hello/greet` method
+- Full three-layer pipeline
+- Execution context invokes application logic
+- Validate complete stack with cross-API flow
+
+**Rationale:** Minimal and complete - build complexity incrementally, validate at each step
+
+### Repo Management Strategy
+
+**Decision:** Embryonic development → single repo transition → full diversification
+
+**Current (Project 03):**
+- All APIs stay in spl2 repo within `runtime-poc/src/modules/`
+- Collaborative development space with cross-pollination
+- Fast iteration, evidence gathering
+
+**Future (explorative project):**
+- Single repo transition - extract proven APIs
+
+**Further future:**
+- Full diversification - each API in own repo
+- Template + tooling for API management
+- AI-managed automation
+- Single concern per repo
+
+**Rationale:**
+- APIs are elementary building blocks (standalone, independently managed)
+- Number of repos not a problem with automation
+- But prove patterns first before diversification complexity
+
+### Glossary Discovery - Critical Insight
+
+**Discovery:** Consistent vocabulary is foundational, not a future enhancement
+**Context:** Discussing common names across APIs, realized full architectural importance
+
+**Why Glossary is Critical:**
+1. **Semantic consistency** - Same concept = same name + same schema everywhere (e.g., "dir" always means directory)
+2. **Compositional reasoning** - AI/humans understand `tools/git/add` from vocabulary alone
+3. **Partial requirements generation** - Package + API + method names with glossary = baseline requirement automatically
+4. **Type safety foundation** - Glossary defines canonical schemas for composition validation
+5. **Day one critical** - Establishing vocabulary NOW prevents expensive renaming/migration later
+
+**Implication:** Glossary is high priority infrastructure, not nice-to-have
+
+**Decision:** Start manually managed glossary in Project 03
+- Manual maintenance for MVP (prove pattern)
+- Document glossary entries as we create APIs/methods/properties
+- Capture tooling requirements during use
+
+**Glossary Structure (4 columns):**
+1. **Term** - The vocabulary word
+2. **Type** - Package name | API name | Method name | Property name | Value type | Concept
+3. **Description** - What it means (semantic definition)
+4. **Requirement** - What it must do/be (behavioral contract)
+
+**Deferred columns (add at project closure if needed):**
+- **Schema reference** - Link to AVRO schema
+  - Reason: Many terms won't have schemas yet, creates placeholder maintenance overhead
+  - When: Add when schemas exist and pain points show need
+- **Examples** - Usage examples for clarity
+  - Reason: Valuable but optional, can add inline in description for now
+  - When: Add if evidence shows examples reduce confusion/errors
+
+**For Project Closure:**
+- Create high-priority CIP for glossary management tooling
+- Requirements: Validation, enforcement, schema integration, requirement generation
+- Assess deferred columns: Do we need schema references? Examples? Based on manual experience
+- Pattern: Prove manually, automate when proven valuable
+
+**Risk:** See R09 - Lack of glossary tooling during development
+
+### Skeleton Structure Created
+
+**Artifacts Created:**
+- Full `[package]/[api]/[method]` folder hierarchy
+- Package index.js at each level (spl, runtime, execution, pr03, hello)
+- Method implementations with standardized signature
+- Placeholder requirement references
+
+**Structure:**
+```
+modules/
+  spl/
+    index.js (package description)
+    runtime/
+      index.js (API description)
+      run/
+        index.js (method with signature)
+    execution/
+      index.js (API description)
+      invoke/
+        index.js (method with signature)
+  pr03/
+    index.js (package description)
+    hello/
+      index.js (API description)
+      greet/
+        index.js (method with signature)
+```
+
+**Amendment:** Method naming clarified
+- Changed `spl/execution/next` to `spl/execution/invoke`
+- Rationale: We're invoking a single method, not stepping through a pipeline
+- "invoke" is clearer and more accurate for MVP scope
+- Pipeline orchestration ("next") is future enhancement
+
+### Production Code Logging Strategy
+
+**Decision:** Only log what could lead to runtime action
+**Context:** Reconstruction capability means we don't need verbose execution logging
+
+**Production methods:**
+- Silent unless error (no console.log for normal operation)
+- Only throw/log actual errors with useful detail
+- No anticipation of future logging needs
+- Add logging when evidence shows need
+
+**MVP error handling:**
+- Bomb out with error details (throw immediately)
+- No try/catch sophistication, no error recovery, no error routing
+- Let errors propagate and kill execution
+- Error message contains useful detail
+
+**Evaluation scripts (separate from production):**
+- Verbose console.log to prove execution and show state
+- Not production code - validation only
+
+**Rationale:** Minimal and complete - state captured in records for reconstruction, only log actionable information
+
+### Bug Report Infrastructure - Critical Gap Identified
+
+**Discovery:** On error, need automated bug report generation with complete footprint
+**Context:** Architecture relies on reconstruction rather than archiving during execution
+
+**Bug report must capture:**
+- Exact code footprint (all artifact versions/GUIDs that executed)
+- Complete input (all arguments, previous output)
+- Full state (runtime/execution/API records at failure point)
+- Environment (Node version, system info)
+- Error details (stack trace, error message)
+- Enables: Exact reproduction of failure scenario
+
+**Decision:** High-priority infrastructure deliverable
+- Critical for architecture to work (without archiving, need reconstruction)
+- Enables debugging via replay instead of log mining
+- Required before production use
+
+**For Project Closure:**
+- Create high-priority backlog item or CIP for bug report infrastructure
+- Requirements: Automatic capture on error, complete footprint extraction, reproduction package generation
+- This is foundational - not optional enhancement
+
+### Module Resolution - Convention-Based Dynamic Loading
+
+**Decision:** Implement simple module resolver based on spl1 pattern
+**Context:** execution/invoke needs to dynamically load and call methods by path
+
+**SPL2 Module Resolver:**
+- Convention-based: `modulePath` → `{modulesBasePath}/{package}/{api}/{method}/index.js`
+- Example: "spl/runtime/run" → "{basePath}/spl/runtime/run/index.js"
+- Dynamic ES module import with path validation
+- Returns resolution metadata (path, module, error)
+- `invokeMethod(methodPath, context, modulesBasePath)` - resolve and invoke in one call
+
+**modulesBasePath Bootstrap:**
+- Passed at initialization (can't rely on runtime context - chicken/egg problem)
+- Evaluation scripts construct basePath from their location
+- Execution context receives basePath at creation
+
+**MVP Scope:**
+- Single resolution path: global modules folder only
+- No app overlay yet (future enhancement)
+
+**App Overlay Pattern (Deferred):**
+From spl1 - valuable pattern for future implementation:
+- Resolution order: Try `apps/{app}/modules/` first, then global `modules/`
+- App overlay purpose:
+  - Work on modules in app context without touching global install
+  - Selective override for debugging (app-specific version shadows global)
+  - Development workflow: Standard install + work-in-progress in app overlay
+- Context switching: Modules in global folder run in install context, app folder run in app context
+- Benefits: Safe experimentation, module development without install disruption
+
+**For Project Closure:**
+- Create CIP for app overlay implementation
+- Requirements: Two-tier resolution (app → global), context determination, development workflow support
+
+**Next:** Define glossary entries, implement Step 1 (runtime/run)
+
+---

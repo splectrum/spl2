@@ -6,7 +6,10 @@
   "scripts": {
     "build": "node scripts/build.js",
     "teardown": "node scripts/teardown.js",
-    "validate": "node scripts/validate.js"
+    "validate": "node scripts/validate.js",
+    "hello:runtime": "node src/helloRuntime.js",
+    "hello:execution": "node src/helloExecution.js",
+    "hello:world": "node src/helloWorld.js"
   },
   "engines": {
     "node": ">=18.0.0"
