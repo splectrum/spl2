@@ -9,10 +9,11 @@ SPL2 is a platform for AI to create and manage software solutions with a focus o
 **Understand how we work:**
 - Read `foundations/WOW.md` - Philosophy, PRINCE2, TDC methodologies
 - Read `foundations/PRINCIPLES.md` - What SPL2 is, design principles
+- Read `foundations/PARTNERSHIP.md` - Partnership health, collaboration patterns, friction metric
 
 **Understand current state:**
-- Read `projects/INDEX.md` - Completed projects and current status
-- Read `projects/BACKLOG.md` - Next work to do (9 projects with priorities)
+- Read `projects/INDEX.md` - Completed projects and current status (3 complete, 1 active)
+- Read `projects/BACKLOG.md` - Next work to do (10+ projects with priorities)
 
 **Everything else references from these foundation documents.**
 
@@ -22,13 +23,17 @@ SPL2 is a platform for AI to create and manage software solutions with a focus o
 spl2/
 ├── foundations/          # How we work (WOW) and what we build (PRINCIPLES)
 │   ├── WOW.md           # References versioned detail files in projects/
-│   └── PRINCIPLES.md    # References versioned detail files in projects/
+│   ├── PRINCIPLES.md    # References versioned detail files in projects/
+│   └── PARTNERSHIP.md   # Partnership health, collaboration patterns (headline)
 ├── projects/            # All project work
 │   ├── INDEX.md         # Project status register
 │   ├── BACKLOG.md       # Work to do (with priorities/dependencies)
 │   ├── backlog/         # Individual backlog item details
-│   ├── 01-*/            # Completed project 01 with artifacts
-│   └── 02-*/            # Completed project 02 with artifacts
+│   ├── project-types/   # Project type requirements (Explorative, etc.)
+│   ├── 01-*/            # Completed: Preliminary to Workplan
+│   ├── 02-*/            # Completed: Initial Workplan
+│   ├── 03-*/            # Completed: Runtime Structure Hello World
+│   └── 04-*/            # Active: Bare Runtime Hello World
 ├── archive/             # Reference: spl1 materials (legacy)
 ├── CLAUDE.md            # This file - navigation guide
 └── README.md            # Project overview
@@ -62,14 +67,24 @@ spl2/
 - Twin pair pattern (deliverable + template in parallel)
 - Skip work when discovery reveals it's unnecessary
 
+**Partnership reflection:**
+- Mandatory at project closure (PRINCE2_operational_v1.2.0)
+- Three artifacts: Reflection (AI), Review (collaborative), Foundation doc (current state)
+- Purpose: Surface misunderstandings, align understanding, reduce friction
+- Primary metric: Friction level (technical + emotional)
+
 ## Where to Find Things
 
 **How we work:** `foundations/WOW.md` → references detail files
 **What we're building:** `foundations/PRINCIPLES.md` → references detail files
-**Project status:** `projects/INDEX.md`
-**Next work:** `projects/BACKLOG.md`
-**Completed project artifacts:** `projects/01-*/`, `projects/02-*/`
+**Partnership health:** `foundations/PARTNERSHIP.md` → current state, friction metric, patches
+**Project status:** `projects/INDEX.md` (3 complete, 1 active)
+**Next work:** `projects/BACKLOG.md` (10+ projects)
+**Completed project artifacts:** `projects/01-*/`, `projects/02-*/`, `projects/03-*/`
+**Active project:** `projects/04-bare-runtime-hello-world/`
 **Lessons learned:** `projects/XX-*/LESSONS_LEARNED.md` in each project folder
+**Partnership reflections:** `projects/XX-*/PARTNERSHIP_REFLECTION*.md` at project closures
+**Project types:** `projects/project-types/` (Explorative, etc.)
 **Detailed methodology:** Follow references from WOW.md to versioned files
 
 ## Archive (Reference Only)
