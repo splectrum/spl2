@@ -1,4 +1,5 @@
 Requirements: ../project-types/Explorative_project_requirements_v1.0.0.md
+Requirements: projects/03-runtime-hello-world/PRINCE2_operational_v1.2.0.md
 
 # Project Brief: Bare Runtime Hello World
 

@@ -24,7 +24,7 @@ We use **PRINCE2 for our agile way of working** (instead of traditional agile/sp
 
 **Quality approach:** PRINCE2 products use TDC validation criteria to define "done"
 
-**Current implementation:** See `projects/02-initial-workplan/PRINCE2_operational_v1.1.0.md`
+**Current implementation:** See `projects/03-runtime-hello-world/PRINCE2_operational_v1.2.0.md`
 
 ## Methodology: TDC (Test Driven Creation)
 

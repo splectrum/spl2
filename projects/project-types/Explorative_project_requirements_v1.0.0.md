@@ -116,11 +116,28 @@ An Explorative Project succeeds when:
 
 ---
 
+## Base Requirements
+
+This document **extends** PRINCE2_operational (base project management requirements) with additional requirements specific to explorative projects.
+
+**Inheritance Pattern:**
+- All PRINCE2_operational requirements apply (project lifecycle, artifacts, closure process)
+- This document adds: collaboration mode (COLLABORATIVE), twin pair methodology, explorative-specific success criteria
+- Where this document specifies additional constraints, those constraints are **in addition to** PRINCE2 base requirements (not conflicting)
+- Example: PROJECT_BRIEF must have products (PRINCE2) AND twin pair structure (Explorative)
+
+**Referenced at Project Initiation:**
+- PROJECT_BRIEF.md must reference this document (first line): `Requirements: ../project-types/Explorative_project_requirements_v1.0.0.md`
+- PROJECT_BRIEF.md must also reference PRINCE2_operational (second line)
+- Dual requirements pattern enables quality assessment
+
+---
+
 ## Related Artifacts
 
-- Philosophy: Minimal and complete, evidence-based evolution
-- PRINCE2_operational: Project planning and execution
-- TDC_framework: Artifact-to-requirements pinning
+- PRINCE2_operational_v1.2.0: Base project management requirements (extended by this document)
+- Philosophy_v1.1.0: Minimal and complete, evidence-based evolution
+- TDC_framework_v1.1.0: Artifact-to-requirements pinning
 
 ---
 
