@@ -24,8 +24,18 @@ spl2/
 ├── foundations/          # How we work (WOW) and what we build (PRINCIPLES)
 │   ├── WOW.md           # References versioned detail files in projects/
 │   ├── PRINCIPLES.md    # References versioned detail files in projects/
-│   └── PARTNERSHIP.md   # Partnership health, collaboration patterns (headline)
-├── projects/            # All project work
+│   ├── PARTNERSHIP.md   # Partnership health, collaboration patterns (headline)
+│   └── *_CHANGELOG.md   # Track changes to mutable foundation documents
+├── chats/               # Informal collaborative work captures
+│   ├── YYYY-MM-DD_*.md  # Chat captures (sufficient and complete pattern)
+│   ├── CHAT_REQUIREMENTS_v1.0.0.md  # How chat capture works
+│   └── immutables/      # Adhoc-created versioned artifacts (requirements, designs)
+├── glossary/            # Context-specific terminology
+│   ├── DSL_GLOSSARY.md  # Runtime/API vocabulary (mutable, with CHANGELOG)
+│   ├── STEPPING_STONES_GLOSSARY.md  # Foundation concepts (mutable, with CHANGELOG)
+│   ├── SPOTS_GLOSSARY.md  # Repository structure terms (mutable, with CHANGELOG)
+│   └── *_CHANGELOG.md   # Track changes to glossaries
+├── projects/            # All formal project work
 │   ├── INDEX.md         # Project status register
 │   ├── BACKLOG.md       # Work to do (with priorities/dependencies)
 │   ├── backlog/         # Individual backlog item details
@@ -41,31 +51,36 @@ spl2/
 
 ## How Documentation Works
 
-**Living documents pattern:**
-- Foundations (WOW.md, PRINCIPLES.md) are **headlines** - concise, stable
-- Detail files live in project folders - **versioned** (e.g., Philosophy_v1.1.0.md)
-- Foundations reference current version of detail files
-- Each project folder contains artifacts created during that project
+**Mutable-immutable dualism:**
+- **Mutable entry points** (foundations/, glossary/) - Always "current", unversioned names, protected by CHANGELOGs
+- **Immutable artifacts** (projects/, chats/immutables/) - Versioned, never change, referenceable
+- Entry points branch to standalone immutables in version jackets
+
+**Pattern:**
+- Foundations (WOW.md, PRINCIPLES.md, PARTNERSHIP.md) are **headlines** - concise, mutable, with CHANGELOGs
+- Detail files live in project folders - **versioned immutables** (e.g., Philosophy_v1.1.0.md)
+- Glossaries (DSL, Stepping Stones, Spots) are **mutable** - always current, with CHANGELOGs tracking evolution
+- Requirements are **immutable** - versioned in projects/ (formal work) or chats/immutables/ (adhoc work)
 - All artifacts reference their requirements document (first line)
 
-**Example:** WOW.md says "See Philosophy_v1.1.0.md for current philosophy" - that file lives in the project folder where it was created/evolved.
+**Example:** WOW.md (mutable) references Philosophy_v1.1.0.md (immutable) - that versioned file lives in the project folder where it was created/evolved.
 
 ## Key Patterns Established
 
-**Artifact-to-requirements pinning:**
-- All artifacts reference their requirements version (first line)
-- Enables quality assessment and versioned evolution
-- See TDC_framework_v1.1.0.md for full pattern
+**Stepping stones (navigational concepts):**
+- Journey metaphor: patterns encountered repeatedly throughout work
+- Same stones appear at different decision points - choose which to step on based on context
+- See STEPPING_STONES_GLOSSARY.md for full list (minimal and complete, artifact-to-requirements pinning, duality pattern, fire and forget, sufficient and complete, twin pair methodology, etc.)
 
-**Minimal and complete:**
-- Start minimal, add based on evidence
-- Over-engineering is ongoing risk (see Philosophy_v1.1.0.md)
-- Question every addition: is this needed NOW?
+**Activity types (change management):**
+- **Adhoc activity:** Informal "chat while we work"; artifacts in chats/ or chats/immutables/
+- **Unplanned activity:** Project closure maintenance; emerged during work; artifacts in projects/
+- **Planned activity:** Formal backlog items; known work; artifacts in projects/
 
-**Explorative projects:**
-- Discover through doing, not planning upfront
-- Twin pair pattern (deliverable + template in parallel)
-- Skip work when discovery reveals it's unnecessary
+**Mutable-immutable dualism:**
+- Mutable entry points (foundations, glossaries) protected by CHANGELOGs
+- Immutable artifacts (requirements, detail files) in version jackets
+- Solves findability vs traceability tension
 
 **Partnership reflection:**
 - Mandatory at project closure (PRINCE2_operational_v1.2.0)
@@ -78,8 +93,11 @@ spl2/
 **How we work:** `foundations/WOW.md` → references detail files
 **What we're building:** `foundations/PRINCIPLES.md` → references detail files
 **Partnership health:** `foundations/PARTNERSHIP.md` → current state, friction metric, patches
+**Terminology:** `glossary/` - DSL_GLOSSARY.md (runtime/API terms), STEPPING_STONES_GLOSSARY.md (foundation concepts), SPOTS_GLOSSARY.md (repository structure)
+**Chat captures:** `chats/` - informal collaborative work discussions, discoveries, decisions
+**Adhoc requirements:** `chats/immutables/` - versioned artifacts created during informal work
 **Project status:** `projects/INDEX.md` (3 complete, 1 active)
-**Next work:** `projects/BACKLOG.md` (10+ projects)
+**Next work:** `projects/BACKLOG.md` (11 projects now, including glossary-term-requirements)
 **Completed project artifacts:** `projects/01-*/`, `projects/02-*/`, `projects/03-*/`
 **Active project:** `projects/04-bare-runtime-hello-world/`
 **Lessons learned:** `projects/XX-*/LESSONS_LEARNED.md` in each project folder
