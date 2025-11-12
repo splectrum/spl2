@@ -1,3 +1,5 @@
+Requirements: ../project-types/Explorative_project_requirements_v1.0.0.md
+
 # Project Brief: Runtime Structure "Hello World"
 
 **Project Code:** 03-runtime-hello-world

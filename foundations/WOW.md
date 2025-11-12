@@ -33,3 +33,22 @@ We use **TDC to define quality and validate all deliverables** (code, documentat
 **Core concept:** Define what "done" means → Create artifact → Validate → Iterate until passes
 
 **Current implementation:** See `projects/02-initial-workplan/TDC_framework_v1.1.0.md`
+
+## Local Rules Apply
+
+**Artifacts satisfy their own requirements (version at time of creation). No retroactive burden.**
+
+**Detailed guidance:** See `projects/03-runtime-hello-world/Local_rules_apply_v1.0.0.md`
+
+## General Guidance
+
+**Consult requirements documents for WOW guidance.**
+
+Requirements documents may contain specific WOW guidance for their artifact type:
+- **Project types** specify collaboration mode, methodology patterns, success criteria
+- **Product types** may specify creation processes, validation approaches
+- **Deliverable types** may include tooling, format, quality standards
+
+**Example:** Explorative Project requirements specify collaborative mode (human + AI planning together) and twin pair methodology.
+
+**Pattern:** When starting work on any artifact, check if its requirements document provides WOW guidance beyond just acceptance criteria.

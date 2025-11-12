@@ -4,7 +4,7 @@
 
 | Code | Name | Status | Started | Products |
 |------|------|--------|---------|----------|
-| 03-runtime-hello-world | Runtime Structure "Hello World" | Initiated | 2025-11-10 | 8 products in 4 twin pairs |
+| 04-bare-runtime-hello-world | Bare Runtime Hello World | Initiated | 2025-11-12 | 2 products |
 
 ## Completed Projects
 
@@ -12,6 +12,7 @@
 |------|------|-----------|--------------|
 | 01-preliminary-to-workplan | Preliminary to Workplan | 2025-11-08 | Validated foundations, established PRINCE2+TDC methodology, bootstrap pattern |
 | 02-initial-workplan | Initial Workplan | 2025-11-10 | Simplified foundations, backlog structure with 9 projects, artifact-to-requirements pattern, minimal+complete practice guidance |
+| 03-runtime-hello-world | Runtime Structure "Hello World" | 2025-11-12 | Core architecture validated, single-parameter method signature, platform abstraction, glossary discovery, MVP+End Vision pattern, Local Rules Apply generality |
 
 ## Planned Projects
 
@@ -80,23 +81,68 @@
 
 **Project Type:** Explorative Project (4 twin pairs)
 
-**Products:**
-1. Development Setup (Node.js environment) + Setup Template
-2. State-Backed API Implementation + API Design Template
-3. Runtime State Stack Implementation + Runtime Structure Template
-4. Working Hello World Code + Implementation Templates
+**Products Delivered:**
+1. Twin Pair 1: Development Setup (deployment scripts) + Deployment Template ✅
+2. Twin Pairs 2-4: Comprehensive API Design Documentation ✅ (merged conceptually)
+3. Platform abstraction implementation ✅
+4. Module resolution (convention-based) ✅
 
-**Status:** Initiated - Project planning complete, ready to execute
+**Status:** Complete - Core architecture validated, extensive documentation created
+
+**Key Outcomes:**
+- **Core architecture validated:** Single-parameter method signature with hierarchical context, proven execution model
+- **Platform abstraction:** Pure methods with auxiliary libraries pattern established
+- **API architecture comprehensive:** API_DESIGN.md documents MVP (three-layer structure, state backing, CLI invocation)
+- **Glossary discovery:** Two glossaries needed (methodology concepts + API vocabulary) - foundational infrastructure
+- **Method execution model:** Single context parameter, hierarchical Kafka records, access rules defined
+- **MVP + End Vision pattern:** Build practical MVP, capture architectural vision, migrate when capacity/evidence exists
+- **Local Rules Apply generality:** Fundamental TDC principle for ALL artifacts, not just projects
+- **Embryonic → Mature pattern:** Systems evolve through stages (embryonic, transitional, mature)
+
+**Key Learnings:**
+- Local Rules Apply more general than initially recognized (fundamental TDC principle)
+- Glossary is critical from day one (semantic consistency, compositional reasoning)
+- Reconstruction-over-archiving requires bug report infrastructure (foundational)
+- MVP + End Vision balances pragmatism with architectural integrity
+- Over-engineering tendency requires ongoing vigilance (Risk R05)
+- Platform abstraction from start enables portability
+
+**Backlog Updates:**
+- Added: Bug Report Infrastructure (high priority explorative project)
+- Added: Foundation Update & Documentation Templates (highest priority)
+- Added: Import Resolution Experiment (addon to Bare Runtime Hello World)
+- Updated: CIP Register with 4 new items (CIP-005 to CIP-008)
+
+**See:** `projects/03-runtime-hello-world/LESSONS_LEARNED.md` for comprehensive synthesis (28 lessons)
+
+### 04-bare-runtime-hello-world
+**Objective:** Validate Bare platform basics through simplest possible implementation
+
+**Project Type:** Explorative Project (Small - 3-5 days)
+
+**Products:**
+1. Working Bare Hello World
+2. Bare Platform Familiarization Documentation
+
+**Status:** Initiated - Project brief created, ready to execute
 
 **Key Focus:**
-- Validate core architecture (invocation → context → pipeline → execution)
-- Prove state-backed APIs work in practice
-- Establish development patterns and templates
-- Critical path project - unlocks all downstream work
+- Bare installation and setup
+- Basic execution (console, file I/O)
+- Library landscape survey
+- Development workflow
+- Platform viability validation
 
-**Risk:** HIGH - Architectural validation. If execution model doesn't work, pivot needed.
+**Why Critical:**
+- Platform viability validation before deeper investment
+- Discover showstoppers early
+- Foundation for Bare Runtime Compatibility deep dive
+- Required for Bare-based architecture confidence
 
-**See:** `projects/03-runtime-hello-world/PROJECT_BRIEF.md` for full details
+**Project Addon:**
+- Import Resolution Experiment (compare package aliases vs importModule function in Bare context)
+
+**See:** `projects/04-bare-runtime-hello-world/PROJECT_BRIEF.md` for full details
 
 ---
 

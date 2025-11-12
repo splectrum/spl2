@@ -9,7 +9,7 @@
  */
 
 import { execSync } from 'child_process';
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
 
 // ANSI colors for output
 const colors = {
@@ -62,6 +62,54 @@ function installDependencies() {
   }
 }
 
+function setupModuleAliases() {
+  log('\n[BUILD] Setting up module aliases...', 'blue');
+
+  // Ensure node_modules exists
+  if (!existsSync('node_modules')) {
+    mkdirSync('node_modules');
+  }
+
+  // Define module aliases (clean names -> actual paths)
+  const aliases = {
+    'spl_utils': '../../src/modules/spl/_utils/index.js',
+    'spl_context': '../../src/modules/spl/_context/index.js'
+  };
+
+  try {
+    for (const [name, targetPath] of Object.entries(aliases)) {
+      const packageDir = `node_modules/${name}`;
+
+      // Create package directory
+      if (!existsSync(packageDir)) {
+        mkdirSync(packageDir, { recursive: true });
+      }
+
+      // Create package.json
+      const packageJson = {
+        name: name,
+        version: '1.0.0',
+        type: 'module',
+        main: './index.js',
+        exports: './index.js'
+      };
+      writeFileSync(`${packageDir}/package.json`, JSON.stringify(packageJson, null, 2));
+
+      // Create index.js that re-exports from actual location
+      const indexContent = `// Re-export from actual location\nexport * from '${targetPath}';\n`;
+      writeFileSync(`${packageDir}/index.js`, indexContent);
+
+      log(`✓ Created alias: ${name} -> ${targetPath}`, 'green');
+    }
+
+    log('✓ Module aliases created successfully', 'green');
+  } catch (error) {
+    log('✗ Failed to setup module aliases', 'red');
+    log(`  ${error.message}`, 'red');
+    process.exit(1);
+  }
+}
+
 function main() {
   log('═══════════════════════════════════════', 'blue');
   log('  SPL2 Runtime POC - Build', 'blue');
@@ -69,6 +117,7 @@ function main() {
 
   checkNodeVersion();
   installDependencies();
+  setupModuleAliases();
 
   log('\n[BUILD] Build completed successfully!', 'green');
   log('  Run "npm run validate" to verify environment\n', 'yellow');

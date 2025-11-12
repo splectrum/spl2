@@ -5,7 +5,7 @@
 
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { invokeMethod } from './modules/spl/runtime/_runtime/index.js';
+import { createRuntimeHelper } from './modules/spl/runtime/_runtime/index.js';
 import { createRecordAccessor, createArgsAccessor } from './modules/spl/_context/index.js';
 
 // Get modules base path
@@ -57,12 +57,17 @@ async function main() {
   log('[BOOTSTRAP] modulesBasePath:', 'yellow');
   log(`  ${modulesBasePath}`, 'yellow');
   log('');
+  log('[EVALUATION] Creating runtime helper with injected state...', 'yellow');
+
+  // Create runtime helper with state injection (consistent with _context pattern)
+  const runtimeHelper = createRuntimeHelper(runtimeApiState);
+
   log('[EVALUATION] Invoking spl/runtime/run via module resolver...', 'yellow');
   log('');
 
   try {
-    // Call the method via module resolver (bootstrap pattern)
-    const output = await invokeMethod('spl/runtime/run', context, modulesBasePath);
+    // Call the method via runtime helper (state already injected)
+    const output = await runtimeHelper.invokeMethod('spl/runtime/run', context);
 
     log('[EVALUATION] Method completed successfully', 'green');
     log(`[EVALUATION] Output: ${JSON.stringify(output)}`, 'green');

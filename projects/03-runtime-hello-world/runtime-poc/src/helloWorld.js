@@ -29,7 +29,8 @@ function log(message, color = 'reset') {
 
 async function main() {
   log('═══════════════════════════════════════', 'blue');
-  log('  Step 2: Runtime + Execution Context', 'blue');
+  log('  Step 3: Full Hello World Execution', 'blue');
+  log('  (Runtime → Execution → Hello/Greet)', 'blue');
   log('═══════════════════════════════════════', 'blue');
   log('');
 
@@ -54,21 +55,21 @@ async function main() {
     execution: null
   };
 
-  log('[STEP 2.1] Initializing runtime context...', 'yellow');
+  log('[STEP 3.1] Initializing runtime context...', 'yellow');
   log('');
 
   try {
     // Create runtime helper with state injection (bootstrap pattern)
     const runtimeHelper = createRuntimeHelper(runtimeApiState);
 
-    // Step 2.1: Initialize runtime via bootstrap helper
+    // Step 3.1: Initialize runtime via bootstrap helper
     const runtimeOutput = await runtimeHelper.invokeMethod('spl/runtime/run', runtimeContext);
-    log('[STEP 2.1] ✓ Runtime initialized', 'green');
-    log(`[STEP 2.1] Output: ${JSON.stringify(runtimeOutput)}`, 'green');
+    log('[STEP 3.1] ✓ Runtime initialized', 'green');
+    log(`[STEP 3.1] Output: ${JSON.stringify(runtimeOutput)}`, 'green');
     log('');
 
-    // Step 2.2: Create execution context record
-    log('[STEP 2.2] Creating execution context...', 'yellow');
+    // Step 3.2: Create execution context and invoke hello world
+    log('[STEP 3.2] Creating execution context and invoking pr03/hello/greet...', 'yellow');
     log('');
 
     const executionApiState = {
@@ -88,15 +89,16 @@ async function main() {
       execution: null
     };
 
-    // Initialize execution context (direct call - execution initializing itself)
+    // Initialize execution context - this will invoke pr03/hello/greet (Step 3 logic)
     const executionOutput = await init(executionContext);
-    log('[STEP 2.2] ✓ Execution context initialized', 'green');
-    log(`[STEP 2.2] Output: ${JSON.stringify(executionOutput)}`, 'green');
+    log('[STEP 3.2] ✓ Execution context initialized and method invoked', 'green');
+    log(`[STEP 3.2] Output from pr03/hello/greet: ${JSON.stringify(executionOutput)}`, 'green');
+    log(`[STEP 3.2] Message: "${executionOutput.message}"`, 'green');
     log('');
 
     // Display final state
     log('─────────────────────────────────────', 'blue');
-    log('Final Runtime API State (with nested execution):', 'blue');
+    log('Final State (Three-Layer Stack):', 'blue');
     log('─────────────────────────────────────', 'blue');
     log(JSON.stringify(runtimeApiState, null, 2), 'reset');
     log('');
@@ -129,24 +131,33 @@ async function main() {
 
     // Verify nested structure
     log('─────────────────────────────────────', 'cyan');
-    log('Nested Structure Verification:', 'cyan');
+    log('Three-Layer Stack Verification:', 'cyan');
     log('─────────────────────────────────────', 'cyan');
     const nestedExecution = runtimeContext.apiState.getData('1');
     log(`✓ Execution context stored in runtime.value.1: ${nestedExecution ? 'YES' : 'NO'}`,
         nestedExecution ? 'green' : 'red');
     log(`✓ Execution key: ${nestedExecution?.key}`, nestedExecution?.key ? 'green' : 'red');
+
+    // Verify hello world invocation
+    const helloState = executionContext.apiState.getData('pr03/hello');
+    const greeting = helloState?.value?.greeting;
+    log(`✓ Hello API state exists: ${helloState ? 'YES' : 'NO'}`, helloState ? 'green' : 'red');
+    log(`✓ Greeting message: ${greeting || 'NOT FOUND'}`, greeting ? 'green' : 'red');
+    log(`✓ Output matches: ${executionOutput.message === greeting ? 'YES' : 'NO'}`,
+        executionOutput.message === greeting ? 'green' : 'red');
     log('');
 
     log('╔═══════════════════════════════════════╗', 'green');
-    log('║  ✓ STEP 2 PASSED                      ║', 'green');
-    log('║  Runtime + execution structure works  ║', 'green');
+    log('║  ✓ STEP 3 PASSED                      ║', 'green');
+    log('║  Full three-layer execution works!    ║', 'green');
+    log('║  Runtime → Execution → Hello World    ║', 'green');
     log('╚═══════════════════════════════════════╝', 'green');
     log('');
 
     process.exit(0);
   } catch (error) {
     log('╔═══════════════════════════════════════╗', 'red');
-    log('║  ✗ STEP 2 FAILED                      ║', 'red');
+    log('║  ✗ STEP 3 FAILED                      ║', 'red');
     log('╚═══════════════════════════════════════╝', 'red');
     log('');
     log('Error:', 'red');

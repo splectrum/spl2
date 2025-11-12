@@ -167,6 +167,193 @@ Primary purpose of SPL2 - enabling AI to create and use custom tooling. DSL engi
 
 ---
 
+### CIP-005: GUID-Based Artifact Identification System
+
+**Type:** Infrastructure/Tooling
+**Status:** Captured
+**Priority:** TBD (implement when execution tracking infrastructure exists)
+**Source:** Project 03 - Artifact Identification Discussion
+**Date Captured:** 2025-11-10
+
+**Description:**
+Implement GUID-based artifact identification system for exact bug reproduction:
+- Unique identifier per file/artifact
+- Stable across requirement evolution
+- Resolves to: requirements + version + hash + metadata
+- Enables exact code footprint extraction for bug reproduction
+- Requires: GUID generation, resolution mechanism, registry
+
+**Rationale:**
+Architecturally superior to requirement references for bug reproduction use case. When error occurs, need to extract complete footprint (exact artifact versions that executed) to enable reconstruction. GUID provides stable identification independent of requirement evolution.
+
+**Current Approach:**
+Using requirement reference stamping (`// Requirements: requirement_file_v1.0.0.md`) as interim solution. Simple, manageable manually, satisfies current traceability needs.
+
+**Considerations:**
+- Premature without automation infrastructure
+- Requires execution tracking to capture which artifacts executed
+- Needs bug extraction tooling to generate reproduction packages
+- "Local rules apply" - future projects can adopt GUIDs when infrastructure ready
+
+**Next Steps:**
+- Implement when execution tracking infrastructure exists
+- Build bug extraction / reproduction tooling first
+- Then migrate from requirement references to GUID system
+- Dependencies: execution tracking, deployment automation, bug report infrastructure
+
+---
+
+### CIP-006: N-Tier API Hierarchy with Hierarchical State Scoping
+
+**Type:** Architecture/Feature
+**Status:** Captured
+**Priority:** TBD (implement when capacity and evidence support it)
+**Source:** Project 03 - API Structure Discussion
+**Date Captured:** 2025-11-10
+
+**Description:**
+Extend API structure from three-layer MVP to sophisticated hierarchical organization:
+
+**N-tier organizational hierarchy:**
+- Flexible depth above API level: `[domain]/[subdomain]/.../[api]/[method]`
+- API remains concern + namespace boundary
+- Methods always leaves (endpoints)
+- Grow hierarchy as needed based on evidence
+
+**Hierarchical APIs with state scoping:**
+- APIs can contain sub-APIs
+- State scoping: child sees parent state, siblings isolated
+- Progressive context refinement down hierarchy
+- Complex but powerful for large systems
+
+**Rationale:**
+MVP uses simple three-layer structure `[package]/[api]/[method]` (proven from spl1). Works for current needs, but architectural vision shows value in flexible hierarchy for larger systems. N-tier prevents organizational constraints, hierarchical state scoping enables sophisticated state management patterns.
+
+**Current Approach (MVP):**
+- Three-layer structure: `[package]/[api]/[method]`
+- State backing at API level (methods share API state)
+- Single-layer API (no sub-APIs)
+- Simple, concrete, sufficient for validation
+
+**Considerations:**
+- MVP design doesn't prevent future extension
+- Implement when complexity justifies it (evidence-based)
+- Pattern fits "MVP + End Vision" approach
+- State scoping rules need careful design
+
+**Next Steps:**
+- Use MVP for current development
+- Gather evidence on organizational needs
+- Implement when system scale demands it
+- Dependencies: proven MVP, clear use cases for hierarchy
+
+---
+
+### CIP-007: Glossary Management Tooling for API Vocabulary
+
+**Type:** Infrastructure/Tooling
+**Status:** Captured
+**Priority:** High (foundational for API development)
+**Source:** Project 03 - Glossary Discovery
+**Date Captured:** 2025-11-11
+
+**Description:**
+Automated tooling for managing API vocabulary glossary:
+- **Validation:** Ensure consistent term usage across codebase
+- **Enforcement:** Prevent naming conflicts, enforce glossary compliance
+- **Schema integration:** Link terms to AVRO schemas automatically
+- **Requirement generation:** Auto-generate baseline requirements from package/API/method names using glossary definitions
+
+**Current Approach (MVP):**
+Manual glossary management in Project 03:
+- 4-column structure: Term, Type, Description, Requirement
+- Document entries as APIs/methods/properties created
+- Deferred columns: Schema reference, Examples (add based on evidence)
+- Glossary file: `GLOSSARY_vocabulary_v1.0.0.md` with manual maintenance
+
+**Rationale:**
+Glossary is foundational infrastructure, not nice-to-have:
+1. Semantic consistency - same concept = same name + schema everywhere
+2. Compositional reasoning - AI/humans understand from vocabulary alone
+3. Partial requirements generation - names carry semantic meaning
+4. Type safety foundation - canonical schemas for validation
+5. Day one critical - prevents expensive renaming/migration later
+
+**Tooling Requirements:**
+- Validate glossary compliance during development
+- Enforce vocabulary rules (prevent non-glossary terms)
+- Auto-link to AVRO schemas
+- Generate baseline requirements from method signatures
+- Integration with IDE/linting
+
+**Considerations:**
+- Prove manual pattern first (Project 03)
+- Capture pain points during manual use
+- Assess deferred columns (schema refs, examples) based on experience
+- Build tooling when manual maintenance becomes burden
+
+**Next Steps:**
+- Complete Project 03 with manual glossary
+- Document manual workflow pain points
+- Design tooling based on evidence
+- Implement automation when proven valuable
+
+**Risk:** R09 - Lack of glossary tooling during development (accepted for MVP, deferred until proven)
+
+---
+
+### CIP-008: App Overlay Pattern for Module Resolution
+
+**Type:** Feature/Infrastructure
+**Status:** Captured
+**Priority:** TBD (implement when development workflow demands it)
+**Source:** Project 03 - Module Resolution Discussion
+**Date Captured:** 2025-11-11
+
+**Description:**
+Two-tier module resolution with app overlay pattern (proven from spl1):
+
+**Resolution Order:**
+1. Try `apps/{app}/modules/` first (app-specific overlay)
+2. Fall back to global `modules/` (standard install)
+
+**Use Cases:**
+- Work on modules in app context without touching global install
+- Selective override for debugging (app version shadows global)
+- Development workflow: Standard install + work-in-progress in overlay
+- Safe experimentation without disrupting global modules
+
+**Context Switching:**
+- Modules in global folder: run in install context
+- Modules in app folder: run in app context
+- Clear separation of concerns
+
+**Current Approach (MVP):**
+Single resolution path - global modules folder only:
+- Convention-based: `{modulesBasePath}/{package}/{api}/{method}/index.js`
+- Dynamic ES module import with path validation
+- Simple, proven, sufficient for current needs
+
+**Benefits:**
+- Safe experimentation
+- Module development without install disruption
+- Debugging flexibility (override specific modules)
+- Clear development workflow
+
+**Considerations:**
+- Context determination logic needed
+- Security implications of overlay shadowing
+- Clear documentation of resolution order
+- Tooling to manage overlays
+
+**Next Steps:**
+- Prove MVP module resolution first
+- Gather evidence on development workflow pain points
+- Implement when need for overlay becomes clear
+- Dependencies: proven module resolution, clear use cases
+
+---
+
 ## Implemented CIPs
 
 *(None yet)*

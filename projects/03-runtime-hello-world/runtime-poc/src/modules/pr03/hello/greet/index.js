@@ -6,8 +6,16 @@
 //  description Output hello world greeting
 ///////////////////////////////////////////////////////////////////////////////
 
+import { getCurrentTimestamp } from 'spl_utils';
+
 /**
  * Hello greet method
+ *
+ * Generates a "Hello World" greeting message, demonstrating:
+ * - Access to runtime context (read-only)
+ * - Access to execution context (read-only)
+ * - API state manipulation
+ * - Output generation
  *
  * @param {Object} context - Unified context object
  * @param {Object} context.apiState - API state accessor (get/set for hierarchical Kafka record)
@@ -17,7 +25,23 @@
  * @returns {Object} Output property bag
  */
 export function greet(context) {
-  // TODO: Implement hello world greeting
+  if (!context || !context.apiState) {
+    throw new Error('pr03/hello/greet: context.apiState is required');
+  }
 
-  return {};
+  // Get name from arguments (if provided)
+  const name = context.args?.get('name') || 'World';
+
+  // Generate greeting message
+  const message = `Hello ${name}!`;
+
+  // Store greeting in API state
+  context.apiState.setData('greeting', message);
+  context.apiState.setMetadata('pr03.hello.greetedAt', getCurrentTimestamp());
+
+  // Return output for potential chaining
+  return {
+    message,
+    name
+  };
 }

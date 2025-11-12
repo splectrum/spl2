@@ -759,3 +759,66 @@ From spl1 - valuable pattern for future implementation:
 **Next:** Define glossary entries, implement Step 1 (runtime/run)
 
 ---
+
+## 2025-11-12
+
+### Platform Abstraction Implementation
+
+**Decision:** Refactor all production methods to be platform-agnostic
+**Context:** Preparing for Bare compatibility exploration - need clean separation of Node.js-specific code
+**Rationale:** spl1 pattern - methods contain zero platform imports, auxiliary libraries handle all platform-specific code
+
+**Implementation:**
+- Created `spl/_utils` auxiliary library
+- Platform detection at module load (auto-detect Node/Bare)
+- Exports: `generateUUID()`, `getCurrentTimestamp()`, `getPlatformVersion()`, `getPlatformName()`
+- Platform-specific imports conditional at module level (top-level await)
+- All methods refactored to import from `spl/_utils` only
+
+**Methods now platform-agnostic:**
+- `spl/runtime/run` - no crypto import, uses `generateUUID()` from utils
+- `spl/execution/init` - no crypto import, uses `generateUUID()` from utils
+- `pr03/hello/greet` - no Date() import, uses `getCurrentTimestamp()` from utils
+
+**Pattern:** Methods are pure - only import from SPL auxiliary libraries, never from platform (node:crypto, etc.)
+
+**Bare compatibility path:**
+- Implement Bare versions in `spl/_utils` (UUID, timestamps, version detection)
+- Methods unchanged - automatic platform switching
+- Clear surface area: exactly which platform APIs we use
+
+### Import Resolution - Two Approaches Exploration
+
+**Context:** Methods importing auxiliary libraries with relative paths (`../../_utils/index.js`) is fragile and ugly
+
+**Explored approaches:**
+
+**Approach 1: Package aliases (implemented in runtime-poc)**
+- Build script creates package directories in `node_modules/`
+- Each alias: package.json + index.js that re-exports from actual location
+- Clean imports: `import { generateUUID } from 'spl_utils'`
+- Overhead: Build step, package files to maintain
+- Benefit: Clean readable imports, no path traversal
+
+**Approach 2: Dynamic importModule function (proposed for Bare project)**
+- Auxiliary function: `importModule(modulePath)` resolves and imports
+- Usage: `const { generateUUID } = await importModule('spl/_utils')`
+- Zero overhead: No build step, no extra files
+- Centralized resolution logic (one place to change)
+- Platform-aware resolution potential
+- Clean module references without `../../` ugliness
+
+**Decision:** Implement both, compare based on evidence
+- runtime-poc (Node): Keep package aliases approach
+- Bare project: Implement `importModule` function approach
+- Compare both in practice
+- Decide which to standardize based on real-world usage
+
+**For Project Closure:**
+- Document both approaches with pros/cons
+- Note: Evidence-based decision deferred until Bare project complete
+- CIP or methodology update based on comparison results
+
+**Rationale:** Explorative methodology - build both, let evidence guide decision rather than speculation
+
+---

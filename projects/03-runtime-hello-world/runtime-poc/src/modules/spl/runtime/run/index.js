@@ -6,16 +6,18 @@
 //  description Initialize and run runtime context
 ///////////////////////////////////////////////////////////////////////////////
 
-import { randomUUID } from 'crypto';
+import { generateUUID, getPlatformVersion, getCurrentTimestamp } from 'spl_utils';
 
 /**
  * Runtime run method
  *
  * Initialize runtime context with essential properties:
  * - version: SPL2 runtime version
- * - nodeVersion: Node.js version for reproducibility
+ * - platformVersion: Platform version for reproducibility (Node.js, Bare, etc.)
  * - runtimeId: Unique identifier for this execution
  * - startTime: Execution start timestamp
+ *
+ * Platform-agnostic: Uses SPL utilities that abstract platform differences
  *
  * @param {Object} context - Unified context object
  * @param {Object} context.apiState - API state accessor (get/set for hierarchical Kafka record)
@@ -30,10 +32,11 @@ export function run(context) {
   }
 
   // Initialize runtime properties in metadata (headers)
+  // All platform-specific calls abstracted through spl/_utils
   context.apiState.setMetadata('spl.runtime.version', '0.1.0');
-  context.apiState.setMetadata('spl.runtime.nodeVersion', process.version);
-  context.apiState.setMetadata('spl.runtime.runtimeId', randomUUID());
-  context.apiState.setMetadata('spl.runtime.startTime', new Date().toISOString());
+  context.apiState.setMetadata('spl.runtime.platformVersion', getPlatformVersion());
+  context.apiState.setMetadata('spl.runtime.runtimeId', generateUUID());
+  context.apiState.setMetadata('spl.runtime.startTime', getCurrentTimestamp());
 
   return { status: 'initialized' };
 }
