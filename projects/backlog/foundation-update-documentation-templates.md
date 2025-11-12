@@ -288,3 +288,15 @@ LESSONS_LEARNED.md documents extensive foundation updates needed. Creating separ
 - Completes Project 03 handoff (learning → foundation integration)
 - Validates twin pair methodology through documentation domain
 - Tests explorative project approach on non-code deliverables
+
+---
+
+## Project Addons
+
+**Partnership Reflection Foundations Addon**
+- **Status:** Backlog
+- **Location:** `projects/backlog/addons/partnership-reflection-foundations.md`
+- **Purpose:** Implement partnership reflection review recommendations (catch phrases, detail documents, guidelines)
+- **Integration:** Natural fit with WOW restructuring phase
+- **Value:** Completes Project 03 partnership learning capture, reduces AI friction
+- **Timing:** While partnership reflection context fresh
