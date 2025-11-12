@@ -2,7 +2,7 @@
 
 # Project Backlog
 
-**Last Updated:** 2025-11-12
+**Last Updated:** 2025-11-13
 
 Backlog of identified projects for SPL2 development. Projects analyzed for priority and dependencies during Project 02 (Dependency & Priority Analysis).
 
@@ -22,6 +22,7 @@ Backlog of identified projects for SPL2 development. Projects analyzed for prior
 | [API State Management](backlog/api-state-management.md) | High | Runtime Structure Hello World, Kafka Compatible Records | N/A | State backing mechanism, execution state stack, state transitions, stateless code with state backing. 1-2 weeks. |
 | [DSL Engine Foundation](backlog/dsl-engine-foundation.md) | High | Runtime Structure Hello World, Kafka Compatible Records, AVRO Schema and RPC, API State Management | N/A | Core DSL engine: discoverability, type-guided composition, pattern reuse, API library. AI as primary user. Unlocks custom languages. 3-4 weeks. |
 | [Pear P2P Platform](backlog/pear-p2p-platform.md) | High | Bare Runtime Compatibility | Phase 4 Dev Setup (Pear) | P2P networking, device discovery, state synchronization, multi-device execution. Unlocks P2P use cases. 2-3 weeks. |
+| [Glossary Term Requirements](backlog/glossary-term-requirements.md) | Medium | Glossaries exist (DSL, Stepping Stones, Spots) | N/A | Define requirements for glossary terms themselves, enabling artifact-to-requirements pinning for glossary entries. Create requirements for all existing terms. Foundation for glossary quality assessment and management tooling. 1-2 weeks. |
 | [Development Environment Setup](backlog/dev-environment-setup.md) | N/A (Progressive) | Progressive pathway | Phase 1 (Node.js), Phase 2 (Bare), Phase 3 (UI), Phase 4 (Pear) | Reference document. Products distributed to projects: Phase 1 in Runtime Hello World, Phase 2 in Bare Compatibility, Phase 3 in first UI project, Phase 4 in Pear exploration. |
 
 ---
