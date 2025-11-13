@@ -1,10 +1,10 @@
-Requirements: ../project-types/Explorative_project_requirements_v1.0.0.md
+Requirements: projects/04-bare-runtime-hello-world/Exploration_project_requirements_v1.0.0.md
 Requirements: projects/03-runtime-hello-world/PRINCE2_operational_v1.2.0.md
 
 # Project Brief: Bare Runtime Hello World
 
 **Project Code:** 04-bare-runtime-hello-world
-**Project Type:** Explorative Project (Small)
+**Project Type:** Exploration Project (Small)
 **Start Date:** 2025-11-12
 **Status:** Initiated
 
@@ -38,9 +38,9 @@ Validate Bare runtime basics through simplest possible implementation: installat
 - Confidence to proceed with Bare-based work
 - Foundation for Bare Runtime Compatibility deep dive
 
-### Project Type: Explorative Project (Small)
+### Project Type: Exploration Project (Small)
 
-This is a **small Explorative Project** - platform validation through minimal implementation and documentation.
+This is a **small Exploration Project** - platform validation through minimal implementation and documentation.
 
 **Methodology:**
 - Build minimal "hello world" on Bare

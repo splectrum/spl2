@@ -1,14 +1,14 @@
-# Explorative Project Requirements
+# Exploration Project Requirements
 
 **Version:** 1.0.0
 **Created:** 2025-11-12
-**Purpose:** Define characteristics, methodology, and WOW guidance for Explorative Projects
+**Purpose:** Define characteristics, methodology, and WOW guidance for Exploration Projects
 
 ---
 
-## What is an Explorative Project?
+## What is an Exploration Project?
 
-An **Explorative Project** is characterized by:
+An **Exploration Project** is characterized by:
 - **Architecture discovery** - Validating core design decisions through implementation
 - **Pattern creation** - Establishing new patterns while using them
 - **Twin pair methodology** - Creating deliverables and templates in parallel
@@ -32,7 +32,7 @@ An **Explorative Project** is characterized by:
 
 **Collaboration Mode:** **COLLABORATIVE**
 
-Explorative projects require **human + AI collaboration** throughout:
+Exploration projects require **human + AI collaboration** throughout:
 
 **Planning Phase:**
 - Human provides architectural intuition and constraints
@@ -51,7 +51,7 @@ Explorative projects require **human + AI collaboration** throughout:
 - Validate architectural implications together
 - Document decisions and rationale in DAILY_LOG
 
-**Rationale:** Explorative projects involve critical architectural decisions that benefit from both human intuition (experience, constraints, vision) and AI capabilities (rapid implementation, pattern recognition). Too critical to run autonomously.
+**Rationale:** Exploration projects involve critical architectural decisions that benefit from both human intuition (experience, constraints, vision) and AI capabilities (rapid implementation, pattern recognition). Too critical to run autonomously.
 
 ---
 
@@ -122,7 +122,7 @@ This document **extends** PRINCE2_operational (base project management requireme
 
 **Inheritance Pattern:**
 - All PRINCE2_operational requirements apply (project lifecycle, artifacts, closure process)
-- This document adds: collaboration mode (COLLABORATIVE), twin pair methodology, explorative-specific success criteria
+- This document adds: collaboration mode (COLLABORATIVE), twin pair methodology, exploration-specific success criteria
 - Where this document specifies additional constraints, those constraints are **in addition to** PRINCE2 base requirements (not conflicting)
 - Example: PROJECT_BRIEF must have products (PRINCE2) AND twin pair structure (Explorative)
 
