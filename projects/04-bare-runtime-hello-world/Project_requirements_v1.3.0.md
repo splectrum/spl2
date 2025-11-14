@@ -316,14 +316,24 @@ Repeat Plan → Implement for each product/stage until all complete.
 - Organize by category (Methodology, Technology, Architecture, Process, etc.)
 - Document what worked, what didn't, why it matters
 
-**4.3 Housekeeping (Optional):**
+**4.3 Review and Act on Learnings:**
+- Review LESSONS_LEARNED.md collaboratively
+- Identify actionable items from learnings:
+  - CIPs (Continual Improvement Proposals) for methodology improvements
+  - Backlog items for new work identified
+  - Stepping stones work needed
+  - Foundation or glossary updates needed
+- Create identified items (CIPs, backlog items, etc.)
+- Not housekeeping - this is acting on project-specific discoveries
+
+**4.4 Housekeeping (Optional):**
 - Maintain mutable spots discovered during project
 - See Spots requirements for housekeeping activities per spot type
 - Examples: Update foundations, update glossaries, add CIPs, groom backlog
 - Optional because: May be nothing to maintain, or capacity doesn't allow
 - Housekeeping details defined in spot requirements (friction reduction)
 
-**4.4 Project Evaluation:**
+**4.5 Project Evaluation:**
 - Evaluate project against all requirements (Project + Project Type)
 - If evaluation passes → Continue to Final Commit/Push
 - If evaluation fails:
@@ -331,7 +341,7 @@ Repeat Plan → Implement for each product/stage until all complete.
   - If can't fix → Document as risks/learnings in LESSONS_LEARNED.md
   - Project still completes (not aborted)
 
-**4.5 Final Commit and Push:**
+**4.6 Final Commit and Push:**
 - Add DAILY_LOG entry: "**Project Completed:** [date] - [brief summary]"
 - Ensure all project artifacts committed:
   - LESSONS_LEARNED.md
@@ -345,6 +355,7 @@ Repeat Plan → Implement for each product/stage until all complete.
 **Close complete when:**
 - ✅ All products evaluated
 - ✅ Learnings synthesized (LESSONS_LEARNED.md)
+- ✅ Learnings reviewed and actionable items created
 - ✅ Housekeeping done (if applicable)
 - ✅ Project evaluated against requirements
 - ✅ DAILY_LOG shows "Project Completed"
