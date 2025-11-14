@@ -12,8 +12,8 @@ SPL2 is a platform for AI to create and manage software solutions with a focus o
 - Read `foundations/PARTNERSHIP.md` - Partnership health, collaboration patterns, friction metric
 
 **Understand current state:**
-- Read `projects/INDEX.md` - Completed projects and current status (3 complete, 1 active)
-- Read `projects/BACKLOG.md` - Next work to do (10+ projects with priorities)
+- Read `projects/INDEX.md` - Completed projects and current status (4 complete)
+- Read `projects/BACKLOG.md` - Next work to do (15 projects with priorities/dependencies)
 
 **Everything else references from these foundation documents.**
 
@@ -43,7 +43,7 @@ spl2/
 │   ├── 01-*/            # Completed: Preliminary to Workplan
 │   ├── 02-*/            # Completed: Initial Workplan
 │   ├── 03-*/            # Completed: Runtime Structure Hello World
-│   └── 04-*/            # Active: Bare Runtime Hello World
+│   └── 04-*/            # Completed: Bare Runtime Hello World
 ├── archive/             # Reference: spl1 materials (legacy)
 ├── CLAUDE.md            # This file - navigation guide
 └── README.md            # Project overview
@@ -96,10 +96,10 @@ spl2/
 **Terminology:** `glossary/` - DSL_GLOSSARY.md (runtime/API terms), STEPPING_STONES_GLOSSARY.md (foundation concepts), SPOTS_GLOSSARY.md (repository structure)
 **Chat captures:** `chats/` - informal collaborative work discussions, discoveries, decisions
 **Adhoc requirements:** `chats/immutables/` - versioned artifacts created during informal work
-**Project status:** `projects/INDEX.md` (3 complete, 1 active)
-**Next work:** `projects/BACKLOG.md` (11 projects now, including glossary-term-requirements)
-**Completed project artifacts:** `projects/01-*/`, `projects/02-*/`, `projects/03-*/`
-**Active project:** `projects/04-bare-runtime-hello-world/`
+**Project status:** `projects/INDEX.md` (4 complete)
+**Next work:** `projects/BACKLOG.md` (15 projects queued, including high-priority Repository Streaming Structure)
+**Completed projects:** `projects/01-*/`, `projects/02-*/`, `projects/03-*/`, `projects/04-*/`
+**Next projects:** Foundation Update & Documentation Templates → Glossary Term Requirements (+ Spots Housekeeping addon)
 **Lessons learned:** `projects/XX-*/LESSONS_LEARNED.md` in each project folder
 **Partnership reflections:** `projects/XX-*/PARTNERSHIP_REFLECTION*.md` at project closures
 **Project types:** `projects/project-types/` (Explorative, etc.)
