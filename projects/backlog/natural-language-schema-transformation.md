@@ -1019,6 +1019,215 @@ TDC becomes the methodology for AI-augmented work across all domains.
 
 ---
 
+---
+
+### Transaction Semantics and "Local Rules Apply"
+
+**Discovery:** Project folders are transaction boundaries. "Local rules apply" = local transaction context.
+
+**Key insight:**
+
+Artifacts have different mutability depending on **transaction state**:
+
+```
+Project Active (uncommitted transaction):
+├─ Artifacts MUTABLE (to project owner)
+├─ Outside reads are "dirty reads" (may change)
+├─ No guarantee of stability for external references
+└─ Owner can modify freely
+
+Project Closed (committed transaction):
+├─ Artifacts IMMUTABLE (to everyone, including owner)
+├─ Outside reads are "clean reads" (stable)
+├─ External references guaranteed valid
+└─ No further modification allowed
+```
+
+**Database transaction parallel:**
+
+**Dirty read:**
+- Project active → Owner creating/modifying artifacts
+- External project references those artifacts
+- External reads "uncommitted data" (may still change)
+- Risk: Artifact might change before project closes
+
+**Committed read:**
+- Project closed → All artifacts committed (immutable)
+- External project references artifacts
+- External reads "committed data" (guaranteed stable)
+- Safe: Artifacts won't change, references remain valid
+
+**"Local Rules Apply" = Transaction Boundary**
+
+```
+Project folder (local context):
+├─ Transaction scope
+├─ Local rules govern mutability
+├─ Owner has write access during Active
+├─ Artifacts in transaction are mutable
+└─ Commit (project close) → immutable forever
+
+Outside project folder:
+├─ Different transaction scope
+├─ Can only read (not write)
+├─ Dirty reads if project Active
+└─ Clean reads if project Closed
+```
+
+**The local context bag IS the transaction context:**
+
+**Context Active (transaction open):**
+- Project status: Active (DAILY_LOG doesn't show "Project Completed")
+- Artifacts: Mutable within context
+- Owner: Has write access
+- External access: Can read (dirty) but not write
+- Transaction state: Uncommitted
+
+**Context Closed (transaction committed):**
+- Project status: Completed (DAILY_LOG shows "Project Completed")
+- Artifacts: Immutable to everyone (including owner)
+- Owner: Read-only now
+- External access: Can read (clean)
+- Transaction state: Committed
+
+**"Local rules apply" means:**
+
+1. **Transaction boundary:** This folder is a transaction scope
+2. **Local governance:** Rules inside folder govern mutability
+3. **Owner control:** Project owner controls artifact lifecycle
+4. **External visibility:** Outside sees as read-only (or dirty read if active)
+5. **Commit semantics:** Project closure commits transaction
+
+**Artifact Lifecycle States:**
+
+```
+Draft → Active → Committed → (optional) Archived
+
+Draft:     Being created within project (not yet visible externally)
+Active:    Project active, artifact visible but mutable (dirty reads possible)
+Committed: Project closed, artifact immutable (clean reads guaranteed)
+Archived:  Old version, superseded but preserved (referenced by version)
+```
+
+**Reference Safety Rules:**
+
+**Intra-project references:**
+- Always safe (same transaction)
+- Project references its own artifacts
+- No isolation needed
+
+**Inter-project references to committed:**
+- Safe (clean read)
+- Referenced project closed
+- Artifacts guaranteed immutable
+
+**Inter-project references to active:**
+- Dirty read (caveat emptor)
+- Referenced project still active
+- Artifacts may change before commit
+- Accept risk or wait for commit
+
+**Current SPL2 behavior:**
+
+We DO reference active project artifacts:
+- Example: Foundation Update references backlog items created in Project 04 (while Project 04 active)
+- Dirty read accepted
+- Works because:
+  - Single-threaded (one project at a time)
+  - Collaborative (we know what's changing)
+  - Low risk in practice
+
+**Transaction Commit Trigger:**
+
+```
+Project closure = Transaction commit
+
+DAILY_LOG entry:
+"Project Completed: 2025-11-14"
+
+Effect:
+- All project artifacts transition: mutable → immutable
+- Transaction state: Active → Committed
+- External references now safe (clean reads)
+- Owner loses write access (immutable to everyone)
+```
+
+**ACID Properties from Organizational Patterns:**
+
+**Atomicity:**
+- Project completes or doesn't (all-or-nothing)
+- Partial completion = project aborted (still preserves artifacts)
+- Commit = all artifacts finalized together
+
+**Consistency:**
+- Requirements evaluation ensures valid final state
+- Artifacts meet quality criteria before commit
+- Invalid state = evaluation fails, issues documented
+
+**Isolation:**
+- Project folder = isolated transaction scope
+- Multiple projects possible (different folders = different transactions)
+- Currently: serial execution (one active project at a time)
+- Future: concurrent projects isolated by folder boundaries
+
+**Durability:**
+- Committed artifacts never change (immutable)
+- Git preserves all versions
+- GitHub backup ensures durability
+
+**The Beauty:**
+
+**No transactional infrastructure needed:**
+- File system boundaries = transaction boundaries
+- Project ownership = transaction ownership
+- Project status (DAILY_LOG) = transaction state
+- Simple, self-evident, no database required
+
+**Transactional semantics without transactional infrastructure!**
+
+**Folder = Transaction**
+**Owner = Transaction manager**
+**Project closure = Commit**
+**Local rules apply = Local transaction context**
+
+**Benefits:**
+
+1. **Simple:** No complex transaction manager needed
+2. **Natural:** Follows existing organizational patterns
+3. **Visible:** Transaction state obvious (project status)
+4. **Scalable:** Concurrent transactions via folder isolation
+5. **Durable:** Git + immutability ensures ACID properties
+
+**For Repository Streaming Structure:**
+
+This transaction model integrates perfectly:
+
+**Streaming layer:**
+- Tables = transaction logs (append-only)
+- Each entry = committed transaction artifact
+- CHANGELOG = transaction history
+
+**Schemaless layer:**
+- Flexibility within transaction (any artifact type)
+- Commit enforces schema compliance (requirements evaluation)
+
+**Schemafull layer:**
+- Requirements = transaction validity rules
+- Evaluation = pre-commit validation
+- Schemas ensure consistent committed state
+
+**RDB layer:**
+- Indexes reference committed transactions only (clean reads)
+- Or accept dirty reads with awareness (active projects)
+
+**Transaction semantics make the hybrid repository coherent!**
+
+Each layer respects transaction boundaries. Project folder isolation provides transaction isolation. Project closure provides commit semantics. Requirements provide consistency guarantees.
+
+**ACID properties emerge from organizational patterns + streaming + immutability.**
+
+---
+
 **End of Appendix**
 
 **Note:** This appendix represents collaborative design thinking that occurred after Project 04 closure. Insights here refine and extend the core addon concept, establishing clearer architecture and validating strategic direction. These insights will inform exploration when Repository Streaming Structure project initiates.
