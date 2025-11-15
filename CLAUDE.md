@@ -30,6 +30,9 @@ spl2/
 │   ├── YYYY-MM-DD_*.md  # Chat captures (sufficient and complete pattern)
 │   ├── CHAT_REQUIREMENTS_v1.0.0.md  # How chat capture works
 │   └── immutables/      # Adhoc-created versioned artifacts (requirements, designs)
+├── cips/                # Continual Improvement Proposals
+│   ├── CIP_REGISTER.md  # CIP tracking register (mutable, living artifact)
+│   └── CIP-NNN_*.md     # Individual CIP documents (immutable)
 ├── glossary/            # Context-specific terminology
 │   ├── DSL_GLOSSARY.md  # Runtime/API vocabulary (mutable, with CHANGELOG)
 │   ├── STEPPING_STONES_GLOSSARY.md  # Foundation concepts (mutable, with CHANGELOG)
@@ -53,7 +56,7 @@ spl2/
 
 **Mutable-immutable dualism:**
 - **Mutable entry points** (foundations/, glossary/) - Always "current", unversioned names, protected by CHANGELOGs
-- **Immutable artifacts** (projects/, chats/immutables/) - Versioned, never change, referenceable
+- **Immutable artifacts** (projects/, chats/immutables/, cips/) - Versioned, never change, referenceable
 - Entry points branch to standalone immutables in version jackets
 
 **Pattern:**
@@ -61,6 +64,7 @@ spl2/
 - Detail files live in project folders - **versioned immutables** (e.g., Philosophy_v1.1.0.md)
 - Glossaries (DSL, Stepping Stones, Spots) are **mutable** - always current, with CHANGELOGs tracking evolution
 - Requirements are **immutable** - versioned in projects/ (formal work) or chats/immutables/ (adhoc work)
+- CIPs are **immutable** - once created, never change; tracked via CIP_REGISTER.md (mutable, living)
 - All artifacts reference their requirements document (first line)
 
 **Example:** WOW.md (mutable) references Philosophy_v1.1.0.md (immutable) - that versioned file lives in the project folder where it was created/evolved.
@@ -96,6 +100,8 @@ spl2/
 **Terminology:** `glossary/` - DSL_GLOSSARY.md (runtime/API terms), STEPPING_STONES_GLOSSARY.md (foundation concepts), SPOTS_GLOSSARY.md (repository structure)
 **Chat captures:** `chats/` - informal collaborative work discussions, discoveries, decisions
 **Adhoc requirements:** `chats/immutables/` - versioned artifacts created during informal work
+**CIP documents:** `cips/CIP-NNN_*.md` - Continual Improvement Proposals (immutable)
+**CIP tracking:** `cips/CIP_REGISTER.md` - living register of all CIPs
 **Project status:** `projects/INDEX.md` (4 complete)
 **Next work:** `projects/BACKLOG.md` (15 projects queued, including high-priority Repository Streaming Structure)
 **Completed projects:** `projects/01-*/`, `projects/02-*/`, `projects/03-*/`, `projects/04-*/`

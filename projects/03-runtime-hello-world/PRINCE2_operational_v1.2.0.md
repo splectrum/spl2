@@ -78,7 +78,8 @@
 - Continual Improvement Proposals
 - Lightweight idea capture during project work
 - Reviewed during project closure
-- File: `projects/02-initial-workplan/CIP_REGISTER.md` (or later location)
+- Register: `cips/CIP_REGISTER.md` (mutable, living artifact)
+- CIP documents: `cips/CIP-NNN_*.md` (immutable)
 
 ### We Don't Use ❌
 
