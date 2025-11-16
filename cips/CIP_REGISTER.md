@@ -519,6 +519,135 @@ Establish presence:
 
 ---
 
+### CIP-011: Dual Representation and Index Architecture
+
+**Type:** Architectural Foundation
+**Status:** Proposed
+**Priority:** High (foundational for data layer implementation)
+**Source:** Discussion on data structures and multi-model interfaces
+**Date Captured:** 2025-11-14
+
+**Description:**
+Define architecture for Splectrum's dual representation model and flexible index system.
+
+**Three Layers:**
+1. **Native Layer (AI-optimized):** Kafka topics/records, schema-enforced (AVRO), partitioned by spots
+2. **Derived Layer (human-friendly):** Filesystem structure, markdown/CSV, git-versionable
+3. **Index Layer (flexible views):** Mutable indexes materialized from immutable artifact stream
+
+**The Killer Features:**
+> **"No migration headaches"** - Indexes are just views over artifact stream. Create new access patterns without moving data!
+
+> **"Independent evolution"** - Update content bucket creation (producers), rendering views unchanged. Microservices dream realized - no coordinated upgrades!
+
+**Key Insights:**
+
+**Flexibility is the feature:**
+- Start simple (filesystem only)
+- Add Kafka backing (stream established)
+- Create indexes as needed (glossary, dependency, timeline, search)
+- Evolve organically (no breaking changes)
+- Try new patterns (create index, test, iterate, delete if not useful)
+
+**Dual representation serves both:**
+- AI: Kafka streams (efficient, schema-enforced, type-guided composition)
+- Humans: Filesystem (familiar, git-friendly, naturally editable)
+- No compromise (each optimized for consumer)
+
+**Cascading enables composition:**
+- Indexes build on indexes (dependency graph uses glossary)
+- Changelogs enable reactivity (artifact created → indexes update → downstream notified)
+- Like ksqlDB materialized views
+
+**Architecture:**
+```
+Native (Kafka) ←→ Derived (Filesystem)
+       ↓
+  Index Layer (views)
+       ↓
+Multi-Model Interfaces (document/graph/streaming/transactional)
+```
+
+**Repository as Kafka topic:**
+- Partitioned by spots (foundations/, glossary/, projects/, cips/, chats/)
+- Records: `{ key: "spot/path", value: { content, format, schema, metadata } }`
+- PK spacing: Natural ordering within spot
+- Flexible content: With or without rigid schema
+
+**Index examples:**
+- Glossary index: term → artifacts
+- Dependency index: artifact → relationships
+- Timeline index: timestamp → artifacts
+- Type index: type → artifacts
+- Full-text search: word → artifacts
+- Custom: as needed (no migration!)
+
+**Bidirectional sync:**
+- Native → Derived: Continuous background consumer (Kafka → files)
+- Derived → Native: Git hook or manual sync (files → Kafka)
+- Conflict detection: Checksums, timestamps, warnings
+
+**Cascading changelogs:**
+```
+artifacts (base stream)
+  ↓
+glossary-index-changelog
+  ↓
+dependency-index-changelog
+  ↓
+filesystem-changelog
+```
+
+**Implementation phases:**
+1. Foundation (current filesystem - no changes)
+2. Native layer bootstrap (Kafka setup, initial sync)
+3. First indexes (glossary, type - prove pattern)
+4. Derived sync (bidirectional, conflict detection)
+5. Multi-model interfaces (document/graph/streaming/transactional)
+6. Advanced indexes (dependency graph, full-text search, optimization)
+
+**Documentation:**
+- Full CIP: `cips/CIP-011_dual-representation-and-index-architecture.md`
+- Related: CIP-009 (splectrum-native), CIP-010 (product vision)
+
+**Rationale:**
+Following discussion on data structures feeding multi-model interfaces, realized need for dual representation (AI-optimized native, human-friendly derived) with flexible index layer. The key insight: indexes are views, not data - create new access patterns without migration pain. This enables organic evolution: start simple (filesystem), add sophistication incrementally (Kafka, indexes), no breaking changes.
+
+**Open questions:**
+- Kafka or Kafka-compatible? (Redpanda, Pulsar)
+- Embedded or external?
+- Binary artifacts handling? (images, PDFs in Kafka)
+- Index rebuild triggers? (automatic, manual, scheduled)
+- Multi-repository model? (one cluster, or distributed)
+- When to introduce? (MVP without Kafka, or from start)
+- P2P implications? (Kafka + P2P interaction)
+
+**Processing guidance:**
+Validate with prototypes:
+- Simple Kafka → filesystem sync
+- Single index materialization (glossary)
+- Rebuild mechanism from stream
+
+Design detailed specs:
+- Artifact record schema (AVRO)
+- Index formats per type
+- Sync protocol (bidirectional)
+- Data layer API surface
+
+Update backlog:
+- Break "Repository Streaming Structure" into phases
+- Add Kafka setup, sync tool, index tasks
+- Sequence with clear dependencies
+
+**Next Steps:**
+- Prototype simple sync
+- Validate index rebuild pattern
+- Design artifact record schema
+- Evaluate Kafka alternatives
+- Consider MVP without Kafka (defer complexity?)
+
+---
+
 ## Implemented CIPs
 
 *(None yet)*
