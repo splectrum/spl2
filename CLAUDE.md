@@ -111,6 +111,15 @@ spl2/
 **Project types:** `projects/project-types/` (Explorative, etc.)
 **Detailed methodology:** Follow references from WOW.md to versioned files
 
+## Working with Claude Code
+
+**Todo List Usage:**
+- Use TodoWrite tool for **small to medium** lists only (never large lists)
+- Purpose: Track progress through multi-step work, provide visibility to user
+- When to use: Complex work that benefits from granular tracking (e.g., Project 03 closure scale)
+- When NOT to use: Simple, straightforward execution - adds overhead without benefit
+- This is internal guidance for AI assistant, not a methodology stepping stone
+
 ## Archive (Reference Only)
 
 `archive/spl1-docs/` and `archive/spl1-spl-dev/` contain legacy spl1 materials. Reference when specific proven solutions are needed, but don't feel constrained by spl1's architecture.
