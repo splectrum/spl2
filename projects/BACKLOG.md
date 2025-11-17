@@ -2,7 +2,7 @@
 
 # Project Backlog
 
-**Last Updated:** 2025-11-13
+**Last Updated:** 2025-11-17
 
 Backlog of identified projects for SPL2 development. Projects analyzed for priority and dependencies during Project 02 (Dependency & Priority Analysis).
 
@@ -15,6 +15,7 @@ Backlog of identified projects for SPL2 development. Projects analyzed for prior
 | [Foundation Update & Documentation Templates](backlog/foundation-update-documentation-templates.md) | Critical | Runtime Structure Hello World | | Restructure foundations (catch phrase format), create glossaries (methodology + API vocabulary), enhance technical docs, establish documentation templates. Captures Project 03 learning while fresh. High leverage for all future projects. |
 | [Glossary Term Requirements](backlog/glossary-term-requirements.md) | Medium | | Spots Housekeeping Requirements | Define requirements for glossary terms themselves, enabling artifact-to-requirements pinning for glossary entries. Create requirements for all existing terms. Foundation for glossary quality assessment and management tooling. |
 | [Spots Housekeeping Requirements](backlog/spots-housekeeping-requirements.md) | Medium | | | Define housekeeping requirements for mutable spots (foundations/, glossary/). What activities needed at project closure. Addon to Glossary Term Requirements project. |
+| [Console API - AI-Primary Execution Model](backlog/console-api-exploration.md) | High | Foundation Update & Documentation Templates | | Exploration project proving AI-primary invocation model. Implement console API (5 methods: configure, log, error, warn, flush) with AVRO schemas, discovery API, transparent validation, CLI wrapper. Establishes pattern for all future APIs. Familiar domain, real utility, easy Bare compatibility. |
 | [Bare Runtime Compatibility](backlog/bare-runtime-compatibility.md) | High | Bare Runtime Hello World | Phase 2 Dev Setup | Deep dive: Node.js → Bare workflow, tooling compatibility (Vite, Vitest), SPL2 patterns on Bare. Prerequisite for Pear platform work. |
 | [Browser Platform Exploration](backlog/browser-platform-exploration.md) | High | Bare Runtime Compatibility | | Validate browser as third pillar platform for SPL2 runtime. File system abstraction (IndexedDB/OPFS), browser lifecycle, basic P2P validation (WebRTC/WebTransport). Completes three-pillar portability (Node/Bare/Browser). |
 | [Bug Report Infrastructure](backlog/bug-report-infrastructure.md) | High | Runtime Structure Hello World | | Automated bug report generation with complete execution footprint for reconstruction. Captures: code versions, input, state, environment, error details. Enables exact failure reproduction for reconstruction-based architecture. |
