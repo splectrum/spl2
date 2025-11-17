@@ -187,3 +187,31 @@
 - What we know: Vitest excellent, AVRO works client-side, React solid, Bare validated
 - What we're exploring: Bare tooling integration, P2P layer specifics
 - What will change: Evidence drives evolution, local rules apply
+
+## Platform Design
+
+**Implementation templates and patterns for building Splectrum - living design documentation.**
+
+**See:** design/DESIGN_REGISTER.md (catalog of all design elements)
+**See:** design/API_DESIGN.md (comprehensive API architecture)
+
+**Key design elements (validated):**
+- **API as elementary building block** - Smallest standalone deployable unit
+- **Three-layer structure** - package/api/method hierarchy (MVP)
+- **State backing architecture** - Stateless code, flowing state (Panta Rhei)
+- **Context API pattern** - Getters/setters abstract state complexity
+- **Runtime state stack** - Nested contexts (Runtime → Execution → Pipeline)
+- **Kafka-compatible records** - Immutable with complete metadata
+- **CLI-callable methods** - All methods invocable from command line
+- **Integrated help system** - Package/API/method level documentation
+- **Common names glossary** - Same thing = same name + schema across APIs
+
+**Design/ spot:**
+- Mutable design docs (always current, with CHANGELOGs)
+- Registry pattern tracks all platform design elements
+- Referenced by requirements (for broader context)
+- Evolves based on implementation evidence
+
+**Related CIPs:**
+- CIP-013: Design Spot Setup (implemented)
+- CIP-014: Comprehensive API Design Phase (future deep work)
