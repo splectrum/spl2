@@ -1,7 +1,7 @@
 # Continual Improvement Proposal (CIP) Register
 
 **Project:** 02-initial-workplan
-**Last Updated:** 2025-11-14
+**Last Updated:** 2025-11-17
 
 Lightweight capture of improvement ideas that emerge during project work. CIPs are reviewed during planning cycles and either implemented, deferred, or rejected based on priority and dependencies.
 
@@ -749,6 +749,106 @@ This CIP itself demonstrates HAICC:
 - Develop community content (blog, talks, docs)
 - Update existing foundations (integrate HAICC)
 - Build external assets (website, README, materials)
+
+---
+
+### CIP-013: Design Spot Setup
+
+**Type:** Infrastructure/Documentation
+**Status:** In Progress (implementing in Project 05)
+**Priority:** High (enables design documentation pattern)
+**Source:** Project 05 - API_DESIGN.md enhancement discussion
+**Date Captured:** 2025-11-17
+
+**Description:**
+Create design/ spot as structured location for platform design documentation following established patterns (glossary/, cips/, projects/).
+
+**Structure:**
+- design/DESIGN_REGISTER.md - Registry of platform design elements (mutable)
+- design/API_DESIGN.md - API design documentation (mutable, with CHANGELOG)
+- Mutable entry points with CHANGELOGs (like glossary/)
+- Registry pattern tracks all design elements
+
+**What goes in design/:**
+- Platform/product design elements (what we're building)
+- Runtime architecture, API structures, state patterns
+- Implementation templates for Splectrum platform
+- NOT methodology patterns (those stay in WOW.md, project-types/)
+
+**Integration:**
+- PRINCIPLES.md references design/ (headline blocks)
+- Requirements reference design/ (for broader context)
+- CIPs may use design/ for working on design elements
+
+**Rationale:**
+API_DESIGN.md from Project 03 has dual nature: some belongs in PRINCIPLES.md headlines, rest needs home as living design documentation. Design spot provides structured location that:
+- Is discoverable (design/ spot, DESIGN_REGISTER.md)
+- Evolves naturally (mutable docs with CHANGELOGs)
+- Provides implementation templates
+- Integrates with existing patterns
+
+**Full CIP:** `cips/CIP-013_design-spot-setup.md`
+
+**Next Steps:**
+- Implementing in Project 05 (Product 2)
+- Create design/ folder structure
+- Bring Project 03 API_DESIGN.md content
+- Add PRINCIPLES.md reference
+- Validate pattern through use
+
+---
+
+### CIP-014: Comprehensive API Design Phase
+
+**Type:** Architecture/Design
+**Status:** Captured
+**Priority:** Medium (after CIP-013 established, when complexity justifies)
+**Source:** Project 05 - API_DESIGN.md enhancement discussion
+**Date Captured:** 2025-11-17
+
+**Description:**
+Comprehensive API design work - detailed requirements, expanded documentation, design methodology, and formalization of platform architecture patterns.
+
+**Scope:**
+- Detailed API design requirements (with validation criteria)
+- Comprehensive design documentation expansion
+- Design methodology (how we do design work)
+- Architecture pattern formalization
+- Integration with DSL engine, P2P layer, data layer
+- N-tier hierarchy (CIP-006), security model, performance patterns
+
+**Current vs. Future:**
+- CIP-013: Basic design/ spot, API_DESIGN.md from Project 03 (lightweight)
+- CIP-014: Deep design work when complexity justifies (comprehensive)
+
+**Deliverables:**
+- Design requirements document (comprehensive, validated)
+- Expanded design documentation (API_DESIGN.md + additional docs)
+- Design methodology document
+- Implementation guidance (templates, examples, anti-patterns)
+- PRINCIPLES.md integration (comprehensive headline blocks)
+
+**When to implement:**
+- Design complexity justifies comprehensive work
+- Friction from incomplete design documentation
+- New layers require integration (DSL engine, P2P)
+- Evidence shows patterns need formalization
+
+**Dependencies:**
+- CIP-013 implemented (design/ spot exists)
+- Basic patterns validated (Projects 03-04 evidence)
+- Clear need demonstrated (friction signals)
+
+**Rationale:**
+Separating infrastructure setup (CIP-013) from deep design work (CIP-014) allows quick pattern establishment in Project 05, validate approach through use, then comprehensive work when justified by evidence. Minimal and complete → expand based on need.
+
+**Full CIP:** `cips/CIP-014_comprehensive-api-design-phase.md`
+
+**Next Steps:**
+- Implement CIP-013 first (Project 05)
+- Validate design/ pattern through use
+- Assess triggers when ready (complexity, friction, gaps)
+- Plan as project (possibly Exploration Project)
 
 ---
 
