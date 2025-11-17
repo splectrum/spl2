@@ -129,6 +129,33 @@
 - Splectrum expresses flow (DSLs describe state transitions)
 - HAICC creates flowing systems (partnership builds architecture)
 
+## The Many Incarnations of Friction
+
+**Friction appears in many forms across design, technology, and architecture - each type a distinct signal.**
+
+**See:** Friction_in_design_v1.0.0.md (projects/05-foundation-update-documentation-templates/)
+**See also:** WOW.md "The Magic of Friction" (why friction matters, how we work with it)
+
+**Five design incarnations:**
+- **Architecture friction:** Stateless vs stateful, flow vs blocking, simple vs complex
+- **Technology friction:** Stack matching vs fighting architecture, tooling smooth vs clunky
+- **Cognitive friction:** Clear mental models vs confusion, AI-friendly vs opaque
+- **Integration friction:** Components compose vs clash, patterns align vs conflict
+- **Evolution friction:** Easy to change vs rigid, evidence-based iteration vs locked-in
+
+**Minimal friction as dynamic KPI:**
+- Not static rule but ever-changing signal guiding design
+- What's low friction today may shift tomorrow
+- Sniff out best path continuously through friction signals
+- Build → measure friction → if low keep going, if high pivot
+
+**Each incarnation teaches:**
+- Architecture friction reveals flow alignment
+- Technology friction shows stack coherence
+- Cognitive friction indicates mental model clarity
+- Integration friction exposes coupling/boundaries
+- Evolution friction demonstrates changeability
+
 ## The Stack to Match
 
 **Technology choices that match the architecture and reduce friction.**

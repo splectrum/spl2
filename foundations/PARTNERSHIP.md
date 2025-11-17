@@ -39,6 +39,33 @@ Clear boundary maintenance essential. Both sides must maintain awareness of patc
 
 Increasing friction = signal to investigate root cause
 
+## The Many Incarnations of Friction
+
+**Friction manifests in many forms throughout partnership - each a signal to understand and address.**
+
+**See:** Friction_in_partnership_v1.0.0.md (projects/05-foundation-update-documentation-templates/)
+
+**Partnership incarnations:**
+- **Communication friction:** Misunderstanding, talking past each other, unclear expectations
+- **Decision friction:** Uncertainty about authority, waiting for approval, unclear boundaries
+- **Process friction:** Methodology overhead, unnecessary ceremony, bureaucracy blocking flow
+- **Quality friction:** Unclear success criteria, subjective judgment, moving goalposts
+- **Context friction:** Missing information, forgotten decisions, lost understanding
+- **Trust friction:** Second-guessing, over-verification, micromanagement
+
+**Friction as health signal:**
+- Low and decreasing = partnership strengthening, understanding deepening
+- Low and stable = healthy equilibrium, patterns working
+- Increasing = something misaligned, investigate root cause
+- Spiking = pause work, surface explicitly, address before continuing
+
+**Using friction as dynamic KPI:**
+- Monitor continuously (not just at milestones)
+- Both technical AND emotional components matter equally
+- Ask "what's the friction level?" regularly
+- Friction reduction validates partnership improvements
+- Sniff out best collaboration patterns through friction signals
+
 ### Shared Understanding Requirement
 
 **"It is not enough to have foundations, necessary that we are in tune with our understanding"**
