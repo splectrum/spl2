@@ -51,7 +51,7 @@ spl2/
 │   ├── 02-*/            # Completed: Initial Workplan
 │   ├── 03-*/            # Completed: Runtime Structure Hello World
 │   ├── 04-*/            # Completed: Bare Runtime Hello World
-│   └── 05-*/            # In Progress: Foundation Update & Documentation Templates
+│   └── 05-*/            # Completed: Foundation Update & Documentation Templates
 ├── archive/             # Reference: spl1 materials (legacy)
 ├── CLAUDE.md            # This file - navigation guide
 └── README.md            # Project overview
@@ -109,10 +109,9 @@ spl2/
 **Adhoc requirements:** `chats/immutables/` - versioned artifacts created during informal work
 **CIP documents:** `cips/CIP-NNN_*.md` - Continual Improvement Proposals (immutable)
 **CIP tracking:** `cips/CIP_REGISTER.md` - living register of all CIPs (14 active CIPs including CIP-013 Design Spot Setup, CIP-014 Comprehensive API Design Phase)
-**Project status:** `projects/INDEX.md` (4 complete, 1 in progress)
-**Current project:** Project 05 - Foundation Update & Documentation Templates (in progress)
-**Next work:** `projects/BACKLOG.md` (15 projects queued, including high-priority Repository Streaming Structure)
-**Completed projects:** `projects/01-*/`, `projects/02-*/`, `projects/03-*/`, `projects/04-*/`
+**Project status:** `projects/INDEX.md` (5 complete, 0 in progress)
+**Next work:** `projects/BACKLOG.md` (15 projects queued, Console API Exploration at position #4)
+**Completed projects:** `projects/01-*/`, `projects/02-*/`, `projects/03-*/`, `projects/04-*/`, `projects/05-*/`
 **Lessons learned:** `projects/XX-*/LESSONS_LEARNED.md` in each project folder
 **Partnership reflections:** `projects/XX-*/PARTNERSHIP_REFLECTION*.md` at project closures
 **Project types:** `projects/project-types/` (Explorative, etc.)

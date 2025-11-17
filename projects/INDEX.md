@@ -4,7 +4,7 @@
 
 | Code | Name | Status | Started | Products |
 |------|------|--------|---------|----------|
-| 04-bare-runtime-hello-world | Bare Runtime Hello World | Initiated | 2025-11-12 | 2 products |
+| - | - | - | - | - |
 
 ## Completed Projects
 
@@ -13,6 +13,8 @@
 | 01-preliminary-to-workplan | Preliminary to Workplan | 2025-11-08 | Validated foundations, established PRINCE2+TDC methodology, bootstrap pattern |
 | 02-initial-workplan | Initial Workplan | 2025-11-10 | Simplified foundations, backlog structure with 9 projects, artifact-to-requirements pattern, minimal+complete practice guidance |
 | 03-runtime-hello-world | Runtime Structure "Hello World" | 2025-11-12 | Core architecture validated, single-parameter method signature, platform abstraction, glossary discovery, MVP+End Vision pattern, Local Rules Apply generality |
+| 04-bare-runtime-hello-world | Bare Runtime Hello World | 2025-11-14 | Bare platform validated, dual-platform patterns, three-pillar strategy, platform abstraction architecture, novel contribution to Bare ecosystem |
+| 05-foundation-update-documentation-templates | Foundation Update & Documentation Templates | 2025-11-17 | Foundation headline format, design/ spot established, friction as dynamic KPI, AI-primary execution model, Blank Project type created |
 
 ## Planned Projects
 
@@ -116,33 +118,71 @@
 **See:** `projects/03-runtime-hello-world/LESSONS_LEARNED.md` for comprehensive synthesis (28 lessons)
 
 ### 04-bare-runtime-hello-world
-**Objective:** Validate Bare platform basics through simplest possible implementation
+**Objective:** Validate Bare as viable platform for SPL2 runtime through exploration
 
-**Project Type:** Explorative Project (Small - 3-5 days)
+**Project Type:** Explorative Project (4 twin pairs)
 
-**Products:**
-1. Working Bare Hello World
-2. Bare Platform Familiarization Documentation
+**Products Delivered:**
+1. Twin Pair 1: Bare Platform Guide + Platform Requirements ✅
+2. Twin Pair 2: Platform Switching Guide + Dual-Platform Requirements ✅
+3. Twin Pair 3: Runtime Migration Guide + Migration Requirements ✅
+4. Twin Pair 4: Platform Abstraction Architecture + Architecture Requirements ✅
 
-**Status:** Initiated - Project brief created, ready to execute
+**Status:** Complete - All 4 twin pairs delivered, Bare validated as viable platform
 
-**Key Focus:**
-- Bare installation and setup
-- Basic execution (console, file I/O)
-- Library landscape survey
-- Development workflow
-- Platform viability validation
+**Key Outcomes:**
+- **Bare platform validated:** Installation trivial, performance excellent, modern JavaScript supported
+- **Dual-platform patterns:** Novel contribution not documented in Bare ecosystem
+- **Three-pillar strategy:** Node (dev/server), Bare (P2P/native), Browser (universal reach)
+- **Platform abstraction simple:** Object wrapper, zero overhead, CommonJS for dual-platform
+- **SPL2 runtime pattern platform-agnostic:** Full Project 03 migration feasible
+- **Production-ready architecture:** Clear design, extensible, implementation-ready
 
-**Why Critical:**
-- Platform viability validation before deeper investment
-- Discover showstoppers early
-- Foundation for Bare Runtime Compatibility deep dive
-- Required for Bare-based architecture confidence
+**Key Learnings:**
+- Twin pair methodology highly effective (4 pairs, all valuable)
+- "Local rules apply" pattern violation discovered (runtime-minimal global install)
+- Novel dual-platform patterns (original contribution to Bare ecosystem)
+- CommonJS better than ESM for dual-platform code
+- Zero-overhead abstraction achievable
 
-**Project Addon:**
-- Import Resolution Experiment (compare package aliases vs importModule function in Bare context)
+**See:** `projects/04-bare-runtime-hello-world/LESSONS_LEARNED.md` for full details
 
-**See:** `projects/04-bare-runtime-hello-world/PROJECT_BRIEF.md` for full details
+### 05-foundation-update-documentation-templates
+**Objective:** Restructure foundations based on Projects 03-04 learning, establish design documentation infrastructure
+
+**Project Type:** Blank Project (straightforward execution, clear deliverables)
+
+**Products Delivered:**
+1. WOW.md & PRINCIPLES.md Simplification (headline format with references) ✅
+2. Design/ Spot Implementation (CIP-013: DESIGN_REGISTER.md, API_DESIGN.md, CHANGELOG) ✅
+3. Partnership Stepping Stones (5 terms added to STEPPING_STONES_GLOSSARY) ✅
+4. CLAUDE.md Navigation Updates ✅
+
+**Unplanned Deliverables:**
+- Blank Project type created (completes project type spectrum)
+- CIP-013 implemented (design spot infrastructure)
+- CIP-014 created (comprehensive API design work scoped for future)
+- Console API Exploration backlog item (AI-primary execution model)
+- Friction incarnations documented (design + partnership contexts)
+
+**Status:** Complete - All products delivered, foundations restructured, design infrastructure established
+
+**Key Outcomes:**
+- **Foundation headline format:** Concise entry points with references to versioned detail files
+- **Friction as dynamic KPI:** Captured across design (5 types) and partnership (6 types) contexts
+- **Design/ spot established:** Mutable docs with CHANGELOGs, registry for discovery, follows glossary/ pattern
+- **AI-primary execution model:** Fundamental architectural decision - AI calls JavaScript functions, CLI is secondary wrapper
+- **Platform vs methodology distinction:** Clear separation (design/ for platform, WOW.md for methodology)
+- **CIP-driven infrastructure:** Lightweight now (CIP-013), comprehensive later (CIP-014)
+
+**Key Learnings:**
+- Friction as path-finding mechanism (not performance gap to eliminate)
+- Discovery through friction (AI-primary model emerged through dialogue)
+- Both perspectives valid (AI: uncomfortable, Partnership: productive)
+- Unplanned deliverables natural for foundation work
+- Blank Project type appropriate for clear scope work
+
+**See:** `projects/05-foundation-update-documentation-templates/LESSONS_LEARNED.md` for comprehensive synthesis
 
 ---
 
