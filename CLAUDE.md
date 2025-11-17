@@ -26,6 +26,10 @@ spl2/
 │   ├── PRINCIPLES.md    # References versioned detail files in projects/
 │   ├── PARTNERSHIP.md   # Partnership health, collaboration patterns (headline)
 │   └── *_CHANGELOG.md   # Track changes to mutable foundation documents
+├── design/              # Platform design documentation (mutable with CHANGELOGs)
+│   ├── DESIGN_REGISTER.md        # Registry of all platform design elements
+│   ├── API_DESIGN.md             # Comprehensive API architecture
+│   └── API_DESIGN_CHANGELOG.md   # Track API design evolution
 ├── chats/               # Informal collaborative work captures
 │   ├── YYYY-MM-DD_*.md  # Chat captures (sufficient and complete pattern)
 │   ├── CHAT_REQUIREMENTS_v1.0.0.md  # How chat capture works
@@ -46,7 +50,8 @@ spl2/
 │   ├── 01-*/            # Completed: Preliminary to Workplan
 │   ├── 02-*/            # Completed: Initial Workplan
 │   ├── 03-*/            # Completed: Runtime Structure Hello World
-│   └── 04-*/            # Completed: Bare Runtime Hello World
+│   ├── 04-*/            # Completed: Bare Runtime Hello World
+│   └── 05-*/            # In Progress: Foundation Update & Documentation Templates
 ├── archive/             # Reference: spl1 materials (legacy)
 ├── CLAUDE.md            # This file - navigation guide
 └── README.md            # Project overview
@@ -55,13 +60,14 @@ spl2/
 ## How Documentation Works
 
 **Mutable-immutable dualism:**
-- **Mutable entry points** (foundations/, glossary/) - Always "current", unversioned names, protected by CHANGELOGs
+- **Mutable entry points** (foundations/, design/, glossary/) - Always "current", unversioned names, protected by CHANGELOGs
 - **Immutable artifacts** (projects/, chats/immutables/, cips/) - Versioned, never change, referenceable
 - Entry points branch to standalone immutables in version jackets
 
 **Pattern:**
 - Foundations (WOW.md, PRINCIPLES.md, PARTNERSHIP.md) are **headlines** - concise, mutable, with CHANGELOGs
 - Detail files live in project folders - **versioned immutables** (e.g., Philosophy_v1.1.0.md)
+- Design docs (API_DESIGN.md, etc.) are **mutable** - always current, with CHANGELOGs tracking evolution, cataloged in DESIGN_REGISTER.md
 - Glossaries (DSL, Stepping Stones, Spots) are **mutable** - always current, with CHANGELOGs tracking evolution
 - Requirements are **immutable** - versioned in projects/ (formal work) or chats/immutables/ (adhoc work)
 - CIPs are **immutable** - once created, never change; tracked via CIP_REGISTER.md (mutable, living)
@@ -97,15 +103,16 @@ spl2/
 **How we work:** `foundations/WOW.md` → references detail files
 **What we're building:** `foundations/PRINCIPLES.md` → references detail files
 **Partnership health:** `foundations/PARTNERSHIP.md` → current state, friction metric, patches
+**Platform design:** `design/DESIGN_REGISTER.md` → catalog of all design elements, `design/API_DESIGN.md` → comprehensive API architecture
 **Terminology:** `glossary/` - DSL_GLOSSARY.md (runtime/API terms), STEPPING_STONES_GLOSSARY.md (foundation concepts), SPOTS_GLOSSARY.md (repository structure)
 **Chat captures:** `chats/` - informal collaborative work discussions, discoveries, decisions
 **Adhoc requirements:** `chats/immutables/` - versioned artifacts created during informal work
 **CIP documents:** `cips/CIP-NNN_*.md` - Continual Improvement Proposals (immutable)
-**CIP tracking:** `cips/CIP_REGISTER.md` - living register of all CIPs
-**Project status:** `projects/INDEX.md` (4 complete)
+**CIP tracking:** `cips/CIP_REGISTER.md` - living register of all CIPs (14 active CIPs including CIP-013 Design Spot Setup, CIP-014 Comprehensive API Design Phase)
+**Project status:** `projects/INDEX.md` (4 complete, 1 in progress)
+**Current project:** Project 05 - Foundation Update & Documentation Templates (in progress)
 **Next work:** `projects/BACKLOG.md` (15 projects queued, including high-priority Repository Streaming Structure)
 **Completed projects:** `projects/01-*/`, `projects/02-*/`, `projects/03-*/`, `projects/04-*/`
-**Next projects:** Foundation Update & Documentation Templates → Glossary Term Requirements (+ Spots Housekeeping addon)
 **Lessons learned:** `projects/XX-*/LESSONS_LEARNED.md` in each project folder
 **Partnership reflections:** `projects/XX-*/PARTNERSHIP_REFLECTION*.md` at project closures
 **Project types:** `projects/project-types/` (Explorative, etc.)
