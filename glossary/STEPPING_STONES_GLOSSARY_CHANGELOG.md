@@ -4,6 +4,20 @@ This file tracks changes to STEPPING_STONES_GLOSSARY.md using diff format.
 
 ---
 
+## 2025-11-18 - Updated Autonomy stepping stone with "Constraints Create Freedom" paradox
+
+Updated Autonomy definition to capture the key insight that constraints enable freedom. Fencing (requirements + self-evaluation tools) enables autonomy within - without boundaries, no autonomy can be granted.
+
+**Changes:**
+- Added "Constraints create freedom" as core concept
+- Clarified prerequisites: state requirements, define self-evaluation tools, then autonomy granted
+- Added context-bound nature: autonomy always operates within defined fence
+- Updated "When to Use" to emphasize defining reqs + self-eval before free action
+
+**Context:** API design paradigm shift discussion - emerged from exploring scripting-to-API promotion pattern and HAICC autonomy model.
+
+---
+
 ## 2025-11-13 - Initial creation
 
 Glossary created with 8 stepping stones defining navigational concepts for SPL2 foundations and work patterns.

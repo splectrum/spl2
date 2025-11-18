@@ -2,9 +2,9 @@
 
 **Location:** design/ spot - mutable design documentation
 **Source:** Project 03 - Runtime Structure "Hello World"
-**Current Version:** v0.1.0 (MVP validated)
-**Last Updated:** 2025-11-17 (moved to design/ spot in Project 05)
-**Status:** Active - validated patterns from Projects 03-04, evolving based on evidence
+**Current Version:** v0.2.0 (AI-primary paradigm shift)
+**Last Updated:** 2025-11-18 (AI-primary execution model, JS invocation primary)
+**Status:** Active - validated patterns from Projects 03-05, evolving based on evidence
 **Changelog:** See API_DESIGN_CHANGELOG.md
 
 ---
@@ -126,12 +126,12 @@ An API is a collection of related methods that:
 
 **Example:**
 ```
-deployment-mgmt/deployment-api/build()
-deployment-mgmt/deployment-api/teardown()
-deployment-mgmt/deployment-api/validate()
+deployment-mgmt/deploymentapi/build()
+deployment-mgmt/deploymentapi/teardown()
+deployment-mgmt/deploymentapi/validate()
 
-state-mgmt/state-api/transition()
-state-mgmt/state-api/snapshot()
+state-mgmt/stateapi/transition()
+state-mgmt/stateapi/snapshot()
 ```
 
 ### Layer Definitions
@@ -146,7 +146,7 @@ state-mgmt/state-api/snapshot()
 - **Contains:** Methods addressing single concern
 - **Defines:** Argument namespace for all methods
 - **State:** API-level state shared across methods
-- **Example:** `deployment-api` contains build, teardown, validate methods
+- **Example:** `deploymentapi` contains build, teardown, validate methods
 
 #### Method Level
 - **Purpose:** Individual operations (leaves/endpoints)
@@ -157,59 +157,77 @@ state-mgmt/state-api/snapshot()
 
 ---
 
-## Multi-Level Argument Passing
+## Argument Passing and Context
 
-### CLI Invocation Pattern
+### Squash Pattern
 
-APIs support argument passing at multiple levels:
+**Design principle:** Arguments from multiple sources are squashed into a single flat ctx before method execution.
 
-```bash
-[package] -pkg-arg value [api] -api-arg value [method] -method-arg value
+**Sources (in precedence order, later overrides earlier):**
+1. Schema defaults
+2. Package-level configuration
+3. API-level configuration
+4. Previous method output
+5. Invocation arguments
+
+**Framework squashes layers:**
+```javascript
+// Framework handles this (fire and forget)
+const ctx = squash(schemaDefaults, packageConfig, apiConfig, previousOutput, invocationArgs);
 ```
 
-### Argument Scope
-
-**Package-level arguments:**
-- Passed to package
-- Available to all APIs in package
-- Use case: Global configuration, package-wide settings
-
-**API-level arguments:**
-- Passed to API
-- **Persist across method invocations** within pipeline
-- Available to all methods in API
-- Use case: Configuration, base paths, shared context
-
-**Method-level arguments:**
-- Passed to specific method
-- Scoped to that method invocation
-- Use case: Operation-specific parameters
-
-### Example
-
-```bash
-# Package-level: set working directory
-deployment-mgmt -workdir /project
-
-# API-level: set deployment target
-deployment-api -target production
-
-# Method-level: specific build options
-build -clean true
+**Method receives flat ctx:**
+```javascript
+async function processData(ctx) {
+  const dataroot = ctx.dataroot;  // resolved from layers
+  const filepath = ctx.filepath;  // resolved from layers
+  // ... business logic
+}
 ```
 
-**Result:**
-- `build()` method sees: workdir, target, clean
-- API-level `target` persists for subsequent method calls
-- Next method invocation: `validate()` still sees `target`
+### JavaScript Access Pattern (Primary)
+
+**Arguments accessed through ctx with optional chaining:**
+```javascript
+const dataroot = ctx?.dataroot;
+const target = ctx?.deployment?.target;
+const clean = ctx?.build?.clean;
+```
+
+**Override when needed:**
+```javascript
+// All input through ctx (preferred)
+await deployment.buildapi.build(ctx);
+
+// Explicit override
+await deployment.buildapi.build(ctx, { clean: true });
+```
+
+### CLI Argument Mapping (Secondary)
+
+**For CLI wrapper, multi-level syntax maps to ctx:**
+```bash
+# CLI syntax
+deployment -workdir /project buildapi -target production build -clean true
+```
+
+**Maps to ctx:**
+```javascript
+{
+  workdir: '/project',      // package-level
+  target: 'production',     // api-level
+  clean: true               // method-level
+}
+```
 
 ### Rationale
 
-**API-level argument persistence enables:**
-- Avoid repetition across method calls
-- Share configuration context
-- Consistent argument naming (namespace at API level)
-- Natural grouping of related operations
+**Squash pattern enables:**
+- Single access pattern (flat ctx with `?.`)
+- Clear precedence (later overrides earlier)
+- Framework handles complexity (fire and forget)
+- Simpler data structures than spl1
+- Defaults resolved at squash time, not scattered through access
 
 ---
 
@@ -223,46 +241,49 @@ build -clean true
 State₁ → Process (stateless code) → State₂
 ```
 
-### State Access Abstraction - Context API Pattern
+### State Access - Flat Context with Optional Chaining
 
-**Key insight:** APIs don't just provide business logic methods - they also provide **state access abstraction**.
+**Key insight:** Framework squashes layers into flat ctx. AI code accesses with optional chaining.
 
-**Problem:** State records are nested (runtime → execution context → pipeline). Direct access couples code to structure:
+**The pattern:**
 ```javascript
-// Bad - coupled to structure
-state.runtime.executionContext.pipeline.count
+// Access flat ctx with optional chaining
+const dataroot = ctx?.dataroot;
+const filepath = ctx?.runtime?.contextapi?.filepath;
+const input = ctx?.input;
 ```
 
-**Solution:** Context API provides getters/setters that abstract structure:
-```javascript
-// Good - abstracted via context API
-ctx.getCount()      // getter knows how to navigate structure
-ctx.setCount(5)     // setter knows how to update immutably
-```
+**Why optional chaining:**
+- Minimal and complete data structures (absent property = doesn't exist)
+- No empty scaffolding (wasteful chatter)
+- Verbosity expresses real uncertainty (semantically correct)
+- Native JS, TypeScript alignment
 
-**Example - Pipeline method using context API:**
+**Example - Pipeline method:**
 ```javascript
-function processPipeline(ctx, args) {
-  // ctx = execution context API
-  // Provides state access abstraction
+async function processPipeline(ctx) {
+  // ctx = flat context (squashed by framework)
 
-  const dataRoot = ctx.getDataRoot();  // getter
-  const input = ctx.getInput();        // getter
+  const dataroot = ctx?.dataroot;
+  const input = ctx?.input;
 
   // Business logic (stateless)
   const result = process(input);
 
-  ctx.setResult(result);  // setter (immutable update)
-
-  return ctx.getState();  // new complete state
+  // Return new state (framework handles persistence)
+  return {
+    ...ctx,
+    result,
+    status: 'success'
+  };
 }
 ```
 
 **Benefits:**
-- **Encapsulation:** Structure can evolve without breaking code
-- **Simplicity:** Clean interface hides nesting complexity
-- **Immutability:** Setters enforce immutable updates through nested structure
-- **Clarity:** Intent clear (getting/setting what, not navigating structure)
+- **Simplicity:** Flat access, no getters/setters needed
+- **Clarity:** Optional chaining shows uncertainty explicitly
+- **Framework handles complexity:** Squash, persistence, state transitions
+- **TypeScript support:** Types from AVRO schemas, IDE autocomplete
 
 **Three-layer invocation architecture:**
 ```
@@ -284,12 +305,12 @@ Runtime API (method with state)
   runtime: {
     // runtime state
     version: "0.1.0",
-    startTime: timestamp,
+    starttime: timestamp,
 
-    executionContext: {
+    executioncontext: {
       // execution context state
-      pipelineId: "abc-123",
-      dataRoot: "/data",
+      pipelineid: "abc-123",
+      dataroot: "/data",
 
       pipeline: {
         // pipeline/request state
@@ -304,7 +325,7 @@ Runtime API (method with state)
 
 **Implementation pattern:**
 - Runtime Context API implements `ctx` object
-- Getters navigate nested structure: `ctx.getInput()` → `state.runtime.executionContext.pipeline.input`
+- Getters navigate nested structure: `ctx.getInput()` → `state.runtime.executioncontext.pipeline.input`
 - Setters create new immutable state tree with updated value
 - Pipeline methods receive `ctx`, use getters/setters, never touch structure directly
 
@@ -331,7 +352,7 @@ function methodName(state, arguments) {
   // Stateless logic
   // Operate on state (read only)
   // Return new state
-  return newState;
+  return newstate;
 }
 ```
 
@@ -402,12 +423,12 @@ function methodName(state, arguments) {
 **Output data structure = metadata (in headers)**
 - Method results stored as headers
 - Becomes input to next method (stays in headers)
-- Example: `runtime.contextapi.status="success"`, `runtime.contextapi.rowCount="100"`
+- Example: `runtime.contextapi.status="success"`, `runtime.contextapi.rowcount="100"`
 
 **Data = State (in value)**
 - Actual content being managed
 - Promoted from metadata when it becomes part of state
-- Example: `parsedData`, `processedContent` in value
+- Example: `parseddata`, `processedContent` in value
 
 **Why this makes sense:**
 
@@ -432,13 +453,13 @@ function methodName(state, arguments) {
 
 // Output (metadata in headers):
 //   runtime.contextapi.status = "success"
-//   runtime.contextapi.rowCount = 100
+//   runtime.contextapi.rowcount = 100
 
 // Promote to data (add to value):
 {
   "value": {
-    "parsedData": [...],  // Promoted - now part of state
-    "sourceFile": "/tmp/file.txt"  // Promoted - tracking state origin
+    "parseddata": [...],  // Promoted - now part of state
+    "sourcefile": "/tmp/file.txt"  // Promoted - tracking state origin
   }
 }
 ```
@@ -490,7 +511,7 @@ Input structure overlays onto API record headers:
     {"key": "file.api.timestamp", "value": "1699564800000"}
   ],
   "value": {
-    "fileContents": "Hello World",  // Promoted from metadata to state
+    "filecontents": "Hello World",  // Promoted from metadata to state
     "encoding": "utf-8",
     "size": 11
   }
@@ -512,10 +533,10 @@ Input structure overlays onto API record headers:
 1. **Create/Update operations** - Data payload in input metadata
    - Input: `content="Hello World"` (in headers)
    - Process: Store in state
-   - Promote: content → value.fileContents
+   - Promote: content → value.filecontents
 
 2. **Read operations** - Data payload in output metadata
-   - Process: Retrieve from value.fileContents
+   - Process: Retrieve from value.filecontents
    - Output: `content="Hello World"` (in headers, passed to next method)
 
 3. **Transform operations** - Data in both input and output metadata
@@ -622,9 +643,9 @@ pipeline.processapi.duration
 **Example:**
 ```
 runtime.contextapi.init          // method
-runtime.contextapi.getState      // method
+runtime.contextapi.getstate      // method
 runtime.contextapi.timestamp     // property
-runtime.contextapi.dataRoot      // property
+runtime.contextapi.dataroot      // property
 runtime.contextapi.version       // property
 ```
 
@@ -703,7 +724,7 @@ Contents of /data/myfile.json:
     {"key": "file.api.operation", "value": "write"}
   ],
   "value": {
-    "fileContents": "Hello World"  ← Original file contents here
+    "filecontents": "Hello World"  ← Original file contents here
   }
 }
 ```
@@ -725,11 +746,11 @@ The original file's contents become the `value` property of the Kafka record. Th
     {"key": "file.api.filepath", "value": "/tmp/data.txt"},
     {"key": "file.api.size", "value": "11"},
     {"key": "file.api.encoding", "value": "utf-8"},
-    {"key": "file.api.lastModified", "value": "1699564800000"}
+    {"key": "file.api.lastmodified", "value": "1699564800000"}
   ],
   "value": {
-    "fileContents": "Hello World",
-    "originalPath": "/tmp/data.txt"
+    "filecontents": "Hello World",
+    "originalpath": "/tmp/data.txt"
   }
 }
 ```
@@ -773,7 +794,7 @@ The original file's contents become the `value` property of the Kafka record. Th
 **Implications for API design:**
 
 1. **File APIs don't manage files directly** - They manage Kafka records that represent files
-2. **Reading a file** - Deserialize record, extract value.fileContents
+2. **Reading a file** - Deserialize record, extract value.filecontents
 3. **Writing a file** - Create new record with content in value
 4. **File metadata** - Stored in headers (accessible without deserializing)
 5. **Immutability** - New version = new record (append-only)
@@ -787,7 +808,7 @@ The original file's contents become the `value` property of the Kafka record. Th
 
 // file.api.read()
 // Input: filepath="/tmp/data.txt"
-// Reads Kafka record from filesystem, returns value.fileContents in output metadata
+// Reads Kafka record from filesystem, returns value.filecontents in output metadata
 
 // file.api.append()
 // Input: filepath="/tmp/data.txt", content=" More text"
@@ -825,9 +846,9 @@ The original file's contents become the `value` property of the Kafka record. Th
   "headers": [
     // Runtime properties in headers (metadata/configuration)
     {"key": "runtime.context.version", "value": "0.1.0"},
-    {"key": "runtime.context.startTime", "value": "1699564800000"},
-    {"key": "runtime.context.maxContexts", "value": "10"},
-    {"key": "runtime.context.config.logLevel", "value": "info"}
+    {"key": "runtime.context.starttime", "value": "1699564800000"},
+    {"key": "runtime.context.maxcontexts", "value": "10"},
+    {"key": "runtime.context.config.loglevel", "value": "info"}
     // Shared configuration, resource info, etc.
   ],
   "value": {
@@ -837,8 +858,8 @@ The original file's contents become the `value` property of the Kafka record. Th
       "key": "exec-123",
       "timestamp": 1699564800500,
       "headers": [
-        {"key": "runtime.executioncontext.dataRoot", "value": "/tmp"},
-        {"key": "runtime.executioncontext.requestId", "value": "req-abc"}
+        {"key": "runtime.executioncontext.dataroot", "value": "/tmp"},
+        {"key": "runtime.executioncontext.requestid", "value": "req-abc"}
       ],
       "value": {
         // Pipeline API state records (namespaced by package.api)
@@ -853,8 +874,8 @@ The original file's contents become the `value` property of the Kafka record. Th
           ],
           "value": {
             // Git API state data
-            "clonePath": "/tmp/repo",
-            "commitHash": "abc123"
+            "clonepath": "/tmp/repo",
+            "commithash": "abc123"
           }
         },
         "tools.7zip": {
@@ -865,8 +886,8 @@ The original file's contents become the `value` property of the Kafka record. Th
             {"key": "tools.7zip.format", "value": "7z"}
           ],
           "value": {
-            "archivePath": "/tmp/archive.7z",
-            "compressedSize": 1024
+            "archivepath": "/tmp/archive.7z",
+            "compressedsize": 1024
           }
         },
         "spl.parser": {
@@ -877,7 +898,7 @@ The original file's contents become the `value` property of the Kafka record. Th
             {"key": "spl.parser.status", "value": "success"}
           ],
           "value": {
-            "parsedData": { /* parsed content */ }
+            "parseddata": { /* parsed content */ }
           }
         }
       }
@@ -894,7 +915,7 @@ The original file's contents become the `value` property of the Kafka record. Th
 - **Value:** Execution contexts (numbered "1", "2", "3"...) - state
 
 **Execution Context Record (nested in runtime value):**
-- **Headers:** Execution context properties (dataRoot, requestId) - metadata
+- **Headers:** Execution context properties (dataroot, requestid) - metadata
 - **Value:** Pipeline API records (namespaced by package.api) - state
 
 **Pipeline API Record (nested in execution context value):**
@@ -1004,7 +1025,7 @@ Runtime Context (shared across threads)
 - Monitoring/metrics aggregation
 
 **Execution Context (isolated per thread):**
-- Request-specific data (dataRoot, inputs)
+- Request-specific data (dataroot, inputs)
 - Pipeline state (API records)
 - Execution metadata (timing, status)
 - Thread-local state
@@ -1018,38 +1039,46 @@ Runtime Context (shared across threads)
 
 ### State Flow Through Layers
 
-**Access patterns:**
+**Framework handles internal structure. AI code accesses flat ctx.**
 
+**Internal structure (framework manages):**
 ```javascript
-// Runtime level (shared - in headers)
-runtime.headers["runtime.context.version"]
-runtime.headers["runtime.context.config.logLevel"]
-
-// Execution context level (thread-local - in value)
-runtime.value["1"].headers["runtime.executioncontext.dataRoot"]
-runtime.value["1"].value  // Pipeline API records
-
-// Pipeline API level (within execution context value)
-runtime.value["1"].value["tools.git"].headers["tools.git.operation"]
-runtime.value["1"].value["tools.git"].value.clonePath
+// Runtime state with nested execution contexts
+// AI code never navigates this directly
+{
+  runtime: {
+    version: "0.1.0",
+    executioncontext: {
+      "1": {
+        dataroot: "/tmp",
+        pipeline: { /* API records */ }
+      }
+    }
+  }
+}
 ```
 
-**ctx object (getter/setter abstraction):**
-
-The execution context API provides `ctx` object that abstracts state access:
-
+**AI code uses flat ctx with optional chaining:**
 ```javascript
-// Instead of navigating structure manually:
-const filepath = runtime.value["1"].value["file.api"].value.filepath;
+// Framework squashes layers into flat ctx
+const version = ctx?.version;
+const dataroot = ctx?.dataroot;
+const filepath = ctx?.filepath;
+const operation = ctx?.git?.operation;
 
-// Use ctx abstraction:
-const filepath = ctx.getFilepath();  // Knows how to navigate
-
-// Setting values (immutable update):
-ctx.setResult(data);  // Creates new state tree with update
+// Return new state (framework handles persistence)
+return {
+  ...ctx,
+  result: processedData,
+  status: 'success'
+};
 ```
 
-**ctx is provided by Execution Context API** - hides nesting complexity from pipeline methods.
+**Framework responsibilities:**
+- Squash layers into flat ctx before method runs
+- Persist state changes after method returns
+- Manage nested structure internally
+- Handle execution context isolation
 
 ### MVP Implementation (Project 03)
 
@@ -1067,104 +1096,294 @@ ctx.setResult(data);  // Creates new state tree with update
 
 ---
 
-## CLI-Callable Methods and Invocation Patterns
+## Method Invocation Patterns
 
-### Every Method is CLI-Callable
+### JS-Callable Primary, CLI Secondary
 
-**Design principle:** All API methods can be invoked from command line.
+**Design principle:** All API methods are JavaScript functions. CLI is a secondary wrapper for human convenience ("AI absent" mode).
 
-**Benefits:**
-1. Composability - methods chain naturally
-2. Testing - call methods directly without test framework
-3. Debugging - inspect intermediate states
-4. Automation - script workflows easily
-5. Transparency - execution model visible
-
-### Command-Line Invocation Syntax (from spl1)
-
-**Basic invocation:**
-```bash
-[package]/[api]/[method] -arg1 value -arg2 value
+**Primary invocation (AI writes code):**
+```javascript
+await runtime.contextapi.init(ctx);
+await pipeline.processapi.execute(ctx);
+await pipeline.validateapi.check(ctx);
 ```
 
-**Example:**
+**Secondary invocation (CLI wrapper for humans):**
 ```bash
-runtime/context-api/init -dataRoot /tmp
-pipeline/process-api/execute -input data.json
+runtime/contextapi/init -dataroot /tmp
+```
+
+**Benefits of JS-primary:**
+1. Type safety - TypeScript types from AVRO schemas
+2. IDE support - autocomplete, refactoring, static analysis
+3. Full language - conditionals, loops, error handling
+4. No strings - typed function calls
+5. Composability - JS is the composition language
+
+### JavaScript Composition (Primary)
+
+**Simple pipeline:**
+```javascript
+async function processWorkflow(ctx) {
+  await runtime.contextapi.init(ctx);
+  await pipeline.processapi.execute(ctx);
+  await pipeline.validateapi.check(ctx);
+}
+```
+
+**Conditional logic:**
+```javascript
+const result = await pipeline.processapi.execute(ctx);
+if (result.status === 'error') {
+  await pipeline.errorapi.handle(ctx);
+} else {
+  await pipeline.validateapi.check(ctx);
+}
+```
+
+**Loops:**
+```javascript
+for (const item of items) {
+  await pipeline.processapi.execute(ctx, { input: item });
+}
+```
+
+**How composition works:**
+- State flows through ctx (mutated or replaced by framework)
+- JS provides all control flow (no separate DSL needed)
+- Methods are async functions, composition is await chains
+- Framework handles squashing layers into ctx before code runs
+
+### CLI Invocation (Secondary - "AI Absent" Mode)
+
+**For humans operating without AI collaboration:**
+```bash
+runtime/contextapi/init -dataroot /tmp
+pipeline/processapi/execute -input data.json
 ```
 
 **Chaining with `@@` operator:**
 ```bash
-[package]/[api]/[method] -args @@ [package]/[api]/[method] -args
+runtime/contextapi/init -dataroot /tmp @@ \
+pipeline/processapi/execute -input data.json @@ \
+pipeline/validateapi/check
 ```
 
-**Example chain:**
-```bash
-runtime/context-api/init -dataRoot /tmp @@ \
-pipeline/process-api/execute -input data.json @@ \
-pipeline/validate-api/check
+**CLI is wrapper over JS:**
+- Parses arguments, builds ctx
+- Calls underlying JS function
+- Help generated from AVRO schemas
+
+### Dynamic Composition
+
+**With JS as primary, dynamic composition is just JavaScript:**
+
+```javascript
+// Dynamic method sequences
+const methods = ['init', 'process', 'validate'];
+for (const method of methods) {
+  await api[method](ctx);
+}
+
+// Parameterized composition
+async function runWorkflow(ctx, config) {
+  await runtime.contextapi.init(ctx);
+
+  for (const step of config.steps) {
+    await pipeline[step.api][step.method](ctx, step.args);
+  }
+}
+
+// Conditional flows
+if (ctx?.mode === 'production') {
+  await pipeline.validateapi.strict(ctx);
+} else {
+  await pipeline.validateapi.basic(ctx);
+}
 ```
 
-**How chaining works:**
-- State flows through chain (State₁ → Method₁ → State₂ → Method₂ → State₃)
-- `@@` separates invocations
-- Output state from one becomes input state to next
-- **This IS the DSL** - composition at command line, no separate syntax needed
-- Chaining with `@@` can cross API boundaries (different APIs in chain)
+**No special batch syntax needed:**
+- JS provides loops, conditionals, dynamic property access
+- Full language power for composition
+- Type safety maintained with TypeScript
+- Error handling with try/catch
 
-### Batch Execution Pattern (Future Enhancement)
+---
 
-**Alternative to scripted chaining:** Invoke API with batch of method calls.
+## Scripting-to-API Promotion Pattern
 
-**Traditional chaining (scripted, crosses APIs):**
-```bash
-package1/api1/method1 -arg1 value @@ \
-package2/api2/method2 -arg2 value @@ \
-package1/api1/method3 -arg3 value
+### Prerequisites for Autonomy
+
+**HAICC requires before availing of autonomy:**
+1. Requirements stated (what am I trying to achieve?)
+2. Self-evaluation tools defined (how will I verify?)
+
+**Then free scripting is granted** - full internal access, no artificial constraints.
+
+### Free Scripting with Full Internal Access
+
+**AI can script freely with full access to internal structures:**
+
+```javascript
+// Free scripting - direct access to metadata and data
+const records = ctx?.mycelium?.topic?.records;
+const metadata = records?.map(r => r.headers);
+const transformed = customLogic(metadata, records);
 ```
 
-**Batch execution (dynamic, within API context):**
-```bash
-package/api -batch "method1 -arg1 value; method2 -arg2 value; method3 -arg3 value"
+**Why this is powerful:**
+- No artificial constraints during exploration
+- Full metadata/data access when needed
+- Natural experimentation without penalty
+- Internal access becomes "legal" once wrapped in API method
+
+### Requirements, Scripting, and Self-Evaluation
+
+**The complete workflow:**
+
+```javascript
+// REQUIREMENTS:
+// - Transform mycelium records by extracting timestamp metadata
+// - Filter records older than threshold
+// - Return filtered set with computed age field
+
+// SELF-EVALUATION TOOLS:
+// - Check timestamp extraction from headers
+// - Verify threshold filtering (default and custom)
+// - Confirm computed age field present
+// - Test optional chaining for missing data
+
+// SCRIPT:
+async function filterOldRecords(ctx) {
+  const threshold = ctx?.threshold ?? 86400000; // default 24h
+  const records = ctx?.mycelium?.topic?.records;
+
+  return records
+    ?.filter(r => r.headers?.timestamp < Date.now() - threshold)
+    ?.map(r => ({
+      ...r,
+      computed: { age: Date.now() - r.headers?.timestamp }
+    }));
+}
+
+// SELF-EVALUATION:
+// ✓ Extracts timestamp from metadata (headers)
+// ✓ Filters by threshold (configurable, with default)
+// ✓ Computes age field
+// ✓ Handles missing data with optional chaining
+// → Ready for filing decision
 ```
 
-**Characteristics:**
-- **Within API context:** Batch executes methods within single API (not across APIs)
-- **State flow identical:** State flows through batch methods same as `@@` chaining
-- **Dynamic composition:** Batch content can be parameterized, loaded from file, generated
-- **Reusable scripts:** Same invocation, different batch arguments
+### Filing Decision - Navigation Not Design
 
-**Benefits:**
-1. **Flexible complex operations** - Compose on-the-fly without scripting
-2. **Testing variations** - Easy to test different sequences
-3. **Parameterization** - Batch can be variable/generated
-4. **On-demand workflows** - No pre-scripting needed
+**After successful self-evaluation, determine where to file.**
 
-**API-Level Code:**
-- APIs can have executable code (not just contain methods)
-- API-level code implemented same as methods
-- Handles: batch parsing, orchestration, state flow through batch methods
-- Returns: final state after batch execution
+**The structure guides the filing:**
+- Package structure shows organizational groupings
+- Existing APIs show which concerns live where
+- API glossary defines naming conventions
+- AVRO schemas define data structures each API owns
 
-**Comparison:**
+**Filing is pattern matching:**
 
-| Pattern | Scope | Use Case |
-|---------|-------|----------|
-| `@@` chaining | Cross-API | Script complex workflows across system |
-| Batch execution | Within API | Dynamic method sequences in API context |
-| Programmatic API | Either | Complex logic, conditionals, loops |
+```javascript
+// FILING DECISION:
 
-**Implementation Notes:**
-- **Batch format:** To be decided (command-line syntax? JSON? YAML?)
-- **Complex arguments:** Can batch methods have complex arguments? Format dependent
-- **Error handling:** How do errors in batch affect remaining methods?
-- **Status:** Future enhancement - capture in CIP during project closure
+// 1. Which package?
+//    Look at existing: runtime/, data/, tools/, pipeline/
+//    This filters records → runtime infrastructure
+//    → Package: runtime
 
-**When to implement:**
-- After CLI invocation proven (Twin Pairs 2-4)
-- When use cases demand dynamic composition
-- After batch format decided
-- With full CLI parser infrastructure
+// 2. Which API?
+//    Look at runtime/ APIs: contextapi, filterapi, lifecycleapi
+//    My code filters records → filterapi exists
+//    → API: filterapi
+
+// 3. What method name?
+//    Look at filterapi methods: bytype, bystatus, bydate...
+//    My code filters by age → follows "by___" pattern
+//    → Method: byage
+
+// FILING: runtime/filterapi/byage
+```
+
+**Self-evaluate the filing:**
+- ✓ Package aligns with concern (infrastructure)
+- ✓ API owns this data structure (filter operations)
+- ✓ Method name follows glossary pattern
+- → File it
+
+### Vocabulary Extension
+
+**When filing reveals vocabulary gap:**
+
+```javascript
+// FILING DECISION:
+// → This manages P2P peer connections
+// → No existing package fits
+// → No existing API addresses this concern
+
+// PROPOSAL: New vocabulary needed
+// - Package: p2p (new - follows pattern: lowercase, domain)
+// - API: peerapi (new - follows pattern: concern + api)
+// - Method: connect (follows pattern: verb for operations)
+
+// SELF-EVALUATE PROPOSAL:
+// ✓ Package name follows existing patterns
+// ✓ API name follows existing patterns
+// ✓ Method name aligns with glossary conventions
+// → Propose addition to API glossary
+```
+
+**Glossary grows through use:**
+- Scripting creates new capability
+- Filing reveals vocabulary gap
+- Propose addition following established patterns
+- Self-evaluate the proposal
+- Glossary extends (not speculative, evidence-based)
+
+### Promotion to API Method
+
+**File the script in the determined location:**
+
+```
+Script with successful self-evaluation
+    ↓
+Filing decision (navigate structure)
+    ↓
+Place in [package]/[api]/methods/
+    ↓
+Add AVRO schemas (input/output)
+    ↓
+Now it's an API method
+```
+
+**External callers see clean interface:**
+```javascript
+await runtime.filterapi.byage(ctx);
+```
+
+**Internal complexity hidden.** The full metadata/data access that was "free scripting" is now encapsulated inside the API boundary.
+
+### Why This Works
+
+**Frictionless transition:**
+- Same code, different location
+- Structure guides filing (navigation, not design)
+- Fire and forget - write it, file it, it's an API
+
+**Trust through discipline:**
+- Requirements + self-evaluation tools before scripting
+- Honest self-assessment after
+- Filing decision self-evaluated
+- Accurate self-evaluation expands autonomy over time
+
+**Structure provides guardrails:**
+- Packages show where concerns live
+- APIs show data structure ownership
+- Glossary ensures naming consistency
+- Filing becomes pattern matching
 
 ---
 
@@ -1177,9 +1396,9 @@ package/api -batch "method1 -arg1 value; method2 -arg2 value; method3 -arg3 valu
 **Level 1: Script → Programmatic Pipeline Structure**
 ```bash
 # Input: Command-line script
-runtime/context-api/init -dataRoot /tmp @@ \
-pipeline/process-api/execute -input data.json @@ \
-pipeline/validate-api/check
+runtime/contextapi/init -dataroot /tmp @@ \
+pipeline/processapi/execute -input data.json @@ \
+pipeline/validateapi/check
 
 # Level 1 compilation: Programmatic structure (preserves granularity)
 compiler-api/compile-script -level 1 \
@@ -1191,9 +1410,9 @@ compiler-api/compile-script -level 1 \
 ```javascript
 // workflow-api/process-and-validate.js (Level 1)
 async function processAndValidate(ctx, input) {
-  let state = await runtime.contextApi.init(ctx, { dataRoot: '/tmp' });
-  state = await pipeline.processApi.execute(state, { input });
-  state = await pipeline.validateApi.check(state);
+  let state = await runtime.contextapi.init(ctx, { dataroot: '/tmp' });
+  state = await pipeline.processapi.execute(state, { input });
+  state = await pipeline.validateapi.check(state);
   return state;
 }
 ```
@@ -1332,113 +1551,123 @@ wrapper-api/wrap-bash \
 - When integration needs emerge
 - With proper sandboxing/isolation infrastructure
 
-### Integrated Help System
+### Discovery and Help System
 
-**Help at every hierarchy level (from spl1):**
+**AVRO is the specification. Help is generated from AVRO.**
 
-**Package level:**
-```bash
-runtime -h
-# Output: Available APIs in runtime package
-#   - context-api: Execution context management
-#   - lifecycle-api: Runtime lifecycle operations
-```
-
-**API level:**
-```bash
-runtime/context-api -h
-# Output: Available methods in context-api
-#   - init: Initialize execution context
-#   - getState: Retrieve current state
-#   Methods, arguments, descriptions
-```
-
-**Method level:**
-```bash
-runtime/context-api/init -h
-# Output: Detailed method help
-#   Description: Initialize execution context with configuration
-#   Arguments:
-#     -dataRoot <path>: Root directory for data (required)
-#     -config <file>: Configuration file (optional)
-#   Returns: Initialized state with execution context
-#   Examples: ...
-```
-
-**Help as Requirements:**
-- Help artifacts stored alongside code
-- Help describes the contract (what method does, arguments, behavior)
-- **Help IS the specification** - unified documentation and requirements
-- Part of requirements validation
-- Self-documenting system
-
-**Benefits for discoverability:**
-- Humans can explore system via help
-- AI can discover available operations
-- Type information enables intelligent composition
-- Pattern recognition from descriptions
-- No external documentation needed
-
-### Programmatic API Equivalent (Future)
-
-**Vision:** Equivalent programming syntax alongside command-line scripting.
-
-**Command-line (interactive, testing, simple workflows):**
-```bash
-runtime/context-api/init -dataRoot /tmp @@ \
-pipeline/process-api/execute -input data.json @@ \
-pipeline/validate-api/check
-```
-
-**Programmatic (complex logic, conditionals, loops):**
+**AI discovery (primary):**
 ```javascript
-const result = await runtime.contextApi.init({ dataRoot: '/tmp' })
-  .then(state => pipeline.processApi.execute(state, { input: 'data.json' }))
-  .then(state => pipeline.validateApi.check(state));
+// Import TypeScript types generated from AVRO
+import { InitInput, InitOutput } from 'runtime/contextapi/schemas';
+
+// IDE provides autocomplete, type checking
+const input: InitInput = { dataroot: '/tmp' };
 ```
 
-**Benefits of dual syntax:**
-1. **Isomorphic** - Same execution model, different expression
-2. **Right tool for job** - CLI for quick tasks, code for complexity
-3. **Composability** - Can mix: script calls programmatic, programmatic calls scripts
-4. **Testing** - CLI for manual, programmatic for automated
-5. **Learning path** - Start with CLI (immediate), graduate to code (power)
-6. **AI flexibility** - Generate either form depending on context
+**AI reads AVRO schemas directly:**
+- Full type information
+- Field descriptions, defaults, constraints
+- Schema evolution history
+- No separate help artifacts needed
 
-**For DSL Engine:**
-- Understands both representations
-- Can translate between them
-- Optimizes execution regardless of form
-- Help system metadata supports both
-- Type-guided composition from help artifacts
-- Pattern suggestions from method descriptions
+**CLI help (secondary - for humans):**
+```bash
+runtime/contextapi -h
+# Output generated from AVRO:
+#   Available methods in contextapi
+#   - init: Initialize execution context
+#   - getstate: Retrieve current state
 
-**Implementation path:**
-- **MVP:** CLI invocation with `@@` chaining (prove execution model)
-- **Help system:** Integrated help at all levels (enables discovery)
-- **Programmatic API:** Layer on top after CLI proven
-- Both compile to same runtime execution
+runtime/contextapi/init -h
+# Output generated from AVRO:
+#   Arguments:
+#     -dataroot <path>: Root directory for data (required)
+#     -config <file>: Configuration file (optional)
+```
+
+**AVRO as single source:**
+- Schemas define the contract (types, constraints, descriptions)
+- TypeScript types generated for AI code
+- CLI help generated for human convenience
+- Tests validate the contract (tests as requirements)
+- No separate help artifacts to maintain
+
+**Benefits:**
+- Single source of truth (AVRO schemas)
+- AI gets full type support (TypeScript)
+- Humans get CLI help (generated)
+- No documentation drift
+
+### JavaScript API (Primary)
+
+**JS is the primary invocation method. CLI is secondary wrapper.**
+
+**Primary - AI writes JavaScript:**
+```javascript
+async function workflow(ctx) {
+  await runtime.contextapi.init(ctx);
+  await pipeline.processapi.execute(ctx);
+  await pipeline.validateapi.check(ctx);
+}
+```
+
+**With TypeScript types from AVRO:**
+```typescript
+import { InitInput } from 'runtime/contextapi/schemas';
+
+async function workflow(ctx: Context) {
+  const input: InitInput = { dataroot: '/tmp' };
+  await runtime.contextapi.init(ctx, input);
+  // ...
+}
+```
+
+**Secondary - CLI for humans ("AI absent" mode):**
+```bash
+runtime/contextapi/init -dataroot /tmp @@ \
+pipeline/processapi/execute -input data.json @@ \
+pipeline/validateapi/check
+```
+
+**Why JS primary:**
+1. **AI's natural invocation** - writes code, calls functions
+2. **Type safety** - TypeScript from AVRO schemas
+3. **Full language** - conditionals, loops, error handling
+4. **IDE support** - autocomplete, refactoring, static analysis
+5. **No strings** - typed function calls
+
+**CLI as wrapper:**
+- Parses arguments, builds ctx
+- Calls underlying JS functions
+- Help generated from AVRO
+- For humans operating without AI collaboration
+
+**Implementation:**
+- JS functions are the methods
+- CLI wrapper calls JS functions
+- Same execution, different entry point
 
 ### Implementation Approach
 
-**MVP (Twin Pair 1):**
-- npm scripts expose methods: `npm run build`, `npm run validate`
-- Simple, works for exploration
-- Proven pattern
+**MVP:**
+- JS functions as methods (primary invocation)
+- TypeScript types generated from AVRO schemas
+- Direct imports for type safety and IDE support
+- Framework handles ctx squashing and state persistence
+- npm scripts for convenience: `npm run build`, `npm run validate`
 
-**Near-term (Twin Pairs 2-4):**
-- CLI invocation: `[package]/[api]/[method]` syntax
-- Chaining with `@@`
-- State flow through pipeline
-- Integrated help system (package/api/method levels)
-- Help artifacts alongside code
+**Near-term:**
+- Console API exploration validates patterns
+- AVRO schema definitions for core APIs
+- TypeScript type generation pipeline
+- Squash pattern implementation
+- Basic CLI wrapper for "AI absent" mode
 
-**Future (Post-Project 03):**
-- Dedicated CLI parser (full spl1-style invocation)
-- Programmatic API equivalent
-- DSL engine using help metadata
-- Type-guided composition
-- Advanced pipeline orchestration
+**Future:**
+- Full CLI wrapper with help generation from AVRO
+- Advanced state persistence (Kafka integration)
+- Schema evolution tooling
+- Performance optimization
 
 ### Validation Pattern
 
@@ -1641,7 +1870,7 @@ Arguments:
 ### Single Concern Principle
 
 **Each API addresses one concern:**
-- ✅ Good: `deployment-api` - build, teardown, validate (all deployment)
+- ✅ Good: `deploymentapi` - build, teardown, validate (all deployment)
 - ❌ Bad: `utils-api` - mixed unrelated utilities
 
 **How to identify concerns:**
@@ -1660,9 +1889,9 @@ Arguments:
 **Example:**
 ```javascript
 // Good - consistent naming
-read(state, { filePath })
-write(state, { filePath, content })
-delete(state, { filePath })
+read(state, { filepath })
+write(state, { filepath, content })
+delete(state, { filepath })
 
 // Bad - inconsistent
 read(state, { path })
@@ -1726,7 +1955,7 @@ function methodName(state, input) {
 // Error state transition
 return {
   state: {
-    ...currentState,
+    ...currentstate,
     error: {
       code: 'BUILD_FAILED',
       message: 'Node.js version too old',
@@ -1747,17 +1976,23 @@ return {
 
 ## MVP vs End Vision
 
-### MVP Scope (Project 03)
+### MVP Scope
+
+**AI-primary invocation:**
+- JS functions as methods
+- TypeScript types from AVRO schemas
+- Direct imports for type safety
+- Framework handles ctx and state
 
 **Three-layer structure:**
 - `[package]/[api]/[method]`
 - Proven from spl1
 - Simple, concrete
 
-**Single-layer APIs:**
-- API directly contains methods
-- No sub-APIs
-- Flat structure
+**Flat ctx access:**
+- Squash pattern for layered input
+- Optional chaining (`?.`) for access
+- Simpler data structures than spl1
 
 **State backing at API level:**
 - Methods share API state
@@ -1769,12 +2004,13 @@ return {
 - Traceability to requirements
 - Manual management
 
-**CLI via npm scripts:**
-- Simple invocation
-- Sufficient for exploration
-- No dedicated CLI parser yet
-
 ### End Vision (Future CIPs)
+
+**Full CLI wrapper ("AI absent" mode):**
+- Help generated from AVRO schemas
+- Standard invocation syntax
+- Multi-level argument parsing
+- For humans operating without AI
 
 **N-tier organizational hierarchy:**
 - Flexible depth above API level
@@ -1793,17 +2029,10 @@ return {
 - Perfect bug reproduction
 - Requires automation infrastructure
 
-**Dedicated CLI parser:**
-- Standard invocation syntax
-- Multi-level argument parsing
-- Built-in pipeline orchestration
-- Rich error handling
-
-**AVRO schema integration:**
-- Typed state records
-- Schema evolution support
-- Type-safe composition
-- Validation at boundaries
+**Advanced state persistence:**
+- Kafka integration
+- Schema evolution tooling
+- Performance optimization
 
 ### Migration Philosophy
 
@@ -1814,10 +2043,10 @@ return {
 3. **Migrate when capacity + evidence exist** (not speculative)
 4. **"Local rules apply"** (no retroactive burden)
 
-**Examples in Project 03:**
+**Examples:**
+- JS primary now → Full CLI wrapper future
 - Requirements now → GUIDs future
 - Three-layer now → N-tier future
-- npm scripts now → CLI parser future
 - Flat APIs now → Hierarchical future
 
 ---
@@ -1834,10 +2063,10 @@ return {
 - Immutable state transitions
 - Complete audit trail
 
-**3. CLI-callable by default**
-- All methods invocable from command line
-- Composability, testability, transparency
-- No hidden behavior
+**3. JS-primary invocation**
+- AI writes JS, calls functions directly
+- TypeScript types from AVRO schemas
+- CLI is secondary wrapper for humans
 
 **4. Minimal and complete**
 - Start simple (MVP)

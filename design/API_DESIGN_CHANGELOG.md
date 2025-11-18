@@ -5,6 +5,41 @@
 
 ---
 
+## 2025-11-18
+
+**Version:** v0.2.0 (AI-primary paradigm shift)
+**Changes:**
+- **Major paradigm shift:** CLI primary → JS primary invocation
+- AI writes JavaScript functions, CLI is secondary wrapper for "AI absent" mode
+- AVRO schemas as single source of truth (types, validation, help generated)
+- TypeScript types generated from AVRO for IDE support and type safety
+- Squash pattern for argument/context layering (framework handles complexity)
+- Optional chaining (`?.`) for flat ctx access
+- No camelCase transformation - lowercase naming throughout
+- No string-based invocation or property access in AI code
+- Simplified naming: two representations only (JS objects, URN identification)
+- Updated sections:
+  - Method Invocation Patterns (was CLI-Callable Methods)
+  - Argument Passing and Context (was Multi-Level Argument Passing)
+  - State Access - Flat Context with Optional Chaining
+  - Discovery and Help System (AVRO is specification)
+  - JavaScript API (Primary) (was Programmatic API Future)
+  - Dynamic Composition (was Batch Execution Pattern)
+  - Implementation Approach
+  - MVP vs End Vision
+  - Design Principles Summary
+- **New section:** Scripting-to-API Promotion Pattern
+  - Prerequisites for autonomy (requirements + self-evaluation tools)
+  - Free scripting with full internal access
+  - Filing decision as navigation (structure guides)
+  - Vocabulary extension through use
+  - Frictionless promotion path
+
+**Context:** Partnership reflection discussion on AI-primary execution model
+**Reason:** AI is primary user of Splectrum APIs (writes code, calls functions, needs help, executes). CLI is convenience wrapper for humans operating without AI collaboration. Scripting-to-API promotion enables path to autonomous API creation with discipline (requirements/self-evaluation before autonomy).
+
+---
+
 ## 2025-11-17
 
 **Version:** v0.1.0 (moved to design/ spot)

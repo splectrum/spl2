@@ -280,6 +280,44 @@
 - Surface to human: criteria ambiguous, subjective judgment needed, high risk, uncertainty
 - Boundary expands with demonstrated accuracy
 
+## Constraints Create Freedom
+
+**The paradox: fencing enables autonomy. Without boundaries, no autonomy can be granted.**
+
+**See stepping stone:** Autonomy
+**See:** Constraints_create_freedom_v1.0.0.md (chats/immutables/)
+
+**The paradox explained:**
+- Constraints (requirements + self-evaluation tools) define the fence
+- Autonomy operates freely within the fence
+- Without boundaries: no way to verify success, no autonomy possible
+- With clear boundaries: full freedom inside, trust through verification
+
+**Prerequisites for autonomy:**
+1. State requirements (what am I trying to achieve?)
+2. Define self-evaluation tools (how will I verify?)
+3. Then autonomy granted (full freedom within fence)
+
+**Why this works:**
+- Requirements define success → I know what to aim for
+- Self-evaluation tools define verification → I can check my work
+- Clear boundaries → no ambiguity about scope
+- Trust through accuracy → boundary expands over time
+
+**The cycle:**
+- Define fence → act freely within → self-evaluate → accurate? → trust builds → fence expands
+- Inaccurate self-evaluation → fence contracts → rebuild trust
+
+**Connection to HAICC:**
+- Not "do whatever you want" (chaos)
+- Not "check everything" (micromanagement)
+- But "clear boundaries enable maximum freedom" (partnership)
+
+**Application:**
+- Scripting-to-API promotion (requirements + self-eval → free scripting → evaluate → file)
+- Project work (product descriptions define fence, execution is autonomous)
+- Any delegated work (requirements enable, not restrict)
+
 ## Local Rules Apply
 
 **Artifacts satisfy their requirements version at creation - no retroactive burden when requirements evolve.**
