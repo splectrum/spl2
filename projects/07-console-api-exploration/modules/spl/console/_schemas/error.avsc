@@ -1,0 +1,18 @@
+{
+  "type": "record",
+  "name": "Error",
+  "namespace": "spl.console",
+  "doc": "Standard error structure for console API methods",
+  "fields": [
+    {
+      "name": "code",
+      "type": "string",
+      "doc": "Error code for programmatic handling"
+    },
+    {
+      "name": "message",
+      "type": "string",
+      "doc": "Human readable error description"
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "type": "record",
+  "name": "ConsoleState",
+  "namespace": "spl.console",
+  "doc": "Console API state maintained across pipeline",
+  "fields": [
+    {
+      "name": "data",
+      "type": {
+        "type": "record",
+        "name": "ConsoleData",
+        "doc": "Console API data (value/payload)",
+        "fields": [
+          {
+            "name": "config",
+            "type": ["null", {
+              "type": "record",
+              "name": "Config",
+              "fields": [
+                { "name": "level", "type": "string" },
+                { "name": "format", "type": "string" },
+                { "name": "destination", "type": "string" }
+              ]
+            }],
+            "default": null,
+            "doc": "Current configuration"
+          },
+          {
+            "name": "invocationCount",
+            "type": "int",
+            "default": 0,
+            "doc": "Number of method invocations"
+          },
+          {
+            "name": "bytesOutput",
+            "type": "int",
+            "default": 0,
+            "doc": "Total bytes output"
+          }
+        ]
+      },
+      "doc": "API data payload"
+    },
+    {
+      "name": "metadata",
+      "type": {
+        "type": "record",
+        "name": "ConsoleMetadata",
+        "doc": "Console API metadata (headers)",
+        "fields": [
+          {
+            "name": "configuredAt",
+            "type": ["null", "string"],
+            "default": null,
+            "doc": "ISO timestamp when last configured"
+          }
+        ]
+      },
+      "doc": "API metadata"
+    }
+  ]
+}

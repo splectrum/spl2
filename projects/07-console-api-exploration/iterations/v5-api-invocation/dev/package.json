@@ -1,0 +1,12 @@
+{
+  "name": "project-07-dev",
+  "version": "0.1.0",
+  "description": "Dev environment for Console API exploration",
+  "type": "module",
+  "scripts": {
+    "start": "node run.js"
+  },
+  "dependencies": {
+    "avsc": "^5.7.7"
+  }
+}
