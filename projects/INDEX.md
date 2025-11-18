@@ -4,7 +4,7 @@
 
 | Code | Name | Status | Started | Products |
 |------|------|--------|---------|----------|
-| - | - | - | - | - |
+| 07-console-api-exploration | Console API - AI-Primary Execution Model | In Progress | 2025-11-18 | Iterations v1-v6, WOW patterns |
 
 ## Completed Projects
 
