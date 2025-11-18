@@ -4,6 +4,39 @@ This file tracks changes to STEPPING_STONES_GLOSSARY.md using diff format.
 
 ---
 
+## 2025-11-18 - Project 06: Term requirements and major restructuring
+
+Major restructuring as part of Glossary Term Requirements project.
+
+**Structure changes:**
+- Converted from 4-column table to 3-column: Term | Description | Req
+- Extends/type shown in bold within description
+- All terms now have associated requirement files
+
+**Terms removed:**
+- duality pattern (meta-comment, not stepping stone)
+- headline/detail separation (foundation req, not stepping stone)
+- sufficient and complete (covered by more than complete)
+
+**Terms added:**
+- activity (base concept with microservice ownership pattern)
+- preamble, preamble_ref, ref
+- register, index, backlog_register
+- versioned (global versioning scheme)
+- project, blank_project, exploration_project
+- splectrum, mycelium, panta_rhei, haicc
+- friction, maturity, autonomy, local_rules_apply
+- collaboration, pragmatism, single_concern
+- dsl_glossary, spots_glossary
+
+**Terms renamed:**
+- artifact-to-requirements pinning → preamble ref
+
+**Req files created (35+):**
+activity, adhoc_activity, planned_activity, unplanned_activity, preamble, preamble_ref, versioned, versioned_immutable, minimal_and_complete, more_than_complete, twin_pair_methodology, chicken_and_egg, collaboration, pragmatism, single_concern, project, blank_project, exploration_project, splectrum, mycelium, panta_rhei, haicc, friction, maturity, autonomy, local_rules_apply, register, index, backlog_register, glossary, stepping_stones_glossary, commit_message, fire_and_forget, ref, and more
+
+---
+
 ## 2025-11-18 - Updated Autonomy stepping stone with "Constraints Create Freedom" paradox
 
 Updated Autonomy definition to capture the key insight that constraints enable freedom. Fencing (requirements + self-evaluation tools) enables autonomy within - without boundaries, no autonomy can be granted.

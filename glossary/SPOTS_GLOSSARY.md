@@ -8,16 +8,18 @@ This glossary defines the top-level repository structure using the "spots" metap
 
 ---
 
-## Repository Spots (Alphabetical)
+## Terms
 
-| Spot | Activity | Contents | Pattern/Notes |
-|------|----------|----------|---------------|
-| archive/ | Look up historical reference materials | Legacy spl1 materials; reference-only documentation from previous iterations | Not for active work; preserved for context and proven solutions when needed |
-| chats/ | Have informal collaborative conversations | Captured working discussions; insights from free-flowing conversations; decisions made outside formal artifacts | Sufficient and complete pattern; fire and forget capture; AI summarizes before memory lost |
-| cips/ | Propose and track continual improvements | CIP_REGISTER.md (living register); individual CIP documents (immutable proposals) | Lightweight idea capture; CIPs processed during planning cycles; ITIL Continual Improvement practice |
-| foundations/ | Reference foundational principles | WOW.md (how we work), PRINCIPLES.md (what we build), PARTNERSHIP.md (partnership health) | Headline/detail separation; foundations are concise, reference versioned detail files in projects/ |
-| glossary/ | Define and clarify language for different contexts | Context-specific glossaries (DSL, Stepping Stones, Spots); term definitions with requirements | Minimal and complete; living documents that evolve; simplicity paramount, completeness desired |
-| projects/ | Do formal work through structured projects | Project folders (01-*, 02-*, etc.); INDEX.md (project register); BACKLOG.md (work queue); project types, templates | Manufacturing happens here; PRINCE2-based; deliverables "ready for collection"; not everything manufactured gets externalized |
+| Term | Description | Req |
+|------|-------------|-----|
+| spots glossary | Registry of spots terms with associated reqs; context: repository structure - activity-based locations | spots_glossary_v1.0.0.md |
+| spot | Activity-based location in repository; like rooms in a house, defined by what you do there, not just contents | spot_v1.0.0.md |
+| archive/ | **spot** - Look up historical reference materials; legacy spl1 materials; reference-only, not for active work | archive_v1.0.0.md |
+| chats/ | **spot** - Have informal collaborative conversations; captured discussions, insights, decisions; fire and forget capture | chats_v1.0.0.md |
+| cips/ | **spot** - Propose and track continual improvements; CIP_REGISTER.md (living) + individual CIPs (immutable); ITIL practice | cips_v1.0.0.md |
+| foundations/ | **spot** - Reference foundational principles; WOW.md, PRINCIPLES.md, PARTNERSHIP.md; headlines referencing versioned details | foundations_v1.0.0.md |
+| glossary/ | **spot** - Define and clarify language for different contexts; DSL, Stepping Stones, Spots glossaries; terms with reqs | glossary_spot_v1.0.0.md |
+| projects/ | **spot** - Do formal work through structured projects; project folders, INDEX.md, BACKLOG.md; manufacturing with PRINCE2 structure | projects_v1.0.0.md |
 
 ---
 

@@ -15,6 +15,7 @@
 | 03-runtime-hello-world | Runtime Structure "Hello World" | 2025-11-12 | Core architecture validated, single-parameter method signature, platform abstraction, glossary discovery, MVP+End Vision pattern, Local Rules Apply generality |
 | 04-bare-runtime-hello-world | Bare Runtime Hello World | 2025-11-14 | Bare platform validated, dual-platform patterns, three-pillar strategy, platform abstraction architecture, novel contribution to Bare ecosystem |
 | 05-foundation-update-documentation-templates | Foundation Update & Documentation Templates | 2025-11-17 | Foundation headline format, design/ spot established, friction as dynamic KPI, AI-primary execution model, Blank Project type created |
+| 06-glossary-term-requirements | Glossary Term Requirements | 2025-11-18 | 67+ term reqs (24 DSL, 35+ Stepping Stones, 8 Spots), unified 3-column glossary structure, base concepts (api_node, activity, spot), extends pattern with term names |
 
 ## Planned Projects
 
@@ -183,6 +184,42 @@
 - Blank Project type appropriate for clear scope work
 
 **See:** `projects/05-foundation-update-documentation-templates/LESSONS_LEARNED.md` for comprehensive synthesis
+
+### 06-glossary-term-requirements
+**Objective:** Define requirements for glossary terms, enabling artifact-to-requirements pinning for methodology concepts
+
+**Project Type:** Explorative Project
+
+**Products Delivered:**
+1. Plain Req Template (base req type with Spec + Self-eval + Comments) ✅
+2. DSL Glossary Terms (24 reqs: api_node hierarchy, methods, properties, Kafka records) ✅
+3. Stepping Stones Terms (35+ reqs: activities, completeness, collaboration, friction, autonomy) ✅
+4. Spots Glossary Terms (8 reqs: spot base concept + 6 repository spots) ✅
+5. ~~Spots Structure Twin Pair~~ (deferred - combine with tooling)
+
+**Status:** Complete - 4 products delivered, 1 deferred
+
+**Key Outcomes:**
+- **67+ term requirements created:** Infrastructure for all future glossary terms
+- **Unified 3-column structure:** Term | Description | Req (consistent across all glossaries)
+- **Base concepts established:** api_node (DSL), activity (Stepping Stones), spot (Spots)
+- **Extends pattern:** Use term names (not versions) for decoupled evolution
+- **Naming conventions:** Single underscore for word boundary, double for hierarchy (DSL)
+- **Activity ownership pattern:** Activity registers change with spot, spot executes
+
+**Key Learnings:**
+- Autonomy calibration per product (conceptual work needs discussion, mechanical can batch)
+- Update indexes immediately (not in batches)
+- Term-by-term discussion for conceptual work produces better results
+- Extends with term names prevents mass reference updates on version changes
+
+**Deferred Items:**
+- Product 5: Spots Structure Twin Pair
+- Housekeeping concept definition
+- Backlog restructuring (backlog/ as independent spot)
+- Spots requirements document
+
+**See:** `projects/06-glossary-term-requirements/LESSONS_LEARNED.md` for full details
 
 ---
 

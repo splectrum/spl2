@@ -10,47 +10,63 @@ This glossary defines stepping stones - the navigational concepts used throughou
 
 ## Stepping Stones (Alphabetical)
 
-| Term | Description | When to Use | Current Requirements | Related Detail Files |
-|------|-------------|-------------|---------------------|---------------------|
-| Adhoc Activity | Change activity through informal "chat while we work"; emergent, low formality; artifacts in chats/ (captures) or chats/immutables/ (requirements, designs). Local scope: Activity. | When changes emerge during informal conversation; when formal project overhead not needed; for lightweight requirements or discoveries | | chats/2025-11-13_rooms-and-glossary.md |
-| Artifact-to-requirements pinning | All artifacts reference their requirements version as mandatory first line; enables quality assessment and versioned evolution without forced upgrades. Global scope. | When creating any artifact (document, code, template); when assessing artifact quality | | TDC_framework_v1.1.0.md |
-| Autonomy | Freedom to act within defined boundaries. **Constraints create freedom:** requirements + self-evaluation tools define the fencing, autonomy operates within. Without boundaries, no autonomy can be granted (no way to verify success). Prerequisites: state requirements, define self-evaluation tools. Then autonomy granted. Trust builds through accurate self-evaluation, boundary expands with evidence. Context-bound always - never absolute. Global scope. | When delegating work; before free action (define reqs + self-eval first); enabling self-directed execution; recognizing that autonomy requires fencing not vagueness; understanding the paradox: constraints enable freedom | | |
-| Backlog | Work queue of projects in execution order; top item is next to execute. Global scope. | When planning work sequence; when identifying next project to initiate | projects/04-bare-runtime-hello-world/Backlog_register_requirements_v1.1.0.md | projects/BACKLOG.md |
-| Blank Project | A project that has just the base PRINCE2 project requirements; straightforward execution with clear deliverables; no special methodology or collaboration requirements. Local scope: Project. | When work is clear and straightforward; following established patterns; low uncertainty execution | None - base Project requirements apply | See Project entry for base requirements |
-| Chicken and Egg | Bootstrap pattern where methodology and implementation co-evolve; can't separate defining from doing, building language while using it. Common in HAICC where requirements, documentation, and execution emerge together rather than sequentially. Global scope. | When recognizing circular dependencies are natural; methodology emerges through practice; internal/external language collapse; twin pair work; building while figuring out how to build | | HAICC pattern |
-| Collaboration | Pause to share, discuss, and work together through steps rather than executing independently; recognizing when to collaborate vs execute; applicable to Exploration Projects and partnership-critical moments. Global scope. | When working on Exploration Projects (mandatory collaboration); during closure processes; when partnership alignment needed; when choosing path requires shared understanding | | Project 04 closure discovery; requirements to be formalized in glossary project |
-| Commit Message | Commit message depth and structure guidelines; minimal and complete with hooks to detail artifacts. Global scope. | When creating git commits; balancing detail vs readability; referencing DAILY_LOG and artifacts | | Partnership stepping stone from Project 03 reflection |
-| Duality Pattern | Structure underneath (requirements, versioning, patterns) supports informal surface (simple language, natural conversation); the rigor enables the freedom. Local scope: Pattern. | When establishing patterns that need both structure and flexibility; understanding how SPL2 balances formality and informality | | chats/2025-11-13_terminology-and-chat-capture.md |
-| Exploration Project | Type of project for architecture discovery through twin pair methodology; high uncertainty requiring evidence-based evolution. Local scope: Project. | When validating core design decisions; establishing new patterns; critical validation of foundational concepts | projects/04-bare-runtime-hello-world/Exploration_project_requirements_v1.0.0.md | See Project entry for base requirements |
-| Fire and forget | Additive not corrective; capture chunks standalone without backward-looking consistency checking; prefer overlap over missing information. Global scope. | When capturing chats, meeting notes, or any sufficient-and-complete context; when speed and low friction matter more than polish | | CHAT_REQUIREMENTS_v1.0.0.md |
-| Friction | Technical + emotional resistance/difficulty in getting work done; primary partnership health metric. Global scope. | Continuously assess friction level; when friction increases it's a signal; applies to requirements clarity, decision quality, anxiety, misunderstanding | | Partnership stepping stone from Project 03 reflection |
-| HAICC | Human-AI Collaboration Creativity - partnership methodology where each brings unique strengths to create what neither could alone. Global scope. | When describing our collaboration approach; explaining how we work; understanding the partnership model | | CIP-012 |
-| Headline/detail separation | Foundations are headlines (concise, stable); detail lives in versioned files in project folders; foundations reference current version. Global scope. | When creating or evolving foundation documents; when detail threatens to make foundations unwieldy | | Philosophy_v1.1.0.md, TDC_framework_v1.1.0.md |
-| Local Rules Apply | Artifacts satisfy their own requirements version at time of creation; no retroactive burden when requirements evolve. Global scope. | When creating artifacts; when requirements change; understanding artifact quality assessment; avoiding forced upgrades | | Local_rules_apply_v1.0.0.md |
-| Maturity | Systems, partnerships, vocabularies, and understanding evolve through stages; recognizing current maturity level enables appropriate expectations and organic progression. Evidence-based advancement, not time-based. Global scope. | When assessing readiness for next stage; understanding what's appropriate for current level; avoiding premature optimization or forcing maturity; trusting organic progression through evidence | | Emerged from Project 05 WOW restructure |
-| Minimal and complete | Start minimal, gaps acceptable, grow based on evidence; question every addition - is this needed NOW?; simplicity paramount. Global scope. | When creating artifacts, designing systems, writing code; default mode for SPL2 work; when building new things | | Philosophy_v1.1.0.md |
-| More Than Complete | Project documentation guideline - prefer too much over missing information; distinct from minimal and complete. Global scope. | When documenting projects (DAILY_LOG, discoveries); raw material for distillation; usability test: if detail makes it harder to use, it's too much | | Partnership stepping stone from Project 03 reflection |
-| Mycelium | Logical data repository layer supporting multiple physical repositories (Git, Fossil, Pijul, etc.); the network beneath Splectrum. Global scope. | When discussing data layer architecture; repository abstraction; multiglot support; the foundation of the platform | | Data layer concept |
-| Panta Rhei | "Everything flows" - design philosophy where state flows like a river through stateless code; immutable records preserve history, processes transform state, event sourcing emerges naturally. Low friction by design. Global scope. | When understanding architecture decisions, stateless design patterns, flow-oriented thinking, why immutability matters; recognizing that simplicity enables emergence | | Panta_rhei_v1.0.0.md (Project 05) |
-| Planned Activity | Change activity through formal project addons; known work, backlog item; high formality; artifacts in project folders. Local scope: Activity. | When work is known upfront and scheduled; for formal feature development or significant planned changes | | PRINCE2_operational_v1.2.0.md |
-| Pragmatism | Pragmatic usability tests determine "good enough" rather than theoretical perfection; context-dependent levels. Global scope. | When determining documentation depth, commit detail, granularity decisions; apply usability test for the specific context | | Partnership stepping stone from Project 03 reflection |
-| Project | Formal work unit with defined products, quality criteria, closure process. Global scope (base concept). | When performing formal work requiring structure, validation, and lessons capture | projects/05-foundation-update-documentation-templates/Project_requirements_v1.3.1.md | See Blank Project, Exploration Project for defined types |
-| Single Concern | All units should address a single concern; criterion for boundaries and granularity. Global scope. | When deciding inline vs separate file; module boundaries; artifact scope; identifying when concern becomes multiple concerns | | Partnership stepping stone from Project 03 reflection |
-| Splectrum | Platform for building P2P applications with AI collaboration; built on Mycelium data layer; enables HAICC methodology. Global scope. | When describing the platform; explaining what we're building; positioning the product; technical architecture discussions | | Platform concept |
-| Stepping stones | Navigational concepts encountered repeatedly throughout journey; same types appear at different decision points; active choice-making aids for path-finding. Global scope (meta-concept). | Meta-concept - this is what all these terms are! Used when establishing or recognizing foundational patterns | | chats/2025-11-13_terminology-and-chat-capture.md |
-| Sufficient and complete | Capture essence with overlap/redundancy; prefer too much over missing key insights; completeness highly desired but never fully achieved (living). Global scope. | When capturing conversations, documenting existing systems, preserving context; when missing information is more costly than redundancy | | CHAT_REQUIREMENTS_v1.0.0.md |
-| Twin Pair Methodology | Create deliverable and template in parallel; discover through doing what's actually needed; skip work when discovery reveals it's unnecessary. Local scope: Methodology. | When exploring new patterns in Exploration Projects; when template would help future work but requirements unclear upfront | | See Exploration Project requirements |
-| Unplanned Activity | Change activity at project closure (maintenance); emerged during project work; medium formality; artifacts in project folders. Local scope: Activity. | When changes emerge during project execution; handled at project closure as maintenance activity; for foundation updates or discovered needs | | PRINCE2_operational_v1.2.0.md |
+| Term | Description | Req |
+|------|-------------|-----|
+| activity | Work that creates immutables and updates mutables, within a defined context (chat, project). Ownership pattern: activity registers change with spot, spot executes | activity_v1.0.0.md |
+| adhoc activity | **Extends activity** - Informal "chat while we work"; emergent, low formality; artifacts in chats/ or chats/immutables/ | adhoc_activity_v1.0.0.md |
+| autonomy | Freedom to act within defined boundaries. **Constraints create freedom:** reqs + self-eval define the fence, autonomy operates within. Prerequisites: state reqs, define self-eval. Trust builds through accurate self-eval. See Constraints_create_freedom_v1.0.0.md | autonomy_v1.0.0.md |
+| backlog | See backlog register | |
+| backlog register | **register** - Work queue of projects in execution order; top item is next to execute. Mutable. See projects/BACKLOG.md | backlog_register_v1.0.0.md |
+| blank project | Base project type with PRINCE2 requirements; straightforward execution with clear deliverables; no special methodology. Other project types extend this | blank_project_v1.0.0.md |
+| chicken and egg | Circular dependency where evolution is mandatory; without evolution, infinite loop. X and Y need each other, so they co-evolve | chicken_and_egg_v1.0.0.md |
+| collaboration | Joint activity that is interactive; partnership with mutual respect aiming to deepen understanding and trigger insight; different but overlapping roles | collaboration_v1.0.0.md |
+| commit message | Headline for git commit; identifies scope, summarizes why, hooks to detail; not a changelog or diff explanation | commit_message_v1.0.0.md |
+| dsl glossary | Glossary type for SPL2 Domain-Specific Language vocabulary - runtime, APIs, methods, properties. Entry structure: Term, Description, Req | dsl_glossary_v1.0.0.md |
+| exploration project | **Extends blank project** - Architecture discovery through twin pair methodology; high uncertainty requiring evidence-based evolution | exploration_project_v1.0.0.md |
+| fire and forget | Launch and move on; self-contained action without follow-up; additive not corrective; no backward consistency checking | fire_and_forget_v1.0.0.md |
+| friction | Resistance that impedes flow; internal (anxiety, confusion) or external (blockers, unclear reqs); primary partnership health metric | friction_v1.0.0.md |
+| glossary | Registry of terms with associated reqs; can be created for different contexts; terms can represent vocabulary, functional units, patterns | glossary_v1.0.0.md |
+| index | Fast lookup and ordering; navigational aid for finding things quickly | index_v1.0.0.md |
+| preamble | Reference block at the start of an artifact; contains one or more preamble refs (Type, Extends, Requirements, etc.) | preamble_v1.0.0.md |
+| preamble ref | Reference within the preamble; points to requirements, types, or related artifacts; enables quality assessment and local rules apply | preamble_ref_v1.0.0.md |
+| ref | Reference - pointer to another artifact or term. Abbreviation used throughout SPL2 | ref_v1.0.0.md |
+| register | Log of what exists for a specific item type; inventory or catalog. Mutable | register_v1.0.0.md |
+| haicc | Human-AI Collaboration Creativity - partnership methodology where each brings unique strengths to create what neither could alone. See CIP-012 | haicc_v1.0.0.md |
+| local rules apply | Artifacts are self-sufficient in reqs; no external supervisor needed. Each artifact has its own reqs version and self-eval. No retroactive burden | local_rules_apply_v1.0.0.md |
+| maturity | What is achieved through evolution in time; sign of sufficient longevity. Journey from inception to maturity is positive - allows maturing within context. Evidence-based advancement | maturity_v1.0.0.md |
+| minimal and complete | Try to be complete with minimal means, knowing it will fall short and need continued effort. For situations where complete isn't fully known. Question every addition | minimal_and_complete_v1.0.0.md |
+| more than complete | For situations where complete exists but is hard to figure out; be overgenerous to capture completeness within | more_than_complete_v1.0.0.md |
+| mycelium | Logical data repository layer supporting multiple physical repositories (Git, Fossil, Pijul, etc.); the network beneath Splectrum. Repository abstraction | mycelium_v1.0.0.md |
+| panta rhei | "Everything flows" - design philosophy where state flows like a river through stateless code; immutable records preserve history, event sourcing emerges naturally | panta_rhei_v1.0.0.md |
+| plain req | Base req type using natural language for spec and self-eval. Structure: Type, Extends (optional), Spec, Self-eval, Comments (optional). All req types extend this | plain_req_v1.0.0.md |
+| planned activity | **Extends activity** - Formal project work; known work, on the workplan; high formality; artifacts in project folders | planned_activity_v1.0.0.md |
+| pragmatism | Usability tests determine "good enough" rather than theoretical perfection; context-dependent. Practical value over abstract ideals | pragmatism_v1.0.0.md |
+| project | Formal work unit for delivering products; replaces sprint in agile. Set of related products with maintenance cycle. Project types enable complex delivery | project_v1.0.0.md |
+| reqs | Requirements - clear statement of what needs to be achieved; defines the fence for autonomy. Structure: spec + self-eval. Without reqs, no autonomy can be granted | reqs_v1.0.0.md |
+| requirements | See reqs | |
+| self-eval | Self-evaluation - verification against reqs. Enables autonomy through accountability. Trust builds through accurate self-eval, erodes through inaccurate. Defined before work begins | self_eval_v1.0.0.md |
+| self-evaluation | See self-eval | |
+| single concern | Within a defined context, aim to deal with one thing only; criterion for boundaries and granularity | single_concern_v1.0.0.md |
+| spec | Specification - the WHAT component of reqs. Natural language statement of what needs to be achieved. Part of req (spec + self-eval = req) | spec_v1.0.0.md |
+| specification | See spec | |
+| splectrum | Platform for building P2P applications with AI collaboration; built on Mycelium data layer; enables HAICC methodology | splectrum_v1.0.0.md |
+| stepping stones | See stepping stones glossary | |
+| stepping stones glossary | Navigational concepts encountered repeatedly throughout journey; active choice-making aids for path-finding. Glossary entry structure: Term, Description, Req | stepping_stones_glossary_v1.0.0.md |
+| twin pair methodology | Create deliverable and req in tandem; discover through doing what's actually needed; skip unnecessary work | twin_pair_methodology_v1.0.0.md |
+| unplanned activity | **Extends activity** - Emerged during project work, not on workplan; handled at closure; medium formality; artifacts in project folders | unplanned_activity_v1.0.0.md |
+| versioned | Artifact using global versioning scheme (semver: major.minor.patch). Filename pattern: `name_vX.Y.Z.md`. Platform-wide consistency | versioned_v1.0.0.md |
+| versioned immutable | **versioned** - Artifact that doesn't change once created but can have new versions. Evolution creates new version | versioned_immutable_v1.0.0.md |
 
 ---
 
 ## Notes
 
-- **Journey metaphor:** Stepping stones are navigational aids on your journey through work. Same stones appear repeatedly at different points - you choose which to step on based on context.
-- **Not sequential:** Don't use stepping stones once and move forward - return to them continuously throughout work for validation and decision-making.
-- **Emerge through use:** Stepping stones are discovered and crystallized from working patterns, not pre-planned.
-- **Simplicity:** Keep conversation informal while structure underneath is carefully thought out. The stepping stones themselves should be easy to reference and apply.
-- **Minimal and complete applies:** This glossary starts minimal. Will grow as new stepping stones emerge and are validated through use.
+- **Entry structure:** Term | Description | Req (three columns)
+- **Description format:** Type/extends in bold where applicable, then description
+- **Req column:** Points to versioned req file in projects/06-glossary-term-requirements/reqs/
+- **Journey metaphor:** Stepping stones are navigational aids - same stones appear repeatedly at different decision points
+- **Emerge through use:** Discovered and crystallized from working patterns, not pre-planned
+- **Minimal and complete applies:** Grows as new stepping stones emerge and are validated
 
 ---
 

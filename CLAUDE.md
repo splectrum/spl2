@@ -12,8 +12,8 @@ SPL2 is a platform for AI to create and manage software solutions with a focus o
 - Read `foundations/PARTNERSHIP.md` - Partnership health, collaboration patterns, friction metric
 
 **Understand current state:**
-- Read `projects/INDEX.md` - Completed projects and current status (4 complete)
-- Read `projects/BACKLOG.md` - Next work to do (15 projects with priorities/dependencies)
+- Read `projects/INDEX.md` - Completed projects and current status (6 complete)
+- Read `projects/BACKLOG.md` - Next work to do (13 projects with priorities/dependencies)
 
 **Everything else references from these foundation documents.**
 
@@ -51,7 +51,8 @@ spl2/
 │   ├── 02-*/            # Completed: Initial Workplan
 │   ├── 03-*/            # Completed: Runtime Structure Hello World
 │   ├── 04-*/            # Completed: Bare Runtime Hello World
-│   └── 05-*/            # Completed: Foundation Update & Documentation Templates
+│   ├── 05-*/            # Completed: Foundation Update & Documentation Templates
+│   └── 06-*/            # Completed: Glossary Term Requirements
 ├── archive/             # Reference: spl1 materials (legacy)
 ├── CLAUDE.md            # This file - navigation guide
 └── README.md            # Project overview
@@ -80,7 +81,7 @@ spl2/
 **Stepping stones (navigational concepts):**
 - Journey metaphor: patterns encountered repeatedly throughout work
 - Same stones appear at different decision points - choose which to step on based on context
-- See STEPPING_STONES_GLOSSARY.md for full list (minimal and complete, artifact-to-requirements pinning, duality pattern, fire and forget, sufficient and complete, twin pair methodology, etc.)
+- See STEPPING_STONES_GLOSSARY.md for full list (40+ terms with reqs: activity types, completeness patterns, collaboration, friction, autonomy, twin pair methodology, etc.)
 
 **Activity types (change management):**
 - **Adhoc activity:** Informal "chat while we work"; artifacts in chats/ or chats/immutables/
@@ -98,6 +99,12 @@ spl2/
 - Purpose: Surface misunderstandings, align understanding, reduce friction
 - Primary metric: Friction level (technical + emotional)
 
+**Learning stance:**
+- Be happy to fail at times and learn from it - it's worth it and can be fun
+- Adjustments happen organically, from experience on the ground
+- Surprise at interpretation gaps is calibration, not frustration
+- "So alike but so different" - same words, different mental models is the core challenge and opportunity
+
 ## Where to Find Things
 
 **How we work:** `foundations/WOW.md` → references detail files
@@ -109,9 +116,9 @@ spl2/
 **Adhoc requirements:** `chats/immutables/` - versioned artifacts created during informal work
 **CIP documents:** `cips/CIP-NNN_*.md` - Continual Improvement Proposals (immutable)
 **CIP tracking:** `cips/CIP_REGISTER.md` - living register of all CIPs (14 active CIPs including CIP-013 Design Spot Setup, CIP-014 Comprehensive API Design Phase)
-**Project status:** `projects/INDEX.md` (5 complete, 0 in progress)
-**Next work:** `projects/BACKLOG.md` (15 projects queued, Console API Exploration at position #4)
-**Completed projects:** `projects/01-*/`, `projects/02-*/`, `projects/03-*/`, `projects/04-*/`, `projects/05-*/`
+**Project status:** `projects/INDEX.md` (6 complete)
+**Next work:** `projects/BACKLOG.md` (13 projects queued, Console API Exploration is next)
+**Completed projects:** `projects/01-*/`, `projects/02-*/`, `projects/03-*/`, `projects/04-*/`, `projects/05-*/`, `projects/06-*/`
 **Lessons learned:** `projects/XX-*/LESSONS_LEARNED.md` in each project folder
 **Partnership reflections:** `projects/XX-*/PARTNERSHIP_REFLECTION*.md` at project closures
 **Project types:** `projects/project-types/` (Explorative, etc.)
