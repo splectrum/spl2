@@ -1,0 +1,25 @@
+{
+  "type": "record",
+  "name": "ErrorInput",
+  "namespace": "spl.console",
+  "doc": "Log an error message (stderr)",
+  "fields": [
+    {
+      "name": "message",
+      "type": "string",
+      "doc": "Error message to log"
+    },
+    {
+      "name": "format",
+      "type": "string",
+      "default": "text",
+      "doc": "Output format: text or json"
+    },
+    {
+      "name": "data",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Optional additional data (JSON string)"
+    }
+  ]
+}

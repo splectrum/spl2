@@ -20,6 +20,7 @@ This glossary defines the top-level repository structure using the "spots" metap
 | foundations/ | **spot** - Reference foundational principles; WOW.md, PRINCIPLES.md, PARTNERSHIP.md; headlines referencing versioned details | foundations_v1.0.0.md |
 | glossary/ | **spot** - Define and clarify language for different contexts; DSL, Stepping Stones, Spots glossaries; terms with reqs | glossary_spot_v1.0.0.md |
 | projects/ | **spot** - Do formal work through structured projects; project folders, INDEX.md, BACKLOG.md; manufacturing with PRINCE2 structure | projects_v1.0.0.md |
+| status/ | **spot** - Check current state of repository; active work, recent context, session entry point; reduces dynamic update load | status_v1.0.0.md |
 
 ---
 

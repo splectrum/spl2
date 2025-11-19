@@ -1,7 +1,7 @@
 # Continual Improvement Proposal (CIP) Register
 
 **Project:** 02-initial-workplan
-**Last Updated:** 2025-11-17
+**Last Updated:** 2025-11-19
 
 Lightweight capture of improvement ideas that emerge during project work. CIPs are reviewed during planning cycles and either implemented, deferred, or rejected based on priority and dependencies.
 
@@ -849,6 +849,47 @@ Separating infrastructure setup (CIP-013) from deep design work (CIP-014) allows
 - Validate design/ pattern through use
 - Assess triggers when ready (complexity, friction, gaps)
 - Plan as project (possibly Exploration Project)
+
+---
+
+### CIP-015: Cross-Cutting Layers Over Data Entities
+
+**Type:** Architectural Pattern
+**Status:** Proposed
+**Priority:** High (foundational for howto glossary and similar patterns)
+**Source:** Project 07 - Console API Exploration closure discussion
+**Date Captured:** 2025-11-19
+
+**Description:**
+Define the architectural pattern for creating higher-level structures (integrator layers) over data layer entities (spots), with refs connecting them while preserving local rules apply.
+
+**The Pattern:**
+```
+Higher-level structure (integrator)
+    ↓ refs
+Data layer entities (spots)
+    ↓ own
+Local details (local rules apply)
+```
+
+**Origin:** Designing howto glossary - how to capture procedures that span multiple spots while preserving local rules apply.
+
+**Key Insights:**
+- **Glossary territories:** Creator's (stepping stones), User's (howto), Language (DSL), Functional (spots)
+- **Same term, different context:** efficient_search as concept (stepping stone) vs procedure (howto)
+- **Mycelium metaphor:** Trees (entities) connected by network (integrators) via pathways (refs)
+
+**Applications:**
+- Howto glossary (central patterns + spot-local details)
+- Status layer over projects (already implemented)
+- Validation, permissions, audit, discovery layers (future)
+
+**Full CIP:** `cips/CIP-015_cross-cutting-layers-over-data-entities.md`
+
+**Next Steps:**
+- Validate pattern with howto glossary implementation
+- Apply to next cross-cutting need
+- Formalize in design/ when proven
 
 ---
 

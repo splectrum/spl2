@@ -1,0 +1,58 @@
+{
+  "type": "record",
+  "name": "ConsoleState",
+  "namespace": "spl.console",
+  "doc": "Console API state",
+  "fields": [
+    {
+      "name": "data",
+      "type": {
+        "type": "record",
+        "name": "ConsoleData",
+        "fields": [
+          {
+            "name": "invocationCount",
+            "type": "int",
+            "default": 0
+          },
+          {
+            "name": "bytesOutput",
+            "type": "int",
+            "default": 0
+          }
+        ]
+      },
+      "default": {}
+    },
+    {
+      "name": "metadata",
+      "type": {
+        "type": "record",
+        "name": "ConsoleMetadata",
+        "fields": [
+          {
+            "name": "lastOutputAt",
+            "type": ["null", "string"],
+            "default": null
+          }
+        ]
+      },
+      "default": {}
+    },
+    {
+      "name": "args",
+      "type": {
+        "type": "record",
+        "name": "ConsoleArgs",
+        "fields": [
+          {
+            "name": "format",
+            "type": "string",
+            "default": "text"
+          }
+        ]
+      },
+      "default": {}
+    }
+  ]
+}

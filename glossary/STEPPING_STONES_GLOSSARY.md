@@ -17,7 +17,7 @@ This glossary defines stepping stones - the navigational concepts used throughou
 | autonomy | Freedom to act within defined boundaries. **Constraints create freedom:** reqs + self-eval define the fence, autonomy operates within. Prerequisites: state reqs, define self-eval. Trust builds through accurate self-eval. See Constraints_create_freedom_v1.0.0.md | autonomy_v1.0.0.md |
 | backlog | See backlog register | |
 | backlog register | **register** - Work queue of projects in execution order; top item is next to execute. Mutable. See projects/BACKLOG.md | backlog_register_v1.0.0.md |
-| blank project | Base project type with PRINCE2 requirements; straightforward execution with clear deliverables; no special methodology. Other project types extend this | blank_project_v1.0.0.md |
+| blank project | Base project type with PRINCE2 requirements; straightforward execution with clear deliverables; no special methodology. Other project types extend this | blank_project_v1.0.1.md |
 | chicken and egg | Circular dependency where evolution is mandatory; without evolution, infinite loop. X and Y need each other, so they co-evolve | chicken_and_egg_v1.0.0.md |
 | collaboration | Joint activity that is interactive; partnership with mutual respect aiming to deepen understanding and trigger insight; different but overlapping roles | collaboration_v1.0.0.md |
 | commit message | Headline for git commit; identifies scope, summarizes why, hooks to detail; not a changelog or diff explanation | commit_message_v1.0.0.md |
@@ -25,7 +25,7 @@ This glossary defines stepping stones - the navigational concepts used throughou
 | exploration project | **Extends blank project** - Architecture discovery through twin pair methodology; high uncertainty requiring evidence-based evolution | exploration_project_v1.0.0.md |
 | fire and forget | Launch and move on; self-contained action without follow-up; additive not corrective; no backward consistency checking | fire_and_forget_v1.0.0.md |
 | friction | Resistance that impedes flow; internal (anxiety, confusion) or external (blockers, unclear reqs); primary partnership health metric | friction_v1.0.0.md |
-| glossary | Registry of terms with associated reqs; can be created for different contexts; terms can represent vocabulary, functional units, patterns | glossary_v1.0.0.md |
+| glossary | Registry of terms with associated reqs; can be created for different contexts; terms can represent vocabulary, functional units, patterns. Four territories: creator's (stepping stones), user's (howto), language (DSL), functional (spots) | glossary_v1.1.0.md |
 | index | Fast lookup and ordering; navigational aid for finding things quickly | index_v1.0.0.md |
 | preamble | Reference block at the start of an artifact; contains one or more preamble refs (Type, Extends, Requirements, etc.) | preamble_v1.0.0.md |
 | preamble ref | Reference within the preamble; points to requirements, types, or related artifacts; enables quality assessment and local rules apply | preamble_ref_v1.0.0.md |

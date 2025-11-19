@@ -4,6 +4,18 @@ This file tracks changes to STEPPING_STONES_GLOSSARY.md using diff format.
 
 ---
 
+## 2025-11-19 - blank_project v1.0.1: Project creation actions
+
+**Changes:**
+- Updated blank_project req reference: v1.0.0 → v1.0.1
+- Added explicit project creation actions to blank_project spec
+- Added "Remove backlog item" as required action when project originates from backlog
+- Added self-eval check for backlog removal
+
+**Context:** Project 07 closure - discovered backlog item removal was not documented as project creation action.
+
+---
+
 ## 2025-11-18 - Project 06: Term requirements and major restructuring
 
 Major restructuring as part of Glossary Term Requirements project.

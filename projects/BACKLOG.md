@@ -2,7 +2,7 @@
 
 # Project Backlog
 
-**Last Updated:** 2025-11-18
+**Last Updated:** 2025-11-19
 
 Backlog of identified projects for SPL2 development. Projects analyzed for priority and dependencies during Project 02 (Dependency & Priority Analysis).
 
@@ -12,7 +12,9 @@ Backlog of identified projects for SPL2 development. Projects analyzed for prior
 
 | Backlog Item | Priority | Dependencies | Addons | Comments |
 |--------------|----------|--------------|--------|----------|
-| [Console API - AI-Primary Execution Model](backlog/console-api-exploration.md) | High | Foundation Update & Documentation Templates | | Exploration project proving AI-primary invocation model. Implement console API (5 methods: configure, log, error, warn, flush) with AVRO schemas, discovery API, transparent validation, CLI wrapper. Establishes pattern for all future APIs. Familiar domain, real utility, easy Bare compatibility. |
+| [Dev Environment API](backlog/dev-environment-api.md) | High | Console API Exploration | | Infrastructure for autonomous development. Self-eval requirements, Dev Environment API (create/submit/cycle/status/teardown), defined purpose environments, publishing to spot, deployment script generation, bug report integration. Foundation for "autonomy enables delegation" pattern. |
+| [CIP Processing](backlog/cip-processing.md) | High | None | | Standard maintenance project - process 15 accumulated CIPs. Create backlog items, update foundations, spawn CIPs, close processed ones. Repeatable project triggered by CIP debt. |
+| [AVRO Wrapper API](backlog/avro-wrapper-api.md) | High | Console API Exploration | | SPL2 wrapper for AVRO schema operations. Schema loading/caching, validation helpers, Bare compatibility. Foundation for all APIs - every API uses AVRO schemas. |
 | [Bare Runtime Compatibility](backlog/bare-runtime-compatibility.md) | High | Bare Runtime Hello World | Phase 2 Dev Setup | Deep dive: Node.js → Bare workflow, tooling compatibility (Vite, Vitest), SPL2 patterns on Bare. Prerequisite for Pear platform work. |
 | [Browser Platform Exploration](backlog/browser-platform-exploration.md) | High | Bare Runtime Compatibility | | Validate browser as third pillar platform for SPL2 runtime. File system abstraction (IndexedDB/OPFS), browser lifecycle, basic P2P validation (WebRTC/WebTransport). Completes three-pillar portability (Node/Bare/Browser). |
 | [Bug Report Infrastructure](backlog/bug-report-infrastructure.md) | High | Runtime Structure Hello World | | Automated bug report generation with complete execution footprint for reconstruction. Captures: code versions, input, state, environment, error details. Enables exact failure reproduction for reconstruction-based architecture. |

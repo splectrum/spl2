@@ -285,12 +285,219 @@ Req spec → Self-eval → Dev → Integration testing → ...
 
 ---
 
+## 2025-11-19
+
+### Session Start
+
+**v7 Implementation:**
+- Removed configure method (redundant with API-level invocation)
+- Implemented 5 wrapper methods: log, error, warn, info, debug
+- Schema-driven property selection for three-layer merge
+- Self-contained deployment script (v7-deploy.sh)
+- All 11 self-eval tests pass
+
+**Key clarifications:**
+
+**API structure:**
+- Wrapper APIs: thin pass-through to native objects (console.log, console.error, etc.)
+- DSL APIs: shaped for how we want to work (future layer on top)
+- Package types: core (no dependencies), tools (wrappers), api (mixed)
+- Package/API implied from context in invocation path
+
+**Invocation at any level:**
+- Package level: `spl` (package args, not implementing now)
+- API level: `spl/console` (state shaping, default args)
+- Method level: `spl/console/log` (execution)
+
+**API invocation input structure:**
+- Known method properties → API defaults (flow to methods via merge)
+- `batch` → Execution directive (transient)
+- Everything else → API-specific (internal state management)
+
+**Schema-driven merge:**
+- Method input schema defines which properties it cares about
+- Merge picks only those properties from each layer
+- Clean separation - API-specific properties never leak to methods
+
+**Teardown approach for dev environments:**
+- Each dev cycle creates fresh environment from scratch
+- When done, becomes immutable artifact
+- Deployment script enables resurrection anywhere
+
+---
+
+### Dev Environment as API (Future Work)
+
+**Concept:** Dev environment becomes an API with management methods
+
+**Proposed structure:**
+```
+spl/dev/
+  create/      # Create new dev environment from spec
+  submit/      # Submit a requirement to work on
+  cycle/       # Run a dev cycle (code until self-eval passes)
+  status/      # Check current state
+  teardown/    # Clean up environment
+```
+
+**Workflow example:**
+```javascript
+// Create environment
+await invoke('spl/dev/create', {
+  name: 'console-v8',
+  dependencies: ['avsc']
+});
+
+// Submit requirement
+await invoke('spl/dev/submit', {
+  method: 'spl/console/clear',
+  schema: { /* input schema */ },
+  selfEval: ['logic', 'safety', 'qc']
+});
+
+// Run dev cycle - autonomous until green
+await invoke('spl/dev/cycle');
+
+// Teardown or keep as immutable artifact
+await invoke('spl/dev/teardown', { preserve: true });
+```
+
+**Key properties:**
+- Self-contained unit
+- Requirement-driven development
+- Autonomous execution (code until self-eval passes)
+- Immutable artifacts when done
+- AI-primary invocation model
+- Aligns with "dumb execution, smart definition" pattern
+
+**For backlog:** Add Dev Environment API project
+
+---
+
+### Failure Preprocessing & Autonomous Bug Fix Loop
+
+**Failure preprocessing concept:**
+
+Self-eval failures include preprocessed advice to reduce AI context load:
+
+```javascript
+{
+  status: 'failed',
+  category: 'qc',
+  message: 'schema validation failed',
+
+  advice: {
+    type: 'schema_mismatch',
+    instructions: [
+      'Output field "bytesOutput" is integer but method returns string',
+      'Check line 28 in log/index.js',
+      'Expected: return bytesOutput as number'
+    ],
+    suggestedFix: 'Remove .toString() call on line 28',
+    references: ['log-input.avsc:field:bytesOutput']
+  }
+}
+```
+
+**Failure types with tailored advice:**
+- Schema mismatch: field name, expected type, actual type, location
+- Missing import: module name, suggested import statement
+- Runtime error: stack trace analysis, common causes
+- Safety violation: what was modified, how to preserve
+- Logic failure: test case details, expected vs actual
+
+**Autonomous bug fix loop:**
+
+```
+Dev cycle fails
+    ↓
+Bug report generated (with preprocessed advice)
+    ↓
+Route to new dev environment
+    ↓
+AI agent receives bug report as requirement
+    ↓
+Codes fix based on advice/instructions
+    ↓
+Self-eval runs
+    ↓
+Pass → merge back / Fail → escalate or retry
+```
+
+**Key insight:** Bug report IS a requirement - has spec violation, self-eval, context, and advice. The `spl/dev/submit` method accepts both new features and bug reports (same structure, different origin).
+
+**Escalation paths:**
+- Retry limit exceeded → human intervention
+- Confidence too low → human review
+- Scope creep detected → split into separate requirements
+
+**System becomes convergent** - errors feed back into the same development machinery that created the code.
+
+---
+
+### Autonomy Enables Delegation
+
+**Key insight:** Autonomy isn't just about working independently - it's the authority to spawn sub-work.
+
+**What autonomy grants:**
+- Freedom to execute without approval
+- Authority to delegate/spawn sub-work
+- Responsibility for coordination
+- Accountability for outcome
+
+**Without autonomy:** Must ask permission for each sub-task
+**With autonomy:** Can orchestrate a swarm of work
+
+**Delegation pattern:**
+
+```
+AI receives requirement with autonomy grant
+    ↓
+Breaks down into sub-requirements
+    ↓
+Delegates to other agents/dev environments
+    ↓
+Coordinates results
+    ↓
+Delivers composite outcome
+```
+
+**Example:**
+```javascript
+// AI with autonomy receives complex requirement
+// Autonomously decides to parallelize:
+
+await Promise.all([
+  invoke('spl/dev/create', { name: 'feature-a' }),
+  invoke('spl/dev/create', { name: 'feature-b' }),
+  invoke('spl/dev/create', { name: 'integration-tests' })
+]);
+
+// Submits sub-requirements to each
+// Runs dev cycles in parallel
+// Merges results
+// Delivers composite outcome
+```
+
+**Why this matters for splectrum APIs:**
+- APIs become the interface for AI orchestration
+- Clean method signatures enable composition
+- State management enables coordination
+- Self-eval enables autonomous quality control
+- The dev environment itself is an API that can invoke other APIs
+
+**The OCD about API design pays off** - every API is a potential delegation target for autonomous agents.
+
+---
+
 ## For Project Closure
 
 - [ ] Update Exploration_project_requirements reference in STEPPING_STONES_GLOSSARY if needed
 - [ ] Consider whether autonomous activities pattern applies to other project types
 - [ ] Propose early SPL2 AVRO API wrapper project - wraps avsc, includes Bare adaptation
+- [ ] **Discuss simplifying dynamic change load** - CLAUDE.md, INDEX.md updates feel like overhead; want streamlined approach to project status tracking
 - [ ] Update API_DESIGN.md to use glossary terms (api_node, underscore prefix convention)
+- [ ] Add Dev Environment API to backlog
 
 ---
 

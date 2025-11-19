@@ -1,8 +1,8 @@
 # Design Register
 
 **Purpose:** Registry of platform design elements - implementation templates for Splectrum
-**Last Updated:** 2025-11-17
-**Status:** Active - initialized with API design elements from Project 03
+**Last Updated:** 2025-11-19
+**Status:** Active - updated with Project 07 design elements
 
 ---
 
@@ -226,7 +226,82 @@ Each entry:
 
 ## Design Documents
 
-- **API_DESIGN.md** - Comprehensive API architecture and implementation patterns (from Project 03)
+- **API_DESIGN.md** - Comprehensive API architecture and implementation patterns (from Projects 03-07)
+- **DEV_ENVIRONMENT_DESIGN.md** - Dev environment as API, teardown approach, deployment scripts (from Project 07)
+- **SELF_EVAL_DESIGN.md** - Self-evaluation architecture, autonomy enabler, quality control (from Project 07)
+- **EXECUTION_DESIGN.md** (future) - Bug fix loop, failure preprocessing, error routing
+
+---
+
+## Design Elements (Project 07)
+
+### Boundary Validation Model
+
+**Status:** Validated (Project 07)
+**Location:** API_DESIGN.md § "Boundary Validation Model"
+**Template For:** Method implementation patterns
+**Description:** "Code dangerously with external safeguards" - validation at boundaries only, pure business logic internally, self-eval catches violations
+**Related:** Project 07 v7 implementation
+
+---
+
+### Schema-Driven Property Selection
+
+**Status:** Validated (Project 07)
+**Location:** API_DESIGN.md § "Schema-Driven Property Selection"
+**Template For:** Three-layer merge implementation
+**Description:** Method input schema defines which properties to merge from API defaults, output flow, and method args - clean separation
+**Related:** Project 07 v7 harness
+
+---
+
+### Invocation at Any Level
+
+**Status:** Validated (Project 07)
+**Location:** API_DESIGN.md § "Invocation at Any Level"
+**Template For:** Package/API/method invocation patterns
+**Description:** Path depth determines invocation type - API invocation sets defaults/state shaping, method invocation executes business logic
+**Related:** Project 07 v5-v7
+
+---
+
+### Wrapper vs DSL APIs
+
+**Status:** Validated (Project 07)
+**Location:** API_DESIGN.md § "Wrapper APIs vs DSL APIs"
+**Template For:** API layer design
+**Description:** Two API layers - wrapper (thin pass-through to native) and DSL (shaped for workflow)
+**Related:** Project 07 console wrapper implementation
+
+---
+
+### Self-Eval Development Model
+
+**Status:** Validated (Project 07)
+**Location:** SELF_EVAL_DESIGN.md
+**Template For:** Autonomous development workflows
+**Description:** "Dumb execution, smart definition" - self-eval types, harness integration, method requirements with self-eval spec
+**Related:** Project 07 v6 harness
+
+---
+
+### Dev Environment as API
+
+**Status:** Proposed (Project 07)
+**Location:** DEV_ENVIRONMENT_DESIGN.md
+**Template For:** Development infrastructure
+**Description:** Dev environment with management methods (create, submit, cycle, teardown) - self-contained, requirement-driven, autonomous execution
+**Related:** Project 07 exploration, future backlog item
+
+---
+
+### Teardown Approach
+
+**Status:** Validated (Project 07)
+**Location:** DEV_ENVIRONMENT_DESIGN.md § "Teardown Approach"
+**Template For:** Development environment lifecycle
+**Description:** Fresh environment each cycle, deployment scripts for resurrection, immutable artifacts when done
+**Related:** Project 07 v7-deploy.sh
 
 ---
 

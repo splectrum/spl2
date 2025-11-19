@@ -6,57 +6,19 @@ SPL2 is a platform for AI to create and manage software solutions with a focus o
 
 ## Start Here (New Session)
 
+**Current state (start here):**
+- Read `status/CURRENT.md` - Active work, recent context, session entry point
+
 **Understand how we work:**
 - Read `foundations/WOW.md` - Philosophy, PRINCE2, TDC methodologies
 - Read `foundations/PRINCIPLES.md` - What SPL2 is, design principles
 - Read `foundations/PARTNERSHIP.md` - Partnership health, collaboration patterns, friction metric
 
-**Understand current state:**
-- Read `projects/INDEX.md` - Completed projects and current status (6 complete)
-- Read `projects/BACKLOG.md` - Next work to do (13 projects with priorities/dependencies)
+**Project status:**
+- Read `projects/INDEX.md` - Completed projects and current status
+- Read `projects/BACKLOG.md` - Work queue with priorities/dependencies
 
 **Everything else references from these foundation documents.**
-
-## Repository Structure
-
-```
-spl2/
-├── foundations/          # How we work (WOW) and what we build (PRINCIPLES)
-│   ├── WOW.md           # References versioned detail files in projects/
-│   ├── PRINCIPLES.md    # References versioned detail files in projects/
-│   ├── PARTNERSHIP.md   # Partnership health, collaboration patterns (headline)
-│   └── *_CHANGELOG.md   # Track changes to mutable foundation documents
-├── design/              # Platform design documentation (mutable with CHANGELOGs)
-│   ├── DESIGN_REGISTER.md        # Registry of all platform design elements
-│   ├── API_DESIGN.md             # Comprehensive API architecture
-│   └── API_DESIGN_CHANGELOG.md   # Track API design evolution
-├── chats/               # Informal collaborative work captures
-│   ├── YYYY-MM-DD_*.md  # Chat captures (sufficient and complete pattern)
-│   ├── CHAT_REQUIREMENTS_v1.0.0.md  # How chat capture works
-│   └── immutables/      # Adhoc-created versioned artifacts (requirements, designs)
-├── cips/                # Continual Improvement Proposals
-│   ├── CIP_REGISTER.md  # CIP tracking register (mutable, living artifact)
-│   └── CIP-NNN_*.md     # Individual CIP documents (immutable)
-├── glossary/            # Context-specific terminology
-│   ├── DSL_GLOSSARY.md  # Runtime/API vocabulary (mutable, with CHANGELOG)
-│   ├── STEPPING_STONES_GLOSSARY.md  # Foundation concepts (mutable, with CHANGELOG)
-│   ├── SPOTS_GLOSSARY.md  # Repository structure terms (mutable, with CHANGELOG)
-│   └── *_CHANGELOG.md   # Track changes to glossaries
-├── projects/            # All formal project work
-│   ├── INDEX.md         # Project status register
-│   ├── BACKLOG.md       # Work to do (with priorities/dependencies)
-│   ├── backlog/         # Individual backlog item details
-│   ├── project-types/   # Project type requirements (Explorative, etc.)
-│   ├── 01-*/            # Completed: Preliminary to Workplan
-│   ├── 02-*/            # Completed: Initial Workplan
-│   ├── 03-*/            # Completed: Runtime Structure Hello World
-│   ├── 04-*/            # Completed: Bare Runtime Hello World
-│   ├── 05-*/            # Completed: Foundation Update & Documentation Templates
-│   └── 06-*/            # Completed: Glossary Term Requirements
-├── archive/             # Reference: spl1 materials (legacy)
-├── CLAUDE.md            # This file - navigation guide
-└── README.md            # Project overview
-```
 
 ## How Documentation Works
 
@@ -81,7 +43,7 @@ spl2/
 **Stepping stones (navigational concepts):**
 - Journey metaphor: patterns encountered repeatedly throughout work
 - Same stones appear at different decision points - choose which to step on based on context
-- See STEPPING_STONES_GLOSSARY.md for full list (40+ terms with reqs: activity types, completeness patterns, collaboration, friction, autonomy, twin pair methodology, etc.)
+- See STEPPING_STONES_GLOSSARY.md for full list
 
 **Activity types (change management):**
 - **Adhoc activity:** Informal "chat while we work"; artifacts in chats/ or chats/immutables/
@@ -105,24 +67,44 @@ spl2/
 - Surprise at interpretation gaps is calibration, not frustration
 - "So alike but so different" - same words, different mental models is the core challenge and opportunity
 
+## Efficient Search (Important)
+
+**When looking up SPL2 concepts, use glossaries as index:**
+
+1. **Glossary first** - Read appropriate glossary for term and req file reference
+2. **Req file** - From the Req column, read the requirements file directly
+3. **Then search** - Only use grep/glob if not in glossary
+
+**Glossary locations:**
+- `glossary/STEPPING_STONES_GLOSSARY.md` - Foundation concepts, methodology terms
+- `glossary/DSL_GLOSSARY.md` - Runtime/API vocabulary
+- `glossary/SPOTS_GLOSSARY.md` - Repository structure terms
+
+**Req file locations:**
+- Most reqs in `projects/06-glossary-term-requirements/reqs/`
+- Path shown in glossary Req column
+
+**Example:** Looking for "blank_project" requirements:
+1. Read STEPPING_STONES_GLOSSARY.md → find `blank_project_v1.0.1.md` in Req column
+2. Read `projects/06-glossary-term-requirements/reqs/blank_project_v1.0.1.md`
+
+Two file reads, not multiple failed searches. **Glossaries are the index.**
+
 ## Where to Find Things
 
+**Current state:** `status/CURRENT.md` - active work, session entry point
 **How we work:** `foundations/WOW.md` → references detail files
 **What we're building:** `foundations/PRINCIPLES.md` → references detail files
-**Partnership health:** `foundations/PARTNERSHIP.md` → current state, friction metric, patches
-**Platform design:** `design/DESIGN_REGISTER.md` → catalog of all design elements, `design/API_DESIGN.md` → comprehensive API architecture
-**Terminology:** `glossary/` - DSL_GLOSSARY.md (runtime/API terms), STEPPING_STONES_GLOSSARY.md (foundation concepts), SPOTS_GLOSSARY.md (repository structure)
-**Chat captures:** `chats/` - informal collaborative work discussions, discoveries, decisions
-**Adhoc requirements:** `chats/immutables/` - versioned artifacts created during informal work
-**CIP documents:** `cips/CIP-NNN_*.md` - Continual Improvement Proposals (immutable)
-**CIP tracking:** `cips/CIP_REGISTER.md` - living register of all CIPs (14 active CIPs including CIP-013 Design Spot Setup, CIP-014 Comprehensive API Design Phase)
-**Project status:** `projects/INDEX.md` (6 complete)
-**Next work:** `projects/BACKLOG.md` (13 projects queued, Console API Exploration is next)
-**Completed projects:** `projects/01-*/`, `projects/02-*/`, `projects/03-*/`, `projects/04-*/`, `projects/05-*/`, `projects/06-*/`
-**Lessons learned:** `projects/XX-*/LESSONS_LEARNED.md` in each project folder
-**Partnership reflections:** `projects/XX-*/PARTNERSHIP_REFLECTION*.md` at project closures
-**Project types:** `projects/project-types/` (Explorative, etc.)
-**Detailed methodology:** Follow references from WOW.md to versioned files
+**Partnership health:** `foundations/PARTNERSHIP.md` → current state, friction metric
+**Platform design:** `design/DESIGN_REGISTER.md` → catalog of elements, `design/API_DESIGN.md` → API architecture
+**Terminology:** `glossary/` - see Efficient Search section above
+**Project status:** `projects/INDEX.md`
+**Work queue:** `projects/BACKLOG.md`
+**Chat captures:** `chats/` - informal work discussions
+**CIP tracking:** `cips/CIP_REGISTER.md`
+**Completed projects:** `projects/NN-*/` folders
+**Lessons learned:** `projects/NN-*/LESSONS_LEARNED.md`
+**Partnership reflections:** `projects/NN-*/PARTNERSHIP_REFLECTION*.md`
 
 ## Working with Claude Code
 

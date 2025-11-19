@@ -1,0 +1,12 @@
+{
+  "name": "console-api-v7",
+  "version": "7.0.0",
+  "type": "module",
+  "description": "Console API wrapper - 5 methods with schema-driven merge",
+  "scripts": {
+    "start": "node run.js"
+  },
+  "dependencies": {
+    "avsc": "^5.7.7"
+  }
+}

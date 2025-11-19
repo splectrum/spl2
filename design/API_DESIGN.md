@@ -1,11 +1,13 @@
 # SPL2 API Design and Implementation
 
 **Location:** design/ spot - mutable design documentation
-**Source:** Project 03 - Runtime Structure "Hello World"
-**Current Version:** v0.2.0 (AI-primary paradigm shift)
-**Last Updated:** 2025-11-18 (AI-primary execution model, JS invocation primary)
-**Status:** Active - validated patterns from Projects 03-05, evolving based on evidence
+**Source:** Projects 03-07
+**Current Version:** v0.3.0 (Console API patterns, schema-driven merge)
+**Last Updated:** 2025-11-19 (v7 patterns: schema-driven property selection, boundary validation, wrapper vs DSL APIs, runtime/execution responsibilities)
+**Status:** Active - accumulating detail from implementation, pre-rationalization phase
 **Changelog:** See API_DESIGN_CHANGELOG.md
+
+**Glossary References:** Terms in **bold** reference DSL_GLOSSARY.md or STEPPING_STONES_GLOSSARY.md
 
 ---
 
@@ -37,34 +39,41 @@ An API is a collection of related methods that:
 
 ### API Package Structure
 
-**Everything needed for an API in one package:**
+**Everything needed for an **api_node** in one package:**
 
 ```
 [package]/[api]/
-├── methods/
-│   ├── method1.js              # Method implementation
-│   ├── method2.js              # Method implementation
-│   └── method3.js              # Method implementation
-├── schemas/
+├── method1/
+│   └── index.js                # Method implementation
+├── method2/
+│   └── index.js                # Method implementation
+├── method3/
+│   └── index.js                # Method implementation
+├── _schemas/                   # Underscore prefix for auxiliary folders
 │   ├── method1-input.avsc      # AVRO input schema
 │   ├── method1-output.avsc     # AVRO output schema
 │   ├── method2-input.avsc      # AVRO input schema
 │   ├── method2-output.avsc     # AVRO output schema
 │   └── api-state.avsc          # Shared API state schema
-├── help/
+├── _help/                      # Underscore prefix for auxiliary
 │   ├── api-help.md             # API-level help
 │   ├── method1-help.md         # Method help
-│   ├── method2-help.md         # Method help
-│   └── method3-help.md         # Method help
-├── tests/
+│   └── method2-help.md         # Method help
+├── _tests/                     # Underscore prefix for auxiliary
 │   ├── method1.test.js         # Tests = requirements
 │   ├── method2.test.js         # Tests = requirements
-│   ├── method3.test.js         # Tests = requirements
 │   └── api-integration.test.js # API-level integration tests
-├── requirements/
+├── _requirements/              # Underscore prefix for auxiliary
 │   └── api-requirements.md     # Requirements reference
 └── package.json                # API metadata, dependencies
 ```
+
+**Naming conventions:**
+- **Method folders:** Named after method (e.g., `log/`, `error/`)
+- **Method implementation:** Always `index.js` inside method folder
+- **Auxiliary folders:** Underscore prefix (`_schemas/`, `_help/`, `_tests/`)
+- **Schema files:** `{method}-input.avsc`, `{method}-output.avsc`
+- **State schema:** `{api}-state.avsc`
 
 **Co-located artifacts make API:**
 - **Wholesome** - Everything needed to understand, use, validate API
@@ -228,6 +237,281 @@ deployment -workdir /project buildapi -target production build -clean true
 - Framework handles complexity (fire and forget)
 - Simpler data structures than spl1
 - Defaults resolved at squash time, not scattered through access
+
+---
+
+## Invocation Levels and API Types (Project 07)
+
+### Invocation at Any Level
+
+**Invocation can occur at package, API, or method level:**
+
+| Path | Level | Purpose |
+|------|-------|---------|
+| `spl` | Package | Package-level args (future) |
+| `spl/console` | API | API-level args + state shaping |
+| `spl/console/log` | Method | Method execution |
+
+**Path depth determines invocation type:**
+- 1 part: Package invocation
+- 2 parts: API invocation
+- 3 parts: Method invocation
+
+**API-level invocation responsibilities:**
+1. Set default arguments (baseline for all methods)
+2. State shaping/maintenance (init, reset, cleanup)
+3. Batch execution mode
+4. Caretaker of API state (data/metadata)
+
+**Method invocation responsibilities:**
+1. Business logic execution
+2. Input→output transformation
+3. State updates as side effect
+
+### API Input Structure
+
+**API-level invocation input is composite:**
+
+```javascript
+await invoke('spl/console', {
+  // Method defaults (known from method schemas)
+  level: 'info',
+  format: 'text',
+
+  // Execution directive (transient, not stored)
+  batch: [
+    ['log', { message: 'Hello' }],
+    ['error', { message: 'Oops' }]
+  ],
+
+  // API-specific (everything else)
+  bufferSize: 1000
+});
+```
+
+**Parsing logic:**
+1. **Known method properties** → API defaults (flow to methods via merge)
+2. **`batch`** → Execution directive (transient, not stored)
+3. **Everything else** → API-specific (internal state management)
+
+**Batch execution:**
+- Transient - executed and gone, not stored in state
+- Executes methods in sequence within API context
+- Each batch item: `[methodName, methodArgs]`
+
+### Schema-Driven Property Selection
+
+**Method input schema defines which properties to merge:**
+
+```javascript
+// Method schema defines: { level, message, format, data }
+
+// Merge picks only those properties from each layer:
+const mergedInput = {};
+for (const prop of methodSchema.fields) {
+  // 1. API defaults (lowest)
+  if (apiState.args[prop] !== undefined)
+    mergedInput[prop] = apiState.args[prop];
+
+  // 2. Output flow (middle)
+  if (previousOutput?.[prop] !== undefined)
+    mergedInput[prop] = previousOutput[prop];
+
+  // 3. Method args (highest)
+  if (args[prop] !== undefined)
+    mergedInput[prop] = args[prop];
+}
+```
+
+**Benefits:**
+- Clean separation - API-specific properties never leak to methods
+- No ambiguity about what gets merged
+- Schema is single source of truth for method interface
+- AVRO already has the field list
+
+### Wrapper APIs vs DSL APIs
+
+**Two API layers serve different purposes:**
+
+| Layer | Purpose | Example |
+|-------|---------|---------|
+| **Wrapper API** | Thin pass-through to native objects | `spl/console/log` → `console.log()` |
+| **DSL API** | Shaped for how we want to work | Higher-level abstractions, composition |
+
+**Characteristics:**
+
+**Wrapper APIs:**
+- Mechanical 1:1 mapping to native
+- Easy to generate, predictable
+- Complete coverage of native surface
+- Handle native quirks
+
+**DSL APIs:**
+- Reflect our patterns and workflow
+- May combine multiple wrapper calls
+- Designed for composition model
+- Clear provenance to wrappers used
+
+### Package Types
+
+**Packages categorized by dependency profile:**
+
+| Package Type | Dependencies | Purpose |
+|--------------|--------------|---------|
+| **core** | None (zero dependencies) | Essential for splectrum to run |
+| **tools** | May depend on core | Utility wrappers |
+| **api** | May depend on core, tools | Mixed wrapper + DSL APIs |
+
+**Package type is metadata** - not part of invocation path. The path `spl/console/log` doesn't include package type; that's configuration.
+
+---
+
+## Boundary Validation Model (Project 07)
+
+### Code Dangerously with External Safeguards
+
+**Pattern:** Full internal access with quality control at boundaries only.
+
+**How it works:**
+1. **Boundary IN:** Validate input against schema at method entry
+2. **Internal:** No validation - pure business logic, full access
+3. **Boundary OUT:** Validate output against schema at method exit
+4. **Quality Control:** Full state validation at pipeline end
+
+**Why this works:**
+- Methods become pure business logic (simpler, smaller)
+- Trust the writer, verify the output
+- Aligns with **autonomy** pattern: requirements stated → self-eval defined → freedom granted
+- Opposite of defensive programming
+
+**Example - method implementation:**
+```javascript
+// spl/console/log - Pure business logic, no validation
+export default async function log(ctx, input) {
+  // Input already validated at boundary
+  const message = input.message;
+  const format = input.format;
+
+  // Business logic - no defensive checks needed
+  let output;
+  if (format === 'json') {
+    output = JSON.stringify({ level: 'log', message });
+  } else {
+    output = `[LOG] ${message}`;
+  }
+
+  console.log(output);
+
+  // Return result - validated at boundary
+  return {
+    output: { logged: true, level: 'log', message },
+    console: { /* state updates */ }
+  };
+}
+```
+
+### Self-Evaluation Development Model
+
+**Development harness with configurable self-eval:**
+
+**Self-eval types:**
+- **logic:** Business logic tests
+- **safety:** Compliance (didn't modify runtime/execution)
+- **qc:** Schema validation
+- **codingStandards:** Structure, naming, patterns
+- **performance:** Timing, resource usage
+- **bugs:** Specific bug fix tests
+
+**Single development routine for all work:**
+1. Prime harness with requirement's self-eval content
+2. Code
+3. Trigger self-eval
+4. Digest report
+5. Fix issues
+6. Repeat until all clear
+7. Done
+
+**Method requirements include self-eval spec:**
+```javascript
+{
+  name: 'log',
+  input: 'log-input.avsc',
+  output: 'log-output.avsc',
+  selfEval: ['logic', 'safety', 'qc']
+}
+```
+
+**"Dumb execution, smart definition"** - define the requirement well, let execution run autonomously.
+
+---
+
+## Runtime and Execution Responsibilities (Project 07)
+
+### Runtime Context
+
+**Runtime provides environment context - read-only metadata for methods:**
+
+```javascript
+const runtime = {
+  runtimeId: randomUUID(),
+  startTime: new Date().toISOString(),
+  nodeVersion: process.version,
+  platform: process.platform
+};
+```
+
+**Characteristics:**
+- Created once at startup
+- Read-only for all methods
+- Environment properties, not business state
+- Safety self-eval verifies not modified
+
+### Execution Context
+
+**Execution manages state and invocations:**
+
+**Current responsibilities (v7):**
+- Method invocation with common tasks (guid, timing)
+- API state management across pipeline
+- Schema-driven property selection for merge
+- Self-eval coordination
+- Output flow between methods (previousOutput)
+
+**Future responsibilities:**
+- Child request spawning (fresh/modified states)
+- Bug report package on failure
+- Data layer interface (mycelium)
+
+**Pattern: Free scripting → API wrapping**
+
+Runtime and execution are **utilities now**, formal **APIs later**:
+- Don't force into API structure prematurely
+- They have significant responsibilities that need more exploration
+- Can iterate on patterns before committing to API structure
+- Same approach as AVRO (use directly, wrap later)
+
+### Context Structure
+
+**ctx passed to methods:**
+
+```javascript
+ctx = {
+  runtime: { runtimeId, startTime, nodeVersion, platform },
+  execution: { executionId, invocationId, verbosity },
+  [apiName]: {           // API's own state
+    data: { ... },       // Business data
+    metadata: { ... },   // Operational metadata
+    args: { ... }        // API-level default arguments
+  }
+}
+```
+
+**API state structure (data/metadata/args):**
+- **data:** Business state (invocationCount, bytesOutput)
+- **metadata:** Operational info (lastOutputAt, configuredAt)
+- **args:** API-level default arguments (format, level)
+
+This aligns with Kafka record structure (value/headers).
 
 ---
 
@@ -2159,6 +2443,8 @@ return {
 
 ## Version History
 
+- **v0.3.0** (2025-11-19): Project 07 patterns - schema-driven property selection, boundary validation model, wrapper vs DSL APIs, invocation at any level, runtime/execution responsibilities, package types, self-eval development model. Updated structure to use underscore prefix convention and method folders.
+- **v0.2.0** (2025-11-18): AI-primary paradigm shift - JS invocation primary, CLI secondary wrapper.
 - **v0.1.0** (2025-11-10): Initial design document capturing decisions from Twin Pair 1 and Twin Pair 2 planning discussions. MVP scope defined. End vision captured. Ready for implementation.
 
 ---

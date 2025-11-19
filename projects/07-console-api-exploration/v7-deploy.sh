@@ -1,0 +1,842 @@
+#!/bin/bash
+# v7-deploy.sh - Deploy Console API v7 dev environment
+# Creates complete self-contained environment from scratch
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+V7_DIR="$SCRIPT_DIR/v7"
+
+echo "Creating v7 dev environment..."
+
+# Clean and create structure
+rm -rf "$V7_DIR"
+mkdir -p "$V7_DIR/modules/spl/console"/{log,error,warn,info,debug,_schemas}
+
+# =============================================================================
+# package.json
+# =============================================================================
+cat > "$V7_DIR/package.json" << 'EOF'
+{
+  "name": "console-api-v7",
+  "version": "7.0.0",
+  "type": "module",
+  "description": "Console API wrapper - 5 methods with schema-driven merge",
+  "scripts": {
+    "start": "node run.js"
+  },
+  "dependencies": {
+    "avsc": "^5.7.7"
+  }
+}
+EOF
+
+# =============================================================================
+# run.js - Execution harness with schema-driven property selection
+# =============================================================================
+cat > "$V7_DIR/run.js" << 'EOF'
+// run.js - Execution harness for Console API v7
+// Schema-driven property selection for three-layer merge
+
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import { randomUUID } from 'crypto';
+import { readFileSync } from 'fs';
+import avro from 'avsc';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const modulesPath = join(__dirname, 'modules');
+
+// -----------------------------------------------------------------------------
+// Runtime - environment context properties
+// -----------------------------------------------------------------------------
+function createRuntime() {
+  return {
+    runtimeId: randomUUID(),
+    startTime: new Date().toISOString(),
+    nodeVersion: process.version,
+    platform: process.platform
+  };
+}
+
+// -----------------------------------------------------------------------------
+// Schema loader - loads and caches AVRO types
+// -----------------------------------------------------------------------------
+function createSchemaLoader() {
+  const cache = new Map();
+
+  function loadSchema(schemaPath) {
+    if (cache.has(schemaPath)) {
+      return cache.get(schemaPath);
+    }
+    const schema = JSON.parse(readFileSync(schemaPath, 'utf-8'));
+    const type = avro.Type.forSchema(schema);
+    cache.set(schemaPath, type);
+    return type;
+  }
+
+  return { loadSchema };
+}
+
+// -----------------------------------------------------------------------------
+// Self-eval report
+// -----------------------------------------------------------------------------
+function createSelfEvalReport() {
+  const results = [];
+
+  function pass(category, message) {
+    results.push({ status: 'pass', category, message });
+  }
+
+  function fail(category, message) {
+    results.push({ status: 'fail', category, message });
+  }
+
+  function print() {
+    const passes = results.filter(r => r.status === 'pass');
+    const failures = results.filter(r => r.status === 'fail');
+
+    console.log('');
+    console.log('Self-Eval Report');
+    console.log('================');
+
+    for (const r of results) {
+      const icon = r.status === 'pass' ? '✓' : '✗';
+      console.log(`${icon} [${r.category}] ${r.message}`);
+    }
+
+    console.log('');
+    console.log(`${failures.length} failures, ${passes.length} passed`);
+
+    return failures.length === 0;
+  }
+
+  return { pass, fail, print, results };
+}
+
+// -----------------------------------------------------------------------------
+// Execution - method invocation with self-eval
+// -----------------------------------------------------------------------------
+function createExecution(runtime, options = {}) {
+  const executionId = randomUUID();
+  const verbosity = options.verbosity ?? 'normal';
+  const selfEval = options.selfEval ?? {};
+  const schemaLoader = createSchemaLoader();
+  const report = createSelfEvalReport();
+
+  // API states - maintained across pipeline
+  const apiStates = {};
+
+  // Track previous output for pipeline flow
+  let previousOutput = null;
+
+  // Get or create API state
+  function getApiState(apiPath) {
+    if (!apiStates[apiPath]) {
+      apiStates[apiPath] = {
+        data: {},
+        metadata: {},
+        args: {}
+      };
+    }
+    return apiStates[apiPath];
+  }
+
+  // Update API state
+  function setApiState(apiPath, newState) {
+    apiStates[apiPath] = newState;
+  }
+
+  // Invoke API or method
+  async function invoke(path, args = {}) {
+    const parts = path.split('/');
+    const isApiLevel = parts.length === 2;
+
+    if (isApiLevel) {
+      return await invokeApi(path, args);
+    } else {
+      return await invokeMethod(path, args);
+    }
+  }
+
+  // API-level invocation - set defaults and optionally run batch
+  async function invokeApi(apiPath, args = {}) {
+    const invocationId = randomUUID();
+
+    if (verbosity === 'debug') {
+      console.log(`[${invocationId.slice(0, 8)}] API invocation: ${apiPath}`);
+    }
+
+    const { batch, ...defaultArgs } = args;
+
+    // Store API defaults
+    const apiState = getApiState(apiPath);
+    apiState.args = { ...apiState.args, ...defaultArgs };
+
+    if (verbosity === 'debug' && Object.keys(defaultArgs).length) {
+      console.log(`[${invocationId.slice(0, 8)}] API defaults set: ${JSON.stringify(defaultArgs)}`);
+    }
+
+    // Execute batch if present
+    let result = { output: previousOutput };
+    if (batch && batch.length) {
+      if (verbosity === 'debug') {
+        console.log(`[${invocationId.slice(0, 8)}] Executing batch of ${batch.length} methods`);
+      }
+      for (const [methodName, methodArgs] of batch) {
+        const methodPath = `${apiPath}/${methodName}`;
+        result = await invokeMethod(methodPath, methodArgs ?? {});
+      }
+    }
+
+    return result;
+  }
+
+  // Method-level invocation
+  async function invokeMethod(methodPath, args = {}) {
+    const invocationId = randomUUID();
+    const startTime = Date.now();
+
+    const parts = methodPath.split('/');
+    const apiPath = parts.slice(0, -1).join('/');
+    const methodName = parts[parts.length - 1];
+    const apiName = parts[parts.length - 2];
+
+    const schemasPath = join(modulesPath, apiPath, '_schemas');
+    const inputSchemaPath = join(schemasPath, `${methodName}-input.avsc`);
+
+    if (verbosity === 'debug') {
+      console.log(`[${invocationId.slice(0, 8)}] Invoking ${methodPath}`);
+    }
+
+    // Load input schema for property selection and validation
+    const InputType = schemaLoader.loadSchema(inputSchemaPath);
+    const schemaFields = InputType.fields.map(f => f.name);
+
+    // THREE-LAYER MERGE: API defaults < output flow < method overrides
+    // Schema-driven: only select properties defined in method schema
+    const apiState = getApiState(apiPath);
+    const mergedInput = {};
+
+    for (const prop of schemaFields) {
+      if (apiState.args[prop] !== undefined) {
+        mergedInput[prop] = apiState.args[prop];
+      }
+      if (previousOutput?.[prop] !== undefined) {
+        mergedInput[prop] = previousOutput[prop];
+      }
+      if (args[prop] !== undefined) {
+        mergedInput[prop] = args[prop];
+      }
+    }
+
+    if (verbosity === 'debug') {
+      const layers = [];
+      if (Object.keys(apiState.args).length) layers.push('API defaults');
+      if (previousOutput) layers.push('output flow');
+      if (Object.keys(args).length) layers.push('method overrides');
+      if (layers.length > 1) {
+        console.log(`[${invocationId.slice(0, 8)}] Input merged: ${layers.join(' < ')}`);
+      }
+    }
+
+    // BOUNDARY IN: Validate merged input
+    let validatedInput = mergedInput;
+    try {
+      validatedInput = InputType.clone(mergedInput, { wrapUnions: true });
+      if (verbosity === 'debug') {
+        console.log(`[${invocationId.slice(0, 8)}] Input validated`);
+      }
+    } catch (err) {
+      throw new Error(`Input validation failed: ${err.message}`);
+    }
+
+    // Build ctx for method
+    const ctx = {
+      runtime,
+      execution: {
+        executionId,
+        invocationId,
+        verbosity
+      },
+      [apiName]: apiState
+    };
+
+    // Snapshot for safety self-eval
+    const runtimeSnapshot = selfEval.safety ? JSON.stringify(runtime) : null;
+    const executionSnapshot = selfEval.safety ? JSON.stringify({ executionId, invocationId, verbosity }) : null;
+
+    // Load and call method
+    const fullPath = join(modulesPath, methodPath, 'index.js');
+    const { default: method } = await import(fullPath);
+    const result = await method(ctx, validatedInput);
+
+    // Safety self-eval
+    if (selfEval.safety) {
+      if (JSON.stringify(runtime) !== runtimeSnapshot) {
+        report.fail('safety', `${methodPath}: runtime modified`);
+      } else {
+        report.pass('safety', `${methodPath}: runtime not modified`);
+      }
+
+      const currentExecution = JSON.stringify({ executionId, invocationId, verbosity });
+      if (currentExecution !== executionSnapshot) {
+        report.fail('safety', `${methodPath}: execution modified`);
+      } else {
+        report.pass('safety', `${methodPath}: execution not modified`);
+      }
+    }
+
+    // Extract and store updated API state
+    if (result[apiName]) {
+      setApiState(apiPath, {
+        ...result[apiName],
+        args: apiState.args
+      });
+    }
+
+    previousOutput = result.output;
+
+    const duration = Date.now() - startTime;
+    if (verbosity === 'debug') {
+      console.log(`[${invocationId.slice(0, 8)}] Complete in ${duration}ms`);
+    }
+
+    return result;
+  }
+
+  // Quality control
+  function qualityControl() {
+    if (!selfEval.qc) return true;
+
+    if (verbosity === 'debug') {
+      console.log(`[QC] Running quality control checks...`);
+    }
+
+    for (const [apiPath, state] of Object.entries(apiStates)) {
+      try {
+        const stateSchemaPath = join(modulesPath, apiPath, '_schemas', `${apiPath.split('/').pop()}-state.avsc`);
+        const StateType = schemaLoader.loadSchema(stateSchemaPath);
+        StateType.clone(state, { wrapUnions: true });
+        report.pass('qc', `${apiPath} state schema valid`);
+      } catch (err) {
+        report.fail('qc', `${apiPath} state schema invalid: ${err.message}`);
+      }
+    }
+
+    return true;
+  }
+
+  function printReport() {
+    return report.print();
+  }
+
+  return { invoke, getApiState, qualityControl, printReport, executionId };
+}
+
+// -----------------------------------------------------------------------------
+// Main - test all 5 console methods
+// -----------------------------------------------------------------------------
+async function main() {
+  console.log('========================================');
+  console.log('  Console API v7 - Wrapper Methods');
+  console.log('========================================');
+  console.log('');
+
+  try {
+    console.log('[1] Creating runtime...');
+    const runtime = createRuntime();
+    console.log(`    Runtime ID: ${runtime.runtimeId.slice(0, 8)}...`);
+    console.log('');
+
+    console.log('[2] Creating execution with self-eval...');
+    const exec = createExecution(runtime, {
+      verbosity: 'debug',
+      selfEval: {
+        safety: true,
+        qc: true
+      }
+    });
+    console.log(`    Execution ID: ${exec.executionId.slice(0, 8)}...`);
+    console.log('');
+
+    // API-level invocation - set defaults
+    console.log('[3] API-level invocation (set defaults)...');
+    await exec.invoke('spl/console', { format: 'text' });
+    console.log('');
+
+    // Test all 5 methods
+    console.log('[4] Testing all wrapper methods...');
+    console.log('');
+
+    console.log('--- debug ---');
+    await exec.invoke('spl/console/debug', { message: 'Debug message' });
+    console.log('');
+
+    console.log('--- info ---');
+    await exec.invoke('spl/console/info', { message: 'Info message' });
+    console.log('');
+
+    console.log('--- log ---');
+    await exec.invoke('spl/console/log', { message: 'Log message' });
+    console.log('');
+
+    console.log('--- warn ---');
+    await exec.invoke('spl/console/warn', { message: 'Warning message' });
+    console.log('');
+
+    console.log('--- error ---');
+    await exec.invoke('spl/console/error', { message: 'Error message' });
+    console.log('');
+
+    // Quality control
+    console.log('[5] Quality control...');
+    exec.qualityControl();
+    console.log('');
+
+    // Final state
+    console.log('[6] Final console API state:');
+    const consoleState = exec.getApiState('spl/console');
+    console.log(`    ${JSON.stringify(consoleState, null, 2).split('\n').join('\n    ')}`);
+
+    const allPassed = exec.printReport();
+
+    if (allPassed) {
+      console.log('========================================');
+      console.log('  ✓ ALL SELF-EVAL PASSED');
+      console.log('========================================');
+    } else {
+      console.log('========================================');
+      console.log('  ✗ SELF-EVAL FAILURES');
+      console.log('========================================');
+    }
+    console.log('');
+
+    process.exit(allPassed ? 0 : 1);
+  } catch (error) {
+    console.error('========================================');
+    console.error('  ✗ DEV HARNESS TEST FAILED');
+    console.error('========================================');
+    console.error('');
+    console.error('Error:', error.message);
+    console.error(error.stack);
+    console.error('');
+    process.exit(1);
+  }
+}
+
+main();
+EOF
+
+# =============================================================================
+# Schemas
+# =============================================================================
+
+# console-state.avsc
+cat > "$V7_DIR/modules/spl/console/_schemas/console-state.avsc" << 'EOF'
+{
+  "type": "record",
+  "name": "ConsoleState",
+  "namespace": "spl.console",
+  "doc": "Console API state",
+  "fields": [
+    {
+      "name": "data",
+      "type": {
+        "type": "record",
+        "name": "ConsoleData",
+        "fields": [
+          {
+            "name": "invocationCount",
+            "type": "int",
+            "default": 0
+          },
+          {
+            "name": "bytesOutput",
+            "type": "int",
+            "default": 0
+          }
+        ]
+      },
+      "default": {}
+    },
+    {
+      "name": "metadata",
+      "type": {
+        "type": "record",
+        "name": "ConsoleMetadata",
+        "fields": [
+          {
+            "name": "lastOutputAt",
+            "type": ["null", "string"],
+            "default": null
+          }
+        ]
+      },
+      "default": {}
+    },
+    {
+      "name": "args",
+      "type": {
+        "type": "record",
+        "name": "ConsoleArgs",
+        "fields": [
+          {
+            "name": "format",
+            "type": "string",
+            "default": "text"
+          }
+        ]
+      },
+      "default": {}
+    }
+  ]
+}
+EOF
+
+# log-input.avsc
+cat > "$V7_DIR/modules/spl/console/_schemas/log-input.avsc" << 'EOF'
+{
+  "type": "record",
+  "name": "LogInput",
+  "namespace": "spl.console",
+  "doc": "Log a message (general output)",
+  "fields": [
+    {
+      "name": "message",
+      "type": "string",
+      "doc": "Message to log"
+    },
+    {
+      "name": "format",
+      "type": "string",
+      "default": "text",
+      "doc": "Output format: text or json"
+    },
+    {
+      "name": "data",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Optional additional data (JSON string)"
+    }
+  ]
+}
+EOF
+
+# error-input.avsc
+cat > "$V7_DIR/modules/spl/console/_schemas/error-input.avsc" << 'EOF'
+{
+  "type": "record",
+  "name": "ErrorInput",
+  "namespace": "spl.console",
+  "doc": "Log an error message (stderr)",
+  "fields": [
+    {
+      "name": "message",
+      "type": "string",
+      "doc": "Error message to log"
+    },
+    {
+      "name": "format",
+      "type": "string",
+      "default": "text",
+      "doc": "Output format: text or json"
+    },
+    {
+      "name": "data",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Optional additional data (JSON string)"
+    }
+  ]
+}
+EOF
+
+# warn-input.avsc
+cat > "$V7_DIR/modules/spl/console/_schemas/warn-input.avsc" << 'EOF'
+{
+  "type": "record",
+  "name": "WarnInput",
+  "namespace": "spl.console",
+  "doc": "Log a warning message",
+  "fields": [
+    {
+      "name": "message",
+      "type": "string",
+      "doc": "Warning message to log"
+    },
+    {
+      "name": "format",
+      "type": "string",
+      "default": "text",
+      "doc": "Output format: text or json"
+    },
+    {
+      "name": "data",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Optional additional data (JSON string)"
+    }
+  ]
+}
+EOF
+
+# info-input.avsc
+cat > "$V7_DIR/modules/spl/console/_schemas/info-input.avsc" << 'EOF'
+{
+  "type": "record",
+  "name": "InfoInput",
+  "namespace": "spl.console",
+  "doc": "Log an informational message",
+  "fields": [
+    {
+      "name": "message",
+      "type": "string",
+      "doc": "Info message to log"
+    },
+    {
+      "name": "format",
+      "type": "string",
+      "default": "text",
+      "doc": "Output format: text or json"
+    },
+    {
+      "name": "data",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Optional additional data (JSON string)"
+    }
+  ]
+}
+EOF
+
+# debug-input.avsc
+cat > "$V7_DIR/modules/spl/console/_schemas/debug-input.avsc" << 'EOF'
+{
+  "type": "record",
+  "name": "DebugInput",
+  "namespace": "spl.console",
+  "doc": "Log a debug message",
+  "fields": [
+    {
+      "name": "message",
+      "type": "string",
+      "doc": "Debug message to log"
+    },
+    {
+      "name": "format",
+      "type": "string",
+      "default": "text",
+      "doc": "Output format: text or json"
+    },
+    {
+      "name": "data",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Optional additional data (JSON string)"
+    }
+  ]
+}
+EOF
+
+# =============================================================================
+# Method implementations
+# =============================================================================
+
+# log/index.js
+cat > "$V7_DIR/modules/spl/console/log/index.js" << 'EOF'
+// spl/console/log - Log a message (general output)
+// Wrapper for console.log
+
+export default async function log(ctx, input) {
+  const message = input.message;
+  const format = input.format;
+  const data = input.data;
+
+  let output;
+  if (format === 'json') {
+    output = JSON.stringify({ level: 'log', message, data, timestamp: new Date().toISOString() });
+  } else {
+    output = `[LOG] ${message}`;
+  }
+
+  console.log(output);
+
+  const bytesOutput = (ctx.console?.data?.bytesOutput ?? 0) + output.length;
+
+  return {
+    output: { logged: true, level: 'log', message, bytesOutput },
+    console: {
+      data: {
+        invocationCount: (ctx.console?.data?.invocationCount ?? 0) + 1,
+        bytesOutput
+      },
+      metadata: {
+        lastOutputAt: new Date().toISOString()
+      }
+    }
+  };
+}
+EOF
+
+# error/index.js
+cat > "$V7_DIR/modules/spl/console/error/index.js" << 'EOF'
+// spl/console/error - Log an error message (stderr)
+// Wrapper for console.error
+
+export default async function error(ctx, input) {
+  const message = input.message;
+  const format = input.format;
+  const data = input.data;
+
+  let output;
+  if (format === 'json') {
+    output = JSON.stringify({ level: 'error', message, data, timestamp: new Date().toISOString() });
+  } else {
+    output = `[ERROR] ${message}`;
+  }
+
+  console.error(output);
+
+  const bytesOutput = (ctx.console?.data?.bytesOutput ?? 0) + output.length;
+
+  return {
+    output: { logged: true, level: 'error', message, bytesOutput },
+    console: {
+      data: {
+        invocationCount: (ctx.console?.data?.invocationCount ?? 0) + 1,
+        bytesOutput
+      },
+      metadata: {
+        lastOutputAt: new Date().toISOString()
+      }
+    }
+  };
+}
+EOF
+
+# warn/index.js
+cat > "$V7_DIR/modules/spl/console/warn/index.js" << 'EOF'
+// spl/console/warn - Log a warning message
+// Wrapper for console.warn
+
+export default async function warn(ctx, input) {
+  const message = input.message;
+  const format = input.format;
+  const data = input.data;
+
+  let output;
+  if (format === 'json') {
+    output = JSON.stringify({ level: 'warn', message, data, timestamp: new Date().toISOString() });
+  } else {
+    output = `[WARN] ${message}`;
+  }
+
+  console.warn(output);
+
+  const bytesOutput = (ctx.console?.data?.bytesOutput ?? 0) + output.length;
+
+  return {
+    output: { logged: true, level: 'warn', message, bytesOutput },
+    console: {
+      data: {
+        invocationCount: (ctx.console?.data?.invocationCount ?? 0) + 1,
+        bytesOutput
+      },
+      metadata: {
+        lastOutputAt: new Date().toISOString()
+      }
+    }
+  };
+}
+EOF
+
+# info/index.js
+cat > "$V7_DIR/modules/spl/console/info/index.js" << 'EOF'
+// spl/console/info - Log an informational message
+// Wrapper for console.info
+
+export default async function info(ctx, input) {
+  const message = input.message;
+  const format = input.format;
+  const data = input.data;
+
+  let output;
+  if (format === 'json') {
+    output = JSON.stringify({ level: 'info', message, data, timestamp: new Date().toISOString() });
+  } else {
+    output = `[INFO] ${message}`;
+  }
+
+  console.info(output);
+
+  const bytesOutput = (ctx.console?.data?.bytesOutput ?? 0) + output.length;
+
+  return {
+    output: { logged: true, level: 'info', message, bytesOutput },
+    console: {
+      data: {
+        invocationCount: (ctx.console?.data?.invocationCount ?? 0) + 1,
+        bytesOutput
+      },
+      metadata: {
+        lastOutputAt: new Date().toISOString()
+      }
+    }
+  };
+}
+EOF
+
+# debug/index.js
+cat > "$V7_DIR/modules/spl/console/debug/index.js" << 'EOF'
+// spl/console/debug - Log a debug message
+// Wrapper for console.debug
+
+export default async function debug(ctx, input) {
+  const message = input.message;
+  const format = input.format;
+  const data = input.data;
+
+  let output;
+  if (format === 'json') {
+    output = JSON.stringify({ level: 'debug', message, data, timestamp: new Date().toISOString() });
+  } else {
+    output = `[DEBUG] ${message}`;
+  }
+
+  console.debug(output);
+
+  const bytesOutput = (ctx.console?.data?.bytesOutput ?? 0) + output.length;
+
+  return {
+    output: { logged: true, level: 'debug', message, bytesOutput },
+    console: {
+      data: {
+        invocationCount: (ctx.console?.data?.invocationCount ?? 0) + 1,
+        bytesOutput
+      },
+      metadata: {
+        lastOutputAt: new Date().toISOString()
+      }
+    }
+  };
+}
+EOF
+
+# =============================================================================
+# Install dependencies
+# =============================================================================
+echo ""
+echo "Installing dependencies..."
+cd "$V7_DIR"
+npm install
+
+echo ""
+echo "========================================="
+echo "  v7 environment deployed successfully"
+echo "========================================="
+echo ""
+echo "To run: cd v7 && npm start"
+echo ""

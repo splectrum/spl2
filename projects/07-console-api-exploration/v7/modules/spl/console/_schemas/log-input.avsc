@@ -1,0 +1,25 @@
+{
+  "type": "record",
+  "name": "LogInput",
+  "namespace": "spl.console",
+  "doc": "Log a message (general output)",
+  "fields": [
+    {
+      "name": "message",
+      "type": "string",
+      "doc": "Message to log"
+    },
+    {
+      "name": "format",
+      "type": "string",
+      "default": "text",
+      "doc": "Output format: text or json"
+    },
+    {
+      "name": "data",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Optional additional data (JSON string)"
+    }
+  ]
+}

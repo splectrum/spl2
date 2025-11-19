@@ -1,0 +1,25 @@
+{
+  "type": "record",
+  "name": "DebugInput",
+  "namespace": "spl.console",
+  "doc": "Log a debug message",
+  "fields": [
+    {
+      "name": "message",
+      "type": "string",
+      "doc": "Debug message to log"
+    },
+    {
+      "name": "format",
+      "type": "string",
+      "default": "text",
+      "doc": "Output format: text or json"
+    },
+    {
+      "name": "data",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Optional additional data (JSON string)"
+    }
+  ]
+}

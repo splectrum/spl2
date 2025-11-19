@@ -5,6 +5,36 @@
 
 ---
 
+## 2025-11-19
+
+**Version:** v0.3.0 (Console API patterns, schema-driven merge)
+**Changes:**
+- **New section:** Invocation Levels and API Types
+  - Invocation at any level (package/API/method)
+  - API input structure (method defaults + batch + API-specific)
+  - Schema-driven property selection for three-layer merge
+  - Wrapper APIs vs DSL APIs distinction
+  - Package types (core, tools, api)
+- **New section:** Boundary Validation Model
+  - "Code dangerously with external safeguards" pattern
+  - Self-evaluation development model
+  - Method requirements with self-eval spec
+- **New section:** Runtime and Execution Responsibilities
+  - Runtime context (read-only environment properties)
+  - Execution context (state management, invocation coordination)
+  - "Free scripting → API wrapping" pattern
+  - Context structure (data/metadata/args)
+- **Updated:** API Package Structure
+  - Method folders with index.js pattern
+  - Underscore prefix for auxiliary folders (_schemas/, _help/, etc.)
+  - Naming conventions documented
+- **Updated:** Glossary term bolding for cross-references
+
+**Context:** Project 07 - Console API Exploration v7
+**Reason:** Capture practical implementation patterns from first complete wrapper API. Document runtime/execution responsibilities discovered during dev environment work. Establish conventions (underscore prefix, method folders) that emerged from implementation.
+
+---
+
 ## 2025-11-18
 
 **Version:** v0.2.0 (AI-primary paradigm shift)

@@ -4,7 +4,7 @@
 
 | Code | Name | Status | Started | Products |
 |------|------|--------|---------|----------|
-| 07-console-api-exploration | Console API - AI-Primary Execution Model | In Progress | 2025-11-18 | Iterations v1-v6, WOW patterns |
+| - | - | - | - | - |
 
 ## Completed Projects
 
@@ -16,6 +16,7 @@
 | 04-bare-runtime-hello-world | Bare Runtime Hello World | 2025-11-14 | Bare platform validated, dual-platform patterns, three-pillar strategy, platform abstraction architecture, novel contribution to Bare ecosystem |
 | 05-foundation-update-documentation-templates | Foundation Update & Documentation Templates | 2025-11-17 | Foundation headline format, design/ spot established, friction as dynamic KPI, AI-primary execution model, Blank Project type created |
 | 06-glossary-term-requirements | Glossary Term Requirements | 2025-11-18 | 67+ term reqs (24 DSL, 35+ Stepping Stones, 8 Spots), unified 3-column glossary structure, base concepts (api_node, activity, spot), extends pattern with term names |
+| 07-console-api-exploration | Console API - AI-Primary Execution Model | 2025-11-19 | v7 console wrapper (5 methods), 3 design docs, schema-driven merge, boundary validation, self-eval harness, status/ spot, Dev Env API + AVRO Wrapper + CIP Processing backlog items, CIP-015 |
 
 ## Planned Projects
 
@@ -220,6 +221,52 @@
 - Spots requirements document
 
 **See:** `projects/06-glossary-term-requirements/LESSONS_LEARNED.md` for full details
+
+### 07-console-api-exploration
+**Objective:** Explore Console API implementation to validate AI-primary execution patterns
+
+**Project Type:** Explorative Project
+
+**Products Delivered:**
+1. v7 Console API implementation (5 wrapper methods: log, error, warn, info, debug) ✅
+2. Schema-driven property selection for three-layer merge ✅
+3. Self-eval development harness ✅
+4. Design documentation (API_DESIGN.md v0.3.0, DEV_ENVIRONMENT_DESIGN.md, SELF_EVAL_DESIGN.md) ✅
+5. status/ spot for dynamic load minimisation ✅
+6. Deployment script approach (v7-deploy.sh) ✅
+
+**Status:** Complete - Extensive patterns validated and documented
+
+**Key Outcomes:**
+- **Schema-driven merge:** Method input schema defines which properties to merge from three layers
+- **Boundary validation:** "Code dangerously with external safeguards" - validate at edges, pure logic inside
+- **Wrapper vs DSL APIs:** Two API layers serving different purposes
+- **Invocation at any level:** Package/API/method with path depth determining type
+- **Self-eval as complete work spec:** "Dumb execution, smart definition"
+- **Dev Environment as API:** Management methods for autonomous development
+- **Teardown approach:** Fresh environments, deployment scripts, immutable artifacts
+- **Four glossary territories:** Creator's (stepping stones), User's (howto), Language (DSL), Functional (spots)
+- **status/ spot:** Dashboard for current state, reduces dynamic CLAUDE.md updates
+- **Efficient search:** Glossary-first lookup pattern
+
+**Key Learnings:**
+- Iteration is king - let patterns emerge through v1-v7 cycles
+- Glossaries are the index - efficient search starts there
+- CLAUDE.md should be static - use status/ for dynamic content
+- Autonomy enables delegation - why clean APIs matter
+
+**Infrastructure Created:**
+- status/ spot with CURRENT.md
+- CIP-015: Cross-cutting layers over data entities
+- blank_project_v1.0.1.md (project creation actions)
+- glossary_v1.1.0.md (four territories)
+
+**Backlog Items Created:**
+- Dev Environment API (high priority)
+- CIP Processing (high priority)
+- AVRO Wrapper API (high priority)
+
+**See:** `projects/07-console-api-exploration/LESSONS_LEARNED.md` for full details
 
 ---
 

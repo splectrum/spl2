@@ -190,13 +190,29 @@ function createExecution(runtime, options = {}) {
       console.log(`[${invocationId.slice(0, 8)}] Invoking ${methodPath}`);
     }
 
+    // Load input schema for property selection and validation
+    const InputType = schemaLoader.loadSchema(inputSchemaPath);
+    const schemaFields = InputType.fields.map(f => f.name);
+
     // THREE-LAYER MERGE: API defaults < output flow < method overrides
+    // Schema-driven: only select properties defined in method schema
     const apiState = getApiState(apiPath);
-    const mergedInput = {
-      ...apiState.args,              // 1. API defaults (lowest precedence)
-      ...(previousOutput ?? {}),     // 2. Pipeline flow (middle)
-      ...args                        // 3. Method overrides (highest precedence)
-    };
+    const mergedInput = {};
+
+    for (const prop of schemaFields) {
+      // 1. API defaults (lowest precedence)
+      if (apiState.args[prop] !== undefined) {
+        mergedInput[prop] = apiState.args[prop];
+      }
+      // 2. Pipeline flow (middle)
+      if (previousOutput?.[prop] !== undefined) {
+        mergedInput[prop] = previousOutput[prop];
+      }
+      // 3. Method overrides (highest precedence)
+      if (args[prop] !== undefined) {
+        mergedInput[prop] = args[prop];
+      }
+    }
 
     if (verbosity === 'debug') {
       const layers = [];
@@ -211,7 +227,6 @@ function createExecution(runtime, options = {}) {
     // BOUNDARY IN: Validate merged input
     let validatedInput = mergedInput;
     try {
-      const InputType = schemaLoader.loadSchema(inputSchemaPath);
       validatedInput = InputType.clone(mergedInput, { wrapUnions: true });
       if (verbosity === 'debug') {
         console.log(`[${invocationId.slice(0, 8)}] Input validated`);
