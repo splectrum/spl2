@@ -1,0 +1,23 @@
+{
+  "type": "record",
+  "name": "CreateOutput",
+  "namespace": "spl.dev.create",
+  "doc": "Output schema for spl/dev/create method",
+  "fields": [
+    {
+      "name": "envId",
+      "type": "string",
+      "doc": "UUID for environment"
+    },
+    {
+      "name": "path",
+      "type": "string",
+      "doc": "Filesystem path to environment"
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "doc": "Status - should be 'created'"
+    }
+  ]
+}

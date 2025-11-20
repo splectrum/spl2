@@ -1,0 +1,25 @@
+{
+  "module": "spl-dev-implementation",
+  "description": "Self-eval for spl-dev-implementation work module",
+  "tests": [
+    {
+      "name": "module structure exists",
+      "type": "script",
+      "script": "_tests/check-structure.js",
+      "config": {
+        "folders": ["_reqs", "spl", "spl/dev"],
+        "files": ["README.md", "_reqs/work_module_v1.0.0.md", "_reqs/spl_dev_implementation_v1.0.0.md", "_reqs/_selfeval.json"]
+      },
+      "category": "structure"
+    },
+    {
+      "name": "entry points exist",
+      "type": "script",
+      "script": "_tests/check-entry-points.js",
+      "config": {
+        "paths": [".", "spl", "spl/dev"]
+      },
+      "category": "structure"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "type": "api_method",
+  "version": "1.0.0",
+  "spec": {
+    "description": "Base requirements for any API method",
+    "requires": {
+      "inputSchema": "AVRO schema for input validation",
+      "outputSchema": "AVRO schema for output validation",
+      "implementation": "index.js in method folder"
+    }
+  },
+  "selfEval": {
+    "qc": {
+      "test": "generic/qc.js",
+      "description": "Validate input/output against schemas"
+    },
+    "safety": {
+      "test": "generic/safety.js",
+      "description": "Verify runtime/execution not modified"
+    }
+  }
+}

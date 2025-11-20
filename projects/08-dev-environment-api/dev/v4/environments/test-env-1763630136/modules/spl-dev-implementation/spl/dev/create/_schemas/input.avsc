@@ -1,0 +1,13 @@
+{
+  "type": "record",
+  "name": "CreateInput",
+  "namespace": "spl.dev.create",
+  "doc": "Input schema for spl/dev/create method",
+  "fields": [
+    {
+      "name": "name",
+      "type": "string",
+      "doc": "Environment name"
+    }
+  ]
+}

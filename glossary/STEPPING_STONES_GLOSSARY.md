@@ -14,15 +14,18 @@ This glossary defines stepping stones - the navigational concepts used throughou
 |------|-------------|-----|
 | activity | Work that creates immutables and updates mutables, within a defined context (chat, project). Ownership pattern: activity registers change with spot, spot executes | activity_v1.0.0.md |
 | adhoc activity | **Extends activity** - Informal "chat while we work"; emergent, low formality; artifacts in chats/ or chats/immutables/ | adhoc_activity_v1.0.0.md |
+| api method req | Requirements pattern for API method. Natural language spec with input/output, behavior, schemas, and self-eval reference | api_method_req_v1.0.0.md |
+| api overview req | Requirements pattern for API overview. Inventory and top-level interface - what the API is, what it consists of, method signatures | api_overview_req_v1.0.0.md |
 | autonomy | Freedom to act within defined boundaries. **Constraints create freedom:** reqs + self-eval define the fence, autonomy operates within. Prerequisites: state reqs, define self-eval. Trust builds through accurate self-eval. See Constraints_create_freedom_v1.0.0.md | autonomy_v1.0.0.md |
 | backlog | See backlog register | |
-| backlog register | **register** - Work queue of projects in execution order; top item is next to execute. Mutable. See projects/BACKLOG.md | backlog_register_v1.0.0.md |
-| blank project | Base project type with PRINCE2 requirements; straightforward execution with clear deliverables; no special methodology. Other project types extend this | blank_project_v1.0.1.md |
+| backlog register | **register** - Work queue of projects in execution order; top item is next to execute. Mutable. See projects/BACKLOG.md | backlog_register_v1.1.0.md |
+| base module | **Extends module** - Foundational runtime and support functionality. Layer 0, everything overlays on top | base_module_v1.0.0.md |
+| blank project | Base project type with PRINCE2 requirements; straightforward execution with clear deliverables; no special methodology. Other project types extend this | blank_project_v1.1.0.md |
 | chicken and egg | Circular dependency where evolution is mandatory; without evolution, infinite loop. X and Y need each other, so they co-evolve | chicken_and_egg_v1.0.0.md |
 | collaboration | Joint activity that is interactive; partnership with mutual respect aiming to deepen understanding and trigger insight; different but overlapping roles | collaboration_v1.0.0.md |
 | commit message | Headline for git commit; identifies scope, summarizes why, hooks to detail; not a changelog or diff explanation | commit_message_v1.0.0.md |
 | dsl glossary | Glossary type for SPL2 Domain-Specific Language vocabulary - runtime, APIs, methods, properties. Entry structure: Term, Description, Req | dsl_glossary_v1.0.0.md |
-| exploration project | **Extends blank project** - Architecture discovery through twin pair methodology; high uncertainty requiring evidence-based evolution | exploration_project_v1.0.0.md |
+| exploration project | **Extends blank project** - Architecture discovery through twin pair methodology; high uncertainty requiring evidence-based evolution | exploration_project_v1.1.0.md |
 | fire and forget | Launch and move on; self-contained action without follow-up; additive not corrective; no backward consistency checking | fire_and_forget_v1.0.0.md |
 | friction | Resistance that impedes flow; internal (anxiety, confusion) or external (blockers, unclear reqs); primary partnership health metric | friction_v1.0.0.md |
 | glossary | Registry of terms with associated reqs; can be created for different contexts; terms can represent vocabulary, functional units, patterns. Four territories: creator's (stepping stones), user's (howto), language (DSL), functional (spots) | glossary_v1.1.0.md |
@@ -35,13 +38,16 @@ This glossary defines stepping stones - the navigational concepts used throughou
 | local rules apply | Artifacts are self-sufficient in reqs; no external supervisor needed. Each artifact has its own reqs version and self-eval. No retroactive burden | local_rules_apply_v1.0.0.md |
 | maturity | What is achieved through evolution in time; sign of sufficient longevity. Journey from inception to maturity is positive - allows maturing within context. Evidence-based advancement | maturity_v1.0.0.md |
 | minimal and complete | Try to be complete with minimal means, knowing it will fall short and need continued effort. For situations where complete isn't fully known. Question every addition | minimal_and_complete_v1.0.0.md |
+| module | Root API node structure containing api-node hierarchy (package/API/method). Self-contained mycelium with relative refs and portability. Types: install module, work module | module_v1.0.0.md |
+| modules | Reserved folder within env context for module layer management. Contains named modules with _index.json defining layer order | modules_v1.0.0.md |
 | more than complete | For situations where complete exists but is hard to figure out; be overgenerous to capture completeness within | more_than_complete_v1.0.0.md |
 | mycelium | Logical data repository layer supporting multiple physical repositories (Git, Fossil, Pijul, etc.); the network beneath Splectrum. Repository abstraction | mycelium_v1.0.0.md |
 | panta rhei | "Everything flows" - design philosophy where state flows like a river through stateless code; immutable records preserve history, event sourcing emerges naturally | panta_rhei_v1.0.0.md |
+| patch module | **Extends module** - Partial API unit for targeted fixes. Layer 2+, overlays base/work, only contains changed parts | patch_module_v1.0.0.md |
 | plain req | Base req type using natural language for spec and self-eval. Structure: Type, Extends (optional), Spec, Self-eval, Comments (optional). All req types extend this | plain_req_v1.0.0.md |
 | planned activity | **Extends activity** - Formal project work; known work, on the workplan; high formality; artifacts in project folders | planned_activity_v1.0.0.md |
 | pragmatism | Usability tests determine "good enough" rather than theoretical perfection; context-dependent. Practical value over abstract ideals | pragmatism_v1.0.0.md |
-| project | Formal work unit for delivering products; replaces sprint in agile. Set of related products with maintenance cycle. Project types enable complex delivery | project_v1.0.0.md |
+| project | Formal work unit for delivering products; replaces sprint in agile. Set of related products with maintenance cycle. Project types enable complex delivery | project_v1.3.0.md |
 | reqs | Requirements - clear statement of what needs to be achieved; defines the fence for autonomy. Structure: spec + self-eval. Without reqs, no autonomy can be granted | reqs_v1.0.0.md |
 | requirements | See reqs | |
 | self-eval | Self-evaluation - verification against reqs. Enables autonomy through accountability. Trust builds through accurate self-eval, erodes through inaccurate. Defined before work begins | self_eval_v1.0.0.md |
@@ -56,6 +62,8 @@ This glossary defines stepping stones - the navigational concepts used throughou
 | unplanned activity | **Extends activity** - Emerged during project work, not on workplan; handled at closure; medium formality; artifacts in project folders | unplanned_activity_v1.0.0.md |
 | versioned | Artifact using global versioning scheme (semver: major.minor.patch). Filename pattern: `name_vX.Y.Z.md`. Platform-wide consistency | versioned_v1.0.0.md |
 | versioned immutable | **versioned** - Artifact that doesn't change once created but can have new versions. Evolution creates new version | versioned_immutable_v1.0.0.md |
+| work module | **Extends module** - Implementation work module. Layer 1+, overlays base, contains work package and _meta state tracking | work_module_v1.0.0.md |
+| work package | Self-contained, portable module with spec, self-eval manifest, tests, schemas, and stub implementation. All refs relative to package root. Unit of handoff for autonomous execution | work_package_v1.0.0.md |
 
 ---
 

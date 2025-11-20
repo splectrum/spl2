@@ -1,0 +1,42 @@
+{
+  "method": "spl/dev/create",
+  "description": "Self-eval for spl/dev/create method",
+  "tests": [
+    {
+      "name": "creates environment with correct status",
+      "type": "script",
+      "script": "_tests/create-status.js",
+      "category": "logic"
+    },
+    {
+      "name": "generates valid UUID for envId",
+      "type": "script",
+      "script": "_tests/create-uuid.js",
+      "category": "logic"
+    },
+    {
+      "name": "returns correct filesystem path",
+      "type": "script",
+      "script": "_tests/create-path.js",
+      "category": "logic"
+    },
+    {
+      "name": "handles existing directory gracefully",
+      "type": "script",
+      "script": "_tests/safety-existing-dir.js",
+      "category": "safety"
+    },
+    {
+      "name": "output matches schema",
+      "type": "schema",
+      "schema": "_schemas/output.avsc",
+      "category": "qc"
+    },
+    {
+      "name": "input validates against schema",
+      "type": "schema",
+      "schema": "_schemas/input.avsc",
+      "category": "qc"
+    }
+  ]
+}

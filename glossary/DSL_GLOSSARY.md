@@ -32,6 +32,7 @@ This glossary defines the consistent vocabulary for SPL2 development. Each term 
 | runtime | **api** - API for runtime context management; the context within which execution contexts run | runtime_v1.0.0.md |
 | runtime_id | **Property** (String, UUID) - Unique identifier for runtime execution instance | runtime_id_v1.0.0.md |
 | spl | **package** - Core Splectrum package; contains runtime infrastructure APIs | spl_v1.0.0.md |
+| spl__dev | **api** - Dev Environment API for autonomous development with test-driven implementation; manages ephemeral dev environments and work package execution | SPL_DEV_API_OVERVIEW.md |
 | start_time | **Property** (String, ISO 8601) - Timestamp when something began; general initiation time marker | start_time_v1.0.0.md |
 | value | **Property** (Object) - Contents component of key-value pair; used with designated key property | value_v1.0.0.md |
 | version | **Property** (String, semver) - Version identifier using semantic versioning; platform-wide scheme | version_v1.0.0.md |

@@ -6,7 +6,13 @@
 
 ## Active Project
 
-None - between projects
+**Project 08: Dev Environment API**
+- Type: Exploration Project
+- Focus: Infrastructure for autonomous development
+- Products: 6 twin pairs (self-eval reqs, Console API reqs, Dev Env API, env types, publishing, deployment scripts)
+- Stage: 1 - Foundation (self-eval and Console API requirements)
+
+See: `projects/08-dev-environment-api/`
 
 ---
 

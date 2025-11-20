@@ -1,0 +1,11 @@
+{
+  "name": "dev-environment-v1",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "node run-tests.js"
+  },
+  "dependencies": {
+    "avsc": "^5.7.7"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "record",
+  "name": "CreateInput",
+  "fields": [
+    {
+      "name": "name",
+      "type": "string"
+    },
+    {
+      "name": "template",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    }
+  ]
+}

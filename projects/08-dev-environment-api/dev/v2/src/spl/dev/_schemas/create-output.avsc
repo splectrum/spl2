@@ -1,0 +1,9 @@
+{
+  "type": "record",
+  "name": "CreateOutput",
+  "fields": [
+    { "name": "envId", "type": "string" },
+    { "name": "path", "type": "string" },
+    { "name": "status", "type": "string" }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "type": "method_req",
+  "extends": "api_method_v1.0.0",
+  "version": "1.0.0",
+  "method": "spl/dev/create",
+  "spec": {
+    "description": "Create a new dev environment from specification",
+    "input": {
+      "name": "Environment name (string)",
+      "template": "Optional template type (string)"
+    },
+    "output": {
+      "envId": "UUID of created environment",
+      "path": "Path to environment directory",
+      "status": "created"
+    }
+  },
+  "selfEval": {
+    "logic": {
+      "test": "logic/spl_dev_create.js",
+      "description": "Verify create method behavior",
+      "cases": [
+        {
+          "name": "creates environment with name",
+          "input": {
+            "name": "test-env"
+          },
+          "expect": {
+            "status": "created"
+          }
+        },
+        {
+          "name": "generates unique envId",
+          "input": {
+            "name": "test-env"
+          },
+          "expect": {
+            "envId": "uuid"
+          }
+        }
+      ]
+    }
+  },
+  "schemas": {
+    "input": "create-input.avsc",
+    "output": "create-output.avsc"
+  }
+}
