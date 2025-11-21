@@ -1,0 +1,11 @@
+{
+  "methods": [
+    "create",
+    "install",
+    "submit",
+    "cycle",
+    "status",
+    "extract",
+    "destroy"
+  ]
+}

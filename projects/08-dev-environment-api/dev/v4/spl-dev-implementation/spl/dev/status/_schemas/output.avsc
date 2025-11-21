@@ -1,0 +1,33 @@
+{
+  "type": "record",
+  "name": "StatusOutput",
+  "namespace": "spl.dev.status",
+  "doc": "Output schema for spl/dev/status method",
+  "fields": [
+    {
+      "name": "env",
+      "type": "string",
+      "doc": "Environment metadata (JSON stringified)"
+    },
+    {
+      "name": "cycles",
+      "type": "int",
+      "doc": "Total cycles run"
+    },
+    {
+      "name": "results",
+      "type": "string",
+      "doc": "Latest test results (JSON stringified)"
+    },
+    {
+      "name": "fluency",
+      "type": "string",
+      "doc": "Fluency metrics (JSON stringified)"
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "doc": "Status: active, idle"
+    }
+  ]
+}

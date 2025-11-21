@@ -1,0 +1,23 @@
+{
+  "type": "record",
+  "name": "ExtractOutput",
+  "namespace": "spl.dev.extract",
+  "doc": "Output schema for spl/dev/extract method",
+  "fields": [
+    {
+      "name": "package",
+      "type": "string",
+      "doc": "Path to extracted package"
+    },
+    {
+      "name": "meta",
+      "type": "string",
+      "doc": "Metadata (status, cycle-log, fluency, dependencies, test-results) JSON stringified"
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "doc": "Status message"
+    }
+  ]
+}

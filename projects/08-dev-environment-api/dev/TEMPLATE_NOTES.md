@@ -723,6 +723,445 @@ spl (concrete package)
 
 ---
 
+---
+
+## Executable Self-Eval Pattern
+
+### Motivation
+
+Eliminate the bureaucracy layer of JSON manifests that reference test scripts. Make self-eval directly executable.
+
+### Pattern
+
+**File naming:**
+- Self-eval scripts: `{req_name}_selfeval*.js` (e.g., `api_node_v1.0.0_selfeval.js`)
+- Optional data files: `{req_name}_selfeval_data.json` (e.g., `api_node_v1.0.0_selfeval_data.json`)
+- Multiple selfevals per req: Use suffix (e.g., `spl_dev_implementation_v1.0.0_selfeval_structure.js`)
+
+**Location:**
+All self-eval files live in `_reqs/` folder alongside requirement markdown files.
+
+**Structure example:**
+```
+spl-dev-implementation/
+├── _reqs/
+│   ├── work_module_v1.0.0.md
+│   ├── spl_dev_implementation_v1.0.0.md
+│   ├── spl_dev_implementation_v1.0.0_selfeval_structure.js
+│   ├── spl_dev_implementation_v1.0.0_selfeval_entrypoints.js
+│   ├── spl_dev_implementation_v1.0.0_selfeval_data.json    # Optional
+│   ├── api_node_v1.0.0_selfeval.js
+│   ├── api_node_v1.0.0_selfeval_data.json                  # Optional
+│   └── module_v1.0.0_selfeval.js
+```
+
+**Execution recipe:**
+
+1. **Select** all `*_selfeval*.js` files in `_reqs/`
+2. **Load** all `*_selfeval_data.json` files (if they exist)
+3. **Match** data to scripts by base name (e.g., `api_node_v1.0.0`)
+4. **Execute** each script, passing matching data (or null if no data file)
+
+```javascript
+// Pseudo-code for harness
+const selfevals = glob('_reqs/*_selfeval*.js');
+const dataFiles = glob('_reqs/*_selfeval_data.json');
+
+// Load all data files
+const data = {};
+dataFiles.forEach(file => {
+  const key = extractBaseName(file); // e.g., 'api_node_v1.0.0'
+  data[key] = JSON.parse(readFileSync(file));
+});
+
+// Execute all selfevals
+selfevals.forEach(scriptPath => {
+  const scriptKey = extractBaseName(scriptPath);
+  const scriptData = data[scriptKey] || null;
+
+  const test = require(scriptPath);
+  test(scriptData); // Execute with data or null
+});
+```
+
+**Self-eval script signature:**
+```javascript
+// api_node_v1.0.0_selfeval.js
+export default function selfeval(data) {
+  // data = contents of api_node_v1.0.0_selfeval_data.json (or null)
+
+  // Perform tests
+  if (!fs.existsSync('_reqs')) {
+    console.log('ERROR: _reqs folder missing');
+    process.exit(1);
+  }
+
+  // Use data if provided
+  if (data?.requiredFolders) {
+    data.requiredFolders.forEach(folder => {
+      // check folder exists...
+    });
+  }
+
+  process.exit(0); // Pass
+}
+```
+
+**Data file format:**
+```json
+{
+  "requiredFolders": ["spl", "spl/dev"],
+  "requiredFiles": ["README.md", "_reqs/_selfeval.json"],
+  "internalFolders": ["_reqs", "_schemas", "_tests"]
+}
+```
+
+### Benefits
+
+- **No bureaucracy:** Script IS the test, not a reference to the test
+- **Data separation:** Large test datasets live in JSON, logic in JS
+- **Clear ownership:** Filename shows which req it belongs to
+- **Reusable:** Same pattern for all levels (module, api_node, method)
+- **Flexible:** Multiple selfevals per req via suffixes
+- **Standalone:** Everything needed is in `_reqs/` folder
+
+### Test Categories and Data
+
+Data files can organize test inputs by category:
+
+```json
+{
+  "logic": {
+    "testCases": [
+      { "input": {...}, "expected": {...} }
+    ]
+  },
+  "safety": {
+    "edgeCases": [...]
+  },
+  "qc": {
+    "schemas": ["_schemas/input.avsc", "_schemas/output.avsc"]
+  }
+}
+```
+
+Self-eval script reads categories from data and executes appropriate tests.
+
+### Inheritance Chain
+
+Execution discovers and runs all selfevals in `_reqs/`:
+- Instance selfevals (e.g., `spl_dev_implementation_v1.0.0_selfeval*.js`)
+- Type selfevals (e.g., `work_module_v1.0.0_selfeval.js`)
+- Parent selfevals (e.g., `api_node_v1.0.0_selfeval.js`, `module_v1.0.0_selfeval.js`)
+
+No explicit "extends" chain needed - just run everything discovered. Order doesn't matter (all must pass).
+
+**Copying strategy:**
+Work module must be standalone, so inherited selfevals are **copied** into `_reqs/` with their version-stamped names. This makes origin and version explicit.
+
+### Single Concern Principle
+
+**Each selfeval tests ONE thing:**
+- `*_selfeval_folders.js` - checks required folders exist
+- `*_selfeval_files.js` - checks required files exist
+- `*_selfeval.js` - single concern (e.g., api_node checks _reqs/ exists)
+
+**Benefits:**
+- **Specific messaging:** First failure is exact and actionable
+- **Simple scripts:** Minimal code, easy to understand
+- **Clear progression:** Fix one thing, run again, next specific failure
+- **Stop-on-first-fail friendly:** Works perfectly with cycle pattern
+
+**Example output:**
+```
+Running selfevals...
+  ✓ Required folders exist
+  ✗ Required files exist
+    ERROR: Required file missing: README.md
+
+Fix the issue and run cycle again.
+```
+
+Single concern = single clear message. No confusion about which part failed.
+
+**Implementation guidance:**
+- Minimal: Does one thing, nothing extra
+- Complete: Fully handles that one concern
+- Simple: Easy to understand and maintain
+- Focused: Clear error message for the specific concern
+
+---
+
+---
+
+## API Invocation Model
+
+### Stateful API, Stateless Methods
+
+**API-level invocation = stateful + default:**
+- Primary pattern for using APIs
+- Creates persistent state/context
+- Configuration persists across method calls
+- Sets defaults, environment, preferences
+
+```javascript
+// Set API context (stateful)
+invoke('spl/dev', {
+  envRoot: '/custom/path',
+  setupRoot: './setup',
+  verbosity: 'debug'
+});
+```
+
+**Method-level invocation = stateless + override:**
+- Methods don't keep their own state
+- Receive context from three sources (the sandwich):
+  1. **API state** (bottom) - persistent defaults from API invocation
+  2. **Previous output** (middle) - output from prior method in chain
+  3. **Method input** (top) - explicit arguments + overrides
+
+```javascript
+// Method invocations operate in API context
+const result1 = invoke('spl/dev/create', { name: 'test' });
+// Receives: API state
+// Returns: { envId, path, status }
+
+const result2 = invoke('spl/dev/install', {
+  setupRoot: './other-setup'  // Override API-level default
+});
+// Receives: API state + result1 (previous output) + own input
+// Can override any API-level config for this call only
+```
+
+### The Three-Layer Sandwich
+
+Each method invocation resolves input from three layers:
+
+1. **API state** (persistent) - configuration set at API level
+2. **Previous output** (chained) - output from last method call
+3. **Method input** (explicit) - arguments passed to this method
+
+Priority: Method input > Previous output > API state
+
+Override is per-call only - doesn't change API state.
+
+### API Invocation Schema
+
+API invocation can include:
+- **Defaults** - method argument defaults
+- **Batch** - array of method calls to execute
+- **API-specific config** - context/environment for all methods
+
+All optional, but API invocation is the **primary pattern**.
+
+Example:
+```javascript
+invoke('spl/dev', {
+  envRoot: '/custom/path',           // API-specific
+  setupRoot: './setup',               // API-specific
+  defaults: {
+    install: { packages: 'standard' },
+    cycle: { single: false }
+  },
+  batch: [                            // Execute sequence
+    ['create', { name: 'my-env' }],
+    ['install', {}],                  // Uses defaults
+    ['submit', { workPackage: './work/pkg' }]
+  ]
+});
+```
+
+### Design Principle
+
+APIs are designed **API-first**:
+- Think about the stateful context the API manages
+- Methods operate within that context
+- Previous outputs flow to next method
+- Each method can override context temporarily
+
+This enables:
+- Workflow composition (chain methods)
+- Reduced repetition (defaults at API level)
+- Flexible overrides (per-call basis)
+- Clean state management (API owns state, methods are pure)
+
+---
+
+---
+
+## v4 Session 2 - Module Structure and Executable Selfevals
+
+### Complete 4-Level Structure Established
+
+**Module hierarchy:**
+1. **Module root** (`spl-dev-implementation/`) - Work module instance
+2. **Package** (`spl/`) - Cut-down spl package (only dev API)
+3. **API** (`spl/dev/`) - Dev Environment API
+4. **Methods** (7 methods: create, install, submit, cycle, status, extract, destroy)
+
+Each level has:
+- `README.md` - Mutable entry point
+- `_reqs/` - Requirements and selfevals (versioned immutables + executable tests)
+- Appropriate structure for level (schemas, index.js, etc.)
+
+### Executable Selfeval Pattern (Final)
+
+**File naming:**
+- Scripts: `{req_name}_selfeval*.js` (e.g., `api_node_v1.0.0_selfeval.js`)
+- Data: `{req_name}_selfeval_data.json` (optional)
+- Multiple per req: Use suffix (e.g., `_selfeval_structure.js`, `_selfeval_folders.js`)
+
+**Single concern principle:**
+- Each script tests ONE thing
+- Minimal, complete, simple
+- Focused error messages
+- Stop-on-first-fail friendly
+
+**Execution recipe:**
+1. Discover all `*_selfeval*.js` in `_reqs/`
+2. Load matching `*_selfeval_data.json` files
+3. Execute each script with its data (or null)
+4. Stop on first failure
+5. Report results
+
+**Script signature:**
+```javascript
+function selfeval(data) {
+  // data from {req_name}_selfeval_data.json or null
+  // perform tests
+  // exit(0) = pass, exit(1) = fail with message
+}
+
+if (require.main === module) {
+  let data = null;
+  try {
+    data = require('./{req_name}_selfeval_data.json');
+  } catch (e) {}
+  selfeval(data);
+}
+module.exports = selfeval;
+```
+
+**Local rules apply:**
+- Each node runs its own selfevals
+- Selfevals only test what their req specifies
+- No checking child nodes (they test themselves)
+- Inheritance via copying (version-stamped files in _reqs/)
+
+### Test Runner
+
+Created `run-selfevals.js` - cascading test execution:
+- Discovers selfevals at each level
+- Executes in tree order (root → package → api → methods)
+- Stops on first failure
+- Reports progress and results
+- Works autonomously - just point it at a module
+
+**Usage:**
+```bash
+node run-selfevals.js spl-dev-implementation
+```
+
+### Glossary Updates
+
+**DSL Glossary additions:**
+- `api_method` - moved from stepping stones (structure, not methodology)
+- `api_overview` - moved from stepping stones (structure, not methodology)
+- `create`, `install`, `submit`, `cycle`, `status`, `extract`, `destroy` - method names with semantic meanings
+
+**Pattern established:**
+- All method names must be in DSL with requirement defining meaning
+- Method names locked across SPL2 (same meaning everywhere)
+- DSL requirements inform help metadata
+
+### Schema Decisions
+
+**API-level invocation schema** (`spl/dev/_schemas/input.avsc`):
+- `envRoot` - where to create dev environments (default: /tmp/dev-env)
+- `setupRoot` - where setup folder lives
+- `verbosity` - logging level
+- `defaults` - map of method defaults
+- `batch` - array of method calls to execute
+
+**Method schemas:**
+- All 7 methods have formal AVRO input/output schemas
+- `cycle` refined: `single` (run one test vs all) + `exit` (stop vs loop), both default false
+- Help metadata in schema `doc` fields (local help)
+- API-level help in overview (usage patterns, examples)
+
+**Design decision:** Don't try to be perfect day one
+- Schemas have basic help in `doc` fields
+- Overview has usage info
+- Centralized help file deferred until help tool implementation
+- Sufficient for AI to work with
+
+### Method Argument Review Pattern
+
+**Three-layer sandwich clarified:**
+1. **API state** (persistent) - set by API invocation
+2. **Previous output** (chained) - from last method call
+3. **Method input** (explicit) - arguments to this method
+
+**Priority:** method input > previous output > API state
+
+**Question emerged:** How do methods know which environment?
+- Deferred to implementation
+- Could be API state tracking "current environment"
+- Or explicit passing via previous output
+- Pattern will emerge during implementation
+
+### Work Module Structure Pattern
+
+**Module level has:**
+- Instance req (`spl_dev_implementation_v1.0.0.md`)
+- Type req (`work_module_v1.0.0.md`)
+- Base type req (`api_node_v1.0.0.md`)
+- Selfevals for each (copied into _reqs/)
+
+**Package/API/Method levels:**
+- Instance req (what this specific thing is)
+- Type req (pattern for this level)
+- Inherited selfevals (copied with version stamps)
+
+**Standalone principle:**
+- Work module contains all needed selfevals
+- No external dependencies for validation
+- Portable - can run anywhere
+
+### Test Execution Results
+
+**16 selfevals across 4 levels - all passing:**
+- Module: 3 selfevals (folders, files, api_node)
+- Package: 5 selfevals (folders, files, api schemas, api invocable, api_node)
+- API: 5 selfevals (methods exist, schemas, invocable, subfolders, api_node)
+- Method (create): 3 selfevals (structure, schemas, api_node)
+
+**Other methods:** Stubs created (index.js, README.md, schemas)
+- Selfevals partially created
+- Will complete as best-effort before closure
+
+### Key Insights
+
+**Autonomy boundary:**
+- Good selfevals + clear reqs = autonomous execution possible
+- Tests tell you exactly what's missing
+- Stop-on-first-fail gives precise guidance
+- Pattern enables AI to work independently
+
+**Partnership quality metric:**
+- Friction = requirements unclear
+- Not "can AI do it" but "are reqs sufficient"
+- Test failures improve requirements
+- Cycle tightens partnership
+
+**Pragmatism wins:**
+- Build what's needed, improve through use
+- Don't over-engineer on first pass
+- Tests validate the minimum needed
+- Sufficient > perfect
+
+---
+
 **Created:** 2025-11-19
 **Updated:** 2025-11-20
 **Context:** Project 08 - Dev Environment API iterations v1-v4

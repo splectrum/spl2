@@ -1,0 +1,14 @@
+{
+  "type": "record",
+  "name": "ExtractInput",
+  "namespace": "spl.dev.extract",
+  "doc": "Input schema for spl/dev/extract method",
+  "fields": [
+    {
+      "name": "destination",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Where to extract to (optional)"
+    }
+  ]
+}

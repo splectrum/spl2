@@ -1,0 +1,20 @@
+{
+  "type": "record",
+  "name": "CycleInput",
+  "namespace": "spl.dev.cycle",
+  "doc": "Input schema for spl/dev/cycle method",
+  "fields": [
+    {
+      "name": "single",
+      "type": "boolean",
+      "default": false,
+      "doc": "Run single test vs all tests in cycle (default: false - run all)"
+    },
+    {
+      "name": "exit",
+      "type": "boolean",
+      "default": false,
+      "doc": "Exit after cycle vs continue looping with return-and-resume (default: false - loop until 100%)"
+    }
+  ]
+}

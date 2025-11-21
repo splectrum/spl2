@@ -1,0 +1,4 @@
+{
+  "requiredFolders": ["_reqs", "_schemas"],
+  "requiredFiles": ["README.md", "index.js"]
+}

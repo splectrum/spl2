@@ -1,0 +1,25 @@
+{
+  "type": "record",
+  "name": "DestroyOutput",
+  "namespace": "spl.dev.destroy",
+  "doc": "Output schema for spl/dev/destroy method",
+  "fields": [
+    {
+      "name": "archived",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Archive path if mode=preserve (optional)"
+    },
+    {
+      "name": "published",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Publish location if mode=publish (optional)"
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "doc": "Status message"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "type": "record",
+  "name": "SubmitOutput",
+  "namespace": "spl.dev.submit",
+  "doc": "Output schema for spl/dev/submit method",
+  "fields": [
+    {
+      "name": "overlay",
+      "type": "string",
+      "doc": "Path to overlay folder"
+    },
+    {
+      "name": "dependencies",
+      "type": "string",
+      "doc": "Version dependency report (JSON stringified)"
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "doc": "Status message"
+    }
+  ]
+}

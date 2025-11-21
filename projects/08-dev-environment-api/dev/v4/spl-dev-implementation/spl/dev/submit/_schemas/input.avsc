@@ -1,0 +1,19 @@
+{
+  "type": "record",
+  "name": "SubmitInput",
+  "namespace": "spl.dev.submit",
+  "doc": "Input schema for spl/dev/submit method",
+  "fields": [
+    {
+      "name": "workPackage",
+      "type": "string",
+      "doc": "Path to work package"
+    },
+    {
+      "name": "reset",
+      "type": ["null", "boolean"],
+      "default": null,
+      "doc": "Clear overlay first - partial teardown (optional)"
+    }
+  ]
+}

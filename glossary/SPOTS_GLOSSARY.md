@@ -12,15 +12,15 @@ This glossary defines the top-level repository structure using the "spots" metap
 
 | Term | Description | Req |
 |------|-------------|-----|
-| spots glossary | Registry of spots terms with associated reqs; context: repository structure - activity-based locations | spots_glossary_v1.0.0.md |
-| spot | Activity-based location in repository; like rooms in a house, defined by what you do there, not just contents | spot_v1.0.0.md |
-| archive/ | **spot** - Look up historical reference materials; legacy spl1 materials; reference-only, not for active work | archive_v1.0.0.md |
-| chats/ | **spot** - Have informal collaborative conversations; captured discussions, insights, decisions; fire and forget capture | chats_v1.0.0.md |
-| cips/ | **spot** - Propose and track continual improvements; CIP_REGISTER.md (living) + individual CIPs (immutable); ITIL practice | cips_v1.0.0.md |
-| foundations/ | **spot** - Reference foundational principles; WOW.md, PRINCIPLES.md, PARTNERSHIP.md; headlines referencing versioned details | foundations_v1.0.0.md |
-| glossary/ | **spot** - Define and clarify language for different contexts; DSL, Stepping Stones, Spots glossaries; terms with reqs | glossary_spot_v1.0.0.md |
-| projects/ | **spot** - Do formal work through structured projects; project folders, INDEX.md, BACKLOG.md; manufacturing with PRINCE2 structure | projects_v1.0.0.md |
-| status/ | **spot** - Check current state of repository; active work, recent context, session entry point; reduces dynamic update load | status_v1.0.0.md |
+| spots glossary | Registry of spots terms with associated reqs; context: repository structure - activity-based locations | projects/06-glossary-term-requirements/reqs/spots_glossary_v1.0.0.md |
+| spot | Activity-based location in repository; like rooms in a house, defined by what you do there, not just contents | projects/06-glossary-term-requirements/reqs/spot_v1.0.0.md |
+| archive/ | **spot** - Look up historical reference materials; legacy spl1 materials; reference-only, not for active work | projects/06-glossary-term-requirements/reqs/archive_v1.0.0.md |
+| chats/ | **spot** - Have informal collaborative conversations; captured discussions, insights, decisions; fire and forget capture | projects/06-glossary-term-requirements/reqs/chats_v1.0.0.md |
+| cips/ | **spot** - Propose and track continual improvements; CIP_REGISTER.md (living) + individual CIPs (immutable); ITIL practice | projects/06-glossary-term-requirements/reqs/cips_v1.0.0.md |
+| foundations/ | **spot** - Reference foundational principles; WOW.md, PRINCIPLES.md, PARTNERSHIP.md; headlines referencing versioned details | projects/06-glossary-term-requirements/reqs/foundations_v1.0.0.md |
+| glossary/ | **spot** - Define and clarify language for different contexts; DSL, Stepping Stones, Spots glossaries; terms with reqs | projects/06-glossary-term-requirements/reqs/glossary_spot_v1.0.0.md |
+| projects/ | **spot** - Do formal work through structured projects; project folders, INDEX.md, BACKLOG.md; manufacturing with PRINCE2 structure | projects/06-glossary-term-requirements/reqs/projects_v1.0.0.md |
+| status/ | **spot** - Check current state of repository; active work, recent context, session entry point; reduces dynamic update load | projects/07-console-api-exploration/status_v1.0.0.md |
 
 ---
 

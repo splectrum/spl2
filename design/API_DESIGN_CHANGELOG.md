@@ -5,6 +5,40 @@
 
 ---
 
+## 2025-11-20
+
+**Version:** v0.4.0 (Module structure, executable selfevals, native vs wrapper APIs)
+**Changes:**
+- **New section:** Module Structure (Project 08)
+  - Four-level hierarchy (Module → Package → API → Method)
+  - Standalone work modules with version-stamped inheritance
+  - README.md as mutable entry point at each level
+- **New section:** Executable Selfeval Pattern (Project 08)
+  - File naming: `{req_name}_selfeval*.js` with optional data files
+  - Single concern principle (one test per script)
+  - Local rules apply (each node tests only itself)
+  - Test runner for cascading execution
+- **New section:** API Invocation Model (Project 08)
+  - Stateful API, stateless methods
+  - Three-layer sandwich (API state → previous output → method input)
+  - API invocation schema (envRoot, setupRoot, defaults, batch)
+- **New section:** Native vs Wrapper APIs (Project 08)
+  - Decision criterion: does external vocabulary fit DSL?
+  - Underscore namespace convention: `_` splectrum internal, `__` wrapper internal
+  - Work module discipline: wrapper alone is incomplete, must include native API
+- **New section:** Work Package Pattern (Project 08)
+  - Self-contained structure with spec, selfevals, schemas
+  - Handoff pattern for delegation
+  - Setup folder pattern for accumulating completed work
+- **New section:** Fluency and Friction Metrics (Project 08)
+  - Fluency as implementation smoothness measure
+  - Friction as partnership signal (not capability gap)
+
+**Context:** Project 08 - Dev Environment API
+**Reason:** Capture patterns from building dev environment infrastructure. Module structure, executable selfevals, and work packages enable autonomous/delegated development. Native vs wrapper API distinction with underscore convention clarifies API architecture.
+
+---
+
 ## 2025-11-19
 
 **Version:** v0.3.0 (Console API patterns, schema-driven merge)

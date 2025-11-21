@@ -1,0 +1,13 @@
+{
+  "requiredFolders": ["_reqs", "_schemas", "_tests"],
+  "requiredFiles": [
+    "README.md",
+    "index.js",
+    "_reqs/spl_dev_create_v1.0.0.md",
+    "_reqs/api_method_req_v1.0.0.md"
+  ],
+  "schemas": [
+    "_schemas/input.avsc",
+    "_schemas/output.avsc"
+  ]
+}

@@ -2,9 +2,7 @@
 
 ## Active Projects
 
-| Code | Name | Status | Started | Products |
-|------|------|--------|---------|----------|
-| 08-dev-environment-api | Dev Environment API | In Progress | 2025-11-19 | 6 twin pairs |
+*None currently*
 
 ## Completed Projects
 
@@ -17,6 +15,7 @@
 | 05-foundation-update-documentation-templates | Foundation Update & Documentation Templates | 2025-11-17 | Foundation headline format, design/ spot established, friction as dynamic KPI, AI-primary execution model, Blank Project type created |
 | 06-glossary-term-requirements | Glossary Term Requirements | 2025-11-18 | 67+ term reqs (24 DSL, 35+ Stepping Stones, 8 Spots), unified 3-column glossary structure, base concepts (api_node, activity, spot), extends pattern with term names |
 | 07-console-api-exploration | Console API - AI-Primary Execution Model | 2025-11-19 | v7 console wrapper (5 methods), 3 design docs, schema-driven merge, boundary validation, self-eval harness, status/ spot, Dev Env API + AVRO Wrapper + CIP Processing backlog items, CIP-015 |
+| 08-dev-environment-api | Dev Environment API | 2025-11-20 | 4-level module structure, executable selfeval pattern, test runner, AVRO schemas (API + 7 methods), native vs wrapper API convention, delegation stepping stone, work package pattern |
 
 ## Planned Projects
 
@@ -267,6 +266,47 @@
 - AVRO Wrapper API (high priority)
 
 **See:** `projects/07-console-api-exploration/LESSONS_LEARNED.md` for full details
+
+### 08-dev-environment-api
+**Objective:** Build dev environment API infrastructure enabling autonomous/delegated development
+
+**Project Type:** Explorative Project
+
+**Products Delivered:**
+1. 4-level module structure (Module → Package → API → Method) ✅
+2. Executable selfeval pattern ({req_name}_selfeval*.js) ✅
+3. Test runner (run-selfevals.js) for cascading execution ✅
+4. AVRO schemas for API invocation + all 7 methods ✅
+5. spl/dev/create method fully implemented ✅
+6. 6 methods stubbed with structure and selfevals ✅
+
+**Unplanned Deliverables:**
+- delegation stepping stone (partnership evolution pattern)
+- Native vs wrapper API convention (single `_` vs double `__` underscore)
+- Glossary ref path fix (all refs now relative to repo root)
+- API_DESIGN.md v0.4.0 (6 new standalone blocks)
+
+**Status:** Complete - Foundation delivered, full implementation deferred to next project
+
+**Key Outcomes:**
+- **Module structure validated:** 4-level hierarchy with README.md entry points, _reqs/ for versioned immutables
+- **Executable selfeval pattern:** Scripts directly executable, no JSON manifest bureaucracy
+- **Single concern principle:** One test per script, focused error messages, stop-on-first-fail friendly
+- **Local rules apply:** Each node tests only itself, execution cascades through tree
+- **API invocation model:** Stateful API, stateless methods, three-layer sandwich (API state → previous output → method input)
+- **Native vs wrapper APIs:** Decision criterion (does vocabulary fit DSL?), underscore convention
+- **Work package pattern:** Self-contained, portable, handoff-ready for delegation
+- **Delegation stepping stone:** Mindset shift from executor to orchestrator
+
+**Key Learnings:**
+- Foundation quality > implementation quantity (structure validates pattern)
+- Single concern enables precise error messages
+- Local rules apply means each level validates only itself
+- Glossary refs must be full paths relative to repo root (critical infrastructure)
+- Partial delivery valid when foundation proves pattern
+- Partnership evolving naturally toward higher autonomy
+
+**See:** `projects/08-dev-environment-api/LESSONS_LEARNED.md` for full details
 
 ---
 

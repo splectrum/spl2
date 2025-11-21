@@ -1,28 +1,25 @@
 # Current Status
 
-**Last Updated:** 2025-11-19
+**Last Updated:** 2025-11-20
 
 ---
 
 ## Active Project
 
-**Project 08: Dev Environment API**
-- Type: Exploration Project
-- Focus: Infrastructure for autonomous development
-- Products: 6 twin pairs (self-eval reqs, Console API reqs, Dev Env API, env types, publishing, deployment scripts)
-- Stage: 1 - Foundation (self-eval and Console API requirements)
-
-See: `projects/08-dev-environment-api/`
+*None currently*
 
 ---
 
 ## Next Up
 
-**Three high priority items:**
+**Two high priority items:**
 
-1. **Dev Environment API** - Infrastructure for autonomous development
-2. **CIP Processing** - Process 15 accumulated CIPs
-3. **AVRO Wrapper API** - SPL2 wrapper for schema operations
+1. **CIP Processing** - Process accumulated CIPs
+2. **AVRO Wrapper API** - SPL2 wrapper for schema operations
+
+Or continue dev environment work:
+- Implement remaining 6 methods (install, submit, cycle, status, extract, destroy)
+- Deploy as usable API
 
 See: `projects/BACKLOG.md`
 
@@ -32,10 +29,10 @@ See: `projects/BACKLOG.md`
 
 | Project | Completed | Key Outcomes |
 |---------|-----------|--------------|
+| 08 - Dev Environment API | 2025-11-20 | 4-level module structure, executable selfeval pattern, test runner, delegation stepping stone |
 | 07 - Console API Exploration | 2025-11-19 | v7 wrapper API, 3 design docs, status/ spot, CIP-015 |
 | 06 - Glossary Term Requirements | 2025-11-18 | 67+ term reqs, unified glossary structure |
 | 05 - Foundation Update | 2025-11-17 | Headlines format, design/ spot, friction as KPI |
-| 04 - Bare Runtime Hello World | 2025-11-14 | Bare validated, dual-platform patterns |
 
 ---
 

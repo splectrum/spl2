@@ -1,0 +1,11 @@
+{
+  "requiredFolders": [
+    "spl",
+    "spl/dev"
+  ],
+  "requiredFiles": [
+    "README.md",
+    "_reqs/work_module_v1.0.0.md",
+    "_reqs/spl_dev_implementation_v1.0.0.md"
+  ]
+}

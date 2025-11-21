@@ -1,0 +1,26 @@
+{
+  "type": "record",
+  "name": "InstallOutput",
+  "namespace": "spl.dev.install",
+  "doc": "Output schema for spl/dev/install method",
+  "fields": [
+    {
+      "name": "installed",
+      "type": {
+        "type": "array",
+        "items": "string"
+      },
+      "doc": "List of installed packages"
+    },
+    {
+      "name": "base",
+      "type": "string",
+      "doc": "Path to base folder"
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "doc": "Status message"
+    }
+  ]
+}

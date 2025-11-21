@@ -1,0 +1,13 @@
+{
+  "requiredFolders": [
+    "dev"
+  ],
+  "requiredFiles": [
+    "README.md",
+    "_reqs/package_v1.0.0.md",
+    "_reqs/spl_package_v1.0.0.md"
+  ],
+  "apis": [
+    "dev"
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "type": "record",
+  "name": "SplDevApiOutput",
+  "namespace": "spl.dev",
+  "doc": "Output schema for spl/dev API invocation",
+  "fields": [
+    {
+      "name": "status",
+      "type": "string",
+      "doc": "API invocation status (configured, batch_complete, error)"
+    },
+    {
+      "name": "context",
+      "type": [
+        "null",
+        {
+          "type": "record",
+          "name": "ApiContext",
+          "fields": [
+            {
+              "name": "envRoot",
+              "type": "string",
+              "doc": "Configured environment root path"
+            },
+            {
+              "name": "setupRoot",
+              "type": ["null", "string"],
+              "default": null,
+              "doc": "Configured setup root path"
+            },
+            {
+              "name": "verbosity",
+              "type": "string",
+              "doc": "Configured verbosity level"
+            }
+          ]
+        }
+      ],
+      "default": null,
+      "doc": "API context configuration (when status=configured)"
+    },
+    {
+      "name": "batchResults",
+      "type": [
+        "null",
+        {
+          "type": "array",
+          "items": {
+            "type": "record",
+            "name": "BatchResult",
+            "fields": [
+              {
+                "name": "method",
+                "type": "string",
+                "doc": "Method name executed"
+              },
+              {
+                "name": "success",
+                "type": "boolean",
+                "doc": "Whether method succeeded"
+              },
+              {
+                "name": "output",
+                "type": ["null", "string"],
+                "default": null,
+                "doc": "Method output (JSON stringified)"
+              },
+              {
+                "name": "error",
+                "type": ["null", "string"],
+                "default": null,
+                "doc": "Error message if failed"
+              }
+            ]
+          }
+        }
+      ],
+      "default": null,
+      "doc": "Batch execution results (when status=batch_complete)"
+    },
+    {
+      "name": "message",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Additional information or error message"
+    }
+  ]
+}

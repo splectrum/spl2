@@ -1,0 +1,28 @@
+{
+  "type": "record",
+  "name": "CycleOutput",
+  "namespace": "spl.dev.cycle",
+  "doc": "Output schema for spl/dev/cycle method",
+  "fields": [
+    {
+      "name": "cycle",
+      "type": "int",
+      "doc": "Cycle number"
+    },
+    {
+      "name": "results",
+      "type": "string",
+      "doc": "Test results (JSON stringified)"
+    },
+    {
+      "name": "fluency",
+      "type": "string",
+      "doc": "Fluency metrics (JSON stringified)"
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "doc": "Status: pass, fail, complete"
+    }
+  ]
+}

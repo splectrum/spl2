@@ -1,9 +1,9 @@
 # SPL2 API Design and Implementation
 
 **Location:** design/ spot - mutable design documentation
-**Source:** Projects 03-07
-**Current Version:** v0.3.0 (Console API patterns, schema-driven merge)
-**Last Updated:** 2025-11-19 (v7 patterns: schema-driven property selection, boundary validation, wrapper vs DSL APIs, runtime/execution responsibilities)
+**Source:** Projects 03-08
+**Current Version:** v0.4.0 (Module structure, executable selfevals, native vs wrapper APIs)
+**Last Updated:** 2025-11-20 (Project 08 patterns: module structure, executable selfeval, API invocation model, native vs wrapper APIs with underscore convention)
 **Status:** Active - accumulating detail from implementation, pre-rationalization phase
 **Changelog:** See API_DESIGN_CHANGELOG.md
 
@@ -2441,8 +2441,354 @@ return {
 
 ---
 
+## Module Structure (Project 08)
+
+### Four-Level Hierarchy
+
+SPL2 modules have a four-level structure:
+
+```
+Module root (work module instance)
+└── Package (e.g., spl/)
+    └── API (e.g., spl/dev/)
+        └── Methods (e.g., spl/dev/create/)
+```
+
+**Each level has:**
+- `README.md` - Mutable entry point (human/AI readable)
+- `_reqs/` - Requirements and selfevals (versioned immutables + executable tests)
+- Level-appropriate structure (schemas, index.js, etc.)
+
+**Level responsibilities:**
+
+| Level | Purpose | Contains |
+|-------|---------|----------|
+| Module | Work unit, standalone mycelium | Package(s), module-level reqs |
+| Package | Organizational grouping | API(s), package-level reqs |
+| API | Concern boundary, namespace | Methods, schemas, API overview |
+| Method | Invokable leaf | index.js, method req, schemas |
+
+### Standalone Work Modules
+
+Work modules are self-contained:
+- All dependencies copied into `_reqs/` with version stamps
+- No external refs for validation
+- Portable - can run anywhere
+- Inheritance via copying, not linking
+
+**Version-stamped naming shows provenance:**
+```
+_reqs/
+├── work_module_v1.0.0.md           # Type req
+├── spl_dev_implementation_v1.0.0.md # Instance req
+├── api_node_v1.0.0_selfeval.js     # Inherited selfeval
+└── api_node_v1.0.0_selfeval_data.json
+```
+
+---
+
+## Executable Selfeval Pattern (Project 08)
+
+### Motivation
+
+Eliminate bureaucracy layer of JSON manifests that reference test scripts. Make self-eval directly executable.
+
+### File Naming
+
+- **Scripts:** `{req_name}_selfeval*.js` (e.g., `api_node_v1.0.0_selfeval.js`)
+- **Data files:** `{req_name}_selfeval_data.json` (optional)
+- **Multiple per req:** Use suffix (e.g., `_selfeval_folders.js`, `_selfeval_files.js`)
+
+All selfeval files live in `_reqs/` folder.
+
+### Single Concern Principle
+
+Each selfeval tests ONE thing:
+- `*_selfeval_folders.js` - checks required folders exist
+- `*_selfeval_files.js` - checks required files exist
+- Minimal, complete, simple
+- Focused error messages
+
+**Benefits:**
+- First failure is exact and actionable
+- Simple scripts, easy to understand
+- Clear progression: fix one thing, run again
+- Stop-on-first-fail friendly
+
+### Script Signature
+
+```javascript
+function selfeval(data) {
+  // data from {req_name}_selfeval_data.json or null
+  // perform tests
+  // exit(0) = pass, exit(1) = fail with message
+}
+
+if (require.main === module) {
+  let data = null;
+  try {
+    data = require('./{req_name}_selfeval_data.json');
+  } catch (e) {}
+  selfeval(data);
+}
+module.exports = selfeval;
+```
+
+### Data File Format
+
+```json
+{
+  "requiredFolders": ["spl", "spl/dev"],
+  "requiredFiles": ["README.md", "index.js"],
+  "internalFolders": ["_reqs", "_schemas"]
+}
+```
+
+### Local Rules Apply
+
+- Each node runs its own selfevals
+- Selfevals only test what their req specifies
+- No checking child nodes (they test themselves)
+- Execution cascades through tree (root → package → api → methods)
+
+### Test Runner
+
+Cascading test execution:
+1. Discover all `*_selfeval*.js` in `_reqs/`
+2. Load matching `*_selfeval_data.json` files
+3. Execute each script with its data (or null)
+4. Stop on first failure
+5. Report results
+
+Works autonomously - point it at any module.
+
+---
+
+## API Invocation Model (Project 08)
+
+### Stateful API, Stateless Methods
+
+**API-level invocation = stateful + default:**
+- Primary pattern for using APIs
+- Creates persistent state/context
+- Configuration persists across method calls
+- Sets defaults, environment, preferences
+
+```javascript
+invoke('spl/dev', {
+  envRoot: '/custom/path',
+  setupRoot: './setup',
+  verbosity: 'debug'
+});
+```
+
+**Method-level invocation = stateless + override:**
+- Methods don't keep their own state
+- Receive context from three sources (the sandwich)
+- Can override API-level config for this call only
+
+### Three-Layer Sandwich
+
+Each method invocation resolves input from three layers:
+
+```
+┌─────────────────────────────┐
+│  Method input (explicit)    │  ← Highest priority
+├─────────────────────────────┤
+│  Previous output (chained)  │  ← Middle
+├─────────────────────────────┤
+│  API state (persistent)     │  ← Lowest priority
+└─────────────────────────────┘
+```
+
+**Priority:** Method input > Previous output > API state
+
+Override is per-call only - doesn't change API state.
+
+### API Invocation Schema
+
+API invocation can include:
+- **envRoot** - where to create environments
+- **setupRoot** - where setup folder lives
+- **defaults** - map of method defaults
+- **batch** - array of method calls to execute
+
+All optional, but API invocation is the **primary pattern**.
+
+```javascript
+invoke('spl/dev', {
+  envRoot: '/custom/path',
+  setupRoot: './setup',
+  defaults: {
+    install: { packages: 'standard' },
+    cycle: { single: false, exit: false }
+  },
+  batch: [
+    ['create', { name: 'my-env' }],
+    ['install', {}],
+    ['submit', { workPackage: './work/pkg' }]
+  ]
+});
+```
+
+---
+
+## Native vs Wrapper APIs (Project 08)
+
+### Two API Layers
+
+**Native APIs** (DSL vocabulary):
+- SPL2 vocabulary from DSL glossary
+- Our schemas, our method names
+- For "splectrum proper" use
+- May combine multiple wrapper calls
+
+**Wrapper APIs** (external tool vocabulary):
+- Mirror external tool's native interface
+- External tool's vocabulary/schema preserved
+- Mechanical 1:1 mapping
+- Implementation detail, not for direct use
+
+### Decision Criterion
+
+**Does the external tool's vocabulary fit DSL?**
+
+- **Yes** → Direct native API (no wrapper needed)
+- **No** → Wrapper API + Native API on top
+
+**Examples:**
+- `console` - vocabulary fits (`log`, `error`, `warn`) → Direct native `spl/console`
+- `fs` - vocabulary doesn't fit (`readFileSync`, callbacks) → Wrapper + Native `spl/file`
+
+### Underscore Namespace Convention
+
+**Single underscore `_`** = splectrum internal (higher precedence)
+- `_reqs/`, `_schemas/`, `_meta/`
+- Our infrastructure, our control
+
+**Double underscore `__`** = wrapper internal (lower precedence)
+- `__readFileSync/`, `__input.avsc`
+- External tool's namespace, not our control
+- Subordinate to splectrum internal
+
+**Structure example:**
+```
+spl/
+├── file/                    # Native API (DSL vocabulary)
+│   ├── read/
+│   └── write/
+└── fs/                      # Wrapper API package
+    ├── __readFileSync/      # Double underscore on methods
+    ├── __writeFileSync/
+    └── _schemas/            # Single underscore (our folder)
+        ├── __readFileSync-input.avsc   # Double underscore (their vocab)
+        └── __readFileSync-output.avsc
+```
+
+### Work Module Discipline
+
+Creating wrapper alone is incomplete:
+- Must create native API in same work module
+- Only then is external tool "integrated into splectrum"
+- Wrapper is implementation detail, not deliverable
+
+**Double underscore can be omitted IF:**
+- One-to-one mapping exists in naming AND semantics
+- External tool vocabulary happens to match DSL
+
+---
+
+## Work Package Pattern (Project 08)
+
+### Structure
+
+Self-contained, portable module with everything needed for implementation:
+
+```
+spl/dev/create/
+├── README.md             # Entry point (mutable)
+├── index.js              # Implementation
+├── _reqs/
+│   ├── spl_dev_create_v1.0.0.md           # Method req
+│   ├── spl_dev_create_v1.0.0_selfeval*.js # Tests
+│   └── api_node_v1.0.0_selfeval.js        # Inherited
+├── _schemas/
+│   ├── input.avsc
+│   └── output.avsc
+└── _meta/                # Journey evidence (after execution)
+    ├── status.json
+    ├── cycle-log.json
+    └── fluency.json
+```
+
+### Handoff Pattern
+
+1. Receive folder with spec, schemas, tests (stub implementation)
+2. Drop into dev env
+3. Run harness
+4. Tests fail with guidance
+5. Implement until 100% pass
+6. Done
+
+**"Dumb execution, smart definition"** - definition is complete, execution follows tests.
+
+### Setup Folder Pattern
+
+Dev environment is ephemeral. Setup folder accumulates completed work.
+
+```
+setup/
+├── base-modules/          # Packages for installation
+├── work-packages/         # Input queue (pristine specs)
+└── completed-modules/     # Output - evolved work modules
+    └── spl-dev-create/    # Completed: spec + impl + meta
+```
+
+**Perfect for AI delegation:**
+- Hand agent: setup folder + work package name
+- Agent implements to spec
+- Returns: completed module with _meta/ evidence
+- Setup folder state advances
+
+---
+
+## Fluency and Friction Metrics (Project 08)
+
+### Fluency Metric
+
+Measure of implementation smoothness:
+
+**Measures:**
+- Cycles to completion (overall)
+- Cycles per test
+- Time to green
+
+**Interpretation:**
+- High fluency (few cycles) → clear spec, good tests, straightforward
+- Low fluency (many cycles) → unclear spec, poor guidance, complex
+
+### Friction as Partnership Signal
+
+**Key insight:** Low fluency indicates partnership misalignment, not capability gap.
+
+**Friction points reveal:**
+- Misunderstanding in spec
+- Ambiguity in requirements
+- Gap between intent and expression
+
+**Response to friction:**
+- Review partnership artifacts (spec, guidance, tests)
+- Find the misalignment
+- Clarify and improve the definition
+- **Not** escalate to "more capable agent"
+
+**Partnership is king** - friction is feedback on partnership quality, not executor performance.
+
+---
+
 ## Version History
 
+- **v0.4.0** (2025-11-20): Project 08 patterns - module structure (4-level hierarchy), executable selfeval pattern, API invocation model (stateful API, stateless methods, three-layer sandwich), native vs wrapper APIs with underscore namespace convention, work package pattern, fluency/friction metrics.
 - **v0.3.0** (2025-11-19): Project 07 patterns - schema-driven property selection, boundary validation model, wrapper vs DSL APIs, invocation at any level, runtime/execution responsibilities, package types, self-eval development model. Updated structure to use underscore prefix convention and method folders.
 - **v0.2.0** (2025-11-18): AI-primary paradigm shift - JS invocation primary, CLI secondary wrapper.
 - **v0.1.0** (2025-11-10): Initial design document capturing decisions from Twin Pair 1 and Twin Pair 2 planning discussions. MVP scope defined. End vision captured. Ready for implementation.

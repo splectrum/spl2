@@ -1,0 +1,20 @@
+{
+  "type": "record",
+  "name": "InstallInput",
+  "namespace": "spl.dev.install",
+  "doc": "Input schema for spl/dev/install method",
+  "fields": [
+    {
+      "name": "packages",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Specific packages to install (optional)"
+    },
+    {
+      "name": "reset",
+      "type": ["null", "boolean"],
+      "default": null,
+      "doc": "Clear base first - partial teardown (optional)"
+    }
+  ]
+}

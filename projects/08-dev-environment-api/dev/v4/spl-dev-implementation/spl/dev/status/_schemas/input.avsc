@@ -1,0 +1,20 @@
+{
+  "type": "record",
+  "name": "StatusInput",
+  "namespace": "spl.dev.status",
+  "doc": "Input schema for spl/dev/status method",
+  "fields": [
+    {
+      "name": "silent",
+      "type": ["null", "boolean"],
+      "default": null,
+      "doc": "Suppress screen output (optional)"
+    },
+    {
+      "name": "save",
+      "type": ["null", "boolean"],
+      "default": null,
+      "doc": "Write to work package _meta/ (optional)"
+    }
+  ]
+}

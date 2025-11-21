@@ -10,13 +10,14 @@ This glossary defines howtos - procedural guidance for common tasks. Howtos are 
 
 | Term | Description | Req |
 |------|-------------|-----|
-| create project | Create a project from backlog item: read item → identify project type → look up in glossary → follow req phases | create_project_v1.0.0.md |
+| create project | Create a project from backlog item: read item → identify project type → look up in glossary → follow req phases | projects/08-dev-environment-api/create_project_v1.0.0.md |
 
 ---
 
 ## Notes
 
 - **Entry structure:** Term | Description | Req (three columns)
+- **Req column:** All refs are relative to repo root
 - **User's land:** Procedures for executing work (vs stepping stones for concepts)
 - **Cross-cutting pattern:** Central howto provides pattern, spots own specifics (see CIP-015)
 - **Grows through use:** Add howtos as procedures crystallize from work

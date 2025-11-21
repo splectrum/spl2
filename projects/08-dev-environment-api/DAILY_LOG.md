@@ -150,6 +150,78 @@ Updated glossary refs:
 
 ---
 
+## 2025-11-20 (Session 3)
+
+### Executable Selfeval Pattern Complete
+
+**Context:** Finalized executable selfeval pattern and built complete module structure with test runner.
+
+**Pattern established:**
+- File naming: `{req_name}_selfeval*.js` with optional `{req_name}_selfeval_data.json`
+- Single concern per script (minimal, complete, simple)
+- Local rules apply (each node tests only itself)
+- Stop-on-first-fail with focused error messages
+- Version-stamped naming shows provenance
+
+**Test runner created:**
+- `run-selfevals.js` - autonomous cascading execution
+- Discovers all selfevals in tree order (root → package → api → methods)
+- Stops on first failure
+- Works autonomously - point it at any module
+
+**Structure complete:**
+- 4 levels: Module → Package → API → Methods
+- 23 selfevals across all levels
+- All tests passing ✅
+- Only `create` method fully implemented (others stubbed)
+
+**Glossary updates:**
+- Moved `api_method`, `api_overview` to DSL (structural, not methodology)
+- Added 7 method names to DSL: create, install, submit, cycle, status, extract, destroy
+- Each method has semantic meaning requirement
+
+**Schema decisions:**
+- API invocation schema complete (envRoot, setupRoot, defaults, batch)
+- All 7 method schemas defined (AVRO)
+- `cycle` refined: `single` + `exit` both default false
+- Help metadata in schemas + overview (sufficient for AI, not perfect)
+- Pragmatism: build what's needed, improve through use
+
+**API invocation model clarified:**
+- Stateful API, stateless methods
+- Three-layer sandwich: API state → previous output → method input
+- Priority: method input > previous output > API state
+- Override is per-call only
+
+**Work module pattern:**
+- Standalone (all selfevals copied into _reqs/)
+- Version-stamped files show origin
+- Portable - no external dependencies
+- Inheritance via copying, not linking
+
+**Decision: Stop here for this iteration**
+- Complete structure with selfevals validates the pattern
+- `create` method proves implementation works
+- Other methods stubbed - sufficient for testing structure
+- Next project will finish implementation and deploy as usable API
+- This iteration is embryonic dev environment - foundation is solid
+
+**Test execution:** 23 selfevals, all passing
+- Module root: 3 selfevals
+- Package (spl/): 5 selfevals
+- API (spl/dev/): 5 selfevals
+- Method create: 3 selfevals
+- Methods (6 stubs): 2 selfevals each
+
+**Key insight:** Partnership quality > capability
+- Good selfevals + clear reqs = autonomous execution
+- Friction signals requirements need improvement, not more powerful AI
+- Tests as partnership artifact - they tighten alignment
+
+**Ready for closure.**
+
+---
+
 ## 2025-11-20 (Session 2)
 
 ### Module Structure and Self-Eval Inheritance

@@ -1,0 +1,13 @@
+{
+  "type": "record",
+  "name": "DestroyInput",
+  "namespace": "spl.dev.destroy",
+  "doc": "Input schema for spl/dev/destroy method",
+  "fields": [
+    {
+      "name": "mode",
+      "type": "string",
+      "doc": "Destruction mode: clean, preserve, or publish"
+    }
+  ]
+}

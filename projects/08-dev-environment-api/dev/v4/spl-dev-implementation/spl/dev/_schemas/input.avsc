@@ -1,0 +1,71 @@
+{
+  "type": "record",
+  "name": "SplDevApiInput",
+  "namespace": "spl.dev",
+  "doc": "Input schema for spl/dev API invocation (stateful context)",
+  "fields": [
+    {
+      "name": "envRoot",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Root path for dev environments (default: /tmp/dev-env)"
+    },
+    {
+      "name": "setupRoot",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Root path for setup folder with base modules and work packages"
+    },
+    {
+      "name": "verbosity",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Logging verbosity level (silent, normal, debug)"
+    },
+    {
+      "name": "defaults",
+      "type": [
+        "null",
+        {
+          "type": "map",
+          "values": {
+            "type": "map",
+            "values": ["null", "string", "boolean", "int", "double"]
+          }
+        }
+      ],
+      "default": null,
+      "doc": "Method argument defaults - map of method name to argument defaults"
+    },
+    {
+      "name": "batch",
+      "type": [
+        "null",
+        {
+          "type": "array",
+          "items": {
+            "type": "record",
+            "name": "BatchCall",
+            "fields": [
+              {
+                "name": "method",
+                "type": "string",
+                "doc": "Method name (e.g., 'create', 'install')"
+              },
+              {
+                "name": "args",
+                "type": {
+                  "type": "map",
+                  "values": ["null", "string", "boolean", "int", "double"]
+                },
+                "doc": "Method arguments"
+              }
+            ]
+          }
+        }
+      ],
+      "default": null,
+      "doc": "Batch execution - array of method calls to execute in sequence"
+    }
+  ]
+}
