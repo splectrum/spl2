@@ -77,3 +77,67 @@ These need brewing - will emerge from use.
 - The meta-experiment matters: validating DSL wrapping on ITIL validates the approach for wrapping anything
 - "Not just renaming things" - it's about whether vocabulary transformation creates genuine value
 - Brewing is the point for naming - early ideas, let them percolate, see what emerges from actual use
+
+---
+
+# Part 2: Pipeline Reframe
+
+**Date:** 2025-11-21 (continued)
+
+## The Reframe
+
+spl/execute was too narrow - single-purpose "run code with context".
+
+spl/pipeline is the generative primitive - orchestration with context management.
+
+## Key Insight: Method Invocations as Data
+
+API methods are addressable: `spl/dev/create` + input data. This means:
+- Pipelines themselves are data (storable, versionable, composable)
+- Execution becomes orchestration of method invocations
+- Scripting = nested method specs, no special language needed
+
+## Pipeline Islands in a Sea of Free Script
+
+Scripts contain **pipeline islands** (managed context, orchestration) in a **sea of free script code** (full language freedom).
+
+```javascript
+// === SEA ===
+const config = loadConfig()
+
+// === ISLAND ===
+const result = await spl/pipeline/sequence(runtime, { steps: [...] })
+
+// === SEA ===
+processResult(result)
+```
+
+**Pipelines don't box scripts.** Even API methods (encapsulated in pipeline calls) have full internal freedom - islands and sea inside.
+
+## Layering
+
+| Layer | Role |
+|-------|------|
+| Runtime | Context object - what you *have* |
+| Pipeline API | Orchestration - what you *do* |
+| Domain APIs | Stateful operations |
+| Script | Direct invocations + free code |
+
+**Runtime as context, not actor.** Pipeline methods receive runtime, runtime doesn't "invoke" things.
+
+## Pipeline Responsibilities
+
+- Execution context management (create, transfer, merge)
+- Parallel coordination (spawn, merge results)
+- Error handling (catch → spl/bug/create → decide rethrow)
+- Data layer access within context
+
+## spl/bug Remains Separate
+
+Bug report = API state. Bug API = methods on that state. Version-bound: report created by v1.2 opens with v1.2. Valuable domain functionality justifies separate API.
+
+## Outcome
+
+Project 09 reframed: **spl/pipeline API** instead of spl/execute API.
+
+Backlog updated with Pipeline Islands addon attached to first item.

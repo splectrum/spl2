@@ -2,7 +2,7 @@
 
 **Priority:** High
 **Type:** Implementation Project
-**Dependencies:** spl/execute API
+**Dependencies:** spl/pipeline API
 **Phase:** 1 - Implementation Pipeline
 
 ---

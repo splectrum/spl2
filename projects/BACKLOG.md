@@ -14,17 +14,17 @@ Phased approach to get implementation infrastructure working.
 
 ### Phase 1 - Foundation
 
-| Backlog Item | Priority | Dependencies | Comments |
-|--------------|----------|--------------|----------|
-| [spl/execute API](backlog/spl-execute-api.md) | High | Console API patterns | Execution runtime with context capture. Foundation for bug reports. |
-| [spl/bug API](backlog/spl-bug-api.md) | High | spl/execute API | Bug report infrastructure. Captures failure context for reconstruction. |
+| Backlog Item | Priority | Dependencies | Addons | Comments |
+|--------------|----------|--------------|--------|----------|
+| [spl/pipeline API](backlog/spl-pipeline-api.md) | High | Console API patterns | [Pipeline Islands](backlog/addons/pipeline-islands-pattern.md) | Pipeline orchestration with context management. Islands in sea of free script. |
+| [spl/bug API](backlog/spl-bug-api.md) | High | spl/pipeline API | | Bug report as API state. Captures failure context for reconstruction. |
 
 ### Phase 2 - Complete Pipeline
 
 | Backlog Item | Priority | Dependencies | Comments |
 |--------------|----------|--------------|----------|
-| [Dev Environment API](backlog/dev-environment-api.md) | High | spl/execute, spl/bug | Complete the 6 remaining methods from Project 08 foundation. |
-| [spl/execute v2](backlog/spl-execute-v2.md) | High | Phase 1 complete | Strengthen based on Phase 1 learnings. |
+| [Dev Environment API](backlog/dev-environment-api.md) | High | spl/pipeline, spl/bug | Complete the 6 remaining methods from Project 08 foundation. |
+| [spl/pipeline v2](backlog/spl-pipeline-v2.md) | High | Phase 1 complete | Strengthen based on Phase 1 learnings. |
 | [spl/bug v2](backlog/spl-bug-v2.md) | High | Phase 1 complete | Upgrade based on learnings + ITIL vocabulary alignment. |
 | [ITIL Introduction](backlog/itil-introduction.md) | High | Phase 1 complete | ITIL concepts wrapped in SPL2/DSL vocabulary. Service design foundation. |
 

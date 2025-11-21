@@ -1,15 +1,15 @@
-# spl/execute API v2 (Phase 2)
+# spl/pipeline API v2 (Phase 2)
 
 **Priority:** High
 **Type:** Implementation Project
-**Dependencies:** spl/execute API (Phase 1), spl/dev API
+**Dependencies:** spl/pipeline API (Phase 1), spl/dev API
 **Phase:** 2 - Strengthen Implementation Pipeline
 
 ---
 
 ## Overview
 
-Strengthen spl/execute based on learnings from Phase 1. Iteration driven by actual use in spl/dev cycles.
+Strengthen spl/pipeline based on learnings from Phase 1. Iteration driven by actual use in spl/dev cycles.
 
 ---
 
@@ -17,11 +17,11 @@ Strengthen spl/execute based on learnings from Phase 1. Iteration driven by actu
 
 TBD - depends on Phase 1 learnings. Likely areas:
 
+- Additional pipeline methods (branch, retry, etc.)
+- Context transfer refinements
+- Parallel coordination improvements
+- Error handling patterns
 - Performance optimization
-- Additional context capture needs discovered
-- Integration improvements with spl/dev
-- Error handling refinements
-- Async execution patterns
 
 ---
 
@@ -35,10 +35,11 @@ TBD - depends on Phase 1 learnings. Likely areas:
 
 ## Expected Products
 
-1. Updated spl/execute API based on learnings
-2. Refined context capture
-3. Better spl/dev integration
-4. Updated self-eval specs
+1. Updated spl/pipeline API based on learnings
+2. Additional pipeline methods as needed
+3. Refined context management
+4. Better spl/dev integration
+5. Updated self-eval specs
 
 ---
 
@@ -51,4 +52,5 @@ TBD - depends on Phase 1 learnings. Likely areas:
 ---
 
 **Created:** 2025-11-21
+**Updated:** 2025-11-21 (renamed from spl/execute v2)
 **Source:** Project 09 planning chat

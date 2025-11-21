@@ -2,7 +2,7 @@
 
 **Priority:** High
 **Type:** Implementation Project
-**Dependencies:** spl/execute API, spl/bug API
+**Dependencies:** spl/pipeline API, spl/bug API
 **Phase:** 2 - Complete Implementation Pipeline
 **Source:** Project 07 exploration, Project 08 foundation
 
