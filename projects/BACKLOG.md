@@ -2,22 +2,42 @@
 
 # Project Backlog
 
-**Last Updated:** 2025-11-19
+**Last Updated:** 2025-11-21
 
 Backlog of identified projects for SPL2 development. Projects analyzed for priority and dependencies during Project 02 (Dependency & Priority Analysis).
 
 ---
 
-## Backlog Items
+## Implementation Pipeline (Current Focus)
+
+Phased approach to get implementation infrastructure working.
+
+### Phase 1 - Foundation
+
+| Backlog Item | Priority | Dependencies | Comments |
+|--------------|----------|--------------|----------|
+| [spl/execute API](backlog/spl-execute-api.md) | High | Console API patterns | Execution runtime with context capture. Foundation for bug reports. |
+| [spl/bug API](backlog/spl-bug-api.md) | High | spl/execute API | Bug report infrastructure. Captures failure context for reconstruction. |
+
+### Phase 2 - Complete Pipeline
+
+| Backlog Item | Priority | Dependencies | Comments |
+|--------------|----------|--------------|----------|
+| [Dev Environment API](backlog/dev-environment-api.md) | High | spl/execute, spl/bug | Complete the 6 remaining methods from Project 08 foundation. |
+| [spl/execute v2](backlog/spl-execute-v2.md) | High | Phase 1 complete | Strengthen based on Phase 1 learnings. |
+| [spl/bug v2](backlog/spl-bug-v2.md) | High | Phase 1 complete | Upgrade based on learnings + ITIL vocabulary alignment. |
+| [ITIL Introduction](backlog/itil-introduction.md) | High | Phase 1 complete | ITIL concepts wrapped in SPL2/DSL vocabulary. Service design foundation. |
+
+---
+
+## Other Backlog Items
 
 | Backlog Item | Priority | Dependencies | Addons | Comments |
 |--------------|----------|--------------|--------|----------|
-| [Dev Environment API](backlog/dev-environment-api.md) | High | Console API Exploration | | Infrastructure for autonomous development. Self-eval requirements, Dev Environment API (create/submit/cycle/status/teardown), defined purpose environments, publishing to spot, deployment script generation, bug report integration. Foundation for "autonomy enables delegation" pattern. |
 | [CIP Processing](backlog/cip-processing.md) | High | None | | Standard maintenance project - process 15 accumulated CIPs. Create backlog items, update foundations, spawn CIPs, close processed ones. Repeatable project triggered by CIP debt. |
 | [AVRO Wrapper API](backlog/avro-wrapper-api.md) | High | Console API Exploration | | SPL2 wrapper for AVRO schema operations. Schema loading/caching, validation helpers, Bare compatibility. Foundation for all APIs - every API uses AVRO schemas. |
 | [Bare Runtime Compatibility](backlog/bare-runtime-compatibility.md) | High | Bare Runtime Hello World | Phase 2 Dev Setup | Deep dive: Node.js → Bare workflow, tooling compatibility (Vite, Vitest), SPL2 patterns on Bare. Prerequisite for Pear platform work. |
 | [Browser Platform Exploration](backlog/browser-platform-exploration.md) | High | Bare Runtime Compatibility | | Validate browser as third pillar platform for SPL2 runtime. File system abstraction (IndexedDB/OPFS), browser lifecycle, basic P2P validation (WebRTC/WebTransport). Completes three-pillar portability (Node/Bare/Browser). |
-| [Bug Report Infrastructure](backlog/bug-report-infrastructure.md) | High | Runtime Structure Hello World | | Automated bug report generation with complete execution footprint for reconstruction. Captures: code versions, input, state, environment, error details. Enables exact failure reproduction for reconstruction-based architecture. |
 | [Kafka Compatible Records](backlog/kafka-compatible-records.md) | High | Runtime Structure Hello World | | Record format, storage (file-based), immutability, metadata capture. Foundation for state management. |
 | [AVRO Schema and RPC](backlog/avro-schema-and-rpc.md) | High | Runtime Structure Hello World | | AVRO schemas for records and APIs, type checking, composition validation, RPC for client-server communication. |
 | [API State Management](backlog/api-state-management.md) | High | Runtime Structure Hello World<br>Kafka Compatible Records | | State backing mechanism, execution state stack, state transitions, stateless code with state backing. |

@@ -1,15 +1,20 @@
 # Dev Environment API
 
-**Priority:** High (top priority)
-**Type:** Explorative Project
-**Dependencies:** Console API Exploration (patterns), AVRO Schema and RPC (partial)
-**Source:** Project 07 exploration
+**Priority:** High
+**Type:** Implementation Project
+**Dependencies:** spl/execute API, spl/bug API
+**Phase:** 2 - Complete Implementation Pipeline
+**Source:** Project 07 exploration, Project 08 foundation
 
 ---
 
 ## Overview
 
-Turn the dev environment patterns from Project 07 into a full infrastructure asset. The Dev Environment API enables autonomous development through self-contained, requirement-driven workflows.
+Complete the Dev Environment API - the remaining 6 methods from Project 08 foundation. Turn the module structure and selfeval pattern into a full working API.
+
+**Project 08 delivered:** 4-level module structure, executable selfeval pattern, test runner, delegation stepping stone.
+
+**Phase 2 delivers:** The actual API methods (install, submit, cycle, status, extract, destroy).
 
 ---
 
