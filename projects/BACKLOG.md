@@ -16,8 +16,8 @@ Phased approach to get implementation infrastructure working.
 
 | Backlog Item | Priority | Dependencies | Addons | Comments |
 |--------------|----------|--------------|--------|----------|
-| [spl/pipeline API](backlog/spl-pipeline-api.md) | High | Console API patterns | [Pipeline Islands](backlog/addons/pipeline-islands-pattern.md) | Pipeline orchestration with context management. Islands in sea of free script. |
-| [spl/bug API](backlog/spl-bug-api.md) | High | spl/pipeline API | | Bug report as API state. Captures failure context for reconstruction. |
+| [Console v5 Stream Native](backlog/console-v5-stream-native.md) | **Critical** | Console API v4 | [Pipeline Islands](backlog/addons/pipeline-islands-pattern.md) | **Project 09:** Build spl/pipeline by converting console to stream-native. Design through use. Foundation for everything. |
+| [spl/bug API](backlog/spl-bug-api.md) | High | Console v5 (pipeline proven) | | Bug report as API state. Captures failure context for reconstruction. Bug reports from event streams. |
 
 ### Phase 2 - Complete Pipeline
 
