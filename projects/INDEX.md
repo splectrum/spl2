@@ -2,7 +2,9 @@
 
 ## Active Projects
 
-*None currently*
+| Code | Name | Status | Started |
+|------|------|--------|---------|
+| 09-console-v5-stream-native | Console v5 Stream Native | Initiated | 2025-11-21 |
 
 ## Completed Projects
 
@@ -307,6 +309,26 @@
 - Partnership evolving naturally toward higher autonomy
 
 **See:** `projects/08-dev-environment-api/LESSONS_LEARNED.md` for full details
+
+### 09-console-v5-stream-native
+**Objective:** Convert Console API v4 to stream-native execution, discover event model and handler patterns
+
+**Project Type:** Explorative Project
+
+**Status:** Initiated - Project creation complete, awaiting PROJECT_PLAN
+
+**Background:**
+Comprehensive design session (chats/2025-11-21_project-09-planning-and-itil-dsl.md) established stream-native execution model, pipeline islands pattern, and partnership contract.
+
+**Scope:**
+- Convert Console v4 to event-based execution
+- Discover event schema through real use
+- Implement console handler pattern
+- Write high-confidence self-evals
+- Prove event-based reconstruction
+- Validate Approach B (specialized handlers)
+
+**See:** `projects/09-console-v5-stream-native/PROJECT_BRIEF.md` for full details
 
 ---
 

@@ -1,27 +1,18 @@
 # Current Status
 
-**Last Updated:** 2025-11-20
+**Last Updated:** 2025-11-21
 
 ---
 
 ## Active Project
 
-*None currently*
+**Project 09: Console v5 Stream Native** (Initiated 2025-11-21)
 
----
+Convert Console API v4 to stream-native execution. Discover event model, handler patterns, and self-eval requirements through real implementation.
 
-## Next Up
+**Current Phase:** Project initiation complete (autonomous), awaiting PROJECT_PLAN (collaborative)
 
-**Two high priority items:**
-
-1. **CIP Processing** - Process accumulated CIPs
-2. **AVRO Wrapper API** - SPL2 wrapper for schema operations
-
-Or continue dev environment work:
-- Implement remaining 6 methods (install, submit, cycle, status, extract, destroy)
-- Deploy as usable API
-
-See: `projects/BACKLOG.md`
+**See:** `projects/09-console-v5-stream-native/DAILY_LOG.md`
 
 ---
 
@@ -33,6 +24,20 @@ See: `projects/BACKLOG.md`
 | 07 - Console API Exploration | 2025-11-19 | v7 wrapper API, 3 design docs, status/ spot, CIP-015 |
 | 06 - Glossary Term Requirements | 2025-11-18 | 67+ term reqs, unified glossary structure |
 | 05 - Foundation Update | 2025-11-17 | Headlines format, design/ spot, friction as KPI |
+
+---
+
+## Design Session
+
+**2025-11-21:** Comprehensive design exploration established:
+- Pipeline islands in sea of free script
+- Stream-native execution (Approach B: specialized handlers)
+- Partnership contract (architect/builder, local rules apply)
+- Self-evals as linchpin for distributed validation
+- Lifecycle trinity (spl/dev, spl/test, spl/node)
+- Language as capability enabler
+
+**See:** `chats/2025-11-21_project-09-planning-and-itil-dsl.md`
 
 ---
 
