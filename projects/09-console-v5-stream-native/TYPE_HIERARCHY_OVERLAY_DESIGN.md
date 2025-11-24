@@ -451,6 +451,182 @@ const apiMethod = base('spl/console/log')
 
 ---
 
+## Hierarchy Map: One Search Sequence Per Node
+
+### Build Once, Use Throughout Development
+
+**On environment deployment, build hierarchy map for all nodes:**
+
+```javascript
+// hierarchy.json (generated on deploy)
+{
+  // Each node gets tailored search sequence based on its type
+
+  'spl/dev/create': {
+    instanceOf: 'api_method',
+    layerSequence: [
+      'modules/pr09/spl/dev/create',
+      'base/spl/dev/create',
+      'models/api_method',
+      'models/api_node'
+    ]
+  },
+
+  'spl/console': {
+    instanceOf: 'api',
+    layerSequence: [
+      'modules/pr09/spl/console',
+      'base/spl/console',
+      'models/api',              // different type
+      'models/api_node'
+    ]
+  },
+
+  'spl': {
+    instanceOf: 'package',
+    layerSequence: [
+      'modules/pr09/spl',
+      'base/spl',
+      'models/package',          // different type
+      'models/api_node'
+    ]
+  }
+}
+```
+
+### Two Overlay Operations
+
+**1. File Selection (First Match Wins)**
+
+Use case: Get implementation file (index.js, README.md, schema.avsc)
+
+```javascript
+function selectFile(nodePath, filename) {
+  const node = hierarchyMap[nodePath]
+
+  for (const layer of node.layerSequence) {
+    const path = `${layer}/${filename}`
+    if (fs.existsSync(path)) {
+      return path  // STOP - first match wins
+    }
+  }
+
+  return null  // Not found
+}
+
+// Example: Get index.js for spl/dev/create
+selectFile('spl/dev/create', 'index.js')
+  → modules/pr09/spl/dev/create/index.js (not exists)
+  → base/spl/dev/create/index.js (EXISTS) ✓ RETURN THIS
+  → [stops here - found the file]
+```
+
+**Effect:** If work module doesn't implement, falls back to base default
+
+**Benefit:** Can run tests even with partial implementation! Base provides working defaults.
+
+**2. Collect All (Accumulate From All Layers)**
+
+Use case: Get all self-evals, requirements, schemas (for validation or merging)
+
+```javascript
+function collectAll(nodePath, pattern) {
+  const node = hierarchyMap[nodePath]
+  const collected = []
+
+  for (const layer of node.layerSequence) {
+    const searchPath = `${layer}/${pattern}`
+    const found = glob.sync(searchPath)
+    collected.push(...found)  // ACCUMULATE - keep searching
+  }
+
+  return collected  // All matches from all layers
+}
+
+// Example: Get all self-evals for spl/dev/create
+collectAll('spl/dev/create', '_reqs/*_selfeval.js')
+  → modules/pr09/spl/dev/create/_reqs/spl_dev_create_*_selfeval.js
+  → base/spl/dev/create/_reqs/spl_dev_create_*_selfeval.js
+  → models/api_method/_reqs/api_method_*_selfeval.js
+  → models/api_node/_reqs/api_node_*_selfeval.js
+  → [all collected, all must pass]
+```
+
+**Effect:** Complete test suite = instance + all type levels
+
+**Benefit:** Full validation across entire inheritance chain
+
+### Operation Summary
+
+| Operation | Strategy | Use Cases |
+|-----------|----------|-----------|
+| **selectFile()** | First match (stop) | index.js, README.md, schema.avsc |
+| **collectAll()** | Accumulate (continue) | self-evals, requirements, schemas |
+
+### Progressive Refinement Pattern
+
+**Default implementations enable partial work:**
+
+```
+Scenario: Work module just starting, no index.js yet
+
+Work module: (no index.js)
+Base layer: index.js (generic implementation)
+Result: selectFile() returns base implementation
+
+Tests run with base default!
+→ Might even pass (if base is good enough)
+→ Gradually override specific parts
+→ Tests validate overrides against full type chain
+```
+
+**This enables:**
+1. Start work module with just requirements
+2. Run tests → uses base implementation
+3. Tests might pass! (base provides working default)
+4. Gradually add specific implementations
+5. Tests validate your changes against full inheritance
+
+**Progressive refinement** through overlay defaults.
+
+### Exporting Partial Implementations
+
+**If work module has no specific implementation:**
+
+```
+modules/pr09/spl/dev/create/
+└── _reqs/
+    └── spl_dev_create_v1.0.0.md  (just requirements)
+
+Extract runs:
+→ No specific index.js in work module
+→ Uses base/spl/dev/create/index.js
+→ Merges requirements from all layers
+→ Output: Complete default module with merged reqs
+```
+
+**Result:** Extract always produces complete, working module (default or specific)
+
+### Hierarchy Map Stability
+
+**Map only changes when structure changes:**
+
+**Rebuild hierarchy when:**
+- Deploy new environment
+- Install changes base layer
+- Types added/modified in models/
+- Work module structure changes (new node added)
+
+**Don't rebuild when:**
+- Edit files in work module ✓
+- Add/remove files in existing node ✓
+- Test runs ✓
+- Extract runs ✓
+
+**Why stable:** Map contains layer sequences, not file inventories. Structure changes rarely (install events), content changes constantly (development). Perfect separation.
+
+---
+
 ## Implementation Roadmap
 
 ### v1.1: Foundation
