@@ -388,3 +388,26 @@ events/
 ---
 
 **These explorations inform Product Twin 1 implementation design.**
+
+---
+
+## Implementation Status (2025-11-23)
+
+**Iteration 1 implemented** using fire-and-forget + handler daemon pattern.
+
+**Key implementation decisions:**
+
+1. **Functional scripts first** - dev/src/ contains functional implementation, proper API structure deferred to Product Twin 2
+2. **Stateless handler** - No handler state events needed for iteration 1 (simple sequential arithmetic)
+3. **Request events only** - Stream: `request/{requestId}/` contains step 0 (pending) and step 1 (completed)
+4. **Atomic writes working** - data.js already implements temp+rename pattern
+5. **File watcher pattern** - handler-daemon.js uses fs.watch() to detect new request files
+
+**Files:**
+- dev/src/data.js - Data operations (publish, consume, seek, read, write)
+- dev/src/invoke.js - Fire-and-forget request creation
+- dev/src/handler-daemon.js - Queue processor with file watcher
+- dev/src/iteration-1-async-test.js - Test harness
+- dev/src/iteration-1-check-results.js - Result verification
+
+**Next:** Test iteration 1, then implement iterations 2-4 (precedence, nested, multi-nested)

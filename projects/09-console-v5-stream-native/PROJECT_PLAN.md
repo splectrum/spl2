@@ -156,14 +156,133 @@ Validate that events contain what's needed.
 
 ## Execution Approach
 
+### Iteration Structure
+
+Project uses versioned iteration environments (`dev/vX.Y/`) following pr08/v4 pattern:
+- Each iteration is self-contained with deploy/test scripts
+- Iterations are independent (no shared folders)
+- Clone and modify pattern for low friction
+- See `dev/ITERATION_PLAN.md` for arithmetic exercise details
+
+### Iteration 0: Blank Dev Install Template
+
+**Purpose:** Create reusable template for all iterations
+
+**Deliverables:**
+- `dev/v0.0/` - Blank iteration environment cloned from pr08/v4
+- `package.json` - Dependencies setup (avsc, etc.)
+- `deploy.sh` - Setup script (install deps, create structure, run tests)
+- `test.sh` - Test runner (find and run all tests)
+- `destroy.sh` - Cleanup script
+- `_reqs/` - Requirements folder with iteration env spec
+- Complete structure ready to clone for v1.0, v1.1, etc.
+
+**Pattern:**
+- Clone pr08/v4 structure
+- Adapt for pr09 needs
+- Document for future iterations
+
 ### Stage 1: Building Blocks (Product 1)
 
-1. Design event structure
-2. Implement queue mechanics (file-based)
-3. Create generic executor (lift, filter, route)
-4. Build simple handler (mechanical sequential)
-5. Prototype and validate
-6. Document patterns discovered
+**Iteration 1.0: Fire-and-Forget Pattern** ✅ COMPLETE
+
+**Purpose:** Prove basic sequential execution with async processing
+
+**Deliverables:**
+- Fire-and-forget request submission (invoke exits immediately)
+- Handler daemon watches queue, processes asynchronously
+- Sequential arithmetic handler (processes `3 + 5 - 2` step-by-step)
+- Event persistence to filesystem
+- Test harness with 4 test cases
+- WSL2 polling workaround (fs.watch limitation)
+
+**Key discoveries:**
+- Each processing step fires next step event
+- Handler daemon uses sequential step tracking (lastProcessedStep Map)
+- Polling-based file watching (100ms) for WSL2 compatibility
+- Event streams need cursors, not full scans
+- Modular architecture: daemon-core + handler separation
+
+**Iteration 1.1: Namespace Structure & State Context**
+
+**Purpose:** Establish pr09 namespace and structured event format
+
+**Deliverables:**
+- `pr09/state/context.js` - ExecutionContext wrapper
+- `pr09/state/context-test.js` - Context tests
+- `pr09/handling/arithmetic1.js` - Handler using context
+- `pr09/handling/arithmetic1-test.js` - Handler tests
+- Namespace structure: `headers.pr09.*` for metadata, `value` for payload
+- Handler-specific hives (arithmetic, validation, logging)
+- Runtime-driven processing (requestcomplete flag, not step numbers)
+
+**Event structure:**
+```javascript
+{
+  headers: {
+    pr09: {
+      request: { id: "req-..." },
+      runtime: {
+        requestcomplete: false,
+        errorthrown: false,
+        status: "pending",
+        timestamp: "..."
+      },
+      arithmetic: { /* handler hive */ }
+    }
+  },
+  value: "3 + 5 - 2"  // Direct payload, not namespaced
+}
+```
+
+**Iteration 1.2: Event Router & Handler Registry**
+
+**Purpose:** Separate routing from daemon, enable multiple handler types
+
+**Deliverables:**
+- Event router (examines event, selects handler)
+- Handler registry (maps handler types to implementations)
+- Daemon becomes generic (watch → route → publish)
+- Multiple handler types supported
+- Routing based on event metadata
+
+**Iteration 1.3: Exception Handlers & Error Events**
+
+**Purpose:** Separate error handling from happy path
+
+**Deliverables:**
+- Exception handler pattern
+- Error event structure
+- Happy path handlers stay clean (single concern)
+- Error handlers in separate modules
+- Error propagation through event stream
+
+**Iteration 1.4: Middleware & Cross-Cutting Concerns**
+
+**Purpose:** Extract logging, validation, etc. from handlers
+
+**Deliverables:**
+- Middleware pattern for daemon
+- Logging middleware
+- Validation middleware
+- Handler focus on business logic only
+- Housekeeping doesn't interfere with processing
+
+**Iteration 1.5: Polish & Documentation**
+
+**Purpose:** Prepare for iteration 2 (operator precedence)
+
+**Deliverables:**
+- Complete iteration 1.x documentation
+- Pattern extraction (what works, what doesn't)
+- Cleanup and refactor
+- Ready for iteration 2 arithmetic complexity
+
+**Iteration 2: Operator Precedence** (See ITERATION_PLAN.md)
+
+**Iteration 3: Nested Expressions** (See ITERATION_PLAN.md)
+
+**Iteration 4: Multi-Nested Expressions** (See ITERATION_PLAN.md)
 
 ### Stage 2: Migration (Product 2)
 
