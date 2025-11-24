@@ -386,3 +386,202 @@ v0/
 - v0 is the first properly reusable dev env package
 
 **Next:** Clone v0 to v1.0 and organize iteration 1.0 work (fire-and-forget pattern)
+
+---
+
+## 2025-11-24 (Session 2)
+
+### v0 Refinement: install/ folder and clone.js
+
+**install/ folder added:**
+- Problem: Template files cluttering root directory
+- Solution: `install/` folder for all environment assets
+- Contains: `package.json.template`, `install.js` hook
+- Deploy script copies from `install/` to new environments
+- Keeps root clean and organized
+
+**clone.js script created:**
+- Turnkey iteration creation from v0
+- Automatically updates package.json (name, version, description)
+- Parses destination folder name (v1.0 → version 1.0.0)
+- Makes all scripts executable
+- Usage: `node clone.js ../v1.1`
+
+**Pattern decision:**
+- JS scripts instead of bash (more consistent, easier to maintain)
+- All scripts: deploy.js, test.js, destroy.js, clone.js
+- ES modules enabled in v0 package.json
+
+**v0 final structure:**
+```
+v0/
+├── README.md
+├── package.json             # Enable ES modules
+├── clone.js                 # NEW: Turnkey cloning
+├── deploy.js, test.js, destroy.js
+├── install/                 # NEW: Assets folder
+│   ├── package.json.template
+│   └── install.js          # Optional hook
+├── implementation/
+└── environments/
+```
+
+---
+
+### v1.0 Creation and Organization
+
+**Cloned from v0:**
+- Used `node clone.js ../v1.0`
+- package.json automatically updated
+- All scripts ready to use
+
+**Iteration 1.0 work copied:**
+- 7 files from dev/src/ to v1.0/implementation/pr09/:
+  - data.js (data layer operations)
+  - daemon-core-v2.js (generic daemon)
+  - iteration-1-handler-v2.js (arithmetic handler)
+  - invoke-v2.js (client interface)
+  - install-handler.js (start daemon)
+  - uninstall-handler.js (stop daemon)
+  - test-workflow.js (integration test)
+
+**v1.0 README created:**
+- Documents what iteration accomplished
+- Lists all files with descriptions
+- Shows event structure (V2)
+- Usage instructions
+- Test results (4/4 passing)
+- Key discoveries documented
+
+**Deployed successfully:**
+- `node deploy.js` creates environment
+- Environment: `env-1763988185891`
+- All files copied to modules/pr09/
+
+---
+
+### Critical Issue Discovered: CommonJS vs ES Modules
+
+**Problem found during testing:**
+- v1.0 work files use CommonJS (`require`, `module.exports`)
+- Environment package.json has `"type": "module"`
+- Test execution fails with: "require is not defined in ES module scope"
+
+**Root cause:**
+- Original dev/src/ work done in CommonJS
+- v0 template uses ES modules (for deploy/test/destroy scripts)
+- Environment inherits ES module setting
+- Work files incompatible
+
+**Files needing conversion (all 7):**
+- daemon-core-v2.js
+- data.js
+- install-handler.js
+- invoke-v2.js
+- iteration-1-handler-v2.js
+- test-workflow.js
+- uninstall-handler.js
+
+**Options:**
+1. Convert all files to ES modules (import/export)
+2. Change environment to CommonJS (remove "type": "module")
+3. Use .cjs extensions for CommonJS files
+
+**Decision needed:** Follow splectrum standard (ES modules)
+
+---
+
+### Missing: Extraction/Reporting Mechanism
+
+**Issue identified:**
+- Deployed and tested, but no test reports saved
+- No mechanism to extract "new state" work module
+- Pattern from pr08/v4: `extract` method creates install candidate
+
+**What's missing:**
+1. **Reports folder** - Capture test results, validation logs
+2. **Extract script** - Copy successful work module to install candidate
+3. **Status tracking** - Mark iteration as "ready for install"
+
+**pr08/v4 pattern:**
+- Work module after testing returns "new state"
+- If fully implemented → install candidate
+- extract/ method in spl/dev API
+
+**Need to add:**
+- `extract.js` script to v0 template
+- Reports folder in environment structure
+- Test result persistence
+- Extract workflow: test → validate → extract → install candidate
+
+---
+
+### Documentation Updates
+
+**PROJECT_PLAN updated:**
+- Added iteration 0 (blank dev install template)
+- Added iteration 1.0 (fire-and-forget pattern) ✅ COMPLETE
+- Added iterations 1.1-1.5 (namespace, router, exceptions, middleware, polish)
+- References to ITERATION_PLAN.md for arithmetic exercise
+
+**DAILY_LOG updated:**
+- Complete session 1 notes preserved
+- Session 2 work documented
+- All decisions and discoveries captured
+
+---
+
+### Committed and Pushed
+
+**Commit:** "Project 09: v0 dev env package + v1.0 iteration complete"
+
+**61 files changed, 5478 insertions(+)**
+
+Includes:
+- Complete v0 package (clone.js, install/ folder, all scripts)
+- Complete v1.0 iteration (7 work files, README, deployed environment)
+- Updated PROJECT_PLAN and DAILY_LOG
+- dev/src/ with original work (for reference)
+
+---
+
+### Session Status and Next Steps
+
+**Current state:**
+- ✅ v0 reusable dev env package complete
+- ✅ v1.0 iteration cloned and organized
+- ✅ v1.0 README documents accomplishments
+- ✅ All work committed and pushed
+- ❌ v1.0 tests not executable (CommonJS/ES modules mismatch)
+- ❌ No extraction/reporting mechanism yet
+
+**Immediate next session tasks:**
+1. **Convert v1.0 files to ES modules** (7 files)
+   - Change `require()` → `import`
+   - Change `module.exports` → `export`
+   - Test each file after conversion
+
+2. **Full cycle test:**
+   - `node deploy.js`
+   - Run tests in environment
+   - Verify all 4 test cases pass
+   - Capture test results
+
+3. **Add extraction mechanism:**
+   - Create `extract.js` script
+   - Add reports/ folder to environment
+   - Implement test result persistence
+   - Document extraction workflow
+
+4. **Validate pattern:**
+   - Full workflow: deploy → test → extract → destroy
+   - Verify extracted work module is install-ready
+   - Document in v0 README
+
+**Long-term:**
+- Clone v1.0 to v1.1 for namespace structure work
+- Continue through iterations 1.1-1.5
+- Eventually publish v0 to install/ spot at project closure
+
+**Key insight from session:**
+Testing the full cycle reveals issues early. The CommonJS/ES modules mismatch wouldn't have been caught without actually running the tests. This validates the need for the extraction workflow - it forces full cycle validation.
