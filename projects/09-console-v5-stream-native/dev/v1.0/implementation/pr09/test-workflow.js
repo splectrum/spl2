@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 // Test the complete workflow: install → invoke → uninstall
 
-const { invoke } = require('./invoke-v2.js')
+import { invoke } from './invoke-v2.js'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const isMainModule = process.argv[1] === __filename
 
 async function main() {
   console.log('=== Testing Complete Workflow ===\n')
@@ -28,11 +32,11 @@ async function main() {
 }
 
 // Run if called directly
-if (require.main === module) {
+if (isMainModule) {
   main().catch(err => {
     console.error('Test failed:', err)
     process.exit(1)
   })
 }
 
-module.exports = { main }
+export { main }

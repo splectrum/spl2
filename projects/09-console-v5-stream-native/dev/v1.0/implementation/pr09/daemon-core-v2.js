@@ -1,9 +1,9 @@
 // Core daemon v2 - Handler returns events, daemon publishes them
 // Clean separation: watcher polls, handler processes, daemon publishes
 
-const fs = require('fs')
-const path = require('path')
-const data = require('./data.js')
+import fs from 'fs'
+import path from 'path'
+import * as data from './data.js'
 
 /**
  * Create a handler daemon
@@ -113,4 +113,4 @@ function createDaemon(config) {
   return { start, stop }
 }
 
-module.exports = { createDaemon }
+export { createDaemon }

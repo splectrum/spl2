@@ -1,8 +1,12 @@
 #!/usr/bin/env node
 // Uninstall handler daemon - Stop gracefully
 
-const path = require('path')
-const fs = require('fs')
+import path from 'path'
+import fs from 'fs'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const PID_FILE = path.join(__dirname, '../.handler-daemon.pid')
 

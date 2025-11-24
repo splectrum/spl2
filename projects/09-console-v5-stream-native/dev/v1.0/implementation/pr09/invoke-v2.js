@@ -1,7 +1,7 @@
 // Invoke v2 - Submit request and wait for result
 // Fire-and-forget submission, but can optionally wait for completion
 
-const data = require('./data.js')
+import * as data from './data.js'
 
 /**
  * Generate unique request ID
@@ -82,7 +82,7 @@ async function invoke(input, options = {}) {
   return result
 }
 
-module.exports = {
+export {
   generateRequestId,
   createRequest,
   waitForCompletion,

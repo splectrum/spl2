@@ -2,8 +2,12 @@
 // Functional script for iterations 1-4
 // Later: becomes spl/data API with proper module structure
 
-const fs = require('fs')
-const path = require('path')
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 // Base directory for events
 const EVENTS_DIR = path.join(__dirname, '../events')
@@ -157,7 +161,7 @@ function write(topic, data) {
 }
 
 // Export operations
-module.exports = {
+export {
   publish,
   consume,
   seek,

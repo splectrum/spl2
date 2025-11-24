@@ -1,10 +1,14 @@
 #!/usr/bin/env node
 // Install handler daemon - Start queue watcher + handler
 
-const path = require('path')
-const fs = require('fs')
-const { createDaemon } = require('./daemon-core-v2.js')
-const { processRequest } = require('./iteration-1-handler-v2.js')
+import path from 'path'
+import fs from 'fs'
+import { fileURLToPath } from 'url'
+import { createDaemon } from './daemon-core-v2.js'
+import { processRequest } from './iteration-1-handler-v2.js'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const REQUEST_DIR = path.join(__dirname, '../events/request')
 const PID_FILE = path.join(__dirname, '../.handler-daemon.pid')

@@ -82,7 +82,7 @@ function processRequest(requestId, event) {
   }
 }
 
-module.exports = {
+export {
   processRequest,
   parseNextOperation,
   executeOperation

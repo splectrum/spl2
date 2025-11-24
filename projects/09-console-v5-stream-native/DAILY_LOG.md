@@ -585,3 +585,136 @@ Includes:
 
 **Key insight from session:**
 Testing the full cycle reveals issues early. The CommonJS/ES modules mismatch wouldn't have been caught without actually running the tests. This validates the need for the extraction workflow - it forces full cycle validation.
+
+---
+
+## Session 3: 2025-11-24 (ES Module Conversion + Extraction Mechanism)
+
+**Duration:** ~1 hour
+**Focus:** Resolve CommonJS/ES modules issue, complete extraction mechanism
+
+### ES Module Conversion Complete
+
+**Problem resolved:**
+- 7 work files in v1.0/implementation/pr09/ were CommonJS
+- Environment package.json has `"type": "module"`
+- Tests failing with "require is not defined in ES module scope"
+
+**Files converted:**
+1. data.js - Added import/export, __dirname setup
+2. daemon-core-v2.js - Changed require → import
+3. iteration-1-handler-v2.js - Changed module.exports → export
+4. invoke-v2.js - Changed require → import
+5. install-handler.js - Added __dirname setup, changed imports
+6. uninstall-handler.js - Added __dirname setup
+7. test-workflow.js - Changed require.main check to import.meta.url
+
+**Key patterns:**
+- `import { fileURLToPath } from 'url'` for __dirname replacement
+- `const __dirname = path.dirname(fileURLToPath(import.meta.url))`
+- `import * as data from './data.js'` for namespace imports
+- `export { ... }` for named exports
+- `import.meta.url` for entry point detection
+
+### Full Cycle Test Successful
+
+**Workflow executed:**
+1. Deploy: `node deploy.js` → env-1763991250705 created
+2. Install: `node install-handler.js` → daemon started (PID 767639)
+3. Test: `node test-workflow.js` → All 4 tests passed
+4. Uninstall: `node uninstall-handler.js` → daemon stopped gracefully
+
+**Test results (all passed):**
+- `3 + 5 - 2 = 6` (3 steps)
+- `10 + 20 + 30 = 60` (3 steps)
+- `100 - 50 - 25 = 25` (3 steps)
+- `7 + 3 + 1 + 9 = 20` (4 steps)
+
+**Handler daemon processing visible:**
+- Step-by-step event publishing logged
+- Fire-and-forget pattern working correctly
+- Poll-based queue processing functioning
+- Graceful shutdown working
+
+### Extraction Mechanism Added
+
+**Created extract.js script:**
+- Finds latest (or specified) environment
+- Copies work module to extracted/{envName}/
+- Preserves event logs if present
+- Creates MANIFEST.json with extraction metadata
+
+**Extraction structure:**
+```
+extracted/env-{timestamp}/
+├── pr09/                      # Work module files
+├── events/                    # Event logs (if any)
+└── MANIFEST.json              # Extraction metadata
+```
+
+**Workflow validated:**
+- Deploy → Test → Extract → Destroy
+- All steps working correctly
+- Extract preserves work for install candidate
+- Destroy cleans up after extraction
+
+**Scripts added:**
+- v0/extract.js (template)
+- v1.0/extract.js (copy)
+
+### Pattern Complete
+
+**v0 package now has:**
+- deploy.js - Create environment
+- test.js - Run tests
+- extract.js - Create install candidate ✅ NEW
+- destroy.js - Clean up
+- clone.js - Clone to new iteration
+
+**Full dev workflow:**
+1. Modify implementation/pr09/
+2. `node deploy.js` → fresh environment
+3. `node test.js` → verify tests pass
+4. `node extract.js` → capture install candidate
+5. Review extracted/ for next iteration
+6. `node destroy.js` → clean up
+
+### Session Status
+
+**Completed:**
+- ✅ ES module conversion (7 files)
+- ✅ Full cycle test validation (4/4 passing)
+- ✅ Extraction mechanism implementation
+- ✅ Workflow validation (deploy/test/extract/destroy)
+
+**v1.0 state:**
+- Fire-and-forget + handler daemon pattern working
+- ES modules throughout
+- Full dev workflow functional
+- Install candidate extractable
+- Ready for refinement or next iteration
+
+**Next options:**
+1. Clone v1.0 to v1.1 for namespace structure (planned)
+2. Add reports/ folder for persistent test results
+3. Enhanced extraction with test summaries
+4. Begin iteration 1.1 work
+
+### Key Learnings
+
+**ES modules in Node.js:**
+- `__dirname` not available, must reconstruct from import.meta.url
+- Entry point detection changes from `require.main === module` to comparing paths
+- Namespace imports useful for data modules: `import * as data`
+
+**Dev workflow value:**
+- Extract enables capturing "known good" state
+- Extraction before destroy prevents loss
+- Manifest provides traceability
+- Pattern enables rapid iteration
+
+**Testing discoveries:**
+- Fire-and-forget pattern needs async wait in tests
+- Handler daemon processing visible via logging
+- Event streams preserved for audit/reconstruction
+- Poll-based queue processing simple and effective
