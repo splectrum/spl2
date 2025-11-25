@@ -718,3 +718,187 @@ extracted/env-{timestamp}/
 - Handler daemon processing visible via logging
 - Event streams preserved for audit/reconstruction
 - Poll-based queue processing simple and effective
+
+---
+
+## Session 4: 2025-11-25 (Design Evolution & V0 Model Dev Env)
+
+**Duration:** ~3 hours
+**Focus:** Type hierarchy design refinement, dev modules stepping stone, v0 model dev env foundation
+
+### Major Design Work
+
+**1. Overlay + Extraction Pattern Design**
+- Created OVERLAY_EXTRACTION_PATTERN.md
+- Multi-layer overlay resolution (work → base → types → models)
+- Progressive refinement with defaults
+- Extract merges layers for deployment
+- Committed separately as design principle
+
+**2. Type Hierarchy & Overlay Design (Complete Roadmap)**
+- Created TYPE_HIERARCHY_OVERLAY_DESIGN.md
+- Type hierarchy: api_node (base) with package/api/api_method siblings
+- Declaration-driven: types declare "Extends:", instances declare "Instance of:"
+- Upfront validation on env creation
+- Two overlay operations: selectFile() (first match), collectAll() (accumulate)
+- Hierarchy map: one search sequence per node
+- Progressive refinement pattern documented
+- Committed with full architecture
+
+**3. Hierarchy Map Implementation Details**
+- Added hierarchy map section to design doc
+- Layer sequences built once on deploy
+- Stable cache (only rebuilds on structure changes)
+- selectFile() for implementations (falls back to defaults)
+- collectAll() for self-evals/requirements (accumulates all layers)
+- Export behavior: always produces complete module
+- Committed as design enhancement
+
+### Stepping Stone Created
+
+**dev modules (extends modules):**
+- Created dev modules_v1.0.0.md
+- Type-aware modules folder for dev environments
+- Layer 0 = types/, Layers 1..n-1 = base modules, Layer n = work module
+- Overlay resolution with selectFile/collectAll
+- Dev-only (not in production/runtime)
+- Added to STEPPING_STONES_GLOSSARY.md
+- Fixed naming: "dev modules" with space (not hyphen)
+- Added version post-amble: **Version:** 1.0.0
+
+### Practical Patterns Discovered
+
+**File Naming & Versioning:**
+- External (stepping stones): versioned filenames (`term_v1.0.0.md`)
+- Internal (bundles): generic filenames (`term.md`)
+- Version tracked in post-amble internally
+- Stable references in bundles, no link breakage
+
+**Glossary Conventions:**
+- Stepping stones: space separator (`dev modules`)
+- DSL: underscore separator (`api_node`)
+- Different purposes: methodology vs runtime vocabulary
+
+**V0 Model Dev Env Pattern:**
+- V0 as always-current portable template
+- Lives in latest project: `projects/09-.../dev/v0/`
+- Self-contained with all docs/types/patterns
+- Clone and use anywhere
+
+### V0 Model Dev Env Started
+
+**Structure created:**
+```
+dev/v0/
+├── docs/                   # Clean req files only
+│   ├── modules.md          # Generic filename, version in post-amble
+│   └── dev modules.md      # Generic filename, version in post-amble
+├── modules/                # Dev modules structure
+│   └── types/              # Layer 0 (created, empty)
+└── ... (existing scripts)
+```
+
+**Working documents in project root:**
+- PRACTICAL_PATTERNS.md - File naming, bundling, conventions
+- DATA_VS_LANGUAGE.md - Mycelium vs DSL distinction
+
+### Foundational Understanding Developed
+
+**Data vs Language Distinction:**
+- Mycelium: Data structures + data change events (the "what")
+- DSL: Operators/methods that generate events (the "how")
+- Uniform pattern: data structure name = API name
+- Example: `api_node` data structure + `spl/api_node/` API
+- Inheritance: derived data structures get parent API methods
+
+**Naming Conventions Confirmed:**
+- DSL uses underscore: `api_node`, `api_method`
+- URI separator: forward slash `/`
+- Example: `spl/api_node/validate/`
+- Consistent, discoverable, low friction
+
+### Session Status
+
+**Completed:**
+- ✅ Overlay + extraction pattern documented
+- ✅ Type hierarchy complete design
+- ✅ Hierarchy map implementation details
+- ✅ dev modules stepping stone created and registered
+- ✅ Version post-amble pattern established
+- ✅ V0 structure started (docs/ and modules/ created)
+- ✅ Foundational understanding documented
+- ✅ Data vs language distinction clarified
+
+**In Progress:**
+- ⏸ V0 model dev env population (modules/types/ needs node type folders)
+- ⏸ Node type requirements (api_node, package, api, api_method)
+- ⏸ Status/CURRENT.md update (note v0 location)
+
+**Next Session:**
+1. Create node type folders in modules/types/
+2. Write requirements for each node type
+3. Create _index.json for modules/
+4. Update status/CURRENT.md with v0 location
+5. Update v0 README with model dev env explanation
+6. Ready to start v1.1 iteration work
+
+### Key Decisions
+
+**1. V0 is always-current model:**
+- Update it as patterns evolve
+- Lives in latest project
+- Portable, self-contained
+- Clone for new iterations
+
+**2. Working docs vs bundle docs:**
+- Working docs in project root (PRACTICAL_PATTERNS.md, etc.)
+- Bundle docs in v0/docs/ (clean req files only)
+- Distill working docs to summaries at project closure
+
+**3. Version tracking:**
+- Filenames: versioned externally, generic in bundles
+- Post-amble: **Version:** x.y.z in all touched req files
+- Incremental: only add when we touch files, no mass upgrade
+
+**4. Glossary separation:**
+- Stepping stones: methodology/dev concepts (space separator)
+- DSL: runtime vocabulary (underscore separator)
+- Clear distinction based on: "exists at runtime?"
+
+### Design Artifacts Created
+
+**Project root:**
+1. OVERLAY_EXTRACTION_PATTERN.md - Overlay + extraction design
+2. TYPE_HIERARCHY_OVERLAY_DESIGN.md - Complete architecture roadmap
+3. PRACTICAL_PATTERNS.md - Working patterns (file naming, bundling, etc.)
+4. DATA_VS_LANGUAGE.md - Mycelium vs DSL foundational distinction
+5. dev modules_v1.0.0.md - Stepping stone (also in glossary)
+
+**All committed and pushed** (multiple commits during session)
+
+### Insights
+
+**Low friction prerequisites:**
+- Clear understanding of data vs language
+- Consistent naming conventions
+- Predictable patterns everywhere
+- Discoverable structure
+- Good understanding reduces friction
+
+**Progressive refinement enabled:**
+- Overlay provides defaults
+- Work module can start minimal
+- Tests run with base implementations
+- Gradually override specific parts
+- Extract produces complete module
+
+**Uniform DSL pattern:**
+- Every data structure has associated API
+- Same name for both (e.g., `api_node`)
+- Natural inheritance
+- Clear, discoverable
+
+**Version 1.0.0 note:**
+- Added version post-amble to touched req files
+- Pattern established for future req files
+- Clean separation: versioned source, generic bundle references

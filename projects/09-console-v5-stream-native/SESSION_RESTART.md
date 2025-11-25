@@ -1,6 +1,6 @@
 # Session Restart Guide - Project 09
 
-**Last Updated:** 2025-11-23
+**Last Updated:** 2025-11-25
 
 ---
 
@@ -9,214 +9,280 @@
 **Project:** Console v5 Stream Native (Exploration)
 
 **Phase:** Product Twin 1 - Building Blocks Exploration
-
-**Stage:** Iteration 1 implementation complete, ready for testing
+**Stage:** V0 model dev env foundation in progress
 
 ---
 
-## What We've Built
+## Where We Are
 
-### Iteration 1: Simple Sequential Arithmetic
+**Iteration 1.0:** Complete ✅
+- Fire-and-forget + handler daemon pattern validated
+- ES modules conversion complete
+- Full cycle tests passing (4/4)
+- Extraction mechanism added
 
-**Pattern:** Fire-and-forget + Handler daemon
+**V1.1 Preparation:** Design complete, implementation ready to start
+- Complete type hierarchy design documented
+- Overlay + extraction pattern defined
+- Dev modules stepping stone created
+- V0 model dev env structure started
 
-**Files:** `dev/src/`
-- `data.js` - Data operations (publish, consume, seek, read, write)
-- `invoke.js` - Fire-and-forget request creation
-- `handler-daemon.js` - Queue processor with file watcher
-- `iteration-1-async-test.js` - Test harness (4 test cases)
-- `iteration-1-check-results.js` - Result verification
+**Next:** Populate v0 model dev env, then begin v1.1 iteration
 
-**Test cases:** `3 + 5 - 2`, `10 + 20 + 30`, `100 - 50 - 25`, `7 + 3 + 1 + 9`
+---
+
+## V0 Model Dev Env (Current Focus)
+
+**Location:** `projects/09-console-v5-stream-native/dev/v0/`
+
+**Purpose:** Always-current, portable, self-contained development environment template
+
+**Current state:**
+```
+dev/v0/
+├── docs/                       # ✅ Created with clean req files
+│   ├── modules.md              # Generic filename, version in post-amble
+│   └── dev modules.md          # Generic filename, version in post-amble
+├── modules/                    # ✅ Created, needs population
+│   └── types/                  # ⏸ Empty - needs node type folders
+├── implementation/pr09/        # ✅ Exists from v1.0
+├── install/                    # ✅ Exists
+├── package.json                # ✅ Exists
+└── deploy.js, test.js, etc.   # ✅ Exist
+```
+
+**To complete v0:**
+1. Create node type folders: modules/types/{api_node, package, api, api_method}/
+2. Write requirements for each node type
+3. Create modules/_index.json (layer ordering)
+4. Update v0/README.md (model dev env explanation)
+5. Update status/CURRENT.md (note v0 location)
+
+---
+
+## Major Design Artifacts
+
+**All in project root:**
+
+1. **OVERLAY_EXTRACTION_PATTERN.md**
+   - Multi-layer overlay resolution
+   - Progressive refinement with defaults
+   - Extract merges layers for deployment
+
+2. **TYPE_HIERARCHY_OVERLAY_DESIGN.md**
+   - Complete architecture roadmap
+   - Type hierarchy: api_node (base) with siblings
+   - Declaration-driven resolution
+   - Hierarchy map: one search sequence per node
+   - Two operations: selectFile() + collectAll()
+
+3. **PRACTICAL_PATTERNS.md**
+   - File naming & versioning patterns
+   - Bundle documentation strategy
+   - Glossary conventions
+   - Version post-amble pattern
+
+4. **DATA_VS_LANGUAGE.md**
+   - Mycelium vs DSL distinction
+   - Data structures vs operators
+   - Uniform naming pattern
+   - Foundational understanding
+
+5. **dev modules_v1.0.0.md**
+   - Stepping stone (also in glossary)
+   - Type-aware modules for dev environments
+   - Extends base modules pattern
+
+**Status:** All committed and pushed
 
 ---
 
 ## Key Design Decisions
 
-### 1. Functional Scripts First, API Structure Later
+### 1. V0 as Always-Current Model
 
-**Now:** `dev/src/` - Functional implementation for iterations 1-4
-**Later (Product Twin 2):** Proper `spl/data` API with Project 08 module structure
+- Lives in latest project
+- Update as patterns evolve
+- Portable, self-contained
+- Clone for new iterations
 
-**Reason:** Focus on handler-request-pipeline interaction patterns, not API formalism
+### 2. Overlay Resolution Strategy
 
-### 2. Fire-and-Forget + Handler Daemon Pattern
+**Two operations:**
+- **selectFile():** First match wins (get implementation, fall back to defaults)
+- **collectAll():** Accumulate from all layers (get all self-evals/requirements)
 
-**Free script (invoke.js):**
-- Creates step 0 request event
-- Exits immediately (doesn't wait)
+**Layer structure:**
+- Layer 0: types/ (node type definitions)
+- Layers 1..n-1: named base modules (by package)
+- Layer n: work module (project-specific)
 
-**Handler daemon (handler-daemon.js):**
-- Watches `events/request/` folder for new files
-- File watcher (fs.watch) detects new complete files
-- Processes step 0 requests asynchronously
-- Creates step 1 completion events
+### 3. File Naming Conventions
 
-**Critical:** Atomic writes (temp+rename) ensure listener only sees complete files
+**External (stepping stones):** Versioned filenames
+- `dev modules_v1.0.0.md`
+- Referenced in glossaries
 
-### 3. Stateless Handler = No Handler State Events
+**Internal (bundles):** Generic filenames
+- `dev modules.md`
+- Version in post-amble: `**Version:** 1.0.0`
+- Stable references, no link breakage
 
-**Iteration 1:** Handler has no internal state
-**Result:** Only request events needed: `request/{requestId}/`
-**No:** Handler state events stream
+### 4. Glossary Separation
 
-### 4. Request Processing Completes When Output is Single Number
+**Stepping stones:** Space separator
+- `dev modules`, `base module`
+- Methodology/dev concepts
+- Test: "Only exists during development"
 
-**Step 0:** Input expression, status: pending
-**Step 1:** Output result, status: completed
-**Done:** Single number result means processing complete
+**DSL:** Underscore separator
+- `api_node`, `api_method`
+- Runtime vocabulary
+- Test: "Exists at runtime"
 
----
+### 5. Data vs Language
 
-## Architecture Patterns Established
+**Mycelium:**
+- Data structures (`api_node`, `package`, etc.)
+- Data change events (DCE)
+- The "what" that flows
 
-### Data Layer (Filesystem Implementation)
+**DSL:**
+- Operators/methods (`spl/api_node/`, `spl/package/`, etc.)
+- Generate/process events
+- The "how" that executes
 
-**Operations:**
-- `publish(topic, event)` - Create new event (append-only, atomic)
-- `consume(topic, options)` - Read events in order
-- `seek(topic, position)` - Jump to position ('latest', 'first', index)
-- `read(topic)` - Get latest (convenience wrapper)
-- `write(topic, data)` - Create new version (convenience wrapper)
-
-**Atomic writes:** temp file + rename (critical for listener pattern)
-
-**Topic structure:** `events/{topic}/{timestamp}.json`
-
-### Event Structure
-
-**Flat, simple, metadata in header:**
-```javascript
-{
-  requestId: "req-...",
-  step: 0,
-  input: "3 + 5 - 2",
-  status: "pending",
-  metadata: {
-    timestamp: "...",
-    topic: "request/req-..."
-  }
-}
-```
-
-**Not:** Nested multilevel structures (current/runtime/history/metadata)
-**Instead:** Flat request data + metadata header
-
-### Fire-and-Reference Pattern
-
-**Not:** Fire-and-forget
-**Pattern:** Fire-and-reference (events preserved, references enable reconstruction)
-
-**Top-down references:** Pipeline → steps (happy path)
-**Bottom-up index:** If required (exception scenarios)
+**Uniform pattern:** Data structure name = API name
 
 ---
 
-## Testing Iteration 1
+## Next Session Tasks
 
-**1. Start handler daemon:**
-```bash
-cd projects/09-console-v5-stream-native/dev/src
-node handler-daemon.js
-```
+### Immediate: Complete V0 Model Dev Env
 
-**2. In another terminal, submit test requests:**
-```bash
-cd projects/09-console-v5-stream-native/dev/src
-node iteration-1-async-test.js
-```
+1. **Create node type folders:**
+   ```bash
+   cd dev/v0/modules/types
+   mkdir api_node package api api_method
+   ```
 
-**3. Check results:**
-```bash
-node iteration-1-check-results.js
-```
+2. **Write requirements for each node type:**
+   - api_node (base type, no extends)
+   - package (extends api_node)
+   - api (extends api_node)
+   - api_method (extends api_node)
+   - Each with: _reqs/ folder, req file, basic self-eval
 
-**Expected:** All 4 test cases pass, audit trail shows step 0 → step 1 progression
+3. **Create modules/_index.json:**
+   ```json
+   {
+     "layers": [
+       { "name": "types", "type": "types" }
+     ]
+   }
+   ```
 
----
+4. **Update status/CURRENT.md:**
+   Add highly visible note about v0 model dev env location
 
-## Next Steps
+5. **Update v0/README.md:**
+   Explain model dev env concept, structure, usage
 
-### Immediate: Test Iteration 1
+### Then: Begin V1.1 Iteration
 
-Verify fire-and-forget + handler daemon pattern works correctly.
-
-### After Testing: Iterations 2-4
-
-**Iteration 2:** Operator precedence (`3 + 5 * 3`)
-- Handler intelligence (not just left-to-right)
-- Handler decides execution order
-- Demonstrates Approach B (handler has flow logic)
-
-**Iteration 3:** Nested expressions (`3 * (5 + 7)`)
-- Sub-pipeline pattern
-- Parent/child event coordination
-- Pipeline pattern emerges
-
-**Iteration 4:** Multi-nested (`3 * (5 + 7) / (2 - 3)`)
-- Multiple concurrent sub-pipelines
-- Complex coordination
-- Full pipeline system
+6. Clone v0 to v1.1
+7. Implement namespace structure work:
+   - ExecutionContext wrapper
+   - Handler using context
+   - Structured event format
+   - Handler-specific hives
 
 ---
 
-## Key Exploration Documents
+## Important Files to Review
 
-**Design notes:**
-- `API_ECOSYSTEM_NOTES.md` - API type taxonomy, AVRO+Selfeval synergy
-- `PIPELINE_DESIGN_NOTES.md` - Fire-and-reference, data layer, pipeline model
-- `EXECUTION_EXPLORATION_NOTES.md` - Execution modes, handlers, natural forgetfulness
-- `ITERATION_PLAN.md` - 4 iterations with test cases
-
-**Status:**
-- `DAILY_LOG.md` - Session-by-session progress
-- `dev/README.md` - Quick start guide for iteration 1
-
----
-
-## Important Context
-
-### Three Twin Products
-
-1. **Building Blocks Exploration** (current) - Event structure, handlers, queue mechanics
-2. **Console v4 Migration** - Apply building blocks to real conversion
-3. **Bug Report from Events** - Prove reconstruction from event streams
-
-### Critical Bets
-
-- **Approach B:** Specialized handlers (not generic executor)
-- **Self-evals as linchpin:** High-confidence validation enables "local rules apply"
-- **Fire-and-reference:** Events preserved with references for reconstruction
-- **Stream-native execution:** Event flows through queues, handlers process
-
----
-
-## Files to Review on Restart
-
-**Essential:**
+**On restart:**
 1. This file (SESSION_RESTART.md)
-2. DAILY_LOG.md (2025-11-23 entries)
-3. dev/README.md (quick start)
+2. DAILY_LOG.md (session 4 entries)
+3. TYPE_HIERARCHY_OVERLAY_DESIGN.md (complete architecture)
+4. PRACTICAL_PATTERNS.md (working patterns)
+5. DATA_VS_LANGUAGE.md (foundational understanding)
 
-**Design context:**
-4. PIPELINE_DESIGN_NOTES.md
-5. API_ECOSYSTEM_NOTES.md
-
-**Implementation:**
-6. dev/src/data.js
-7. dev/src/invoke.js
-8. dev/src/handler-daemon.js
+**For implementation:**
+6. dev/v0/docs/dev modules.md (dev-specific overlay system)
+7. dev/v0/docs/modules.md (base layer management)
+8. PROJECT_PLAN.md (v1.1 scope)
 
 ---
 
-## Questions to Address on Restart
+## Questions Resolved
 
-1. Did iteration 1 tests pass?
-2. Any issues with fire-and-forget + handler daemon pattern?
-3. Event structure working as expected?
-4. Audit trail reconstruction successful?
-5. Ready to move to iteration 2?
+1. **Where does model dev env live?**
+   - In latest project: `projects/09-.../dev/v0/`
+   - Always current, update as we evolve
+
+2. **How to reference req files?**
+   - Glossary: versioned (`dev modules_v1.0.0.md`)
+   - Bundles: generic (`dev modules.md`)
+   - Version in post-amble internally
+
+3. **What goes in v0/docs/ vs project root?**
+   - v0/docs/: Clean req files only (distilled summaries)
+   - Project root: Working documents (will be distilled at closure)
+
+4. **Module vs DSL terms?**
+   - module/modules: Stepping stones (dev-only)
+   - api_node/etc: DSL (runtime vocabulary)
+
+5. **Naming conventions?**
+   - Stepping stones: space separator
+   - DSL: underscore separator
+   - URI parts: forward slash separator
 
 ---
 
-**Status:** Implementation complete, ready for testing and iteration 2 planning.
+## Critical Patterns
+
+**Progressive Refinement:**
+- Work module can start minimal
+- Overlay provides defaults
+- Tests run with base implementations
+- Gradually override specifics
+- Extract produces complete module
+
+**Declaration-Driven:**
+- Types declare "Extends: api_node"
+- Instances declare "Instance of: api_method"
+- Hierarchy map built from declarations
+- Validated upfront on env creation
+
+**Uniform DSL:**
+- Data structure name = API name
+- Example: `api_node` data + `spl/api_node/` API
+- Inheritance works naturally
+- Clear, discoverable, low friction
+
+---
+
+## Status Summary
+
+**Complete:**
+- ✅ Iteration 1.0 (ES modules, tests, extraction)
+- ✅ Type hierarchy design (complete roadmap)
+- ✅ Overlay pattern design
+- ✅ dev modules stepping stone
+- ✅ V0 structure created
+- ✅ Foundational understanding documented
+
+**In Progress:**
+- ⏸ V0 node type population
+- ⏸ V0 documentation updates
+
+**Next:**
+- Complete v0 model dev env
+- Begin v1.1 iteration
+- Implement namespace structure
+
+---
+
+**Ready for handover:** All design complete, clear next steps, comprehensive notes captured.

@@ -1,7 +1,7 @@
 **Type:** plain req
 **Extends:** modules
 
-# dev-modules
+# dev modules
 
 ## Spec
 
@@ -111,3 +111,7 @@ Purpose: Enable type-aware overlay resolution with progressive refinement during
 - TYPE_HIERARCHY_OVERLAY_DESIGN.md - Complete architecture
 
 **Used by:** Development environments (v1.1+)
+
+---
+
+**Version:** 1.0.0
