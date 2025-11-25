@@ -902,3 +902,186 @@ dev/v0/
 - Added version post-amble to touched req files
 - Pattern established for future req files
 - Clean separation: versioned source, generic bundle references
+
+---
+
+## 2025-11-25
+
+### Session 6: Event Record Structure & Lib Resolution
+
+**Event record structure refined:**
+
+Applied Kafka record rules with proper API namespacing:
+```json
+{
+  "headers": {
+    "spl": {
+      "runtime": { "error": null, "timestamp": "..." },
+      "request": { "guid": "...", "completed": false, "ttl": 5, "uri": "pr09/console/hello" }
+    },
+    "pr09": {
+      "console": {
+        "hello": { "message": "hello friend" }
+      }
+    }
+  }
+}
+```
+
+**Key decisions:**
+- `headers.spl.runtime` - cross-cutting runtime state (error, timestamp)
+- `headers.spl.request` - request lifecycle (guid, completed, ttl, uri)
+- Method input namespaced by path: `headers.pr09.console.hello.*`
+- `value` = API state (data desk), not used for direct method invocation yet
+- `_return` enables pipelining (at all levels: method, API, package)
+
+**Method signature:**
+```javascript
+import spl from 'spl/core.js'
+
+export function handle(record) {
+  console.log(record.headers.pr09.console.hello.message)
+  spl.complete(record)
+}
+```
+- Method receives Kafka record directly
+- Method imports libs (encapsulation)
+- Handler is dumb - just passes record
+
+**Lib resolution pattern established:**
+
+Three concerns, three layers:
+
+| Concern | Location | Maintenance |
+|---------|----------|-------------|
+| Node resolution | `node_modules/spl/core.js` | Static (set once) |
+| Overlay resolution | `lib/spl/core.js` (symlink) | On new lib file |
+| Source | `modules/work_module/spl/_lib/core.js` | Edit freely |
+
+Benefits:
+- Clean imports (no path traversal)
+- Static package.json (no sync needed)
+- Standard Node resolution
+- Overlay works via symlinks
+- spl is just a package like pr09 (same structure)
+
+See: LIB_RESOLUTION_PATTERN.md
+
+**Work module structure:**
+```
+modules/
+└── work_module/           # module_root
+    ├── spl/               # package (core libs)
+    │   └── _lib/
+    │       └── core.js
+    └── pr09/              # package (our work)
+        └── console/       # api
+            └── hello/     # method
+```
+
+**Next:** Implement lib resolution structure and test hello method with spl/core.js
+
+---
+
+### Lib Resolution Implemented
+
+**Final structure:**
+```
+v0/
+├── node_modules/lib/
+│   ├── package.json      # { "type": "module" }
+│   └── core.js           # re-export from ../../lib/core.js
+├── lib/
+│   └── core.js           # symlink → modules/work_module/_lib/core.js
+└── modules/work_module/
+    ├── _lib/
+    │   └── core.js       # root level lib source
+    └── pr09/console/hello/
+        └── index.js
+```
+
+**Import pattern:** `import { createSpl } from 'lib/core.js'`
+
+**Wrapper pattern adopted:**
+
+Libs provide factory functions that bind to the record:
+
+```javascript
+// core.js
+export function createSpl(record) {
+  return {
+    headers: record.headers,
+    value: record.value,
+    complete() { record.headers.spl.request.completed = true },
+    error(msg) { /* ... */ }
+  }
+}
+```
+
+**Method pattern - clean index.js:**
+
+```javascript
+import { createSpl } from 'lib/core.js'
+
+export function handle(record) {
+  const spl = createSpl(record)
+
+  console.log(spl.headers.pr09.console.hello.message)
+  spl.complete()
+}
+```
+
+**Method-level libs extend for domain vocabulary:**
+
+```javascript
+// index.js - reads like requirements
+import { createHello } from 'lib/pr09/console/hello.js'
+
+export function handle(record) {
+  const hello = createHello(record)
+
+  hello.greet()
+  hello.complete()
+}
+```
+
+- **index.js** = what (flow, intent)
+- **_lib/*.js** = how (implementation details)
+- Function names become method's vocabulary
+
+**Hierarchy for libs:**
+- `node_modules/lib/` - static, set once
+- `lib/` - symlinks, updated on new lib
+- `modules/work_module/_lib/` - root level libs
+- `modules/work_module/{pkg}/{api}/{method}/_lib/` - method level libs
+
+See: LIB_RESOLUTION_PATTERN.md
+
+**Tests passing:** hello method works with full lib resolution chain
+
+---
+
+### Dev Environment Flow Fixed
+
+**Proper flow established:**
+1. `modules/` - source bundles (work_module, types)
+2. `install/install.js` - copies modules/ to implementation/ with lib resolution
+3. `deploy.js` - creates env instance from implementation/
+4. Run in `environments/env-{timestamp}/`
+
+**Fire-and-forget events:**
+- Timestamped filenames with collision handling (digit suffix)
+- Two events per request: initial (pending) + executed (complete)
+- TTL counts down (not iteration up)
+
+**Method requirements and self-eval:**
+- Created `pr09/console/hello/_reqs/pr09_console_hello_v1.0.0.md`
+- Created self-eval that validates:
+  - index.js exists and exports handle
+  - Reads from correct namespace
+  - Calls complete()
+  - No cross-API access
+
+**README.md updated** with current structure and flow.
+
+**Full cycle verified** in deployed environment instance.

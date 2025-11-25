@@ -1,6 +1,6 @@
 # Session Restart Guide - Project 09
 
-**Last Updated:** 2025-11-25 (Session 5)
+**Last Updated:** 2025-11-25 (Session 6)
 
 ---
 
@@ -9,149 +9,97 @@
 **Project:** Console v5 Stream Native (Exploration)
 
 **Phase:** Product Twin 1 - Building Blocks Exploration
-**Stage:** V0 type system complete, ready for work module creation
+**Stage:** Hello method complete with full dev env flow
 
 ---
 
-## Where We Are
+## What's Working
 
-**Iteration 1.0:** Complete ✅
-- Fire-and-forget + handler daemon pattern validated
-- ES modules conversion complete
-- Full cycle tests passing (4/4)
+**V0 Dev Environment:**
+- `modules/` → `implementation/` → `environments/env-*` flow
+- Lib resolution (symlinks + node_modules re-exports)
+- Fire-and-forget event pattern (timestamped files)
+- Hello method with self-eval
 
-**V0 Type System:** Complete ✅
-- All types defined in modules/types/
-- Type hierarchy: module_node → branch → (module_root, package, api); module_node → method
-- Cascading spidering pattern established
-- DSL glossary updated
-
-**Next:** Create work module and move implementation into spl API structure
-
----
-
-## V0 Type Hierarchy
-
+**Event Record Structure:**
+```json
+{
+  "headers": {
+    "spl": {
+      "runtime": { "error": null, "timestamp": "..." },
+      "request": { "guid": "...", "completed": false, "ttl": 5, "uri": "pr09/console/hello" }
+    },
+    "pr09": {
+      "console": {
+        "hello": { "message": "hello friend" }
+      }
+    }
+  }
+}
 ```
-modules/types/
-├── module_node/      # Base type (help input, default handler)
-│   ├── README.md
-│   ├── README.json   # Cascading spidering entry point
-│   ├── index.js      # Default node handler (TODO: context.complete)
-│   └── _schemas/
-│       ├── input.avsc   # module_node.input (help flag)
-│       └── output.avsc  # module_node.output (empty)
-├── branch/           # Non-leaf with batch capability
-│   ├── README.md
-│   ├── README.json
-│   └── _schemas/
-│       └── input.avsc   # branch.input (batch array)
-├── module_root/      # Extends branch
-│   ├── README.md
-│   └── README.json
-├── package/          # Extends branch
-│   ├── README.md
-│   └── README.json
-├── api/              # Extends branch, adds state
-│   ├── README.md
-│   ├── README.json
-│   └── _schemas/
-│       └── state.avsc   # api.state
-└── method/           # Leaf, extends module_node directly
-    ├── README.md
-    └── README.json
+
+**Method Pattern:**
+```javascript
+import { createSpl } from 'lib/core.js'
+
+export function handle(record) {
+  const spl = createSpl(record)
+  console.log(spl.headers.pr09.console.hello.message)
+  spl.complete()
+}
 ```
 
 ---
 
-## Key Design Decisions (Session 5)
+## Quick Start
 
-### 1. api_node → module_node Rename
-- Avoids naming collision with `api` derived type
-- Clearer: base for all module nodes, not just API nodes
-
-### 2. Branch Intermediate Type
-- Non-leaf nodes (module_root, package, api) extend branch
-- Branch adds batch input capability
-- Method extends module_node directly (leaf, no batch)
-
-### 3. Cascading Spidering Pattern
-README.json is the discovery entry point:
-- `files`: inventory of this node's files
-- `children`: references to child README.json (for instances, not types)
-
-### 4. Node Handler Completion
-Three responsibilities:
-1. Set context.transfer to output
-2. Set request status (normal/error)
-3. Fire event record (fire and forget)
-
-### 5. Schema Naming
-- Type level: `module_node.input`, `branch.input`, `api.state`
-- Instance level: `spl.dev.create.input`
-
-### 6. Default Output
-- Empty `{}` - data payload for piping
-- Not status (runtime handles metadata)
+```bash
+cd dev/v0
+node deploy.js                    # Creates env instance
+cd environments/env-{timestamp}
+node submit.js                    # Submit request
+node handler.js                   # Process request
+```
 
 ---
 
-## Important Files
+## Key Files
 
-**Session notes:**
-- `EMERGING_PATTERNS.md` - Living document of WOWs and patterns
-- `DAILY_LOG.md` - Detailed progress
+**Dev env:**
+- `dev/v0/deploy.js` - Creates environment instance
+- `dev/v0/install/install.js` - Prepares implementation/
+- `dev/v0/handler.js` - Dumb request handler
+- `dev/v0/submit.js` - Test request submitter
 
-**Type definitions:**
-- `dev/v0/modules/types/` - All type bundles
-- `dev/v0/modules/_index.json` - Layer ordering
-
-**Req files (immutables):**
-- `module_node_v1.1.0.md` - Base type req
-- `branch_v1.0.0.md` - Branch type req
-- `module_root_v1.0.0.md` - Module root req
+**Source:**
+- `dev/v0/modules/work_module/_lib/core.js` - Core lib (createSpl)
+- `dev/v0/modules/work_module/pr09/console/hello/index.js` - Hello method
+- `dev/v0/modules/work_module/pr09/console/hello/_reqs/` - Requirements + self-eval
 
 **Design docs:**
-- `TYPE_HIERARCHY_OVERLAY_DESIGN.md` - Complete architecture
-- `OVERLAY_EXTRACTION_PATTERN.md` - Overlay + extraction
+- `LIB_RESOLUTION_PATTERN.md` - Lib resolution (3 layers)
+- `TYPE_HIERARCHY_OVERLAY_DESIGN.md` - Type system architecture
 
 ---
 
-## Next Session Tasks
+## Session 6 Accomplishments
 
-### Immediate: Create Work Module
-
-1. Create work module structure in v0/modules/
-2. Move/organize implementation scripts from dev/src/
-3. Set up spl package structure:
-   ```
-   modules/
-   ├── types/           # ✅ Complete
-   └── pr09/            # Work module
-       └── spl/
-           └── console/
-               └── [methods]
-   ```
-
-### Then: Context Functional Setup
-
-- Define context.complete() or equivalent
-- Implement transfer block pattern
-- Connect to fire-and-forget event emission
+1. **Event record structure** - Kafka-compatible with spl.runtime/request namespaces
+2. **Lib resolution pattern** - node_modules/lib → lib/ symlinks → _lib/ source
+3. **Wrapper pattern** - createSpl(record) binds methods to record
+4. **Dev env flow** - modules → install → implementation → deploy → environments
+5. **Fire-and-forget** - Timestamped events with collision handling
+6. **Hello method** - Complete with requirements and self-eval
 
 ---
 
-## Terminology Quick Reference
+## Next Steps
 
-| Term | Meaning |
-|------|---------|
-| module_node | Base type for all nodes |
-| branch | Non-leaf node with batch capability |
-| method | Leaf node (invokable, no children) |
-| bundle | Module container (folder structure) |
-| transfer | Context block carrying input→output |
-| node handler | The index.js implementation |
+1. **Value/API state** - Implement batch processing with value payload
+2. **Arithmetic method** - Multi-step method to test iteration loop
+3. **Sandwich merge** - _return → value merge pattern
+4. **More self-evals** - Cross-API access prevention
 
 ---
 
-**Ready for handover:** Type system complete, patterns documented, clear next steps.
+**Ready for handover:** Full hello method cycle working in deployed environment.
