@@ -905,6 +905,42 @@ dev/v0/
 
 ---
 
+## 2025-11-26
+
+### Session 9: Project Closure Decision
+
+**Decision:** Regroup and close Project 09, create follow-on project.
+
+Project pivoted from "Console v5 Migration" to "Dev Environment Foundation". Valuable work but different scope. Better to close cleanly and continue in new project.
+
+**Created:**
+- `CLOSURE_NOTES.md` - Closure rationale, achievements, deferred items
+- `projects/backlog/dev-env-v0-bundle-continued.md` - Follow-on backlog item
+
+**Process notes for project closure:**
+
+1. **Backlog item removal:** When a backlog item becomes a project, it should be removed from the backlog (it's no longer a backlog item). This should happen during project creation, not closure. Add to project creation checklist.
+
+2. **Dev bundle cloning:** New projects should clone pr09/v0 dev bundle. Need to formalize this - either:
+   - Update `create project` howto (create_project_v1.1.0.md)
+   - Or add new howtos for dev bundle operations (clone, deploy, cycle, etc.)
+
+   The howto glossary may be the right place - we now have procedural knowledge around the dev bundle that should be captured.
+
+3. **Safe deletes in Bash:** When deleting directories, never run `rm -rf` while cwd is inside the target directory. Always use absolute paths or `cd` to a safe location first:
+   ```bash
+   # BAD: if cwd is inside target
+   rm -rf ../some-folder  # Shell loses its cwd
+
+   # GOOD: use absolute path from anywhere
+   rm -rf /absolute/path/to/folder
+
+   # GOOD: cd out first
+   cd /safe/location && rm -rf /path/to/folder
+   ```
+
+---
+
 ## 2025-11-25
 
 ### Session 6: Event Record Structure & Lib Resolution

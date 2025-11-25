@@ -16,8 +16,8 @@ Phased approach to get implementation infrastructure working.
 
 | Backlog Item | Priority | Dependencies | Addons | Comments |
 |--------------|----------|--------------|--------|----------|
-| [Console v5 Stream Native](backlog/console-v5-stream-native.md) | **Critical** | Console API v4 | [Pipeline Islands](backlog/addons/pipeline-islands-pattern.md) | **Project 09:** Build spl/pipeline by converting console to stream-native. Design through use. Foundation for everything. |
-| [spl/bug API](backlog/spl-bug-api.md) | High | Console v5 (pipeline proven) | | Bug report as API state. Captures failure context for reconstruction. Bug reports from event streams. |
+| [Dev Env v0 Bundle Continued](backlog/dev-env-v0-bundle-continued.md) | **Critical** | Project 09 | | Continue v0 dev env. Core APIs, library functions, arithmetic exercises. Deferred items from Project 09. |
+| [spl/bug API](backlog/spl-bug-api.md) | High | Dev Env v0 Bundle | | Bug report as API state. Captures failure context for reconstruction. Bug reports from event streams. |
 
 ### Phase 2 - Complete Pipeline
 

@@ -1,162 +1,115 @@
-# v0 - Reusable Dev Environment Package
+# v0 - Dev Environment Template
 
-**Purpose:** Template for creating isolated development environments with work modules.
+**Purpose:** Template for creating isolated development environments with type hierarchy and selfeval inheritance.
 
-## What This Is
+## Quick Start
 
-A **dev environment package** provides:
-1. **Source modules** (`modules/`) - Types and work module source
-2. **Install script** - Prepares implementation from modules
-3. **Deploy script** - Creates isolated environment instances
-4. **Test script** - Runs tests in environment
-5. **Destroy script** - Cleans up environments
+```bash
+# Clone to new iteration
+node clone.js ../v1.0
+cd ../v1.0
+
+# Create environment and test
+node deploy.js
+node cycle.js        # prepare + test
+
+# Develop in environments/env-*/modules/work_module/
+# Re-run cycle.js after changes
+
+# When done
+node publish.js      # Copy work_module back with timestamp
+node destroy.js      # Clean up
+```
+
+## Scripts
+
+| Script | Purpose |
+|--------|---------|
+| `clone.js` | Create new iteration from this template |
+| `deploy.js` | Create environment from implementation/ |
+| `prepare.js` | Build hierarchy.json (layer sequences) |
+| `test.js` | Run selfevals from all layers |
+| `cycle.js` | Convenience: prepare + test |
+| `publish.js` | Copy work_module back with type flattening |
+| `destroy.js` | Remove environment(s) |
 
 ## Structure
 
 ```
 v0/
-├── README.md                    # This file
-├── package.json                 # Enable ES modules for scripts
-├── deploy.js                    # Create new environment
-├── test.js                      # Test latest environment
-├── destroy.js                   # Remove environment(s)
-├── handler.js                   # Request handler (copied to env)
-├── submit.js                    # Request submitter (copied to env)
-├── install/                     # Installation tools
-│   ├── install.js               # Copies modules/ to implementation/
-│   └── package.json.template    # Template for environment package.json
-├── modules/                     # Source bundles
-│   ├── types/                   # Type definitions
-│   │   ├── module_node/
-│   │   ├── branch/
-│   │   ├── method/
-│   │   └── ...
-│   └── work_module/             # Work module source
-│       ├── _lib/                # Root level libs
-│       │   └── core.js
-│       └── pr09/                # Package
-│           └── console/         # API
-│               └── hello/       # Method
-│                   ├── index.js
-│                   └── _reqs/
-├── implementation/              # Prepared by install (from modules/)
-│   ├── work_module/
-│   ├── types/
-│   ├── lib/                     # Symlinks to _lib/
-│   └── node_modules/lib/        # Re-exports
-└── environments/                # Deployed instances
-    └── env-{timestamp}/
-        ├── package.json
-        ├── handler.js
-        ├── submit.js
-        ├── events/requests/
-        ├── work_module/
-        ├── types/
-        ├── lib/
-        └── node_modules/lib/
+├── package.json
+├── clone.js, deploy.js, prepare.js, test.js
+├── cycle.js, publish.js, destroy.js
+├── handler.js, submit.js          # Copied to env
+├── environments/                   # Deployed instances (gitignored)
+└── implementation/                 # Source
+    ├── types/                      # Type definitions
+    │   ├── module_node/            # Base type (has _lib/, _reqs/)
+    │   ├── branch/                 # Extends module_node
+    │   ├── module_root/            # Extends branch
+    │   ├── package/                # Extends branch
+    │   ├── api/                    # Extends branch
+    │   └── method/                 # Extends module_node
+    └── work_module/                # Work module
+        ├── _lib/                   # Root level libs
+        │   ├── core.js             # SPL wrapper
+        │   └── overlay.js          # Overlay resolution
+        └── pr09/console/hello/     # Example method
 ```
 
-## How It Works
+## Environment Structure
 
-### 1. Develop in modules/
+Created by `deploy.js`:
 
-Source code lives in `modules/`:
-- `modules/types/` - Type definitions
-- `modules/work_module/` - Your work module
-- `modules/work_module/_lib/` - Shared libraries
-
-```bash
-# Create a method
-mkdir -p modules/work_module/pr09/console/hello
-# Add index.js, _reqs/, etc.
+```
+env-{timestamp}/
+├── package.json
+├── hierarchy.json          # Built by prepare.js
+├── handler.js, submit.js
+├── events/requests/
+├── lib/                    # Symlinks to work_module/_lib/
+├── node_modules/lib/       # Re-exports from lib/
+└── modules/
+    ├── types/
+    └── work_module/
 ```
 
-### 2. Install (Prepare Implementation)
+## Type Hierarchy
 
-Install copies modules/ to implementation/ with lib resolution:
-
-```bash
-node install/install.js
+Types declare inheritance via README.json:
+```json
+{ "type": "method", "extends": "module_node" }
 ```
 
-This:
-1. Clears and recreates `implementation/`
-2. Copies `modules/work_module/` and `modules/types/`
-3. Creates `lib/` symlinks to `_lib/` files
-4. Creates `node_modules/lib/` re-exports
+Hierarchy built dynamically by `prepare.js`:
+- Reads type declarations at runtime
+- Creates layer sequence per node
+- Order: work_module ancestors → type chain
 
-### 3. Deploy
+## Selfeval Inheritance
 
-Creates a fresh environment instance from implementation/:
+Selfevals collected from all layers using overlay:
+- Type selfevals run on every node of that type
+- Same-named selfevals: lower layer wins
+- `module_node` selfeval validates folder structure on all nodes
 
-```bash
-node deploy.js
-```
+## Lib Resolution
 
-This:
-1. Runs install (prepares implementation/)
-2. Creates `environments/env-{timestamp}/`
-3. Copies implementation/ to environment
-4. Creates events/requests/ directory
-5. Copies handler.js and submit.js
-
-### 4. Run
-
-In the deployed environment:
-
-```bash
-cd environments/env-{timestamp}
-node submit.js     # Submit a request
-node handler.js    # Process requests
-```
-
-### 5. Test
-
-Run tests in the latest environment:
-
-```bash
-node test.js                    # Test latest environment
-node test.js env-123456         # Test specific environment
-```
-
-### 6. Destroy
-
-Clean up environments:
-
-```bash
-node destroy.js                 # Remove all environments (prompts)
-node destroy.js env-123456      # Remove specific environment
-```
-
-## Lib Resolution Pattern
-
-Libraries are resolved through three layers:
+Three-layer resolution for clean imports:
 
 | Layer | Location | Purpose |
 |-------|----------|---------|
-| Source | `work_module/_lib/core.js` | Actual lib code |
+| Source | `work_module/_lib/core.js` | Actual code |
 | Symlink | `lib/core.js` | Points to source |
 | Re-export | `node_modules/lib/core.js` | Node resolution |
 
-Methods import libs cleanly:
+Methods import cleanly:
 ```javascript
 import { createSpl } from 'lib/core.js'
 ```
 
-Node walks up to `node_modules/lib/`, which re-exports from `lib/`, which symlinks to source.
+## Method Pattern
 
-## Method Structure
-
-Each method has:
-```
-pr09/console/hello/
-├── index.js                         # Method implementation
-└── _reqs/
-    ├── pr09_console_hello_v1.0.0.md      # Requirements
-    └── pr09_console_hello_v1.0.0_selfeval.js  # Self-eval
-```
-
-Method pattern:
 ```javascript
 import { createSpl } from 'lib/core.js'
 
@@ -168,37 +121,18 @@ export function handle(record) {
 }
 ```
 
-## Event Record Structure
-
-Kafka-compatible record:
-```json
-{
-  "headers": {
-    "spl": {
-      "runtime": { "error": null, "timestamp": "..." },
-      "request": { "guid": "...", "completed": false, "ttl": 5, "uri": "pr09/console/hello" }
-    },
-    "pr09": {
-      "console": {
-        "hello": { "message": "hello friend" }
-      }
-    }
-  }
-}
-```
-
-## Cloning for Iterations
-
-Clone v0 for new iterations:
+## Cloning to New Project
 
 ```bash
-cp -r v0 v1.1
-cd v1.1
-# Update modules/work_module/ with iteration code
-node deploy.js
+# From new project folder
+mkdir dev
+cp -r ../09-console-v5-stream-native/dev/v0 dev/v0
+cd dev/v0
+node clone.js ../v1.0
 ```
+
+Update package.json name/description for the new project.
 
 ---
 
-**Pattern Source:** pr08/v4 dev environment API
-**First Use:** Project 09 - Console v5 Stream Native
+**Source:** Project 09 - Console v5 Stream Native

@@ -4,7 +4,7 @@
 
 | Code | Name | Status | Started |
 |------|------|--------|---------|
-| 09-console-v5-stream-native | Console v5 Stream Native | Initiated | 2025-11-21 |
+| - | - | - | - |
 
 ## Completed Projects
 
@@ -18,6 +18,7 @@
 | 06-glossary-term-requirements | Glossary Term Requirements | 2025-11-18 | 67+ term reqs (24 DSL, 35+ Stepping Stones, 8 Spots), unified 3-column glossary structure, base concepts (api_node, activity, spot), extends pattern with term names |
 | 07-console-api-exploration | Console API - AI-Primary Execution Model | 2025-11-19 | v7 console wrapper (5 methods), 3 design docs, schema-driven merge, boundary validation, self-eval harness, status/ spot, Dev Env API + AVRO Wrapper + CIP Processing backlog items, CIP-015 |
 | 08-dev-environment-api | Dev Environment API | 2025-11-20 | 4-level module structure, executable selfeval pattern, test runner, AVRO schemas (API + 7 methods), native vs wrapper API convention, delegation stepping stone, work package pattern |
+| 09-console-v5-stream-native | Console v5 Stream Native | 2025-11-26 | v0 dev env template, type hierarchy design, lib resolution pattern, selfeval inheritance, event record structure (pivoted from Console migration to dev env foundation) |
 
 ## Planned Projects
 
@@ -311,24 +312,39 @@
 **See:** `projects/08-dev-environment-api/LESSONS_LEARNED.md` for full details
 
 ### 09-console-v5-stream-native
-**Objective:** Convert Console API v4 to stream-native execution, discover event model and handler patterns
+**Objective:** Convert Console API v4 to stream-native execution (pivoted to dev environment foundation)
 
 **Project Type:** Explorative Project
 
-**Status:** Initiated - Project creation complete, awaiting PROJECT_PLAN
+**Products Delivered:**
+1. v0 Dev Environment Template (7 scripts: clone, deploy, prepare, test, cycle, publish, destroy) ✅
+2. Type Hierarchy Design (declaration-driven, dynamic hierarchy map) ✅
+3. Lib Resolution Pattern (3-layer: source → symlink → re-export) ✅
+4. Selfeval Inheritance System (type selfevals run on all nodes) ✅
+5. Event Record Structure (Kafka-style headers with API namespacing) ✅
 
-**Background:**
-Comprehensive design session (chats/2025-11-21_project-09-planning-and-itil-dsl.md) established stream-native execution model, pipeline islands pattern, and partnership contract.
+**Status:** Complete - Pivoted from Console migration to dev env foundation
 
-**Scope:**
-- Convert Console v4 to event-based execution
-- Discover event schema through real use
-- Implement console handler pattern
-- Write high-confidence self-evals
-- Prove event-based reconstruction
-- Validate Approach B (specialized handlers)
+**Key Outcomes:**
+- **v0 template ready for cloning:** New projects clone pr09/v0 for dev environment
+- **Type hierarchy works:** module_node base, branch, package, api, method types
+- **Overlay operations:** selectFile() (first wins), collectAll() (accumulate)
+- **Clean imports:** `import { createSpl } from 'lib/core.js'` without path traversal
+- **Inherited selfevals:** Type validations run automatically on all instances
 
-**See:** `projects/09-console-v5-stream-native/PROJECT_BRIEF.md` for full details
+**Key Learnings:**
+- Exploration projects can pivot - recognize and regroup
+- Declaration-driven structure scales better than hardcoded
+- Simple overlay operations + clear layer order = powerful inheritance
+- Cheap iterations enable experimentation with safety net
+
+**Deferred to Follow-On:**
+- Console v4→v5 migration
+- Bug report/reconstruction demo
+- Arithmetic iterations 2-4
+- spl/runtime and spl/pipeline APIs
+
+**See:** `projects/09-console-v5-stream-native/LESSONS_LEARNED.md` for full details
 
 ---
 
