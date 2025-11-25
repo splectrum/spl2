@@ -1,0 +1,11 @@
+{
+  "name": "work_module",
+  "type": "module_root",
+  "description": "Work module instance - development workspace",
+  "files": [
+    "README.json"
+  ],
+  "children": [
+    "pr09/README.json"
+  ]
+}

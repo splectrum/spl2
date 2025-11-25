@@ -1,0 +1,9 @@
+{
+  "publishedFrom": "env-1764082065127",
+  "publishedAt": "2025-11-25T14:48:00.234Z",
+  "sourcePath": "/home/herma/splectrum/spl2/projects/09-console-v5-stream-native/dev/v1.1/environments/env-1764082065127/modules/work_module",
+  "targetPath": "/home/herma/splectrum/spl2/projects/09-console-v5-stream-native/dev/v1.1/implementation/work_module-1764082065127",
+  "typesFlattenedFrom": "/home/herma/splectrum/spl2/projects/09-console-v5-stream-native/dev/v1.1/environments/env-1764082065127/modules/types",
+  "nodesProcessed": 4,
+  "filesFlattened": 16
+}

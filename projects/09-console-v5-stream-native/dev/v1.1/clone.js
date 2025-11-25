@@ -47,9 +47,7 @@ fs.mkdirSync(destPath, { recursive: true })
 const filesToCopy = [
   'package.json',
   'deploy.js',
-  'prepare.js',
   'test.js',
-  'cycle.js',
   'publish.js',
   'destroy.js',
   'handler.js',

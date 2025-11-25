@@ -1,0 +1,10 @@
+{
+  "type": "module_root",
+  "version": "1.0.0",
+  "description": "Root node of a module bundle",
+  "extends": "branch",
+  "files": {
+    "README.md": "Natural language documentation",
+    "README.json": "Cascading spidering entry point"
+  }
+}

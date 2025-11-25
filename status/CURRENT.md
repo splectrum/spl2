@@ -1,6 +1,6 @@
 # Current Status
 
-**Last Updated:** 2025-11-23
+**Last Updated:** 2025-11-25
 
 ---
 
@@ -10,14 +10,15 @@
 
 Convert Console API v4 to stream-native execution. Discover event model, handler patterns, and self-eval requirements through real implementation.
 
-**Current Phase:** Product Twin 1 - Building Blocks Exploration, Iteration 1 complete
+**Current Phase:** Product Twin 1 - Building Blocks Exploration
+**Stage:** Hierarchy overlay and selfeval inheritance complete
 
-**Status:** Iteration 1 implemented (fire-and-forget + handler daemon), ready for testing
+**Status:** Full dev cycle with inherited selfevals working
 
 **See:**
 - `projects/09-console-v5-stream-native/SESSION_RESTART.md` - Session restart guide
 - `projects/09-console-v5-stream-native/DAILY_LOG.md` - Detailed progress
-- `projects/09-console-v5-stream-native/dev/README.md` - Quick start for iteration 1
+- `projects/09-console-v5-stream-native/dev/v0/` - Dev environment template
 
 ---
 
@@ -32,17 +33,28 @@ Convert Console API v4 to stream-native execution. Discover event model, handler
 
 ---
 
-## Design Session
+## Session 8 Progress (2025-11-25)
 
-**2025-11-21:** Comprehensive design exploration established:
-- Pipeline islands in sea of free script
-- Stream-native execution (Approach B: specialized handlers)
-- Partnership contract (architect/builder, local rules apply)
-- Self-evals as linchpin for distributed validation
-- Lifecycle trinity (spl/dev, spl/test, spl/node)
-- Language as capability enabler
+**Hierarchy Overlay:**
+- prepare.js builds hierarchy.json with layer sequences per node
+- Dynamic: reads type declarations at runtime, no hardcoded structure
+- Layer order: work_module ancestors → type chain
 
-**See:** `chats/2025-11-21_project-09-planning-and-itil-dsl.md`
+**Selfeval Inheritance:**
+- test.js collects selfevals from all layers using overlay
+- Same-named selfevals follow overlay (lower layer wins)
+- module_node selfeval validates folder structure on all nodes
+
+**Scripts in v0/v1.1:**
+| Script | Purpose |
+|--------|---------|
+| `deploy.js` | Create env from implementation |
+| `prepare.js` | Build hierarchy.json |
+| `test.js` | Run selfevals from all layers |
+| `cycle.js` | Convenience: prepare + test |
+| `publish.js` | Publish with type flattening |
+| `destroy.js` | Clean up |
+| `clone.js` | Create new iteration |
 
 ---
 
@@ -53,7 +65,7 @@ Convert Console API v4 to stream-native execution. Discover event model, handler
 1. Read this file for current context
 2. Check `projects/INDEX.md` for full project status
 3. Check `projects/BACKLOG.md` for work queue
-4. Review active project's DAILY_LOG for detailed state
+4. Review active project's SESSION_RESTART.md for detailed state
 
 **Looking up SPL2 concepts?**
 

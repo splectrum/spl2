@@ -1,9 +1,0 @@
-{
-  "name": "pr09-dev-env",
-  "version": "1.0.0",
-  "type": "module",
-  "description": "Project 09 development environment",
-  "dependencies": {
-    "avsc": "^5.7.7"
-  }
-}

@@ -1,6 +1,6 @@
 {
-  "name": "pr09-v0-dev-env-package",
+  "name": "pr09-v0",
   "version": "0.0.0",
   "type": "module",
-  "description": "Reusable dev environment package for Project 09"
+  "description": "Project 09 - Dev environment template"
 }

@@ -1,0 +1,6 @@
+{
+  "type": "record",
+  "name": "api.state",
+  "doc": "Base API-level state schema - empty default, APIs extend as needed",
+  "fields": []
+}
