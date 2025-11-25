@@ -12,10 +12,9 @@ This glossary defines the consistent vocabulary for SPL2 development. Each term 
 
 | Term | Description | Req |
 |------|-------------|-----|
-| api | **api_node** - Api node within a package; groups related methods under a common namespace | projects/06-glossary-term-requirements/reqs/api_v1.0.0.md |
-| api_method | **Structure** - Requirements document pattern for API method. Natural language spec with input/output, behavior, schemas, and self-eval reference | projects/08-dev-environment-api/api_method_req_v1.0.0.md |
-| api_node | **Structure** - Folder in SPL2 API hierarchy; can be package, api, or method; underscore prefix for internal folders and auxiliary files | projects/06-glossary-term-requirements/reqs/api_node_v1.0.0.md |
+| api | **branch** - Module node within a package; groups related methods under a common namespace; has state | projects/06-glossary-term-requirements/reqs/api_v1.0.0.md |
 | api_overview | **Structure** - Overview document for an API. Inventory and top-level interface - what the API is, what it consists of, method signatures | projects/08-dev-environment-api/api_overview_req_v1.0.0.md |
+| branch | **module_node** - Non-leaf node with batch capability; can contain child nodes; base for module_root, package, api | projects/09-console-v5-stream-native/branch_v1.0.0.md |
 | create | **method** - Method name for creation operations; bring something into existence that did not exist before | projects/08-dev-environment-api/create_v1.0.0.md |
 | cycle | **method** - Method name for iterative execution; run one iteration of a repeating process with return-and-resume pattern | projects/08-dev-environment-api/cycle_v1.0.0.md |
 | destroy | **method** - Method name for destruction operations; tear down and remove, freeing resources | projects/08-dev-environment-api/destroy_v1.0.0.md |
@@ -28,10 +27,12 @@ This glossary defines the consistent vocabulary for SPL2 development. Each term 
 | invoke | **method** - Method name for invoking a single method with execution context; atomic invocation | projects/06-glossary-term-requirements/reqs/invoke_v1.0.0.md |
 | key | **Property** (String) - Primary key component of Kafka-compatible record; implements primary_key | projects/06-glossary-term-requirements/reqs/key_v1.0.0.md |
 | major | **Version component** - First component of semver; increment for breaking changes | projects/06-glossary-term-requirements/reqs/major_v1.0.0.md |
-| method | **api_node** - Invokable api node; leaf of API hierarchy; contains index.js | projects/06-glossary-term-requirements/reqs/method_v1.0.0.md |
+| method | **module_node** - Invokable leaf node; contains implementation in index.js | projects/06-glossary-term-requirements/reqs/method_v1.0.0.md |
+| module_node | **Structure** - Base structural type for SPL2 hierarchy; all nodes derive from module_node; has index.js with standard async signature | projects/09-console-v5-stream-native/module_node_v1.1.0.md |
+| module_root | **branch** - Root node of a module bundle; entry point for module-level operations | projects/09-console-v5-stream-native/module_root_v1.0.0.md |
 | minor | **Version component** - Second component of semver; increment for new backward-compatible features | projects/06-glossary-term-requirements/reqs/minor_v1.0.0.md |
 | node_version | **Property** (String) - Node.js version of execution environment | projects/06-glossary-term-requirements/reqs/node_version_v1.0.0.md |
-| package | **api_node** - Top-level api node; root of an API tree | projects/06-glossary-term-requirements/reqs/package_v1.0.0.md |
+| package | **branch** - Top-level module node; root of an API tree | projects/06-glossary-term-requirements/reqs/package_v1.0.0.md |
 | patch | **Version component** - Third component of semver; increment for backward-compatible bug fixes | projects/06-glossary-term-requirements/reqs/patch_v1.0.0.md |
 | primary_key | **Concept** - Record identity in Kafka/streaming; determines partitioning, consumer groups, record set shaping | projects/06-glossary-term-requirements/reqs/primary_key_v1.0.0.md |
 | prXX | **package** - Reserved naming pattern for internal test packages; not for external deployment | projects/06-glossary-term-requirements/reqs/prXX_v1.0.0.md |
@@ -54,7 +55,7 @@ This glossary defines the consistent vocabulary for SPL2 development. Each term 
 - **One term, one meaning:** Same concept always uses same term
 - **Description format:** Type in bold, followed by description; schema in parentheses where applicable
 - **Req column:** All refs are relative to repo root
-- **Naming convention:** Single underscore for word boundary (`api_node`), double underscore for hierarchy (`spl__runtime__run`)
+- **Naming convention:** Single underscore for word boundary (`module_node`), double underscore for hierarchy (`spl__runtime__run`)
 - **Maintenance:** Update glossary when introducing new vocabulary; add before or during implementation
 
 ---
