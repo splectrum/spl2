@@ -4,7 +4,7 @@
 
 | Code | Name | Status | Started |
 |------|------|--------|---------|
-| - | - | - | - |
+| 10-dev-env-v0-bundle-continued | Dev Env v0 Bundle Continued | In Progress | 2025-11-26 |
 
 ## Completed Projects
 

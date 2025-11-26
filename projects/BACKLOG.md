@@ -16,7 +16,6 @@ Phased approach to get implementation infrastructure working.
 
 | Backlog Item | Priority | Dependencies | Addons | Comments |
 |--------------|----------|--------------|--------|----------|
-| [Dev Env v0 Bundle Continued](backlog/dev-env-v0-bundle-continued.md) | **Critical** | Project 09 | | Continue v0 dev env. Core APIs, library functions, arithmetic exercises. Deferred items from Project 09. |
 | [spl/bug API](backlog/spl-bug-api.md) | High | Dev Env v0 Bundle | | Bug report as API state. Captures failure context for reconstruction. Bug reports from event streams. |
 
 ### Phase 2 - Complete Pipeline

@@ -1,0 +1,11 @@
+{
+  "type": "api",
+  "version": "1.0.0",
+  "description": "Module_node within a package, groups related methods",
+  "extends": "branch",
+  "files": {
+    "README.md": "Natural language documentation",
+    "README.json": "Cascading spidering entry point",
+    "_schemas/state.avsc": "API-level state schema (api.state)"
+  }
+}

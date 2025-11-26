@@ -6,9 +6,44 @@
 
 ## Active Project
 
-**None** - Ready to start next project from backlog
+**Project 10: Dev Env v0 Bundle Continued**
 
-**Next:** Dev Env v0 Bundle Continued (top of backlog)
+- Type: Exploration Project
+- Status: Execution phase
+- Location: `projects/10-dev-env-v0-bundle-continued/`
+
+### Current Work
+
+Migrating dev bundle scripts to spl/dev API methods for self-hosting.
+
+**Completed:**
+- upgrade.js and spl entry point (splectrum install infrastructure)
+- spl/runtime API (metastate schema, req)
+- spl/request API (metastate schema, req)
+- API_NAMESPACE_MODEL.md design doc
+- Type hierarchy update (state.avsc + metastate.avsc on branch nodes)
+- PROJECT_PLAN.md created
+- Full req audit for all work module nodes
+- spl/dev/deploy method implemented (in dev environment)
+
+**In Progress:**
+- Dev environment deployed: env-1764151558962
+- Implementing spl/dev methods: deploy (done), prepare, test, cycle, publish, destroy, upgrade
+
+**Blocking:**
+- prepare.js hardcodes `work_module`, needs update to find wm_* pattern
+
+**Next:**
+1. Fix prepare.js to find wm_* dynamically
+2. Continue spl/dev methods in environment
+3. Publish back, upgrade, test
+
+**Key files:**
+- `dev/v0/environments/env-1764151558962/` - active dev environment
+- `dev/v0/implementation/wm_spl_dev/` - source (do not edit directly)
+- `PROJECT_PLAN.md` - candidate list and status
+- `API_NAMESPACE_MODEL.md` - design doc
+- `DAILY_LOG.md` - session notes
 
 ---
 

@@ -1,0 +1,119 @@
+#!/usr/bin/env node
+// spl - Splectrum entry point
+//
+// Usage:
+//   ./spl <api>/<method> [args...]
+//
+// Examples:
+//   ./spl dev/clone ../v1.0
+//   ./spl dev/clone ../v1.0 my-name "My description"
+
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+// Parse command line
+const args = process.argv.slice(2)
+
+if (args.length < 1) {
+  console.error('Usage: ./spl <api>/<method> [args...]')
+  console.error('')
+  console.error('Examples:')
+  console.error('  ./spl dev/clone ../v1.0')
+  console.error('  ./spl dev/clone ../v1.0 my-name "My description"')
+  process.exit(1)
+}
+
+const methodPath = args[0]  // e.g., "dev/clone"
+const methodArgs = args.slice(1)
+
+// Parse method path: package/api/method or api/method
+const parts = methodPath.split('/')
+let pkg, api, method
+
+if (parts.length === 2) {
+  // Assume spl package for short form: dev/clone -> spl/dev/clone
+  pkg = 'spl'
+  api = parts[0]
+  method = parts[1]
+} else if (parts.length === 3) {
+  pkg = parts[0]
+  api = parts[1]
+  method = parts[2]
+} else {
+  console.error(`Invalid method path: ${methodPath}`)
+  console.error('Expected: api/method or package/api/method')
+  process.exit(1)
+}
+
+// Find the method module
+// Look in modules/wm_*/pkg/api/method/ or modules/bm_*/pkg/api/method/
+import fs from 'fs'
+
+const modulesDir = path.join(__dirname, 'modules')
+const moduleEntries = fs.readdirSync(modulesDir)
+const workModule = moduleEntries.find(e => e.startsWith('wm_') || e.startsWith('bm_'))
+
+if (!workModule) {
+  console.error('No work module (wm_*) or base module (bm_*) found')
+  process.exit(1)
+}
+
+const methodDir = path.join(modulesDir, workModule, pkg, api, method)
+const indexPath = path.join(methodDir, 'index.js')
+
+if (!fs.existsSync(indexPath)) {
+  console.error(`Method not found: ${pkg}/${api}/${method}`)
+  console.error(`Expected: ${indexPath}`)
+  process.exit(1)
+}
+
+// Import and run the method
+const { handle } = await import(indexPath)
+
+// Build the record with method input
+const record = {
+  headers: {
+    spl: {
+      request: { completed: false },
+      runtime: {}
+    }
+  }
+}
+
+// Set up method-specific input namespace
+// For spl/dev/clone: headers.spl.dev.clone = { path, name, description }
+if (!record.headers[pkg]) record.headers[pkg] = {}
+if (!record.headers[pkg][api]) record.headers[pkg][api] = {}
+record.headers[pkg][api][method] = {}
+
+// Map positional args to method inputs
+// For clone: path (required), name (optional), description (optional)
+if (method === 'clone') {
+  record.headers[pkg][api][method].path = methodArgs[0]
+  if (methodArgs[1]) record.headers[pkg][api][method].name = methodArgs[1]
+  if (methodArgs[2]) record.headers[pkg][api][method].description = methodArgs[2]
+}
+
+// Run the method
+handle(record)
+
+// Report result
+if (record.headers.spl.runtime.error) {
+  console.error('Error:', record.headers.spl.runtime.error)
+  process.exit(1)
+}
+
+const output = record.headers[pkg][api][method].output
+if (output) {
+  console.log('Created:', output.created)
+  if (output.package) {
+    console.log('Package:', output.package.name, 'v' + output.package.version)
+    console.log('Description:', output.package.description)
+  }
+  if (output.stats) {
+    console.log('Stats:', output.stats.files, 'files,', output.stats.folders, 'folders')
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "spl",
+  "type": "package",
+  "description": "Splectrum core package - platform infrastructure",
+  "files": [
+    "README.json"
+  ],
+  "children": [
+    "dev/README.json"
+  ]
+}

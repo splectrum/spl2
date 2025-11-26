@@ -13,7 +13,7 @@ When you have a goal to accomplish, start here. Howtos spider INTO stepping ston
 | Term | Description | Req |
 |------|-------------|-----|
 | close project | Close a project: look up project type → read req with extends chain → follow closure phase respecting autonomous/collaborative boundaries | projects/09-console-v5-stream-native/close_project_v1.0.0.md |
-| create project | Create a project from backlog item: read item → identify project type → look up in glossary → follow req phases → remove from backlog → clone dev bundle | projects/09-console-v5-stream-native/create_project_v1.1.0.md |
+| create project | Create a project from backlog item: read item → determine/validate project type (autonomy criterion) → look up in glossary → follow req phases → remove from backlog → clone dev bundle | projects/10-dev-env-v0-bundle-continued/reqs/create_project_v1.2.0.md |
 
 ---
 

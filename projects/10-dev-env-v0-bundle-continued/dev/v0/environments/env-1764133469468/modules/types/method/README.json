@@ -1,0 +1,11 @@
+{
+  "type": "method",
+  "version": "1.0.0",
+  "description": "Invokable leaf node, contains actual implementation",
+  "extends": "module_node",
+  "files": {
+    "README.md": "Natural language documentation",
+    "README.json": "Cascading spidering entry point"
+  },
+  "children": null
+}

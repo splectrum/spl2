@@ -1,0 +1,18 @@
+{
+  "type": "branch",
+  "version": "1.1.0",
+  "description": "Non-leaf module_node with batch capability and state",
+  "extends": "module_node",
+  "files": {
+    "README.md": "Natural language documentation",
+    "README.json": "Cascading spidering entry point",
+    "_schemas/input.avsc": "Branch input schema (adds batch)",
+    "_schemas/state.avsc": "Internal state schema (value, private)",
+    "_schemas/metastate.avsc": "Public state schema (headers, shared)"
+  },
+  "derived_types": [
+    "module_root",
+    "package",
+    "api"
+  ]
+}

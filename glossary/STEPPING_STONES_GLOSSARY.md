@@ -18,7 +18,7 @@ This glossary defines stepping stones - the navigational concepts used throughou
 | backlog | See backlog register | |
 | backlog register | **register** - Work queue of projects in execution order; top item is next to execute. Mutable. See projects/BACKLOG.md | projects/08-dev-environment-api/backlog_register_v1.1.0.md |
 | base module | **Extends module** - Foundational runtime and support functionality. Layer 0, everything overlays on top | projects/08-dev-environment-api/base_module_v1.0.0.md |
-| blank project | Base project type with PRINCE2 requirements; straightforward execution with clear deliverables; no special methodology. Other project types extend this | projects/08-dev-environment-api/blank_project_v1.1.0.md |
+| blank project | Base project type with PRINCE2 requirements; straightforward execution with clear deliverables; no special methodology. Other project types extend this | projects/10-dev-env-v0-bundle-continued/reqs/blank_project_v1.2.0.md |
 | chicken and egg | Circular dependency where evolution is mandatory; without evolution, infinite loop. X and Y need each other, so they co-evolve | projects/06-glossary-term-requirements/reqs/chicken_and_egg_v1.0.0.md |
 | collaboration | Joint activity that is interactive; partnership with mutual respect aiming to deepen understanding and trigger insight; different but overlapping roles | projects/06-glossary-term-requirements/reqs/collaboration_v1.0.0.md |
 | commit message | Headline for git commit; identifies scope, summarizes why, hooks to detail; not a changelog or diff explanation | projects/06-glossary-term-requirements/reqs/commit_message_v1.0.0.md |
