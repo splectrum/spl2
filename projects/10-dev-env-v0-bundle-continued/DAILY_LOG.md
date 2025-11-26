@@ -283,3 +283,87 @@ Need for repo-wide deployment:
 - Create root node install
 - Create sidecar with spl/ops API
 - Deploy and test
+
+---
+
+### Session 5 - Splectrum Node Deployment Complete
+
+**Implemented:**
+- Symlink version pattern in `spl/dev/upgrade`
+  - Modules stored in `versions/bm_spl-{timestamp}/`
+  - Symlink `bm_spl -> versions/bm_spl-{timestamp}`
+  - Keeps last 5 versions, prunes old ones
+  - Handles legacy directory → symlink migration
+
+- Root node installed at `spl2/splectrum/`
+  - Using `./spl spl/dev/upgrade --target=../../../..` from dev bundle
+
+- Sidecar installed at `spl2/splectrum/ops/`
+  - Separate `bm_spl_ops` module with spl/ops API only
+  - Manages root node from independent process
+
+- spl/ops API methods:
+  - `status` - show root node state, active version, symlink health
+  - `list` - show available versions with timestamps
+  - `upgrade` - deploy candidate to root node
+  - `rollback` - revert to previous version
+
+**Process issues identified:**
+- Wrote code directly to implementation/ instead of environment (wrong)
+- Clone selfeval failing - needs proper runtime context in record
+- Event records not visible - handler shortcuts lose traceability
+- Handcrafted records in selfevals bypass runtime path
+
+**Corrected workflow (followed for spl/ops):**
+1. Create work module structure in implementation/ (folders, README.json)
+2. Deploy environment
+3. Implement in environment
+4. Cycle until tests pass
+5. Publish back to implementation/
+6. Promote and upgrade
+
+**Design discussion: Entry Point**
+
+Problem: Implementation workflow feels like overhead during exploration.
+
+Root cause: Creating structure and implementing at same time (interactive exploration) vs implementing from finished spec (autonomous execution).
+
+**Solution: Interactive mode**
+- Work directly in `implementation/` when in dev bundle
+- `spl/dev/cycle` from bundle root runs against implementation (interactive)
+- `spl/dev/cycle` from environment runs against modules (detached)
+- Context determines mode automatically (no flag needed)
+- API-level state set at record creation, not runtime detection
+
+**Entry Point Design (ENTRY_POINT_DESIGN.md):**
+
+Triple mode invocation:
+1. Single command CLI: `spl spl/dev/cycle --name=env-123`
+2. Inline script: `spl "await spl.dev.cycle({ name: 'env-123' })"`
+3. File invocation: `spl ./workflow.js --env=prod`
+
+Node resolution:
+- `spl` command finds nearest `splectrum/` traversing up from cwd
+- Like `node_modules` resolution
+- Can invoke from anywhere within node's directory tree
+
+Script library:
+- `scripts/` folder at node root
+- Local scripts override parent scripts
+- Resolved by name: `spl deploy-all`
+
+Programmatic API:
+- `spl.dev.cycle({ name: 'env-123' })`
+- API-level state: `spl.dev({ mode: 'interactive' }).cycle()`
+- Full JS flexibility in scripts
+
+**Files created:**
+- `ENTRY_POINT_DESIGN.md` - full design doc
+
+**Committed:** Session 5 work + entry point design
+
+**Next session:**
+- Review/fix selfeval runtime issues
+- Implement entry point design (node resolution, triple mode)
+- Implement interactive mode for dev bundles
+- Add script library support

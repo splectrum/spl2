@@ -14,52 +14,62 @@
 
 ### Current Work
 
-**Self-hosting achieved.** Full spl/dev workflow working via CLI.
+**Splectrum node deployment complete.** Root node and sidecar installed.
 
-**Completed:**
-- All spl/dev methods: deploy, prepare, test, cycle, publish, upgrade
-- Module management model: wm_* (work) → bm_spl (base, monolithic)
-- Dual publish: timestamped wm_* + bm_* artifacts
-- 17 selfevals passing
+**Completed this session:**
+- Symlink version pattern in `spl/dev/upgrade` (keeps last 5 versions)
+- Root node installed at `spl2/splectrum/`
+- Sidecar installed at `spl2/splectrum/ops/`
+- spl/ops API: status, list, upgrade, rollback
+- Entry point design doc (ENTRY_POINT_DESIGN.md)
 
-**Working workflow:**
+**Working commands:**
 ```bash
+# From dev bundle
 ./spl spl/dev/deploy                      # Create environment
 ./spl spl/dev/cycle --name=env-*          # prepare + test
 ./spl spl/dev/publish --name=env-*        # Create artifacts
-# Manual: cp -r bm_spl-{ts} bm_spl        # Promote
 ./spl spl/dev/upgrade                     # Install to splectrum/
+
+# From repo root (sidecar)
+./splectrum/ops/spl spl/ops/status        # Show root node status
+./splectrum/ops/spl spl/ops/list          # List versions
+./splectrum/ops/spl spl/ops/upgrade --candidate=path/to/bm_spl-*
+./splectrum/ops/spl spl/ops/rollback      # Revert to previous
 ```
 
-**In Progress:**
-- Repo-wide Splectrum node deployment
+**Known issues (need review):**
+- Clone selfeval disabled (needs proper runtime context)
+- Event records not visible (handler shortcut)
+- Handcrafted records in tests bypass runtime
 
-**Design complete (SPLECTRUM_NODE_DESIGN.md):**
-- Root node at `splectrum/` spot
-- Ops sidecar at `splectrum/ops/`
-- Symlink version pattern for rollback
-- `./spl` entry point at repo root
+**In Progress:**
+- Entry point design: triple mode (CLI, inline script, file)
+- Node resolution (find nearest splectrum/)
+- Script library (scripts/ folder with resolution)
+- Interactive vs detached mode
 
 **Next session:**
-- Implement symlink version pattern in upgrade
-- Create root node install
-- Create sidecar with spl/ops API (status, upgrade, rollback, list)
-- Deploy and test
+- Review and fix selfeval/runtime issues
+- Implement entry point design
+- Consider interactive mode for implementation workflow
 
 **Key files:**
-- `dev/v0/spl` - working entry point (local)
-- `dev/v0/splectrum/modules/bm_spl/` - deployed base module
-- `dev/v0/environments/env-1764151558962/` - development environment
-- `SPLECTRUM_NODE_DESIGN.md` - design doc
+- `spl` - repo root entry point
+- `splectrum/` - root node
+- `splectrum/ops/` - sidecar node
+- `dev/v0/splectrum/` - dev bundle node
+- `SPLECTRUM_NODE_DESIGN.md` - node architecture
+- `ENTRY_POINT_DESIGN.md` - entry point design (new)
 - `DAILY_LOG.md` - session notes
 
 ---
 
 ## Model Dev Environment
 
-**Location:** `projects/09-console-v5-stream-native/dev/v0/`
+**Location:** `projects/10-dev-env-v0-bundle-continued/dev/v0/`
 
-The always-current, portable dev environment template. Clone this when creating new projects.
+The current development bundle. Contains working spl/dev and spl/ops implementations.
 
 ---
 
