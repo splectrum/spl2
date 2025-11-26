@@ -362,6 +362,26 @@ Programmatic API:
 
 **Committed:** Session 5 work + entry point design
 
+**Implementation experience discussion:**
+
+The session exposed friction between how the workflow is designed and how exploration actually happens:
+
+1. **Rushing leads to shortcuts** - Speed pressure caused bypassing the proper workflow (writing directly to implementation/ instead of environment). This loses traceability and breaks tests.
+
+2. **"Discipline problem" reframed** - Rather than requiring discipline to follow the workflow, the preferred way should be the easiest way. If the workflow feels like overhead, that's a design signal.
+
+3. **Exploring vs implementing** - Two distinct modes:
+   - *Implementing from finished spec*: Structure defined, requirements clear. Deploy/cycle/publish makes sense - you're verifying against spec.
+   - *Interactive exploration*: Discovering design through implementation. Structure evolves. The environment isolation adds friction.
+
+4. **Solution insight**: Interactive mode where you work directly in `implementation/` without deploying. The overlay logic switches based on context (dev bundle root vs environment). Same infrastructure, different routing.
+
+5. **Events must be visible** - Fire-and-forget should create observable events, not invisible ones. Records should be written somewhere to enable traceability.
+
+6. **Selfevals should use runtime path** - Hand-crafting records bypasses the real path. When runtime changes, selfevals break in confusing ways. Fix: selfevals invoke methods through the same API as real usage.
+
+Key principle: *Don't fight the workflow - if it feels wrong, the design needs adjustment.*
+
 **Next session:**
 - Review/fix selfeval runtime issues
 - Implement entry point design (node resolution, triple mode)
