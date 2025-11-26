@@ -242,3 +242,44 @@ dev/v0/
 ```
 
 **Next:** Discussion about repo-wide `./spl` entry point
+
+---
+
+### Session 4 (continued) - Splectrum Node Design
+
+**Design discussion:**
+- Central `./spl` entry point at repo root
+- Root node in `splectrum/` spot
+- Ops sidecar in `splectrum/ops/` for safe upgrade/rollback
+- Dev bundles in projects remain isolated workbenches
+
+**Key decisions:**
+- Symlink version pattern: `bm_spl -> versions/bm_spl-{ts}`
+- Sidecar manages root node (no bootstrap paradox)
+- Sidecar as subfolder of splectrum/ (not separate top-level spot)
+
+**Design doc created:** `SPLECTRUM_NODE_DESIGN.md`
+
+**Gap analysis:**
+
+Already have:
+- spl/dev API: deploy, prepare, test, cycle, publish, upgrade, clone
+
+Need for repo-wide deployment:
+- Update spl/dev/upgrade for symlink version pattern
+- Root node install script
+- spl/ops API: status, upgrade, rollback, list
+- Sidecar bootstrap
+
+**Plan:**
+1. Implement minimum for repo-wide deployment (this project)
+2. Deploy configuration
+3. Close project
+4. New project from same backlog item for remaining work
+5. Working with repo-wide nodes will validate stability
+
+**Next session:**
+- Implement symlink version pattern in upgrade
+- Create root node install
+- Create sidecar with spl/ops API
+- Deploy and test

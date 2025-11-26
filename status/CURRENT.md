@@ -32,12 +32,25 @@
 ```
 
 **In Progress:**
-- Discussion: repo-wide `./spl` entry point
+- Repo-wide Splectrum node deployment
+
+**Design complete (SPLECTRUM_NODE_DESIGN.md):**
+- Root node at `splectrum/` spot
+- Ops sidecar at `splectrum/ops/`
+- Symlink version pattern for rollback
+- `./spl` entry point at repo root
+
+**Next session:**
+- Implement symlink version pattern in upgrade
+- Create root node install
+- Create sidecar with spl/ops API (status, upgrade, rollback, list)
+- Deploy and test
 
 **Key files:**
-- `dev/v0/spl` - working entry point
+- `dev/v0/spl` - working entry point (local)
 - `dev/v0/splectrum/modules/bm_spl/` - deployed base module
 - `dev/v0/environments/env-1764151558962/` - development environment
+- `SPLECTRUM_NODE_DESIGN.md` - design doc
 - `DAILY_LOG.md` - session notes
 
 ---
