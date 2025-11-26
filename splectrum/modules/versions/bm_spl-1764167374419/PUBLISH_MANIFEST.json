@@ -1,0 +1,10 @@
+{
+  "type": "base_module_release",
+  "source": "bm_spl",
+  "mergedFrom": "wm_spl_dev",
+  "environment": "env-1764166354545",
+  "timestamp": "1764167303573",
+  "publishedAt": "2025-11-26T14:28:23.652Z",
+  "nodesProcessed": 20,
+  "filesFlattened": 16
+}

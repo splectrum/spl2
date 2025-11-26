@@ -1,0 +1,6 @@
+{
+  "type": "method",
+  "title": "spl/dev/cycle",
+  "description": "Run prepare + test in sequence",
+  "version": "1.0.0"
+}

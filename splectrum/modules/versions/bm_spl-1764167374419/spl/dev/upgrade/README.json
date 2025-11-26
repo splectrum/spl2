@@ -1,0 +1,6 @@
+{
+  "type": "method",
+  "title": "spl/dev/upgrade",
+  "description": "Install base module to splectrum/ runtime directory",
+  "version": "1.0.0"
+}

@@ -1,0 +1,11 @@
+{
+  "name": "splectrum",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Splectrum runtime",
+  "activeModule": "bm_spl",
+  "activeVersion": "bm_spl-1764165335779",
+  "previousVersion": null,
+  "installedAt": "2025-11-26T14:29:54.556Z",
+  "rolledBackFrom": "bm_spl-1764167374419"
+}

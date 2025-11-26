@@ -1,0 +1,5 @@
+{
+  "type": "api",
+  "version": "1.0.0",
+  "description": "Runtime context API - provides execution environment properties"
+}

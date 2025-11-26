@@ -1,0 +1,11 @@
+{
+  "name": "pr09",
+  "type": "package",
+  "description": "Project 09 package - console v5 stream native exploration",
+  "files": [
+    "README.json"
+  ],
+  "children": [
+    "console/README.json"
+  ]
+}
