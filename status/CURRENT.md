@@ -14,35 +14,30 @@
 
 ### Current Work
 
-Migrating dev bundle scripts to spl/dev API methods for self-hosting.
+**Self-hosting achieved.** Full spl/dev workflow working via CLI.
 
 **Completed:**
-- upgrade.js and spl entry point (splectrum install infrastructure)
-- spl/runtime API (metastate schema, req)
-- spl/request API (metastate schema, req)
-- API_NAMESPACE_MODEL.md design doc
-- Type hierarchy update (state.avsc + metastate.avsc on branch nodes)
-- PROJECT_PLAN.md created
-- Full req audit for all work module nodes
-- spl/dev/deploy method implemented (in dev environment)
+- All spl/dev methods: deploy, prepare, test, cycle, publish, upgrade
+- Module management model: wm_* (work) → bm_spl (base, monolithic)
+- Dual publish: timestamped wm_* + bm_* artifacts
+- 17 selfevals passing
+
+**Working workflow:**
+```bash
+./spl spl/dev/deploy                      # Create environment
+./spl spl/dev/cycle --name=env-*          # prepare + test
+./spl spl/dev/publish --name=env-*        # Create artifacts
+# Manual: cp -r bm_spl-{ts} bm_spl        # Promote
+./spl spl/dev/upgrade                     # Install to splectrum/
+```
 
 **In Progress:**
-- Dev environment deployed: env-1764151558962
-- Implementing spl/dev methods: deploy (done), prepare, test, cycle, publish, destroy, upgrade
-
-**Blocking:**
-- prepare.js hardcodes `work_module`, needs update to find wm_* pattern
-
-**Next:**
-1. Fix prepare.js to find wm_* dynamically
-2. Continue spl/dev methods in environment
-3. Publish back, upgrade, test
+- Discussion: repo-wide `./spl` entry point
 
 **Key files:**
-- `dev/v0/environments/env-1764151558962/` - active dev environment
-- `dev/v0/implementation/wm_spl_dev/` - source (do not edit directly)
-- `PROJECT_PLAN.md` - candidate list and status
-- `API_NAMESPACE_MODEL.md` - design doc
+- `dev/v0/spl` - working entry point
+- `dev/v0/splectrum/modules/bm_spl/` - deployed base module
+- `dev/v0/environments/env-1764151558962/` - development environment
 - `DAILY_LOG.md` - session notes
 
 ---

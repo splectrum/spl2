@@ -178,3 +178,67 @@ project-root/
 1. Fix prepare.js to find wm_* pattern (line 63)
 2. Continue implementing spl/dev methods in environment
 3. Publish back, upgrade, test
+
+---
+
+### Session 4 - Self-Hosting Complete
+
+**Module Management Model Simplified:**
+
+Discussion established simplified model for module management:
+- Single monolithic `bm_spl` module containing all API code
+- Small `wm_*` work modules for additions/fixes, merged into base on completion
+- Versioning at codebase level (git), not module level
+- No registry needed yet - implementation/ suffices
+
+**Publish behavior (dual output):**
+- `wm_*-{timestamp}` - Standalone snapshot of work module (types flattened)
+- `bm_*-{timestamp}` - Work module merged into base module (types flattened)
+- Active versions (`wm_*`, `bm_*`) untouched until manual promotion
+- Promotion: `cp -r bm_spl-{ts} bm_spl`
+
+**spl/dev methods implemented:**
+
+| Method | Purpose |
+|--------|---------|
+| `deploy` | Create env from implementation (wm_* + types) |
+| `prepare` | Build hierarchy.json |
+| `test` | Run selfevals (stops on first failure, or --continueOnFailure) |
+| `cycle` | prepare + test |
+| `publish` | Create timestamped wm_* and bm_* artifacts |
+| `upgrade` | Install bm_spl to splectrum/ |
+
+**Self-hosting achieved:**
+
+```bash
+./spl spl/dev/deploy                      # Create environment
+./spl spl/dev/cycle --name=env-*          # prepare + test
+./spl spl/dev/publish --name=env-*        # Create artifacts
+# Manual: cp -r bm_spl-{ts} bm_spl        # Promote
+./spl spl/dev/upgrade                     # Install to splectrum/
+```
+
+**Test results:** 17 selfevals pass, 0 fail
+
+**Clone selfeval disabled:**
+- Clone tests require bundle root context (package.json present)
+- When run from environment, context is wrong
+- Disabled with explanation in output - not a real failure
+
+**Structure after upgrade:**
+```
+dev/v0/
+├── spl                      # Entry point (works!)
+├── splectrum/
+│   └── modules/bm_spl/      # Deployed standalone module
+├── implementation/
+│   ├── types/
+│   ├── wm_spl_dev/          # Active work module
+│   ├── wm_spl_dev-{ts}/     # Timestamped snapshots
+│   ├── bm_spl/              # Active base module
+│   └── bm_spl-{ts}/         # Timestamped releases
+└── environments/
+    └── env-1764151558962/   # Development environment
+```
+
+**Next:** Discussion about repo-wide `./spl` entry point

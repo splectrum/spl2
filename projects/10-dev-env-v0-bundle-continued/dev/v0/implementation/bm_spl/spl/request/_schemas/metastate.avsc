@@ -1,0 +1,18 @@
+{
+  "type": "record",
+  "name": "RequestMetastate",
+  "namespace": "spl.request",
+  "doc": "Public request lifecycle properties shared via headers",
+  "fields": [
+    {
+      "name": "completed",
+      "type": "boolean",
+      "doc": "Whether the request has been completed (success or error)"
+    },
+    {
+      "name": "ttl",
+      "type": "int",
+      "doc": "Time-to-live - remaining hops before request expires"
+    }
+  ]
+}

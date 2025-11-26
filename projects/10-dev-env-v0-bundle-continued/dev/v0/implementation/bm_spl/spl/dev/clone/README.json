@@ -1,0 +1,10 @@
+{
+  "name": "clone",
+  "type": "method",
+  "description": "Clone dev environment iteration to new location",
+  "files": [
+    "README.json",
+    "index.js"
+  ],
+  "children": []
+}

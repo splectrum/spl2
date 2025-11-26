@@ -141,3 +141,8 @@ vite.config.ts.timestamp-*
 # Project 09: Console v5 Stream Native - generated event files
 projects/09-console-v5-stream-native/dev/events/
 projects/09-console-v5-stream-native/dev/*/extracted/
+
+# Dev bundle generated artifacts
+**/dev/v*/environments/
+**/dev/v*/splectrum/
+**/dev/v*/spl

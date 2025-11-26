@@ -16,7 +16,7 @@ Iterative implementation picking from candidate list as needed.
 
 | Item | Category | Status | Notes |
 |------|----------|--------|-------|
-| spl/dev API | Core API | DONE | clone method implemented |
+| spl/dev API | Core API | DONE | All methods: deploy, prepare, test, cycle, publish, upgrade |
 | spl/runtime API | Core API | DONE | metastate schema, req complete |
 | spl/request API | Core API | DONE | metastate schema, req complete |
 | spl/pipeline API | Core API | | Event routing and handling |
@@ -30,6 +30,9 @@ Iterative implementation picking from candidate list as needed.
 
 | Item | Notes |
 |------|-------|
+| Self-hosting | Full spl/dev workflow via ./spl CLI |
+| Module management | wm_* (work) → bm_spl (monolithic base) |
+| Dual publish | Timestamped wm_* + bm_* artifacts |
 | upgrade.js | Creates splectrum install from bundle |
 | spl entry point | Shell wrapper + spl.mjs ES module |
 | Runtime in record | cwd, splectrumDir, invokedFrom in headers |
