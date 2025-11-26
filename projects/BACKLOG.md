@@ -26,6 +26,7 @@ Phased approach to get implementation infrastructure working.
 | [Dev Environment API](backlog/dev-environment-api.md) | High | spl/pipeline, spl/bug | Complete the 6 remaining methods from Project 08 foundation. |
 | [spl/pipeline v2](backlog/spl-pipeline-v2.md) | High | Phase 1 complete | Strengthen based on Phase 1 learnings. |
 | [spl/bug v2](backlog/spl-bug-v2.md) | High | Phase 1 complete | Upgrade based on learnings + ITIL vocabulary alignment. |
+| [API Design Documentation](backlog/api-design-documentation.md) | High | Phase 1 complete | Split API_DESIGN.md, integrate Project 09 design notes. CIP-014. |
 | [ITIL Introduction](backlog/itil-introduction.md) | High | Phase 1 complete | ITIL concepts wrapped in SPL2/DSL vocabulary. Service design foundation. |
 
 ---

@@ -1,8 +1,10 @@
-**Requirements:** projects/08-dev-environment-api/howto_glossary_v1.0.0.md
+**Requirements:** projects/09-console-v5-stream-native/howto_glossary_v1.1.0.md
 **Status:** Active - procedural guidance for SPL2 work
 **Context:** User's land - procedures and actions
 
-This glossary defines howtos - procedural guidance for common tasks. Howtos are the "user's land" complement to stepping stones ("creator's land").
+**Entry point for goal-oriented action:** "How do I do X?"
+
+When you have a goal to accomplish, start here. Howtos spider INTO stepping stones for concepts needed to execute. They are minimal routers, not duplicators - the intelligence lives in the concept reqs.
 
 ---
 
@@ -10,7 +12,8 @@ This glossary defines howtos - procedural guidance for common tasks. Howtos are 
 
 | Term | Description | Req |
 |------|-------------|-----|
-| create project | Create a project from backlog item: read item → identify project type → look up in glossary → follow req phases | projects/08-dev-environment-api/create_project_v1.0.0.md |
+| close project | Close a project: look up project type → read req with extends chain → follow closure phase respecting autonomous/collaborative boundaries | projects/09-console-v5-stream-native/close_project_v1.0.0.md |
+| create project | Create a project from backlog item: read item → identify project type → look up in glossary → follow req phases → remove from backlog → clone dev bundle | projects/09-console-v5-stream-native/create_project_v1.1.0.md |
 
 ---
 

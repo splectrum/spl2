@@ -67,28 +67,45 @@ SPL2 is a platform for AI to create and manage software solutions with a focus o
 - Surprise at interpretation gaps is calibration, not frustration
 - "So alike but so different" - same words, different mental models is the core challenge and opportunity
 
-## Efficient Search (Important)
+## Glossary-First Lookup (MANDATORY)
 
-**When looking up SPL2 concepts, use glossaries as index:**
+**ALWAYS start with the appropriate glossary. Never grep/scan the repo first.**
 
-1. **Glossary first** - Read appropriate glossary for term and req file reference
-2. **Req file** - From the Req column, read the requirements file directly
-3. **Then search** - Only use grep/glob if not in glossary
+The glossaries are the index to everything. Scanning projects or grepping the repo bypasses the knowledge structure and leads to errors (like missing the extends chain, or finding outdated information).
+
+**Two entry points based on intent:**
+
+| Intent | Glossary | Question |
+|--------|----------|----------|
+| **Understand** something | STEPPING_STONES_GLOSSARY.md | "What is X?" |
+| **Do** something | HOWTO_GLOSSARY.md | "How do I do X?" |
+
+**Spider pattern:**
+- Glossary entry → Req file (from Req column)
+- Req file → Extends chain (follow extends to get full picture)
+- Howtos spider INTO stepping stones for concepts needed
 
 **Glossary locations:**
-- `glossary/STEPPING_STONES_GLOSSARY.md` - Foundation concepts, methodology terms
+- `glossary/HOWTO_GLOSSARY.md` - Procedures, actions (goal-oriented entry point)
+- `glossary/STEPPING_STONES_GLOSSARY.md` - Concepts, patterns (understanding entry point)
 - `glossary/DSL_GLOSSARY.md` - Runtime/API vocabulary
 - `glossary/SPOTS_GLOSSARY.md` - Repository structure terms
 
-**Req file locations:**
-- Most reqs in `projects/06-glossary-term-requirements/reqs/`
-- Path shown in glossary Req column
+**Example - closing a project:**
+1. Goal: close project → HOWTO_GLOSSARY.md
+2. Find `close project` howto → follow req
+3. Req says: look up project type in stepping stones
+4. Find project type (e.g., `exploration project`) → follow req
+5. Req has extends: `blank project` → follow that req too
+6. Now have full closure procedure
 
-**Example:** Looking for "blank_project" requirements:
-1. Read STEPPING_STONES_GLOSSARY.md → find `blank_project_v1.0.1.md` in Req column
-2. Read `projects/06-glossary-term-requirements/reqs/blank_project_v1.0.1.md`
+**Example - understanding a concept:**
+1. Question: what is a work module? → STEPPING_STONES_GLOSSARY.md
+2. Find `work module` → follow req
+3. Req has extends: `module` → follow that req too
+4. Now have full understanding
 
-Two file reads, not multiple failed searches. **Glossaries are the index.**
+**Only grep/scan if:** Term genuinely not in any glossary (rare - consider adding it).
 
 ## Where to Find Things
 

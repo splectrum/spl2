@@ -133,6 +133,16 @@ node clone.js ../v1.0
 
 Update package.json name/description for the new project.
 
+## Documentation
+
+Detailed guides in `docs/`:
+
+| Doc | Purpose |
+|-----|---------|
+| [Adding a Method](docs/adding-a-method.md) | Step-by-step guide to create methods |
+| [Overlay Operations](docs/overlay-operations.md) | selectFile vs collectAll explained |
+| [SPL API](docs/spl-api.md) | createSpl wrapper reference |
+
 ---
 
 **Source:** Project 09 - Console v5 Stream Native
