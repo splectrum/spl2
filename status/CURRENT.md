@@ -1,6 +1,6 @@
 # Current Status
 
-**Last Updated:** 2025-11-26
+**Last Updated:** 2025-11-27
 
 ---
 
@@ -14,45 +14,48 @@
 
 ### Current Work
 
-**Splectrum node deployment complete.** Root node and sidecar installed.
+**Session 6 in progress.** Global entry point implemented.
 
-**Completed this session:**
-- Symlink version pattern in `spl/dev/upgrade` (keeps last 5 versions)
-- Root node installed at `spl2/splectrum/`
-- Sidecar installed at `spl2/splectrum/ops/`
-- spl/ops API: status, list, upgrade, rollback
-- Entry point design doc (ENTRY_POINT_DESIGN.md)
+**Completed Session 6 (so far):**
+- Global `spl` entry point with node resolution
+- Three invocation modes: command, inline script, file script
+- Node detection via `splectrum/package.json` with `name: "splectrum"`
+- Added to PATH (`~/.bashrc`)
+- WYSIWI principle documented
 
-**Working commands:**
+**Working commands (global now!):**
 ```bash
-# From dev bundle
-./spl spl/dev/deploy                      # Create environment
-./spl spl/dev/cycle --name=env-*          # prepare + test
-./spl spl/dev/publish --name=env-*        # Create artifacts
-./spl spl/dev/upgrade                     # Install to splectrum/
+# From anywhere - resolves nearest splectrum node
+spl spl/dev/cycle --name=env-123          # Command mode
+spl "console.log(runtime.nodeRoot)"       # Inline script mode
+spl ./script.js --arg=value               # File script mode
 
-# From repo root (sidecar)
-./splectrum/ops/spl spl/ops/status        # Show root node status
-./splectrum/ops/spl spl/ops/list          # List versions
-./splectrum/ops/spl spl/ops/upgrade --candidate=path/to/bm_spl-*
-./splectrum/ops/spl spl/ops/rollback      # Revert to previous
+# From dev bundle - resolves to dev bundle node
+cd projects/10-.../dev/v0
+spl spl/dev/deploy                        # Uses dev bundle node
+
+# From repo root - resolves to root node
+cd /home/herma/splectrum/spl2
+spl spl/dev/deploy                        # Uses root node
 ```
 
-**Known issues (need review):**
+**Known issues (still to address):**
 - Clone selfeval disabled (needs proper runtime context)
 - Event records not visible (handler shortcut)
 - Handcrafted records in tests bypass runtime
 
-**In Progress:**
-- Entry point design: triple mode (CLI, inline script, file)
-- Node resolution (find nearest splectrum/)
-- Script library (scripts/ folder with resolution)
-- Interactive vs detached mode
+**Implementation plan (Session 6):**
+1. ~~Entry point with node resolution~~ DONE
+2. Script library - NEXT
+3. Event persistence
+4. Request record creation/expansion
+5. Dev mode detection and implementation
+6. Selfeval refactoring
+7. Further code refactoring
 
-**Next session:**
-- Review and fix selfeval/runtime issues
-- Implement entry point design
-- Consider interactive mode for implementation workflow
+**Key docs:**
+- `SESSION_6_DISCUSSION.md` - WYSIWI principle, implementation plan
+- `ENTRY_POINT_DESIGN.md` - Entry point design
 
 **Key files:**
 - `spl` - repo root entry point
