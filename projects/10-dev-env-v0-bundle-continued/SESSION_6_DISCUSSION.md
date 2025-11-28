@@ -202,4 +202,111 @@ This explains why script library (#2) comes early - we need the workspace before
 - `/home/herma/splectrum/spl2/splectrum/scripts/` - Created (script library folder)
 - `~/.bashrc` - Added PATH entry
 
-### Item 2: Script Library - NEXT
+### Item 2: Script Library - COMPLETE
+
+**Implemented:**
+- Script resolution: `spl scriptname` resolves from `splectrum/scripts/` folder
+- Scripts live inside the node (not at nodeRoot)
+- Added `_positional` array to parsed args for positional arguments
+- Added `cwd` alias to runtime for backwards compatibility
+
+**Built-in scripts created:**
+- `splectrum/scripts/status.js` - Node status, directories, package info
+- `splectrum/scripts/list-methods.js` - List available methods
+- `splectrum/scripts/help.js` - General help or method-specific help
+
+**Mode detection (final):**
+1. Explicit file path (./script.js, ../script.js, /absolute/path) → file mode
+2. Starts with `/*` → inline script mode (preamble required)
+3. Script name found in `splectrum/scripts/` → library mode
+4. Default → command mode (method path)
+
+**Four invocation modes:**
+1. `spl spl/dev/cycle --name=env` - command mode (default)
+2. `spl status --verbose` - library mode
+3. `spl ./workflow.js --arg=val` - file mode
+4. `spl "/* script */ code"` - inline script mode (requires `/*` preamble)
+
+### Node Structure Discussion
+
+Significant design discussion captured in `NODE_STRUCTURE_DESIGN.md`:
+
+**Mycelium web pattern:**
+- Self-similar structure at every level
+- Each folder has: README.md, README.json, _reqs/ (when meaningful)
+- Pattern cascades from repository to node to folder to module
+
+**Node structure (splectrum/ IS the node):**
+```
+splectrum/
+├── README.md, README.json, package.json
+├── _reqs/           # Node requirements
+├── docs/            # Documentation
+├── scripts/         # Script library
+├── data/            # Persistent node storage
+├── apps/            # User-facing apps
+│   └── cli/         # Default CLI app
+│       ├── config/
+│       ├── state/
+│       ├── session/requests/
+│       └── channel/
+├── runtime/         # Node-internal (system, boot)
+├── lib/, modules/
+└── spl.mjs, run.js
+```
+
+**App model:**
+- App = self-contained unit (config, state, session, channel)
+- Apps are external-facing (request context in, response routing out)
+- Runtime is internal-facing (system maintenance, boot)
+- CLI is the default app (`apps/cli/`)
+- Apps can bridge to external systems (git, s3, webhooks)
+
+### Item 3: Event Persistence - IN PROGRESS
+
+**Design work completed:**
+- EVENT_STORAGE_DESIGN.md captures DCE principles and structure
+- Two-level event structure (app DCEs vs session DCEs)
+- File/folder storage: folder = key prefix, filename = timestamp
+- Complete record snapshots (no deltas)
+- Handler/app owns its topic structure
+
+**Implementation started:**
+- Created `apps/cli-static/` - default app for terminals without specific ID
+- Entry point builds proper Kafka-style record structure
+- App routing via `SPL_TERMINAL_ID` env var (format: `appId` or `appId:appInstanceId`)
+- Simple echo flow working (no DCE writing yet)
+
+**Record structure (entry point → app):**
+```javascript
+{
+  headers: {
+    spl: {
+      request: {
+        id: 'req-<timestamp>-<random>',
+        timeReceived: <timestamp>,
+        appId: 'cli-static',
+        appInstanceId: null  // for instance-specific apps
+      },
+      runtime: {
+        nodeRoot, splectrumDir, invokedFrom, globalSplectrumDir
+      }
+    }
+  },
+  value: {
+    mode: 'command',  // or 'script'
+    request: {
+      method: 'spl/dev/deploy',
+      input: { name: 'env-123' }
+    }
+  }
+}
+```
+
+**Key design decisions:**
+- Entry point does all resolution work (script loading, arg parsing)
+- Apps receive normalized, ready-to-process records
+- Terminal ID can route to different apps (cli-static is default)
+- No FAFs in entry point happy path
+
+**Next:** App hands off to session for actual processing

@@ -1,0 +1,23 @@
+{
+  "key": {
+    "requestId": "req-1764291593352"
+  },
+  "timestamp": 1764291593352,
+  "type": "response.sent",
+  "data": {
+    "response": {
+      "requestId": "req-1764291593352",
+      "timestamp": 1764291593352,
+      "echo": true,
+      "received": {
+        "method": "spl/dev/deploy",
+        "input": {
+          "_positional": [],
+          "name": "test-app-routing"
+        },
+        "mode": "command"
+      },
+      "message": "Request received by cli-static app (echo mode)"
+    }
+  }
+}

@@ -1,6 +1,6 @@
 # Current Status
 
-**Last Updated:** 2025-11-27
+**Last Updated:** 2025-11-28
 
 ---
 
@@ -14,57 +14,73 @@
 
 ### Current Work
 
-**Session 6 in progress.** Global entry point implemented.
+**Session 6 continued.** Request processing pipeline with FAF and consumer trail implemented.
 
-**Completed Session 6 (so far):**
+**Completed Session 6:**
 - Global `spl` entry point with node resolution
-- Three invocation modes: command, inline script, file script
-- Node detection via `splectrum/package.json` with `name: "splectrum"`
-- Added to PATH (`~/.bashrc`)
-- WYSIWI principle documented
+- Four invocation modes: command, library script, file script, inline script
+- Request record structure (headers = metadata, value = state)
+- Consumer trail for boundary crossings
+- FAF (Fire and Forget) pipeline with atomic writes and dedupe
+- Session structure: inbox/processing/outbox model
+- App → Session handoff via FAF to inbox
+- Response lifecycle: `timeReceived` and `timeResponded` timestamps
+- App metastate (`appModuleOverride`) design
+- Module resolution with app override (app stack → node stack)
+- Bootstrap layer: `lib/moduleBootstrap.js` with `requireSpl()`
+- POC/Pilot/Production implementation levels
+- Development pipeline: creative coding → work module → formal implementation
+- Script/module interface alignment (same record interface)
 
-**Working commands (global now!):**
-```bash
-# From anywhere - resolves nearest splectrum node
-spl spl/dev/cycle --name=env-123          # Command mode
-spl "console.log(runtime.nodeRoot)"       # Inline script mode
-spl ./script.js --arg=value               # File script mode
-
-# From dev bundle - resolves to dev bundle node
-cd projects/10-.../dev/v0
-spl spl/dev/deploy                        # Uses dev bundle node
-
-# From repo root - resolves to root node
-cd /home/herma/splectrum/spl2
-spl spl/dev/deploy                        # Uses root node
+**Current flow:**
+```
+CLI → Entry point → builds record → App
+  → FAF to app/requests/ (audit)
+  → FAF to session/inbox/
+  → Consumer picks from inbox → processing → outbox
+  → App picks from outbox (stamps consumer)
+  → timeResponded stamped
+  → FAF to app/requests/*.response.json
+  → Response to CLI
 ```
 
-**Known issues (still to address):**
-- Clone selfeval disabled (needs proper runtime context)
-- Event records not visible (handler shortcut)
-- Handcrafted records in tests bypass runtime
+**Key structures:**
+```
+splectrum/
+├── lib/moduleBootstrap.js     # Bootstrap layer (requireSpl)
+├── apps/cli-static/
+│   ├── scripts/faf.js         # POC FAF implementation
+│   └── requests/              # Request/response audit trail
+└── runtime/cli-static/
+    └── requests/
+        ├── inbox/             # Incoming from app
+        ├── processing/        # Being worked on
+        ├── outbox/            # Complete, waiting for app
+        └── scripts/           # Consumer handlers
+```
 
-**Implementation plan (Session 6):**
-1. ~~Entry point with node resolution~~ DONE
-2. Script library - NEXT
-3. Event persistence
-4. Request record creation/expansion
-5. Dev mode detection and implementation
-6. Selfeval refactoring
-7. Further code refactoring
+**Next steps:**
+1. Test `requireSpl` with test script (needs script runner update for ES modules)
+2. Update script runner to use record interface (align with modules)
+3. Consider FAF as lib function
+4. Switch existing code to use `requireSpl`
+
+**Key design decisions this session:**
+- Splectrum implementation always async (FAF). Sync is wrapper.
+- Consumer trail tracks boundary crossings (scales to P2P)
+- Data is the audit trail (happy path + exception visibility)
+- Scripts and modules share interface (freedom is structure, not interface)
+- Creative coding → formalize is clean handoff (can be autonomous)
 
 **Key docs:**
-- `SESSION_6_DISCUSSION.md` - WYSIWI principle, implementation plan
-- `ENTRY_POINT_DESIGN.md` - Entry point design
+- `EVENT_STORAGE_DESIGN.md` - Request API, consumer trail, FAF, visibility
+- `NODE_STRUCTURE_DESIGN.md` - Module resolution, session structure, bootstrap
+- `IMPLEMENTATION_APPROACH_DESIGN.md` - POC/Pilot/Production, pipeline, script alignment
 
 **Key files:**
-- `spl` - repo root entry point
-- `splectrum/` - root node
-- `splectrum/ops/` - sidecar node
-- `dev/v0/splectrum/` - dev bundle node
-- `SPLECTRUM_NODE_DESIGN.md` - node architecture
-- `ENTRY_POINT_DESIGN.md` - entry point design (new)
-- `DAILY_LOG.md` - session notes
+- `splectrum/lib/moduleBootstrap.js` - requireSpl (new)
+- `splectrum/apps/cli-static/` - POC app with FAF
+- `splectrum/runtime/cli-static/requests/` - Session with inbox/outbox
 
 ---
 

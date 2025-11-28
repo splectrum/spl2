@@ -1,0 +1,9 @@
+{
+  "name": "cli-static",
+  "description": "Default CLI app for shared terminal sessions",
+  "type": "app",
+  "routing": {
+    "default": true,
+    "terminalId": "cli-static"
+  }
+}
