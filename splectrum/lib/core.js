@@ -1,1 +1,0 @@
-../modules/bm_spl/_lib/core.js

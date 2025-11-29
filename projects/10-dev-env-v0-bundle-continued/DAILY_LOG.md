@@ -455,3 +455,246 @@ cli.parseArgs()
 - Implement dispatch + execution handlers
 - Add FAF before error exit
 - Later: platform switch in requireNonSpl
+
+---
+
+### Session 7 (continued) - Core Lib and FAF
+
+**Core lib location decision:**
+- Named `spl` at package level (not API level)
+- Path: `modules/bm_spl/spl/_lib/spl.js`
+- Required as: `lib/spl`
+- Contains FAF and other foundational utilities
+
+**For project closure docs:**
+- Update NODE_STRUCTURE_DESIGN.md: core lib path is `lib/spl` (package level)
+
+**FAF implementation:**
+- Added `faf(destination, options)` to `lib/spl`
+- Supports `{ sync: true }` for pre-exit writes
+- Default async (fire and forget), sync blocks until complete
+
+**Error topic structure:**
+- Topic first, then app: `runtime/error/cli`
+- cli.js: `resolveErrorTopic()` returns path
+- spl.js: `faf()` writes record
+- spl.mjs: `spl.faf(cli.resolveErrorTopic(), { sync: true })` before handleError
+
+**Tested:** Error record written to `runtime/error/cli/{timestamp}.json` with full WYSIWI state
+
+**Platform metadata:**
+- Add `runtime.platform.type` = `'bare'` | `'node'`
+- Detect early in CLI processing
+
+**Script lib discussion:**
+- `lib/spl/script` provides `script.input()`, `script.output()`
+- Abstracts record structure from scriptwriter
+- Scripts wrapped on load (no export boilerplate)
+- Comment preamble for documentation
+
+**Platform module tiers:**
+- Preferred: fs, path (splectrum internals)
+- Extended: os, crypto, http, etc. (registered in platformModules)
+- External: npm packages (standard require, single platform only)
+
+**Script type detection:**
+- Detect from code patterns: import/require vs requireNonSpl
+- Single platform scripts can use any npm package
+- Platform-portable scripts use requireNonSpl only
+
+---
+
+### Task Split: Pre/Post Request Record Creation
+
+**Pre-request (spl/cli - entry point):**
+- Create initial record ✓
+  - headers.spl.request.timeReceived
+  - headers.spl.runtime.invokedFrom (was cwd)
+  - headers.spl.runtime.platform.type = 'node'
+  - value.argv
+- Resolve node → runtime.nodeRoot ✓
+- Detect mode → value.mode ✓
+- Parse args → value.input ✓
+- Load external script file → value.script, mode file→script ✓
+- Validate (checks all errors) ✓
+- Error handling with FAF (sync) ✓
+- Hand off to cli-static app (next)
+
+**Mode values:**
+- `'command'` → method invocation (spl/dev/cycle)
+- `'script'` → inline code or preloaded external file
+- `'library'` → internal scripts (scripts/ or apps/xxx/scripts/)
+
+**Error codes:**
+- `NO_ARGS` - no arguments provided
+- `NO_NODE` - no splectrum/ node found
+- `FILE_NOT_FOUND` - explicit file path doesn't exist
+- `FILE_READ_ERROR` - can't read file (permissions, etc.)
+
+**Post-request (cli-static app) - three pipelines:**
+1. **Command** - method invocation (spl/dev/cycle)
+2. **Internal script** - library/app scripts (from scripts/)
+3. **Inline script** - code string (including preloaded external files)
+
+**Internal script resolution (app handles):**
+- App scripts first: `apps/cli-static/scripts/`
+- Node scripts second: `scripts/`
+
+**Internal vs external script detection:**
+- If resolved path is inside `nodeRoot` → mode = `'library'` (internal, not preloaded)
+- If resolved path is outside `nodeRoot` → mode = `'file'` (external, preloaded as inline)
+- Prevents internal scripts from being treated as external when invoked with `./` path
+
+---
+
+### App Invocation Architecture
+
+**App as method:**
+- API state = app's internal state (config, session, etc.)
+- Input = record (spl/cli record, RPC message, etc.)
+- Output = depends on transport (console for CLI, response message for RPC)
+
+**Invocation patterns:**
+```javascript
+// CLI (cli-static) - outputs to console, returns nothing
+await cliStatic.handle(cliRecord)
+
+// AVRO RPC - returns response message
+const response = await rpcApp.handle(record)
+```
+
+**Record transformation:**
+```
+spl/cli record → App (preprocessing) → Request record → Session → Output
+```
+
+**Stateful vs Stateless:**
+- **App (stateful context):** config, state, channel setup - persists across requests
+- **Session (stateless context):** processes single request, everything in record (WYSIWI)
+
+**Sync/Async bridge:**
+- External (client): synchronous - user/client waits for response
+- Internal (session): asynchronous - FAF to inbox/processing/outbox
+
+```
+Client ──sync──► App ──async──► Session
+                  │                │
+                  │◄──async────────┘
+Client ◄──sync──┘
+```
+
+**cli-static flow:**
+1. Receives spl/cli record (sync)
+2. Preprocesses → request record
+3. FAF to session inbox
+4. Waits for outbox
+5. Outputs to console
+6. Returns to spl.mjs
+
+---
+
+### External Entry Point Convention
+
+**`spl.mjs` = external entry point (wherever it appears)**
+
+Entry point files by purpose:
+| File | Purpose |
+|------|---------|
+| `spl.mjs` | External entry point (CLI, process, etc.) |
+| `app.mjs` | App-internal entry (if separate from spl.mjs) |
+| `index.js` | API method entry point (in modules) |
+| `handle.js` | Internal request handler (session scripts) |
+
+**Invocation patterns:**
+
+1. **Direct to app:**
+   ```
+   process → apps/cli-static/spl.mjs (JSON record)
+   ```
+
+2. **Global with routing:**
+   ```
+   process → splectrum/spl.mjs → routing → app
+   ```
+
+**Routing options:**
+- CLI args → cli-static (current)
+- JSON message type → appropriate app
+- Explicit app target in message
+
+**Self-documenting entry points:**
+- Each `spl.mjs` returns help on what it expects when requested
+- `--help` or no args shows: expected format, options, examples
+- Generalizes to all external communications
+
+This pattern applies to all external communication entry points.
+
+---
+
+### Entry Point Framework
+
+**File structure per app:**
+```
+apps/cli-static/
+├── spl.mjs    # Entry point shell (thin, standard)
+└── app.mjs    # Implementation (name, help, handle)
+```
+
+**app.mjs provides:**
+```javascript
+export const name = 'cli-static'
+export const help = `Usage: ...`
+export async function handle(record) { ... }
+```
+
+**spl.mjs wires it up (boilerplate):**
+```javascript
+import { entryPoint } from '../../lib/entryPoint.js'
+import * as app from './app.mjs'
+export const { handle } = entryPoint(app, import.meta.url)
+```
+
+**Framework (lib/entryPoint.js) provides:**
+- Main module detection
+- `--help` handling
+- JSON parsing from argv
+- Export of handle for programmatic use
+- Consistent error handling
+
+**Invocation paths:**
+1. Global: `./spl status` → splectrum/spl.mjs → cli-static
+2. Direct help: `node apps/cli-static/spl.mjs --help`
+3. Direct JSON: `node apps/cli-static/spl.mjs '{"headers":...}'`
+4. Programmatic: `import { handle } from './apps/cli-static/spl.mjs'`
+
+---
+
+### App API Vision
+
+**Inheritance pattern for apps:**
+- Base API: `spl/app` - provides common methods (load, save, send, consume)
+- Apps extend base: `app/cli-static` inherits from `spl/app`
+- Apps add specific methods: history, statistics, etc.
+- Resolution follows extends chain (app first, then base)
+
+**MVP for cli-static:**
+- `handle(record)` - main entry point
+- Inbox/outbox pattern (core, not optional):
+  1. FAF to session inbox
+  2. Session picks up → dispatch → execute
+  3. FAF to outbox
+  4. App consumes from outbox
+  5. Console output
+
+**Deferred:**
+- State loading/saving
+- spl/app base implementation
+- Full inheritance resolution
+
+**Session location:** `runtime/cli-static/` (per NODE_STRUCTURE_DESIGN.md)
+```
+runtime/cli-static/
+├── inbox/       # incoming requests
+├── processing/  # being worked on
+└── outbox/      # complete
+```

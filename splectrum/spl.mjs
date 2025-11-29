@@ -9,6 +9,7 @@
 //   4. Library:  spl status
 
 import { requireSpl } from './lib/moduleBootstrap.js'
+import { handle as cliStaticHandle } from './apps/cli-static/spl.mjs'
 
 // ============================================================================
 // Create record first thing - all input captured
@@ -21,17 +22,19 @@ const record = {
         timeReceived: Date.now()
       },
       runtime: {
-        nodeRoot: null
+        nodeRoot: null,
+        invokedFrom: process.cwd(),
+        platform: { type: 'node' }
       }
     }
   },
   value: {
     argv: process.argv.slice(2),
-    cwd: process.cwd(),
     mode: null,
     resolvedPath: null,
     input: null,
     method: null,
+    script: null,
     error: null
   }
 }
@@ -40,15 +43,21 @@ const record = {
 // Process CLI state
 // ============================================================================
 
-const cli = requireSpl('lib/cli', record)
+const cli = await requireSpl('lib/spl/cli', record)
+const spl = await requireSpl('lib/spl', record)
 
 cli.resolveNode()
-
-if (!cli.validate()) cli.handleError()
-
 cli.detectMode()
 cli.parseArgs()
+if (cli.isExternalScriptFile()) cli.loadExternalScriptFile()
 
-// Test: show record after processing
-console.log('=== CLI Record (after processing) ===')
-console.log(JSON.stringify(record, null, 2))
+if (!cli.validate()) {
+  spl.faf(cli.resolveErrorTopic(), { sync: true })
+  cli.handleError()
+}
+
+// ============================================================================
+// Hand off to cli-static app
+// ============================================================================
+
+await cliStaticHandle(record)

@@ -1,10 +1,9 @@
 // cli.js - CLI entry point utilities
 //
-// Bound pattern: createCli(record) returns object with methods
+// Bound pattern: create(record, { requireNonSpl }) returns object with methods
 // that read/write record internally. Caller doesn't know property paths.
 
-import fs from 'fs'
-import path from 'path'
+let fs, path
 
 // Script preamble - inline scripts must start with this
 const SCRIPT_PREAMBLE = '/*'
@@ -12,9 +11,13 @@ const SCRIPT_PREAMBLE = '/*'
 /**
  * Create CLI bound to record
  * @param {Object} record - The CLI record
+ * @param {Object} deps - Dependencies from bootstrap
+ * @param {Function} deps.requireNonSpl - Platform module loader
  * @returns {Object} - Bound CLI methods
  */
-export function create(record) {
+export function create(record, { requireNonSpl }) {
+  fs = requireNonSpl('fs')
+  path = requireNonSpl('path')
 
   // Internal: resolve script by name from scripts/ folder
   function resolveScript(scriptName, nodeRoot) {
@@ -39,12 +42,12 @@ export function create(record) {
 
   return {
     /**
-     * Find nearest splectrum/ folder traversing up from cwd
-     * Reads: record.value.cwd
+     * Find nearest splectrum/ folder traversing up from invokedFrom
+     * Reads: record.headers.spl.runtime.invokedFrom
      * Writes: record.headers.spl.runtime.nodeRoot
      */
     resolveNode() {
-      let dir = record.value.cwd
+      let dir = record.headers.spl.runtime.invokedFrom
 
       while (dir !== path.dirname(dir)) {
         const splectrumPath = path.join(dir, 'splectrum')
@@ -72,12 +75,12 @@ export function create(record) {
 
     /**
      * Detect invocation mode from first argument
-     * Reads: record.value.argv[0], record.value.cwd, record.headers.spl.runtime.nodeRoot
+     * Reads: record.value.argv[0], record.headers.spl.runtime.invokedFrom, record.headers.spl.runtime.nodeRoot
      * Writes: record.value.mode, record.value.resolvedPath
      */
     detectMode() {
       const firstArg = record.value.argv[0]
-      const cwd = record.value.cwd
+      const invokedFrom = record.headers.spl.runtime.invokedFrom
       const nodeRoot = record.headers.spl.runtime.nodeRoot
 
       if (!firstArg) {
@@ -89,11 +92,27 @@ export function create(record) {
       if (firstArg.startsWith('./') || firstArg.startsWith('../') || path.isAbsolute(firstArg)) {
         const possiblePath = path.isAbsolute(firstArg)
           ? firstArg
-          : path.join(cwd, firstArg)
+          : path.join(invokedFrom, firstArg)
 
         if (fs.existsSync(possiblePath) && fs.statSync(possiblePath).isFile()) {
+          // Check if path is inside nodeRoot (internal script)
+          if (nodeRoot && possiblePath.startsWith(nodeRoot + path.sep)) {
+            record.value.mode = 'library'
+            record.value.resolvedPath = possiblePath
+            return
+          }
+          // External file
           record.value.mode = 'file'
           record.value.resolvedPath = possiblePath
+          return
+        } else {
+          // Explicit file path but file not found - error
+          record.value.mode = 'file'
+          record.value.error = {
+            code: 'FILE_NOT_FOUND',
+            path: possiblePath,
+            exitCode: 1
+          }
           return
         }
       }
@@ -152,12 +171,46 @@ export function create(record) {
     },
 
     /**
+     * Check if mode is external script file
+     * Reads: record.value.mode
+     * Returns: true if mode is 'file'
+     */
+    isExternalScriptFile() {
+      return record.value.mode === 'file'
+    },
+
+    /**
+     * Load external script file content for inline execution
+     * Reads: record.value.resolvedPath
+     * Writes: record.value.script, record.value.mode (file → script), record.value.error
+     */
+    loadExternalScriptFile() {
+      try {
+        const content = fs.readFileSync(record.value.resolvedPath, 'utf-8')
+        record.value.script = content
+        record.value.mode = 'script'
+      } catch (e) {
+        record.value.error = {
+          code: 'FILE_READ_ERROR',
+          path: record.value.resolvedPath,
+          message: e.message,
+          exitCode: 1
+        }
+      }
+    },
+
+    /**
      * Validate CLI state
-     * Reads: record.value.argv, record.headers.spl.runtime.nodeRoot
+     * Reads: record.value.argv, record.value.error, record.headers.spl.runtime.nodeRoot
      * Writes: record.value.error (if invalid)
      * Returns: true if valid, false if error
      */
     validate() {
+      // Check: error already set (from detectMode, parseArgs, etc.)
+      if (record.value.error) {
+        return false
+      }
+
       // Check: no args
       if (record.value.argv.length === 0) {
         record.value.error = {
@@ -171,13 +224,24 @@ export function create(record) {
       if (!record.headers.spl.runtime.nodeRoot) {
         record.value.error = {
           code: 'NO_NODE',
-          cwd: record.value.cwd,
+          invokedFrom: record.headers.spl.runtime.invokedFrom,
           exitCode: 1
         }
         return false
       }
 
       return true
+    },
+
+    /**
+     * Resolve error topic path for this CLI session
+     * Reads: record.headers.spl.runtime.nodeRoot
+     * Returns: absolute path to error topic folder
+     */
+    resolveErrorTopic() {
+      const nodeRoot = record.headers.spl.runtime.nodeRoot
+      if (!nodeRoot) return null
+      return path.join(nodeRoot, 'runtime', 'error', 'cli')
     },
 
     /**
@@ -199,7 +263,12 @@ export function create(record) {
         console.error('  spl status')
       } else if (error.code === 'NO_NODE') {
         console.error('Error: No splectrum/ node found in directory tree')
-        console.error(`Searched from: ${error.cwd}`)
+        console.error(`Searched from: ${error.invokedFrom}`)
+      } else if (error.code === 'FILE_NOT_FOUND') {
+        console.error(`Error: File not found: ${error.path}`)
+      } else if (error.code === 'FILE_READ_ERROR') {
+        console.error(`Error: Cannot read file: ${error.path}`)
+        console.error(`  ${error.message}`)
       } else {
         console.error(`Error: ${error.code}`)
       }

@@ -441,58 +441,79 @@ console  // Console for output
 
 ---
 
-## lib/ Organization
+## lib/ and Module Bootstrap
 
-Internal utility libraries. Real files (not symlinks to modules).
+### lib/ Contains Only Bootstrap
 
-### Current Files
-
-| File | Purpose | Used By |
-|------|---------|---------|
-| `moduleBootstrap.js` | Module resolution with overlay algorithm, `requireSpl()` | Entry point, scripts, methods |
-| `cli.js` | CLI-specific utilities (node resolution, mode detection, arg parsing) | `spl.mjs` only |
-
-### cli.js - Bound Pattern
-
-CLI entry point utilities - internal, not part of formal API.
-
-**Pattern:** `createCli(record)` returns bound object. Record property paths internalized.
-
-```javascript
-import { createCli } from './lib/cli.js'
-
-const cli = createCli(record)
-
-cli.resolveNode()   // reads value.cwd → writes headers.spl.runtime.nodeRoot
-cli.detectMode()    // reads value.argv[0], nodeRoot → writes value.mode, value.resolvedPath
-cli.parseArgs()     // reads value.argv → writes value.input, value.method
+```
+lib/
+└── moduleBootstrap.js    ← only this, the bootstrap layer
 ```
 
-**Design principles:**
-- Record structure internalized - caller doesn't know property paths
-- Clear method origin - `cli.resolveNode()` shows where method comes from
-- Same pattern as formal modules (bound to record)
-- Free style (cli.js) and formal (modules) address different concerns but share pattern
+Bootstrap layer enables module loading - can't be inside a module (chicken-egg).
 
-### Why lib/ not modules/
+### moduleBootstrap.js
 
-Bootstrap layer - enables module loading, can't be inside a module (chicken-egg).
-CLI utilities are entry-point specific, not general splectrum functionality.
-
-### platform.js - Platform Abstraction
-
-Single point for external module imports. Provides `require()` that switches internally:
+Two require functions:
 
 ```javascript
-import { require, platform } from './platform.js'
+// Splectrum libs/modules (async, bound to record)
+const cli = await requireSpl('lib/spl/cli', record)
 
-const fs = await require('fs')    // bare-fs on Bare, fs on Node
-const path = await require('path') // bare-path on Bare, path on Node
+// Platform modules (sync, registered)
+const fs = requireNonSpl('fs')
 ```
 
-- Single spl.mjs works for both Node and Bare
-- `platform.name` exposed in runtime record
-- `bareMap` is only place knowing Bare equivalents
+**requireSpl(uri, record):**
+- `lib/spl/cli` → resolves to `modules/bm_spl/spl/cli/_lib/cli.js`
+- Calls `mod.create(record, { requireNonSpl })` - injects dependencies
+- Returns bound object
+
+**requireNonSpl(moduleName):**
+- Sync lookup from pre-loaded registry
+- Must be registered (enforces explicit dependencies)
+- Ready for Bare platform switch (values will be Bare equivalents)
+
+```javascript
+const platformModules = {
+  'fs': fsModule,     // later: 'bare-fs' on Bare
+  'path': pathModule  // later: 'bare-path' on Bare
+}
+```
+
+### Lib Files Live in Module Structure
+
+Libs are formal APIs, live in `modules/bm_spl/`:
+
+```
+modules/bm_spl/spl/cli/_lib/cli.js   ← spl/cli lib
+modules/bm_spl/spl/core/_lib/core.js ← spl/core lib (future)
+```
+
+**No symlinks needed** - requireSpl resolves in code.
+
+### Dependency Injection Pattern
+
+Libs receive dependencies via create(), no imports from lib/:
+
+```javascript
+// cli.js - no import statements for bootstrap
+export function create(record, { requireNonSpl }) {
+  const fs = requireNonSpl('fs')
+  const path = requireNonSpl('path')
+
+  return {
+    resolveNode() { ... },
+    // methods use fs, path
+  }
+}
+```
+
+**Benefits:**
+- No path traversal imports
+- Dependencies explicit
+- Easy to test (mock dependencies)
+- Platform switch transparent to libs
 
 ### CLI Record Pattern (spl/cli API)
 

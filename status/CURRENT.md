@@ -14,62 +14,49 @@
 
 ### Current Work
 
-**Session 7 in progress.** CLI pipeline restructure with record-first pattern.
+**Session 7 in progress.** CLI pipeline and app framework.
 
 **Completed this session:**
-- Fixed path references in foundation docs (proper `folder/file.md` format)
-- Extracted CLI utilities to `lib/cli.js` with bound pattern
-- Record-first pattern: create Kafka record at entry, all functions operate on record
-- `requireSpl(uri, record)` - single function for lib binding
-- `cli.validate()` + `cli.handleError()` - validation with console-friendly output
-- spl.mjs now thin: record creation + requireSpl + flow
+- Pre-request pipeline complete (spl/cli):
+  - Record-first pattern with headers/value structure
+  - `runtime.invokedFrom`, `runtime.platform.type` in headers
+  - Mode detection, arg parsing, external file preloading
+  - Internal vs external script detection (inside nodeRoot = library mode)
+  - Error handling with FAF (sync) to `runtime/error/cli/`
 
-**Current pattern:**
-```javascript
-// spl.mjs
-import { requireSpl } from './lib/moduleBootstrap.js'
+- Entry point framework:
+  - `lib/entryPoint.js` - framework for spl.mjs entry points
+  - Apps provide `{name, help, handle}` in `app.mjs`
+  - `spl.mjs` = thin shell, wires app to framework
+  - Supports: global spl, direct --help, direct JSON, programmatic import
 
-const record = {
-  headers: { spl: { request: {...}, runtime: {...} } },
-  value: { argv, cwd, mode, input, method, error... }
-}
+- cli-static app structure:
+  - `apps/cli-static/spl.mjs` - entry point shell
+  - `apps/cli-static/app.mjs` - name, help, handle
+  - Hand-off from splectrum/spl.mjs working
 
-const cli = requireSpl('lib/cli', record)
+- Core lib:
+  - `lib/spl` at package level (`modules/bm_spl/spl/_lib/spl.js`)
+  - FAF with `{ sync: true }` option for pre-exit writes
 
-cli.resolveNode()
-if (!cli.validate()) cli.handleError()
-cli.detectMode()
-cli.parseArgs()
-// dispatch...
-```
-
-**Bound pattern:**
-- `cli.js` exports `create(record)` returning bound object
-- Methods read/write record internally
-- Caller doesn't know property paths
-- Same pattern for all libs (cli, core, etc.)
-
-**Next steps:**
-1. Add `requireNonSpl(moduleName)` skeleton for platform externals
-2. Add module resolution to requireSpl (for spl/dev/cycle style paths)
-3. Implement dispatch and execution handlers
-4. Add FAF before handleError exits
-5. Later: platform.js switch logic in requireNonSpl
-
-**Key design decisions:**
-- Record created first thing (all input captured)
-- `headers` = public metadata (flows downstream), `value` = internal state
-- spl/cli extends spl/runtime conceptually
-- Free style (lib/) and formal (modules/) share bound pattern
-- `requireSpl` for splectrum, `requireNonSpl` for platform externals
+**Next:** Implement inbox/outbox pattern in cli-static handle()
+- FAF to session inbox
+- Session processes (dispatch to command/library/script)
+- FAF to outbox
+- App consumes and outputs to console
 
 **Key docs:** (in `projects/10-dev-env-v0-bundle-continued/`)
-- `NODE_STRUCTURE_DESIGN.md` - lib/ organization, CLI record pattern, bound pattern
+- `DAILY_LOG.md` - Session 7 notes, task split, app architecture
+- `NODE_STRUCTURE_DESIGN.md` - node structure, lib organization
 
 **Key files:**
-- `splectrum/spl.mjs` - thin entry point
-- `splectrum/lib/moduleBootstrap.js` - requireSpl
-- `splectrum/lib/cli.js` - CLI bound object
+- `splectrum/spl.mjs` - CLI entry point
+- `splectrum/lib/moduleBootstrap.js` - requireSpl, requireNonSpl
+- `splectrum/lib/entryPoint.js` - app entry point framework
+- `splectrum/modules/bm_spl/spl/_lib/spl.js` - core lib (FAF)
+- `splectrum/modules/bm_spl/spl/cli/_lib/cli.js` - CLI lib
+- `splectrum/apps/cli-static/spl.mjs` - app entry point
+- `splectrum/apps/cli-static/app.mjs` - app implementation
 
 ---
 
