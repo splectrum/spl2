@@ -6,7 +6,7 @@
 
 **Splectrum rests on three foundational pillars - data, language, and creation.**
 
-**See:** Three_pillars_v1.0.0.md (projects/05-foundation-update-documentation-templates/)
+**See:** `projects/05-foundation-update-documentation-templates/Three_pillars_v1.0.0.md`
 
 **The triad:**
 - **Mycelium** - The web of data (distributed repository layer, network beneath)
@@ -102,7 +102,7 @@
 
 **You never step in the same river twice - but we trace every drop.**
 
-**See:** Panta_rhei_v1.0.0.md (projects/05-foundation-update-documentation-templates/)
+**See:** `projects/05-foundation-update-documentation-templates/Panta_rhei_v1.0.0.md`
 
 **Everything flows:**
 - State flows like a river (constantly changing, never the same)
@@ -133,7 +133,7 @@
 
 **Friction appears in many forms across design, technology, and architecture - each type a distinct signal.**
 
-**See:** Friction_in_design_v1.0.0.md (projects/05-foundation-update-documentation-templates/)
+**See:** `projects/05-foundation-update-documentation-templates/Friction_in_design_v1.0.0.md`
 **See also:** WOW.md "The Magic of Friction" (why friction matters, how we work with it)
 
 **Five design incarnations:**
@@ -160,7 +160,7 @@
 
 **Technology choices that match the architecture and reduce friction.**
 
-**See:** Stack_to_match_v1.0.0.md (projects/05-foundation-update-documentation-templates/)
+**See:** `projects/05-foundation-update-documentation-templates/Stack_to_match_v1.0.0.md`
 
 **Core technologies (validated):**
 - **Streaming:** Kafka-compatible records, immutable, event sourcing natural

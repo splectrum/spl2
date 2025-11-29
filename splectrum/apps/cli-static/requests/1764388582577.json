@@ -1,0 +1,24 @@
+{
+  "headers": {
+    "spl": {
+      "request": {
+        "id": "req-1764388582577-3srfc7",
+        "timeReceived": 1764388582577
+      },
+      "runtime": {
+        "nodeRoot": "/home/herma/splectrum/spl2",
+        "splectrumDir": "/home/herma/splectrum/spl2/splectrum"
+      }
+    }
+  },
+  "value": {
+    "mode": "command",
+    "appId": "cli-static",
+    "appInstanceId": null,
+    "invokedFrom": "/home/herma/splectrum/spl2",
+    "method": "spl/ops/status",
+    "input": {
+      "_positional": []
+    }
+  }
+}

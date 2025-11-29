@@ -43,7 +43,7 @@ Increasing friction = signal to investigate root cause
 
 **Friction manifests in many forms throughout partnership - each a signal to understand and address.**
 
-**See:** Friction_in_partnership_v1.0.0.md (projects/05-foundation-update-documentation-templates/)
+**See:** `projects/05-foundation-update-documentation-templates/Friction_in_partnership_v1.0.0.md`
 
 **Partnership incarnations:**
 - **Communication friction:** Misunderstanding, talking past each other, unclear expectations

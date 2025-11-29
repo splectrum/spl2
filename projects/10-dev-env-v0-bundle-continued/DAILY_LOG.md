@@ -382,8 +382,76 @@ The session exposed friction between how the workflow is designed and how explor
 
 Key principle: *Don't fight the workflow - if it feels wrong, the design needs adjustment.*
 
-**Next session:**
-- Review/fix selfeval runtime issues
-- Implement entry point design (node resolution, triple mode)
-- Implement interactive mode for dev bundles
-- Add script library support
+---
+
+### Session 7 - CLI Pipeline Restructure
+
+**Goal:** Clean up entry point pipeline, align with record-first pattern.
+
+**Documentation cleanup:**
+- Fixed path references in foundation docs (WOW.md, PRINCIPLES.md, PARTNERSHIP.md)
+- Changed `Filename.md (folder/)` to proper `folder/Filename.md` format
+- Updated CURRENT.md key docs section
+
+**CLI restructure - record-first pattern:**
+
+Created Kafka record at entry point with all input:
+```javascript
+const record = {
+  headers: {
+    spl: {
+      request: { timeReceived },
+      runtime: { nodeRoot }
+    }
+  },
+  value: {
+    argv, cwd, mode, resolvedPath, input, method, error
+  }
+}
+```
+
+**Bound pattern for libs:**
+
+`cli.js` refactored to export `create(record)` returning bound object:
+- Methods read/write record internally
+- Caller doesn't know property paths
+- `cli.resolveNode()`, `cli.detectMode()`, `cli.parseArgs()`
+- `cli.validate()` returns boolean, writes error to record
+- `cli.handleError()` outputs console-friendly message, exits
+
+**requireSpl introduced:**
+
+Single function in `lib/moduleBootstrap.js`:
+```javascript
+const cli = requireSpl('lib/cli', record)
+```
+- URI pattern: `lib/xxx` for libs, `pkg/api/method` for modules (TBD)
+- Returns bound object with record internalized
+
+**spl.mjs now thin:**
+```javascript
+import { requireSpl } from './lib/moduleBootstrap.js'
+
+const record = { ... }
+const cli = requireSpl('lib/cli', record)
+
+cli.resolveNode()
+if (!cli.validate()) cli.handleError()
+cli.detectMode()
+cli.parseArgs()
+// dispatch...
+```
+
+**Design decisions:**
+- `headers` = public metadata (flows downstream)
+- `value` = internal state (spl/cli's business)
+- spl/cli conceptually extends spl/runtime
+- Free style (lib/) and formal (modules/) share bound pattern
+- Two require functions: `requireSpl` for splectrum, `requireNonSpl` for platform externals
+
+**Next:**
+- Add `requireNonSpl(moduleName)` skeleton for platform externals
+- Add module resolution to requireSpl
+- Implement dispatch + execution handlers
+- Add FAF before error exit
+- Later: platform switch in requireNonSpl

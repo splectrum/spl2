@@ -79,7 +79,7 @@
 
 **Equal partnership, not assistant-director.**
 
-**See:** Partnership_in_trust_v1.0.0.md (projects/05-foundation-update-documentation-templates/)
+**See:** `projects/05-foundation-update-documentation-templates/Partnership_in_trust_v1.0.0.md`
 
 **Communication as equals:**
 - Direct and honest discourse - say what you see clearly
@@ -120,7 +120,7 @@
 **Completeness has two approaches depending on context.**
 
 **See stepping stones:** Minimal and Complete, More Than Complete
-**See:** Sides_of_completeness_v1.0.0.md (projects/05-foundation-update-documentation-templates/)
+**See:** `projects/05-foundation-update-documentation-templates/Sides_of_completeness_v1.0.0.md`
 
 **Minimal and complete** (rapid convergence from minimal side):
 - For implementation, code, building
@@ -148,7 +148,7 @@
 **Friction isn't just resistance to eliminate - it's signal that drives evolution and breakthrough.**
 
 **See stepping stone:** Friction
-**See:** Magic_of_friction_v1.0.0.md (projects/05-foundation-update-documentation-templates/)
+**See:** `projects/05-foundation-update-documentation-templates/Magic_of_friction_v1.0.0.md`
 
 **What friction is:**
 - Technical resistance + emotional difficulty in getting work done
@@ -183,7 +183,7 @@
 **Projects replace sprint ceremonies - better fit for AI collaboration.**
 
 **See stepping stone:** Project
-**See:** PRINCE2_methodology_v1.0.0.md (projects/05-foundation-update-documentation-templates/)
+**See:** `projects/05-foundation-update-documentation-templates/PRINCE2_methodology_v1.0.0.md`
 
 **Why PRINCE2 instead of agile:**
 - Sprint planning doesn't fit AI collaboration (variable speed, discovery work)
@@ -216,7 +216,7 @@
 **Service management for running and evolving systems - placeholder for future development.**
 
 **See stepping stones:** Adhoc Activity, Planned Activity, Unplanned Activity
-**See:** ITIL_overview_v1.0.0.md (projects/05-foundation-update-documentation-templates/)
+**See:** `projects/05-foundation-update-documentation-templates/ITIL_overview_v1.0.0.md`
 
 **Current alignment with ITIL concepts:**
 - Adhoc Activity (informal changes, emergent) ~ ITIL standard/emergency changes
@@ -242,7 +242,7 @@
 **Self-evaluation enables autonomy - AI can assess quality independently, work autonomously, build trust through accuracy.**
 
 **See stepping stone:** Artifact-to-requirements pinning
-**See:** Self_evaluation_v1.0.0.md (projects/05-foundation-update-documentation-templates/)
+**See:** `projects/05-foundation-update-documentation-templates/Self_evaluation_v1.0.0.md`
 
 **The connection to autonomy:**
 - Clear requirements → AI knows what success looks like
@@ -285,7 +285,7 @@
 **The paradox: fencing enables autonomy. Without boundaries, no autonomy can be granted.**
 
 **See stepping stone:** Autonomy
-**See:** Constraints_create_freedom_v1.0.0.md (chats/immutables/)
+**See:** `chats/immutables/Constraints_create_freedom_v1.0.0.md`
 
 **The paradox explained:**
 - Constraints (requirements + self-evaluation tools) define the fence
@@ -323,7 +323,7 @@
 **Artifacts satisfy their requirements version at creation - no retroactive burden when requirements evolve.**
 
 **See stepping stone:** Local Rules
-**See:** Local_rules_apply_v1.0.0.md (projects/05-foundation-update-documentation-templates/)
+**See:** `projects/05-foundation-update-documentation-templates/Local_rules_apply_v1.0.0.md`
 
 **The principle:**
 - Each artifact references specific requirements version (first line)
@@ -365,7 +365,7 @@
 **Partnership reflection is what makes everything work beautifully - continuous practice reduces friction, builds trust, improves collaboration over time.**
 
 **See stepping stones:** Friction, Single Concern, Pragmatism, More Than Complete, Commit Message
-**See:** Partnership_reflection_v1.0.0.md (projects/05-foundation-update-documentation-templates/)
+**See:** `projects/05-foundation-update-documentation-templates/Partnership_reflection_v1.0.0.md`
 
 **The virtuous cycle:**
 - Reflect honestly on friction → Understand what created resistance → Adjust patterns → Friction decreases → Trust builds → Autonomy expands → Work flows smoothly → Partnership strengthens → Next reflection even better

@@ -441,6 +441,107 @@ console  // Console for output
 
 ---
 
+## lib/ Organization
+
+Internal utility libraries. Real files (not symlinks to modules).
+
+### Current Files
+
+| File | Purpose | Used By |
+|------|---------|---------|
+| `moduleBootstrap.js` | Module resolution with overlay algorithm, `requireSpl()` | Entry point, scripts, methods |
+| `cli.js` | CLI-specific utilities (node resolution, mode detection, arg parsing) | `spl.mjs` only |
+
+### cli.js - Bound Pattern
+
+CLI entry point utilities - internal, not part of formal API.
+
+**Pattern:** `createCli(record)` returns bound object. Record property paths internalized.
+
+```javascript
+import { createCli } from './lib/cli.js'
+
+const cli = createCli(record)
+
+cli.resolveNode()   // reads value.cwd → writes headers.spl.runtime.nodeRoot
+cli.detectMode()    // reads value.argv[0], nodeRoot → writes value.mode, value.resolvedPath
+cli.parseArgs()     // reads value.argv → writes value.input, value.method
+```
+
+**Design principles:**
+- Record structure internalized - caller doesn't know property paths
+- Clear method origin - `cli.resolveNode()` shows where method comes from
+- Same pattern as formal modules (bound to record)
+- Free style (cli.js) and formal (modules) address different concerns but share pattern
+
+### Why lib/ not modules/
+
+Bootstrap layer - enables module loading, can't be inside a module (chicken-egg).
+CLI utilities are entry-point specific, not general splectrum functionality.
+
+### platform.js - Platform Abstraction
+
+Single point for external module imports. Provides `require()` that switches internally:
+
+```javascript
+import { require, platform } from './platform.js'
+
+const fs = await require('fs')    // bare-fs on Bare, fs on Node
+const path = await require('path') // bare-path on Bare, path on Node
+```
+
+- Single spl.mjs works for both Node and Bare
+- `platform.name` exposed in runtime record
+- `bareMap` is only place knowing Bare equivalents
+
+### CLI Record Pattern (spl/cli API)
+
+spl/cli extends spl/runtime. Record created at entry point encapsulates CLI state.
+
+**Structure:**
+```javascript
+{
+  headers: {
+    spl: {
+      request: { timeReceived },
+      runtime: {
+        nodeRoot,                    // splectrum/ folder
+        platform: { name, isBare, isNode }
+      }
+    }
+  },
+  value: {
+    // CLI internal state (not passed on)
+    argv: [...],
+    cwd: '...',
+    mode: 'command|file|library|script',
+    resolvedPath: '...',
+    input: { ... },
+    method: '...'
+  }
+}
+```
+
+**Processing flow:**
+```
+create record (argv, cwd)
+    ↓
+detectPlatform(record)  → headers.spl.runtime.platform
+    ↓
+resolveNode(record)     → headers.spl.runtime.nodeRoot
+    ↓
+detectMode(record)      → value.mode, value.resolvedPath
+    ↓
+parseArgs(record)       → value.input, value.method
+    ↓
+dispatch(record)        → route based on value.mode
+```
+
+**Key principle:** Process here, keep only public metadata (headers) for downstream.
+CLI internals (value) are spl/cli's business - not passed to apps/methods.
+
+---
+
 ## Implementation Status
 
 - [x] Node identification (package.json with name: "splectrum")

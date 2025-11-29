@@ -1,6 +1,6 @@
 # Current Status
 
-**Last Updated:** 2025-11-28
+**Last Updated:** 2025-11-29
 
 ---
 
@@ -14,73 +14,62 @@
 
 ### Current Work
 
-**Session 6 continued.** Request processing pipeline with FAF and consumer trail implemented.
+**Session 7 in progress.** CLI pipeline restructure with record-first pattern.
 
-**Completed Session 6:**
-- Global `spl` entry point with node resolution
-- Four invocation modes: command, library script, file script, inline script
-- Request record structure (headers = metadata, value = state)
-- Consumer trail for boundary crossings
-- FAF (Fire and Forget) pipeline with atomic writes and dedupe
-- Session structure: inbox/processing/outbox model
-- App → Session handoff via FAF to inbox
-- Response lifecycle: `timeReceived` and `timeResponded` timestamps
-- App metastate (`appModuleOverride`) design
-- Module resolution with app override (app stack → node stack)
-- Bootstrap layer: `lib/moduleBootstrap.js` with `requireSpl()`
-- POC/Pilot/Production implementation levels
-- Development pipeline: creative coding → work module → formal implementation
-- Script/module interface alignment (same record interface)
+**Completed this session:**
+- Fixed path references in foundation docs (proper `folder/file.md` format)
+- Extracted CLI utilities to `lib/cli.js` with bound pattern
+- Record-first pattern: create Kafka record at entry, all functions operate on record
+- `requireSpl(uri, record)` - single function for lib binding
+- `cli.validate()` + `cli.handleError()` - validation with console-friendly output
+- spl.mjs now thin: record creation + requireSpl + flow
 
-**Current flow:**
-```
-CLI → Entry point → builds record → App
-  → FAF to app/requests/ (audit)
-  → FAF to session/inbox/
-  → Consumer picks from inbox → processing → outbox
-  → App picks from outbox (stamps consumer)
-  → timeResponded stamped
-  → FAF to app/requests/*.response.json
-  → Response to CLI
+**Current pattern:**
+```javascript
+// spl.mjs
+import { requireSpl } from './lib/moduleBootstrap.js'
+
+const record = {
+  headers: { spl: { request: {...}, runtime: {...} } },
+  value: { argv, cwd, mode, input, method, error... }
+}
+
+const cli = requireSpl('lib/cli', record)
+
+cli.resolveNode()
+if (!cli.validate()) cli.handleError()
+cli.detectMode()
+cli.parseArgs()
+// dispatch...
 ```
 
-**Key structures:**
-```
-splectrum/
-├── lib/moduleBootstrap.js     # Bootstrap layer (requireSpl)
-├── apps/cli-static/
-│   ├── scripts/faf.js         # POC FAF implementation
-│   └── requests/              # Request/response audit trail
-└── runtime/cli-static/
-    └── requests/
-        ├── inbox/             # Incoming from app
-        ├── processing/        # Being worked on
-        ├── outbox/            # Complete, waiting for app
-        └── scripts/           # Consumer handlers
-```
+**Bound pattern:**
+- `cli.js` exports `create(record)` returning bound object
+- Methods read/write record internally
+- Caller doesn't know property paths
+- Same pattern for all libs (cli, core, etc.)
 
 **Next steps:**
-1. Test `requireSpl` with test script (needs script runner update for ES modules)
-2. Update script runner to use record interface (align with modules)
-3. Consider FAF as lib function
-4. Switch existing code to use `requireSpl`
+1. Add `requireNonSpl(moduleName)` skeleton for platform externals
+2. Add module resolution to requireSpl (for spl/dev/cycle style paths)
+3. Implement dispatch and execution handlers
+4. Add FAF before handleError exits
+5. Later: platform.js switch logic in requireNonSpl
 
-**Key design decisions this session:**
-- Splectrum implementation always async (FAF). Sync is wrapper.
-- Consumer trail tracks boundary crossings (scales to P2P)
-- Data is the audit trail (happy path + exception visibility)
-- Scripts and modules share interface (freedom is structure, not interface)
-- Creative coding → formalize is clean handoff (can be autonomous)
+**Key design decisions:**
+- Record created first thing (all input captured)
+- `headers` = public metadata (flows downstream), `value` = internal state
+- spl/cli extends spl/runtime conceptually
+- Free style (lib/) and formal (modules/) share bound pattern
+- `requireSpl` for splectrum, `requireNonSpl` for platform externals
 
-**Key docs:**
-- `EVENT_STORAGE_DESIGN.md` - Request API, consumer trail, FAF, visibility
-- `NODE_STRUCTURE_DESIGN.md` - Module resolution, session structure, bootstrap
-- `IMPLEMENTATION_APPROACH_DESIGN.md` - POC/Pilot/Production, pipeline, script alignment
+**Key docs:** (in `projects/10-dev-env-v0-bundle-continued/`)
+- `NODE_STRUCTURE_DESIGN.md` - lib/ organization, CLI record pattern, bound pattern
 
 **Key files:**
-- `splectrum/lib/moduleBootstrap.js` - requireSpl (new)
-- `splectrum/apps/cli-static/` - POC app with FAF
-- `splectrum/runtime/cli-static/requests/` - Session with inbox/outbox
+- `splectrum/spl.mjs` - thin entry point
+- `splectrum/lib/moduleBootstrap.js` - requireSpl
+- `splectrum/lib/cli.js` - CLI bound object
 
 ---
 
