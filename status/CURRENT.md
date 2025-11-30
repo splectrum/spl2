@@ -9,53 +9,54 @@
 **Project 10: Dev Env v0 Bundle Continued**
 
 - Type: Exploration Project
-- Status: Execution phase
+- Status: **Closure phase**
 - Location: `projects/10-dev-env-v0-bundle-continued/`
 
 ### Current Work
 
-**Session 8.** Unified request model and script execution.
+**Session 9.** Session pipeline and spl.js library enhancements.
 
 **Completed this session:**
 
-- Unified request model:
-  - Transformation moved to spl.mjs (CLI-specific stays in entry point)
-  - App receives clean request with `method`, `input`, optional `script`
-  - Three dispatch types: command (`spl/dev/cycle`), library (`/path.js`), inline (`spl/script/inline`)
-  - Input AVRO-ready: named args + positional as `"0"`, `"1"` (numeric keys)
-  - Consumer metadata in `headers.spl.consumer` with `sourcePath`
+- Session pipeline implementation:
+  - `session.mjs` - inbox→processing→outbox watchers
+  - `consumeOutbox()` - app outbox consumer with promise-based result
+  - `handleViaSession()` - full pipeline (FAF inbox → session → consume outbox)
+  - CLI now uses session pipeline by default
 
-- Script wrapper design:
-  - Same bootstrap as formal implementations + convenience + freedom
-  - Provides: `record`, `spl` (pre-loaded), `requireSpl`, `requireNonSpl`
-  - Scripts can use splectrum patterns AND non-splectrum (direct imports, npm)
-  - Uniform interface for inline and library scripts
-  - Code moves freely: inline → library → method
+- spl.js library enhancements:
+  - `faf()` - clones record first, always dedupes, raiseAsyncError on failure
+  - `raiseAsyncError()` - FAFs error record to runtime/error/
+  - `completeRequest()` - marks request completed
+  - `raiseError()` - sync error with message
+  - `input()`, `output()` - record I/O shortcuts
 
-- Script execution working:
-  - Inline: `spl "/**/spl.output({ hello: 'world' })"`
-  - Library: `spl test-interface --foo=bar`
-  - Both use same wrapAndExecute with full bootstrap
+- Method execution pathway:
+  - `executeMethod` - imports module, passes (record, spl, requireSpl, requireNonSpl)
+  - `pr09/console/hello` converted to new pattern (no static lib/core.js imports)
 
-- Testing insight:
-  - Scripting environment ideal for selfevals
-  - Full record access, set up test cases, partial loading
-  - Same bootstrap as production
-  - Selfevals as library scripts in `_selfevals/` locations
+- Node root scripts updated:
+  - `help.js`, `status.js` - use new spl interface
+  - `list-methods.js` deleted (now in status --verbose)
 
-**Remaining:**
-- Method execution (module dispatch)
-- Session logic (inbox → processing → outbox pipeline)
+- Cleanup:
+  - Deleted `apps/cli-static/index.js` (old broken session impl)
+  - Deleted `apps/cli-static/scripts/faf.js` (superseded by spl.faf)
+  - Deleted `apps/cli-static/scripts/test-bootstrap.js` (outdated)
 
-**Key docs:** (in `projects/10-dev-env-v0-bundle-continued/`)
-- `CONSUMER_DESIGN.md` - consumer pattern, transient/persistent
-- `DAILY_LOG.md` - Session 8 notes on unified request model, script wrapper design
+**Next session:** Project closure
+- LESSONS_LEARNED.md
+- PARTNERSHIP_REFLECTION.md
+- Foundation maintenance
+- INDEX.md update
+
+**Follow-on project added to backlog:**
+- Dev Env Pipeline Completion - formalize pipeline, upgrade spl/dev methods, upgrade nodes
 
 **Key files:**
-- `splectrum/spl.mjs` - CLI entry point, unified request transformation
-- `splectrum/apps/cli-static/app.mjs` - direct execution, wrapAndExecute
-- `splectrum/modules/bm_spl/spl/_lib/spl.js` - input(), output() helpers
-- `splectrum/scripts/test-interface.js` - example script with full interface
+- `splectrum/apps/cli-static/session.mjs` - session watchers
+- `splectrum/apps/cli-static/app.mjs` - handleViaSession, consumeOutbox
+- `splectrum/modules/bm_spl/spl/_lib/spl.js` - core library with faf, error handling
 
 ---
 
