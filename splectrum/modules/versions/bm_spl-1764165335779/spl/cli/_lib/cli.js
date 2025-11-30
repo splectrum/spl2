@@ -88,7 +88,13 @@ export function create(record, { requireNonSpl }) {
         return
       }
 
-      // 1. Explicit file path
+      // 1. Inline script (starts with /*) - check before file paths since /* looks like absolute path
+      if (firstArg.startsWith(SCRIPT_PREAMBLE)) {
+        record.value.mode = 'script'
+        return
+      }
+
+      // 2. Explicit file path
       if (firstArg.startsWith('./') || firstArg.startsWith('../') || path.isAbsolute(firstArg)) {
         const possiblePath = path.isAbsolute(firstArg)
           ? firstArg
@@ -117,13 +123,7 @@ export function create(record, { requireNonSpl }) {
         }
       }
 
-      // 2. Inline script (starts with /*)
-      if (firstArg.startsWith(SCRIPT_PREAMBLE)) {
-        record.value.mode = 'script'
-        return
-      }
-
-      // 3. Library script
+      // 4. Library script
       if (nodeRoot) {
         const scriptPath = resolveScript(firstArg, nodeRoot)
         if (scriptPath) {
@@ -133,7 +133,7 @@ export function create(record, { requireNonSpl }) {
         }
       }
 
-      // 4. Default: command mode
+      // 5. Default: command mode
       record.value.mode = 'command'
     },
 
@@ -150,7 +150,8 @@ export function create(record, { requireNonSpl }) {
       // For other modes, first arg is script/file, rest are input
       const startIndex = 1
 
-      const input = { _positional: [] }
+      const input = {}
+      let positionalIndex = 0
 
       for (let i = startIndex; i < argv.length; i++) {
         const arg = argv[i]
@@ -158,7 +159,9 @@ export function create(record, { requireNonSpl }) {
           const [key, ...valueParts] = arg.slice(2).split('=')
           input[key] = valueParts.length > 0 ? valueParts.join('=') : true
         } else {
-          input._positional.push(arg)
+          // Positional args as numeric string keys
+          input[String(positionalIndex)] = arg
+          positionalIndex++
         }
       }
 

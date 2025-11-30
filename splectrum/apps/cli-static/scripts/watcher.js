@@ -39,15 +39,12 @@ export function createWatcher({ sourceDir, handler, consumerId }) {
       const content = readFileSync(sourcePath, 'utf-8')
       const record = JSON.parse(content)
 
-      // Attach source location
-      record.sourcePath = sourcePath
-
-      // Stamp consumer trail
-      record.headers.spl.consumers ??= []
-      record.headers.spl.consumers.push({
+      // Stamp consumer with source location
+      record.headers.spl.consumer = {
         id: consumerId,
-        timestamp: Date.now()
-      })
+        timestamp: Date.now(),
+        sourcePath: sourcePath
+      }
 
       // Invoke handler
       await handler(record)

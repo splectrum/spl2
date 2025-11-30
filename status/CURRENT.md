@@ -14,52 +14,48 @@
 
 ### Current Work
 
-**Session 7 continued.** Consumer design and request record structure.
+**Session 8.** Unified request model and script execution.
 
-**Completed this session (continued):**
+**Completed this session:**
 
-- Consumer design documented:
-  - `CONSUMER_DESIGN.md` - folder watcher pattern, state file control
-  - Persistent consumers: watch folder, bidirectional state file
-  - Transient consumers: double-barrel TTL (maxTime + maxTriggers)
-  - Basic watcher: `apps/cli-static/scripts/watcher.js`
+- Unified request model:
+  - Transformation moved to spl.mjs (CLI-specific stays in entry point)
+  - App receives clean request with `method`, `input`, optional `script`
+  - Three dispatch types: command (`spl/dev/cycle`), library (`/path.js`), inline (`spl/script/inline`)
+  - Input AVRO-ready: named args + positional as `"0"`, `"1"` (numeric keys)
+  - Consumer metadata in `headers.spl.consumer` with `sourcePath`
 
-- Overlay logic moved to moduleBootstrap:
-  - `createOverlay(hierarchy)`, `loadOverlay(hierarchyPath)` in `lib/moduleBootstrap.js`
-  - Removed from `modules/versions/*/\_lib/overlay.js`
+- Script wrapper design:
+  - Same bootstrap as formal implementations + convenience + freedom
+  - Provides: `record`, `spl` (pre-loaded), `requireSpl`, `requireNonSpl`
+  - Scripts can use splectrum patterns AND non-splectrum (direct imports, npm)
+  - Uniform interface for inline and library scripts
+  - Code moves freely: inline → library → method
 
-- spl/request record structure:
-  - Input/output are metadata in headers: `headers.spl.request.input`, `headers.spl.request.output`
-  - Value is API state (internal, method-managed)
-  - Fixed properties: timeReceived, type, runtime.*
-  - Updated properties: method, input, output, value
-  - parseArgs() now writes directly to `headers.spl.request.input`
+- Script execution working:
+  - Inline: `spl "/**/spl.output({ hello: 'world' })"`
+  - Library: `spl test-interface --foo=bar`
+  - Both use same wrapAndExecute with full bootstrap
 
-- Record transformation pattern:
-  - Same record evolves through pipeline (not new records)
-  - `set*` functions: setCommandRequest, setLibraryRequest, setScriptRequest
-  - FAF captures evolution snapshots (event sourcing)
-  - Terminology: "transform" conceptually, "set" in function names
+- Testing insight:
+  - Scripting environment ideal for selfevals
+  - Full record access, set up test cases, partial loading
+  - Same bootstrap as production
+  - Selfevals as library scripts in `_selfevals/` locations
 
-- App flow working:
-  - spl.mjs → cli-static → setCommandRequest → FAF to outbox → watcher outputs
-  - Modes: command (implemented), library/script (NOT_IMPLEMENTED errors)
-
-**Next:**
-- Session setup (inbox → processing → outbox pipeline)
-- Double-barrel TTL for transient watcher
-- Move watcher to spl/consumer API
+**Remaining:**
+- Method execution (module dispatch)
+- Session logic (inbox → processing → outbox pipeline)
 
 **Key docs:** (in `projects/10-dev-env-v0-bundle-continued/`)
-- `CONSUMER_DESIGN.md` - consumer pattern, transient/persistent, spl/request structure
-- `DAILY_LOG.md` - Session 7 notes
+- `CONSUMER_DESIGN.md` - consumer pattern, transient/persistent
+- `DAILY_LOG.md` - Session 8 notes on unified request model, script wrapper design
 
 **Key files:**
-- `splectrum/spl.mjs` - CLI entry point, record creation
-- `splectrum/lib/moduleBootstrap.js` - requireSpl, requireNonSpl, overlay
-- `splectrum/modules/bm_spl/spl/cli/_lib/cli.js` - parseArgs writes to headers
-- `splectrum/apps/cli-static/app.mjs` - set* functions, record transformation
-- `splectrum/apps/cli-static/scripts/watcher.js` - basic folder watcher
+- `splectrum/spl.mjs` - CLI entry point, unified request transformation
+- `splectrum/apps/cli-static/app.mjs` - direct execution, wrapAndExecute
+- `splectrum/modules/bm_spl/spl/_lib/spl.js` - input(), output() helpers
+- `splectrum/scripts/test-interface.js` - example script with full interface
 
 ---
 

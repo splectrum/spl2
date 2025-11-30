@@ -57,6 +57,28 @@ if (!cli.validate()) {
 }
 
 // ============================================================================
+// Transform to unified request based on mode
+// ============================================================================
+
+const mode = record.value.mode
+
+switch (mode) {
+  case 'command':
+    record.headers.spl.request.method = record.value.method
+    break
+  case 'library':
+    record.headers.spl.request.method = record.value.resolvedPath
+    break
+  case 'script':
+    record.headers.spl.request.method = 'spl/script/inline'
+    record.headers.spl.request.script = record.value.script ?? record.value.argv[0]
+    break
+}
+
+// Clear CLI-specific state - request is now unified
+record.value = null
+
+// ============================================================================
 // Hand off to cli-static app
 // ============================================================================
 

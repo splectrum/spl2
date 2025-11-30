@@ -2,168 +2,119 @@
 //
 // Provides: name, help, handle
 //
-// Flow:
-// 1. Switch on mode, create request record
-// 2. Handle errors (create error response)
-// 3. FAF to outbox, watcher outputs response
+// Receives unified request record (transformation done by caller).
+// Direct execution mode - no FAF/watcher, executes and outputs directly.
 
 import { fileURLToPath } from 'url'
 import path from 'path'
-import { createWatcher } from './scripts/watcher.js'
-import * as faf from './scripts/faf.js'
+import { requireSpl, requireNonSpl } from '../../lib/moduleBootstrap.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Session paths
-const sessionRoot = path.resolve(__dirname, '../../runtime/cli-static/requests')
-const outboxDir = path.join(sessionRoot, 'outbox')
-
 export const name = 'cli-static'
 
 export const help = `
-CLI Static App - processes CLI requests
+CLI Static App - processes unified requests
 
 Usage:
   node spl.mjs <json-record>
   node spl.mjs --help
 
-Input: JSON record with structure:
+Input: Unified request record:
   {
     "headers": {
       "spl": {
-        "request": { "timeReceived": ... },
+        "request": {
+          "timeReceived": ...,
+          "method": "spl/dev/cycle",
+          "input": { "name": "env-123" }
+        },
         "runtime": { "nodeRoot": ..., "invokedFrom": ..., "platform": { "type": ... } }
       }
     },
-    "value": {
-      "mode": "command" | "script" | "library",
-      "method": "...",      // for command mode
-      "script": "...",      // for script mode
-      "resolvedPath": "...", // for library mode
-      "input": { ... }
-    }
+    "value": null
   }
+
+method can be:
+  - Module path: "spl/dev/cycle"
+  - Script path: "/absolute/path/to/script.js"
+  - Inline: "spl/script/inline" (with script in request.script)
 
 Output: Writes to console, returns nothing.
 `
-
-// ============================================================================
-// Record Transformation
-// ============================================================================
-// Transform record in place - same record evolves through pipeline.
-// Each FAF captures a snapshot of the record's evolution.
-// Errors go in headers.spl.error.
-
-/**
- * Set record as command request
- * @param {Object} record - evolving record
- */
-function setCommandRequest(record) {
-  record.headers.spl.request.type = 'command'
-  record.headers.spl.request.method = record.value.method
-  // input already in headers.spl.request.input from parseArgs()
-  record.value = null  // API state, populated by execution
-}
-
-/**
- * Set record as library request
- * @param {Object} record - evolving record
- */
-function setLibraryRequest(record) {
-  record.headers.spl.error = {
-    code: 'NOT_IMPLEMENTED',
-    message: 'Library mode not yet implemented'
-  }
-}
-
-/**
- * Set record as script request
- * @param {Object} record - evolving record
- */
-function setScriptRequest(record) {
-  record.headers.spl.error = {
-    code: 'NOT_IMPLEMENTED',
-    message: 'Script mode not yet implemented'
-  }
-}
-
-/**
- * Set unknown mode error
- * @param {Object} record - evolving record
- * @param {string} mode - The unknown mode
- */
-function setUnknownModeError(record, mode) {
-  record.headers.spl.error = {
-    code: 'UNKNOWN_MODE',
-    message: `Unknown mode: ${mode}`
-  }
-}
 
 // ============================================================================
 // Main Handler
 // ============================================================================
 
 /**
- * Handle CLI request
- * @param {Object} cliRecord - spl/cli record
+ * Handle unified request - direct execution
+ * @param {Object} record - unified request record
  */
 export async function handle(record) {
-  const timestamp = record.headers.spl.request.timeReceived
-  const filename = `${timestamp}.json`
-  const mode = record.value.mode
+  const method = record.headers.spl.request.method
 
-  // Transform record based on mode
-  switch (mode) {
-    case 'command':
-      setCommandRequest(record)
-      break
-    case 'library':
-      setLibraryRequest(record)
-      break
-    case 'script':
-      setScriptRequest(record)
-      break
-    default:
-      setUnknownModeError(record, mode)
+  // Dispatch based on method type
+  if (method.startsWith('/')) {
+    // Library script - absolute path
+    await executeScript(record)
+  } else if (method === 'spl/script/inline') {
+    // Inline script
+    await executeInline(record)
+  } else {
+    // Module method
+    await executeMethod(record)
   }
 
-  // Handle error - output and return
-  if (record.headers.spl.error) {
-    console.log(JSON.stringify({
-      error: record.headers.spl.error
-    }, null, 2))
-    return
+  // Output result
+  console.log(JSON.stringify(record, null, 2))
+}
+
+// ============================================================================
+// Execution handlers - TODO: implement properly
+// ============================================================================
+
+/**
+ * Wrap and execute script content
+ * Same wrapper for inline and library scripts
+ * @param {string} scriptContent - The script body
+ * @param {Object} record - The request record
+ */
+async function wrapAndExecute(scriptContent, record) {
+  // Same bootstrapping as formal implementations
+  const spl = await requireSpl('lib/spl', record)
+
+  // Wrap script with full splectrum access:
+  // - record: the record
+  // - spl: pre-loaded lib/spl (convenience)
+  // - requireSpl: load splectrum libs
+  // - requireNonSpl: load platform modules
+  // Scripts also have freedom for non-splectrum patterns (direct imports, etc)
+  const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor
+  const fn = new AsyncFunction('record', 'spl', 'requireSpl', 'requireNonSpl', scriptContent)
+
+  await fn(record, spl, requireSpl, requireNonSpl)
+}
+
+async function executeScript(record) {
+  const scriptPath = record.headers.spl.request.method
+  const fs = await import('fs')
+  const scriptContent = fs.readFileSync(scriptPath, 'utf-8')
+
+  await wrapAndExecute(scriptContent, record)
+}
+
+async function executeInline(record) {
+  const scriptContent = record.headers.spl.request.script
+
+  await wrapAndExecute(scriptContent, record)
+}
+
+async function executeMethod(record) {
+  const method = record.headers.spl.request.method
+  record.headers.spl.request.output = {
+    status: 'NOT_IMPLEMENTED',
+    message: `Method execution: ${method}`
   }
-
-  // Promise to await watcher completion
-  let resolveResponse
-  const responsePromise = new Promise(resolve => {
-    resolveResponse = resolve
-  })
-
-  // Start watcher on outbox
-  const watcher = createWatcher({
-    sourceDir: outboxDir,
-    consumerId: 'apps/cli-static/outbox',
-    handler: async (responseRecord) => {
-      // Output to console
-      console.log(JSON.stringify(responseRecord.value, null, 2))
-
-      // Stop watcher
-      watcher.stop()
-      resolveResponse(responseRecord)
-    }
-  })
-
-  // FAF request to outbox
-  await faf.write({
-    folder: outboxDir,
-    filename: filename,
-    dedupe: 'numeric-digit',
-    record: record
-  })
-
-  // Wait for response
-  await responsePromise
 }

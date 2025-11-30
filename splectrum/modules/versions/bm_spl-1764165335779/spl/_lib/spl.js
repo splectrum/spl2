@@ -75,6 +75,22 @@ export function create(record, { requireNonSpl }) {
      */
     getNodeRoot() {
       return record.headers.spl.runtime.nodeRoot
+    },
+
+    /**
+     * Get input from record (shortcut for scripts)
+     * @returns {Object}
+     */
+    input() {
+      return record.headers.spl.request.input
+    },
+
+    /**
+     * Set output on record (for scripts)
+     * @param {*} value - Output value
+     */
+    output(value) {
+      record.headers.spl.request.output = value
     }
   }
 }

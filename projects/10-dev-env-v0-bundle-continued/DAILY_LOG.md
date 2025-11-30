@@ -850,3 +850,159 @@ watcher catches, outputs record.value (null for now), stops
 ### Design Documents Created
 
 - `CONSUMER_DESIGN.md` - consumer pattern, spl/request structure, fixed vs updated properties
+
+---
+
+## 2025-11-30 (continued)
+
+### Session 8 - Unified Request Model & Script Execution
+
+**Goal:** Finish request transformation, implement script execution with uniform interface.
+
+---
+
+### Unified Request Model
+
+**Transformation moved to spl.mjs** - CLI-specific logic stays in entry point, app receives clean request.
+
+**Request structure (AVRO-ready):**
+```javascript
+headers.spl.request = {
+  timeReceived: number,
+  method: string,       // "spl/dev/cycle" | "/path/to/script.js" | "spl/script/inline"
+  input: { ... },       // named args + positional as "0", "1", etc.
+  script: string,       // only for inline scripts
+  output: any           // set by execution
+}
+```
+
+**Three method types - unified dispatch:**
+| Mode | method | Notes |
+|------|--------|-------|
+| Command | `spl/dev/cycle` | Module method |
+| Library | `/absolute/path.js` | Script file |
+| Inline | `spl/script/inline` | Code in `request.script` |
+
+**Input cleanup:**
+- Named args: `{ key: value }`
+- Positional args: `{ "0": value, "1": value }` (numeric string keys)
+- No `_positional` array - all AVRO-friendly named fields
+
+**Consumer metadata:**
+```javascript
+headers.spl.consumer = {
+  id: 'apps/cli-static/outbox',
+  timestamp: number,
+  sourcePath: '/path/to/source.json'  // filesystem metadata lives here
+}
+```
+
+---
+
+### Script Wrapper Design
+
+**Principle:** Same bootstrap as formal implementations + convenience + freedom.
+
+**Wrapper provides:**
+```javascript
+async function wrapAndExecute(scriptContent, record) {
+  // Same bootstrapping as formal implementations
+  const spl = await requireSpl('lib/spl', record)
+
+  // Script gets full splectrum access:
+  // - record: the record
+  // - spl: pre-loaded lib/spl (convenience)
+  // - requireSpl: load splectrum libs
+  // - requireNonSpl: load platform modules
+  const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor
+  const fn = new AsyncFunction('record', 'spl', 'requireSpl', 'requireNonSpl', scriptContent)
+
+  await fn(record, spl, requireSpl, requireNonSpl)
+}
+```
+
+**Script interface:**
+```javascript
+/*
+ * Available: record, spl, requireSpl, requireNonSpl
+ */
+const input = spl.input()
+const fs = requireNonSpl('fs')
+const otherLib = await requireSpl('lib/other', record)
+
+// do work...
+
+spl.output({ result: 'done' })
+```
+
+**Three tiers of access:**
+1. **Formal implementations** (modules) - must use requireSpl/requireNonSpl only
+2. **Scripts** - splectrum patterns + freedom (direct imports, npm, etc.)
+3. **Inline** - same as scripts, most flexible
+
+**Uniform interface:** Same `record`, `spl`, `requireSpl`, `requireNonSpl` for inline and library scripts. Code moves freely between inline → library → method.
+
+---
+
+### Script Execution for Testing
+
+**Key insight:** Scripting environment is ideal for testing.
+
+**Problems with current selfevals:**
+- Handcrafted records bypass runtime path
+- Context-dependent tests awkward
+- Can't easily inspect/modify state
+
+**Scripting environment solves:**
+- Full `record` access - right context straight away
+- Set up test cases by modifying record
+- Partial loading - test libs without full method execution
+- Same bootstrap as production
+
+**Selfevals as library scripts:**
+```javascript
+/*
+ * Selfeval: lib/spl/cli
+ */
+const cli = await requireSpl('lib/spl/cli', record)
+
+// Set up test input
+record.headers.spl.request.input = { name: 'test' }
+
+// Test directly
+cli.parseArgs()
+
+// Verify
+const passed = record.headers.spl.request.input.name === 'test'
+spl.output({ passed })
+```
+
+**Selfeval storage:** Another library script location (e.g., `_selfevals/` in module or `selfevals/` at node level).
+
+---
+
+### Implementation Status
+
+**Completed:**
+- Unified request transformation in spl.mjs
+- Clean input format (positional as "0", "1", etc.)
+- Consumer metadata with sourcePath
+- Script wrapper with full bootstrap
+- `spl.input()` and `spl.output()` helpers in lib/spl
+- Inline script execution
+- Library script execution
+
+**Remaining:**
+- Method execution (module dispatch)
+- Session logic (inbox → processing → outbox)
+
+---
+
+### Key Files Changed
+
+- `spl.mjs` - unified request transformation
+- `apps/cli-static/app.mjs` - direct execution, wrapAndExecute
+- `modules/bm_spl/spl/cli/_lib/cli.js` - positional args as numeric keys, preamble detection order
+- `modules/bm_spl/spl/_lib/spl.js` - added input(), output() helpers
+- `apps/cli-static/scripts/watcher.js` - consumer metadata with sourcePath
+- `scripts/test-interface.js` - example script with full interface
