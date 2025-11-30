@@ -16,8 +16,7 @@ Phased approach to get implementation infrastructure working.
 
 | Backlog Item | Priority | Dependencies | Addons | Comments |
 |--------------|----------|--------------|--------|----------|
-| [Dev Env Pipeline Completion](backlog/dev-env-pipeline-completion.md) | High | Project 10 | | Formalize pipeline, upgrade spl/dev methods to new pattern, upgrade nodes. |
-| [spl/bug API](backlog/spl-bug-api.md) | High | Dev Env Pipeline Completion | | Bug report as API state. Captures failure context for reconstruction. Bug reports from event streams. |
+| [spl/bug API](backlog/spl-bug-api.md) | High | Project 11 (App Architecture) | | Bug report as API state. Captures failure context for reconstruction. Bug reports from event streams. |
 
 ### Phase 2 - Complete Pipeline
 

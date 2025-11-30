@@ -8,47 +8,72 @@
 
 ## Summary
 
-Complete the pipeline infrastructure and code migration started in Project 10. Session 9 established watcher-based session pipeline as prototype; this project formalizes and extends it.
+Implement the repo/node/app architecture, migrating dev bundle and ops infrastructure into system apps. Fuse freestyle and formal implementation modes. The repo + splectrum node becomes a solid unit.
+
+## Vision
+
+**Reference:** [Repo/Node/App Design](../chats/immutables/repo_node_app_design_2025-11-30.md)
+
+Key concepts:
+- Node as seat serving repo (one node, many apps)
+- Spot apps manage external data (name = spot folder name)
+- System apps for internal functions (underscore prefix: _boot, _dev, _ops, _cli)
+- Bidirectional naming convention (spot ↔ app ↔ data root)
+- Location-aware routing (invokedFrom → spot → app)
+- Apps contain scripts/ + modules/ (freestyle + formal together)
 
 ## Scope
 
-### Pipeline Formalization
-- Proper multilayer pipeline (spl/pipeline API)
-- Event routing and handling patterns
-- Build on watcher structure from Project 10 Session 9
+### App Architecture Implementation
+- Establish apps/ folder structure
+- Implement spot app pattern (data root = repo/[spot]/)
+- Implement system app pattern (underscore prefix)
+- Location-aware routing in entry point
+- Bidirectional spot↔app binding
 
-### Library Strengthening
-- overlay.js improvements (extraction, layer handling)
-- spl.js library extensions as needed
+### System App Migration
+- `_dev` - migrate dev bundle functionality into system app
+- `_ops` - migrate ops sidecar into system app
+- `_cli` - evolve cli-static into system app
+- `_boot` - create bootstrap app (install/manage)
+
+### Spot Apps (Initial)
+- `projects` - manages projects/ spot
+- `root` - manages repo root
+
+### Pipeline Integration
+- Session pipeline (inbox → processing → outbox) within apps
+- Proper multilayer pipeline patterns
+- Event routing and handling
 
 ### Code Migration
-- Upgrade spl/dev methods to new pattern (no static lib/core.js imports)
-- Upgrade spl/ops methods to new pattern
-- Remove deprecated core.js
-- Upgrade all splectrum nodes with new module versions
-
-### Optional
-- Arithmetic iterations (if useful for pipeline validation)
-- Console v5 migration (when foundation solid)
+- Upgrade methods to new pattern
+- Remove deprecated infrastructure
+- Consolidate to single node
 
 ## Success Criteria
 
-- spl/pipeline API defined and implemented
-- All spl/dev and spl/ops methods use new pattern
-- Splectrum nodes upgraded
-- Ready for spl/bug API project
+- App architecture working (spot + system apps)
+- Dev bundle functionality in `_dev` app
+- Ops functionality in `_ops` app
+- Location-aware routing functional
+- Single node serving entire repo
+- Freestyle + formal modes integrated in apps
 
 ## Context
 
 Project 10 delivered:
-- Dev environment bundle (v0 template)
-- spl/dev API (deploy, prepare, test, cycle, publish, upgrade)
+- Self-hosting dev cycle
 - CLI pipeline with unified request model
 - Session pipeline (watcher-based prototype)
-- spl.js library (faf, error handling, I/O helpers)
-- Method execution pathway (record, spl, requireSpl, requireNonSpl signature)
-- Free scripting pattern for rapid prototyping
+- Free scripting pattern
+- App concept prototyped (cli-static)
+
+Design discussions captured:
+- [App Unification Discussion](../chats/immutables/app_unification_discussion_2025-11-30.md)
+- [Repo/Node/App Design](../chats/immutables/repo_node_app_design_2025-11-30.md)
 
 ---
 
 **Created:** 2025-11-30
+**Updated:** 2025-11-30 - Incorporated app architecture vision

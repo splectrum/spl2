@@ -4,7 +4,7 @@
 
 | Code | Name | Status | Started |
 |------|------|--------|---------|
-| - | - | - | - |
+| 11-app-architecture | App Architecture | In Progress | 2025-11-30 |
 
 ## Completed Projects
 
