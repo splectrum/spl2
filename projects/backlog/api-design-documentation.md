@@ -2,6 +2,7 @@
 
 **Priority:** High
 **Dependencies:** Phase 1 complete (Dev Env v0 Bundle, spl/bug)
+**Addons:** [Project 10 Design Docs Integration](project-10-design-docs-addon.md)
 **CIP:** CIP-014 (Comprehensive API Design Phase)
 **Type:** Documentation Project
 
@@ -106,6 +107,7 @@ All in `projects/09-console-v5-stream-native/`:
 
 - API_DESIGN.md split into focused docs
 - All Project 09 design thinking incorporated
+- All Project 10 design thinking incorporated (see addon)
 - Single source of truth per concern
 - Easy to find relevant design info
 - Design docs support implementation work

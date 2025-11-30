@@ -4,7 +4,7 @@
 
 | Code | Name | Status | Started |
 |------|------|--------|---------|
-| 10-dev-env-v0-bundle-continued | Dev Env v0 Bundle Continued | In Progress | 2025-11-26 |
+| - | - | - | - |
 
 ## Completed Projects
 
@@ -19,6 +19,7 @@
 | 07-console-api-exploration | Console API - AI-Primary Execution Model | 2025-11-19 | v7 console wrapper (5 methods), 3 design docs, schema-driven merge, boundary validation, self-eval harness, status/ spot, Dev Env API + AVRO Wrapper + CIP Processing backlog items, CIP-015 |
 | 08-dev-environment-api | Dev Environment API | 2025-11-20 | 4-level module structure, executable selfeval pattern, test runner, AVRO schemas (API + 7 methods), native vs wrapper API convention, delegation stepping stone, work package pattern |
 | 09-console-v5-stream-native | Console v5 Stream Native | 2025-11-26 | v0 dev env template, type hierarchy design, lib resolution pattern, selfeval inheritance, event record structure (pivoted from Console migration to dev env foundation) |
+| 10-dev-env-v0-bundle-continued | Dev Env v0 Bundle Continued | 2025-11-30 | Self-hosting dev cycle, spl/dev + spl/ops APIs, CLI pipeline (record-first, session, apps), unified scripting, splectrum node at repo level |
 
 ## Planned Projects
 
@@ -345,6 +346,53 @@
 - spl/runtime and spl/pipeline APIs
 
 **See:** `projects/09-console-v5-stream-native/LESSONS_LEARNED.md` for full details
+
+### 10-dev-env-v0-bundle-continued
+**Objective:** Continue v0 dev bundle work, strengthen dev env implementation, establish core splectrum API infrastructure
+
+**Project Type:** Explorative Project
+
+**Products Delivered:**
+1. Self-hosting dev cycle (deploy → prepare → test → cycle → publish → upgrade) ✅
+2. spl/dev API complete (7 methods) ✅
+3. spl/ops API (status, list, upgrade, rollback) via ops sidecar ✅
+4. Repo-wide splectrum node deployment ✅
+5. CLI pipeline restructure (record-first, requireSpl/requireNonSpl) ✅
+6. Session pipeline (inbox → processing → outbox) ✅
+7. Unified scripting (inline + library + formal methods) ✅
+8. spl.js library (faf, raiseAsyncError, completeRequest, input, output) ✅
+
+**Status:** Complete - Self-hosting achieved, extensive design documentation
+
+**Key Outcomes:**
+- **Self-hosting achieved:** Full dev cycle works (deploy, cycle, publish, upgrade)
+- **Friction led to discovery:** Dev bundle workflow friction led to free scripting and app concept
+- **Unified request model:** Command, library, inline all use same record structure and dispatch
+- **Script wrapper design:** Same bootstrap as formal methods + convenience + freedom
+- **App as first-class concept:** cli-static established app pattern (definition vs session)
+- **Consumer pattern:** Persistent (state file) vs transient (TTL) folder watchers
+- **Record-first pattern:** Same record evolves through pipeline (not new records created)
+- **Event sourcing emerges:** FAF capturing record snapshots = natural event sourcing
+
+**Design Documents Created:**
+- NODE_DESIGN.md (merged from NODE_STRUCTURE + SPLECTRUM_NODE)
+- ENTRY_POINT_DESIGN.md (triple invocation, node resolution)
+- API_NAMESPACE_MODEL.md (APIs = properties + methods, state/metastate)
+- CONSUMER_DESIGN.md (folder watchers, persistent vs transient)
+- EVENT_STORAGE_DESIGN.md (DCE principles, filesystem topics)
+- IMPLEMENTATION_APPROACH_DESIGN.md (pace calibration, POC/Pilot/Production)
+
+**Key Learnings:**
+- Friction signals opportunity - don't fight the workflow, investigate
+- Scripts before methods - start freestyle, promote when stable
+- Same bootstrap, different freedom - unified interface enables code movement
+- Events must be visible - FAF should create observable events
+
+**Backlog Items:**
+- Dev Env Pipeline Completion (formalize pipeline, upgrade methods)
+- Project 10 Design Docs Integration (addon to API Design Documentation)
+
+**See:** `projects/10-dev-env-v0-bundle-continued/LESSONS_LEARNED.md` for full details
 
 ---
 
