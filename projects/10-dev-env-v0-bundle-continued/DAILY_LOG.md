@@ -698,3 +698,155 @@ runtime/cli-static/
 ├── processing/  # being worked on
 └── outbox/      # complete
 ```
+
+---
+
+## 2025-11-30
+
+### Session 7 Continued - Consumer Design & Request Structure
+
+**Focus:** Consumer pattern design, request record structure, terminology.
+
+---
+
+### Consumer Design
+
+Created `CONSUMER_DESIGN.md` documenting folder watcher pattern:
+
+**Two consumer types:**
+1. **Persistent** - long-running, state file control
+   - Watches sourceDir for new files
+   - Secondary watch on state file for control (stop, pause)
+   - Bidirectional: API writes control, watcher writes stats/heartbeat
+   - Lock protocol: atomic rename (write .tmp, rename to target)
+
+2. **Transient** - short-lived, TTL-based
+   - Double-barrel TTL: `maxTime` + `maxTriggers`
+   - Whichever limit hits first triggers shutdown
+   - Use case: request/response (app outbox watcher)
+
+**Consumer architecture:**
+- Consumer watches folder, invokes handler on new file
+- Handler owns destination and cleanup (deletes source after FAF)
+- Record gets `sourcePath` attached for handler to use
+- Consumer stamps trail: `headers.spl.consumers[]`
+
+**spl/consumer API planned:**
+- `watch` - starts watcher
+- `status` - reads state file
+- `stop` - writes running:false
+- `pause/resume` - control processing
+
+---
+
+### Overlay Logic Moved
+
+Moved from module `_lib/overlay.js` to `lib/moduleBootstrap.js`:
+- `createOverlay(hierarchy)` - create resolver from hierarchy map
+- `loadOverlay(hierarchyPath)` - load hierarchy.json and create resolver
+
+Methods: selectFile, selectFromFolder, collectAll, collectAllNoOverlay, getNode, getAllNodes
+
+Removed overlay.js from:
+- `modules/versions/bm_spl-*/\_lib/`
+- `ops/splectrum/modules/versions/bm_spl_ops-*/\_lib/`
+
+---
+
+### spl/request Record Structure
+
+**Key design insight:** Input and output are operational metadata, not API state.
+
+```
+headers.spl.request.timeReceived  - fixed
+headers.spl.request.type          - fixed (command/library/script)
+headers.spl.request.method        - updated
+headers.spl.request.input         - updated (parsed args)
+headers.spl.request.output        - updated (execution result)
+headers.spl.runtime.*             - fixed
+headers.spl.consumers[]           - appended
+headers.spl.error                 - set on error
+value                             - API state (method-managed)
+```
+
+**parseArgs() now writes directly to `headers.spl.request.input`**
+- Input is metadata, belongs in headers from the start
+- Not in value (that's for API state)
+
+---
+
+### Record Transformation Pattern
+
+**Same record evolves through pipeline** - not new records created.
+
+**Terminology:**
+- Conceptual: "transform" - record evolves, FAF captures snapshots
+- Function names: `set*` - simple, clear intent
+
+**Functions in app.mjs:**
+- `setCommandRequest(record)` - sets type, method
+- `setLibraryRequest(record)` - sets error (NOT_IMPLEMENTED)
+- `setScriptRequest(record)` - sets error (NOT_IMPLEMENTED)
+- `setUnknownModeError(record, mode)` - sets error
+
+**FAF as event sourcing:**
+- Each FAF captures snapshot of record's evolution
+- Creates change event, not new record
+- Audit trail of record states
+
+---
+
+### Basic Watcher Implemented
+
+`apps/cli-static/scripts/watcher.js`:
+- `createWatcher({ sourceDir, handler, consumerId })`
+- Watches for `rename` events (file dropped in)
+- Filters `.json` files
+- Tracks in-flight to prevent double-processing
+- Attaches `sourcePath` to record
+- Stamps consumer trail
+- Returns `{ stop }` handle
+
+---
+
+### App Flow Working
+
+```
+./spl spl/dev/cycle --name=test
+    ↓
+spl.mjs (creates record, parseArgs sets headers.spl.request.input)
+    ↓
+cli-static handle(record)
+    ↓
+setCommandRequest(record) - sets type='command', method
+    ↓
+watcher on outbox started
+    ↓
+FAF to outbox
+    ↓
+watcher catches, outputs record.value (null for now), stops
+```
+
+---
+
+### Next Steps
+
+1. Session setup (inbox → processing → outbox pipeline)
+2. Double-barrel TTL for transient watcher
+3. Move watcher to spl/consumer API
+
+---
+
+### Key Files Changed
+
+- `lib/moduleBootstrap.js` - added overlay functions
+- `modules/bm_spl/spl/cli/_lib/cli.js` - parseArgs writes to headers
+- `apps/cli-static/app.mjs` - set* functions, record transformation
+- `apps/cli-static/scripts/watcher.js` - basic folder watcher
+- `spl.mjs` - input placeholder moved to headers
+
+---
+
+### Design Documents Created
+
+- `CONSUMER_DESIGN.md` - consumer pattern, spl/request structure, fixed vs updated properties

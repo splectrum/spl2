@@ -19,7 +19,8 @@ const record = {
   headers: {
     spl: {
       request: {
-        timeReceived: Date.now()
+        timeReceived: Date.now(),
+        input: null  // populated by parseArgs()
       },
       runtime: {
         nodeRoot: null,
@@ -32,7 +33,6 @@ const record = {
     argv: process.argv.slice(2),
     mode: null,
     resolvedPath: null,
-    input: null,
     method: null,
     script: null,
     error: null

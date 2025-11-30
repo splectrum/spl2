@@ -140,7 +140,7 @@ export function create(record, { requireNonSpl }) {
     /**
      * Parse CLI arguments
      * Reads: record.value.argv, record.value.mode
-     * Writes: record.value.input, record.value.method
+     * Writes: record.headers.spl.request.input, record.value.method
      */
     parseArgs() {
       const argv = record.value.argv
@@ -162,7 +162,8 @@ export function create(record, { requireNonSpl }) {
         }
       }
 
-      record.value.input = input
+      // Input is metadata - goes to headers
+      record.headers.spl.request.input = input
 
       // For command mode, first arg is the method
       if (mode === 'command' && argv[0]) {

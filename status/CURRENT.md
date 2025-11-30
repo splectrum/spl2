@@ -1,6 +1,6 @@
 # Current Status
 
-**Last Updated:** 2025-11-29
+**Last Updated:** 2025-11-30
 
 ---
 
@@ -14,49 +14,52 @@
 
 ### Current Work
 
-**Session 7 in progress.** CLI pipeline and app framework.
+**Session 7 continued.** Consumer design and request record structure.
 
-**Completed this session:**
-- Pre-request pipeline complete (spl/cli):
-  - Record-first pattern with headers/value structure
-  - `runtime.invokedFrom`, `runtime.platform.type` in headers
-  - Mode detection, arg parsing, external file preloading
-  - Internal vs external script detection (inside nodeRoot = library mode)
-  - Error handling with FAF (sync) to `runtime/error/cli/`
+**Completed this session (continued):**
 
-- Entry point framework:
-  - `lib/entryPoint.js` - framework for spl.mjs entry points
-  - Apps provide `{name, help, handle}` in `app.mjs`
-  - `spl.mjs` = thin shell, wires app to framework
-  - Supports: global spl, direct --help, direct JSON, programmatic import
+- Consumer design documented:
+  - `CONSUMER_DESIGN.md` - folder watcher pattern, state file control
+  - Persistent consumers: watch folder, bidirectional state file
+  - Transient consumers: double-barrel TTL (maxTime + maxTriggers)
+  - Basic watcher: `apps/cli-static/scripts/watcher.js`
 
-- cli-static app structure:
-  - `apps/cli-static/spl.mjs` - entry point shell
-  - `apps/cli-static/app.mjs` - name, help, handle
-  - Hand-off from splectrum/spl.mjs working
+- Overlay logic moved to moduleBootstrap:
+  - `createOverlay(hierarchy)`, `loadOverlay(hierarchyPath)` in `lib/moduleBootstrap.js`
+  - Removed from `modules/versions/*/\_lib/overlay.js`
 
-- Core lib:
-  - `lib/spl` at package level (`modules/bm_spl/spl/_lib/spl.js`)
-  - FAF with `{ sync: true }` option for pre-exit writes
+- spl/request record structure:
+  - Input/output are metadata in headers: `headers.spl.request.input`, `headers.spl.request.output`
+  - Value is API state (internal, method-managed)
+  - Fixed properties: timeReceived, type, runtime.*
+  - Updated properties: method, input, output, value
+  - parseArgs() now writes directly to `headers.spl.request.input`
 
-**Next:** Implement inbox/outbox pattern in cli-static handle()
-- FAF to session inbox
-- Session processes (dispatch to command/library/script)
-- FAF to outbox
-- App consumes and outputs to console
+- Record transformation pattern:
+  - Same record evolves through pipeline (not new records)
+  - `set*` functions: setCommandRequest, setLibraryRequest, setScriptRequest
+  - FAF captures evolution snapshots (event sourcing)
+  - Terminology: "transform" conceptually, "set" in function names
+
+- App flow working:
+  - spl.mjs → cli-static → setCommandRequest → FAF to outbox → watcher outputs
+  - Modes: command (implemented), library/script (NOT_IMPLEMENTED errors)
+
+**Next:**
+- Session setup (inbox → processing → outbox pipeline)
+- Double-barrel TTL for transient watcher
+- Move watcher to spl/consumer API
 
 **Key docs:** (in `projects/10-dev-env-v0-bundle-continued/`)
-- `DAILY_LOG.md` - Session 7 notes, task split, app architecture
-- `NODE_STRUCTURE_DESIGN.md` - node structure, lib organization
+- `CONSUMER_DESIGN.md` - consumer pattern, transient/persistent, spl/request structure
+- `DAILY_LOG.md` - Session 7 notes
 
 **Key files:**
-- `splectrum/spl.mjs` - CLI entry point
-- `splectrum/lib/moduleBootstrap.js` - requireSpl, requireNonSpl
-- `splectrum/lib/entryPoint.js` - app entry point framework
-- `splectrum/modules/bm_spl/spl/_lib/spl.js` - core lib (FAF)
-- `splectrum/modules/bm_spl/spl/cli/_lib/cli.js` - CLI lib
-- `splectrum/apps/cli-static/spl.mjs` - app entry point
-- `splectrum/apps/cli-static/app.mjs` - app implementation
+- `splectrum/spl.mjs` - CLI entry point, record creation
+- `splectrum/lib/moduleBootstrap.js` - requireSpl, requireNonSpl, overlay
+- `splectrum/modules/bm_spl/spl/cli/_lib/cli.js` - parseArgs writes to headers
+- `splectrum/apps/cli-static/app.mjs` - set* functions, record transformation
+- `splectrum/apps/cli-static/scripts/watcher.js` - basic folder watcher
 
 ---
 
