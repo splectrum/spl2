@@ -146,3 +146,6 @@ projects/09-console-v5-stream-native/dev/*/extracted/
 **/dev/v*/environments/
 **/dev/v*/splectrum/
 **/dev/v*/spl
+
+# Splectrum runtime data
+splectrum/runtime/

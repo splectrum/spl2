@@ -1,0 +1,117 @@
+// apps/cli-static/session.mjs - Session entry point
+//
+// Starts inbox→processing and processing→outbox watchers.
+// Single-event mode: each watcher handles one event then stops.
+
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import { requireSpl, requireNonSpl } from '../../lib/moduleBootstrap.js'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const sessionRoot = path.resolve(__dirname, '../../runtime/cli-static/requests')
+
+const inboxDir = path.join(sessionRoot, 'inbox')
+const processingDir = path.join(sessionRoot, 'processing')
+const outboxDir = path.join(sessionRoot, 'outbox')
+
+/**
+ * Start session watchers
+ * @returns {{ stop: Function }} Handle to stop all watchers
+ */
+export function startSession() {
+  const watchers = []
+
+  // Inbox → Processing watcher (move only)
+  const inboxWatcher = fs.watch(inboxDir, (event, filename) => {
+    if (event !== 'rename') return
+    if (!filename?.endsWith('.json')) return
+
+    const sourcePath = path.join(inboxDir, filename)
+    if (!fs.existsSync(sourcePath)) return
+
+    // Move to processing
+    const destPath = path.join(processingDir, filename)
+    fs.renameSync(sourcePath, destPath)
+  })
+  watchers.push(inboxWatcher)
+
+  // Processing → Outbox watcher (execute request)
+  const processingWatcher = fs.watch(processingDir, async (event, filename) => {
+    if (event !== 'rename') return
+    if (!filename?.endsWith('.json')) return
+
+    const sourcePath = path.join(processingDir, filename)
+    if (!fs.existsSync(sourcePath)) return
+
+    try {
+      // Read and parse record
+      const content = fs.readFileSync(sourcePath, 'utf-8')
+      const record = JSON.parse(content)
+
+      // Execute the request
+      await executeRequest(record)
+
+      // Remove from processing
+      fs.unlinkSync(sourcePath)
+
+      // FAF result to outbox
+      const spl = await requireSpl('lib/spl', record)
+      spl.faf(outboxDir, { sync: true })
+    } catch (err) {
+      console.error(`Session error processing ${filename}:`, err.message)
+    }
+  })
+  watchers.push(processingWatcher)
+
+  return {
+    stop() {
+      for (const w of watchers) {
+        w.close()
+      }
+    }
+  }
+}
+
+// ============================================================================
+// Request execution (same as app.mjs)
+// ============================================================================
+
+async function executeRequest(record) {
+  const method = record.headers.spl.request.method
+
+  if (method.startsWith('/')) {
+    await executeScript(record)
+  } else if (method === 'spl/script/inline') {
+    await executeInline(record)
+  } else {
+    await executeMethod(record)
+  }
+}
+
+async function wrapAndExecute(scriptContent, record) {
+  const spl = await requireSpl('lib/spl', record)
+  const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor
+  const fn = new AsyncFunction('record', 'spl', 'requireSpl', 'requireNonSpl', scriptContent)
+  await fn(record, spl, requireSpl, requireNonSpl)
+}
+
+async function executeScript(record) {
+  const scriptPath = record.headers.spl.request.method
+  const scriptContent = fs.readFileSync(scriptPath, 'utf-8')
+  await wrapAndExecute(scriptContent, record)
+}
+
+async function executeInline(record) {
+  const scriptContent = record.headers.spl.request.script
+  await wrapAndExecute(scriptContent, record)
+}
+
+async function executeMethod(record) {
+  const method = record.headers.spl.request.method
+  const nodeRoot = record.headers.spl.runtime.nodeRoot
+  const modulePath = path.join(nodeRoot, 'modules', 'bm_spl', method, 'index.js')
+  const module = await import(modulePath)
+  const spl = await requireSpl('lib/spl', record)
+  await module.handle(record, spl, requireSpl, requireNonSpl)
+}

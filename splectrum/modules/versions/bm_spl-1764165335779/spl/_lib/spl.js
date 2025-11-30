@@ -6,6 +6,46 @@
 let fs, path
 
 /**
+ * Find unique filename using dedupe algorithm
+ * @param {string} folder - Target folder path
+ * @param {string} filename - Base filename
+ * @param {string} dedupe - Dedupe mode ('numeric-digit') or falsy for default
+ * @returns {string} - Unique filename
+ */
+function findUniqueFilename(folder, filename, dedupe) {
+  const ext = path.extname(filename)
+  const base = path.basename(filename, ext)
+
+  if (dedupe === 'numeric-digit') {
+    // Always append digit starting from 0
+    // 1732789234567.json -> 17327892345670.json -> 17327892345671.json
+    for (let digit = 0; digit < 1000; digit++) {
+      const candidate = `${base}${digit}${ext}`
+      const candidatePath = path.join(folder, candidate)
+      if (!fs.existsSync(candidatePath)) {
+        return candidate
+      }
+    }
+    throw new Error(`Dedupe exhausted: could not find unique filename for ${filename}`)
+  }
+
+  // Default: try original first, then append digits
+  const targetPath = path.join(folder, filename)
+  if (!fs.existsSync(targetPath)) {
+    return filename
+  }
+
+  for (let digit = 0; digit < 1000; digit++) {
+    const candidate = `${base}${digit}${ext}`
+    const candidatePath = path.join(folder, candidate)
+    if (!fs.existsSync(candidatePath)) {
+      return candidate
+    }
+  }
+  throw new Error(`Dedupe exhausted: could not find unique filename for ${filename}`)
+}
+
+/**
  * Create core utilities bound to record
  * @param {Object} record - The request record
  * @param {Object} deps - Dependencies from bootstrap
@@ -23,6 +63,7 @@ export function create(record, { requireNonSpl }) {
      * @param {string} destination - Target folder path
      * @param {Object} options - Options
      * @param {string} options.filename - Optional filename (default: timestamp-based)
+     * @param {string} options.dedupe - Dedupe mode: 'numeric-digit' or undefined
      * @param {boolean} options.sync - Use sync fs operations (for pre-exit writes)
      * @returns {string} - Path where record was written
      */
@@ -33,6 +74,9 @@ export function create(record, { requireNonSpl }) {
         return null
       }
 
+      // Clone immediately - record may mutate before async write completes
+      const recordClone = JSON.parse(JSON.stringify(record))
+
       // Generate filename if not provided
       const timestamp = record.headers.spl.request.timeReceived || Date.now()
       const filename = options.filename || `${timestamp}.json`
@@ -42,22 +86,65 @@ export function create(record, { requireNonSpl }) {
         ? destination
         : path.join(nodeRoot, destination)
 
-      const filePath = path.join(destPath, filename)
-      const recordJson = JSON.stringify(record, null, 2)
+      // Ensure directory exists (sync - needed for dedupe check)
+      fs.mkdirSync(destPath, { recursive: true })
+
+      // Find unique filename (FAF always dedupes - never overwrites)
+      const finalFilename = findUniqueFilename(destPath, filename, options.dedupe)
+
+      const filePath = path.join(destPath, finalFilename)
+      const recordJson = JSON.stringify(recordClone, null, 2)
 
       if (options.sync) {
         // Sync write - blocks until complete
-        fs.mkdirSync(destPath, { recursive: true })
         fs.writeFileSync(filePath, recordJson, 'utf-8')
       } else {
         // Async write - fire and forget
-        fs.mkdir(destPath, { recursive: true }, (err) => {
-          if (err) return
-          fs.writeFile(filePath, recordJson, 'utf-8', () => {})
+        fs.writeFile(filePath, recordJson, 'utf-8', (err) => {
+          if (err) this.raiseAsyncError(err, { operation: 'faf', destination, filePath })
         })
       }
 
       return filePath
+    },
+
+    /**
+     * Raise an async error - clone record, add error info, FAF to error folder
+     * Use this for errors in async callbacks where throwing isn't possible.
+     *
+     * @param {Error} error - The error object
+     * @param {Object} context - Additional context about where/why error occurred
+     */
+    raiseAsyncError(error, context = {}) {
+      const nodeRoot = record.headers.spl.runtime.nodeRoot
+      if (!nodeRoot) return
+
+      // Clone immediately - record may have mutated
+      const errorRecord = JSON.parse(JSON.stringify(record))
+
+      // Add error info to the clone (async: true indicates async context)
+      errorRecord.headers.spl.error = {
+        timestamp: Date.now(),
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+        context,
+        async: true
+      }
+
+      // FAF to error folder
+      const errorPath = path.join(nodeRoot, 'runtime/error')
+      fs.mkdirSync(errorPath, { recursive: true })
+
+      const filename = `${Date.now()}.json`
+      const finalFilename = findUniqueFilename(errorPath, filename, 'numeric-digit')
+
+      fs.writeFile(
+        path.join(errorPath, finalFilename),
+        JSON.stringify(errorRecord, null, 2),
+        'utf-8',
+        () => {} // Swallow errors in error handler - nowhere else to go
+      )
     },
 
     /**
@@ -91,6 +178,22 @@ export function create(record, { requireNonSpl }) {
      */
     output(value) {
       record.headers.spl.request.output = value
+    },
+
+    /**
+     * Mark request as completed successfully
+     */
+    completeRequest() {
+      record.headers.spl.request.completed = true
+    },
+
+    /**
+     * Raise a sync error - sets error on record and marks completed
+     * @param {string} message - Error message
+     */
+    raiseError(message) {
+      record.headers.spl.runtime.error = message
+      record.headers.spl.request.completed = true
     }
   }
 }

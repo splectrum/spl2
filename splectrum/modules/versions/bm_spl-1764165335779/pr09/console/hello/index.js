@@ -1,11 +1,11 @@
 // pr09/console/hello - simple greeting method
-// Tests the complete pattern
+// Receives: record, spl, requireSpl, requireNonSpl (same as scripts)
 
-import { createSpl } from 'lib/core.js'
+export function handle(record, spl) {
+  const input = spl.input()
 
-export function handle(record) {
-  const spl = createSpl(record)
+  console.log(input.message || 'Hello from pr09/console/hello!')
 
-  console.log(spl.headers.pr09.console.hello.message)
-  spl.complete()
+  spl.output({ greeted: true, message: input.message })
+  spl.completeRequest()
 }

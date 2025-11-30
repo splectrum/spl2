@@ -1,17 +1,21 @@
-// scripts/status.js - Show node status
-//
-// Usage: spl status [--verbose]
+/*
+ * scripts/status.js - Show node status
+ * Usage: spl status [--verbose]
+ * Available: record, spl, requireSpl, requireNonSpl
+ */
+const fs = requireNonSpl('fs')
+const path = requireNonSpl('path')
+const input = spl.input()
+
+const nodeRoot = record.headers.spl.runtime.nodeRoot
+const splectrumDir = nodeRoot  // nodeRoot IS the splectrum dir
+const invokedFrom = record.headers.spl.runtime.invokedFrom
 
 console.log('=== Splectrum Node Status ===')
 console.log('')
-console.log(`Node root:     ${runtime.nodeRoot}`)
-console.log(`Splectrum dir: ${runtime.splectrumDir}`)
-console.log(`Invoked from:  ${runtime.invokedFrom}`)
-console.log(`Mode:          ${runtime.mode}`)
+console.log(`Node root:     ${nodeRoot}`)
+console.log(`Invoked from:  ${invokedFrom}`)
 console.log('')
-
-const nodeRoot = runtime.nodeRoot
-const splectrumDir = runtime.splectrumDir
 
 // Directories inside splectrum/ (the node)
 console.log('=== Node Directories ===')
@@ -26,10 +30,11 @@ for (const dir of nodeDirs) {
   console.log(`${exists ? '[x]' : '[ ]'} ${dir.name}`)
 }
 
-// Directories at nodeRoot (for dev bundles)
+// Directories at nodeRoot parent (for dev bundles)
+const parentDir = path.dirname(nodeRoot)
 const bundleDirs = [
-  { name: 'implementation/', path: path.join(nodeRoot, 'implementation') },
-  { name: 'environments/', path: path.join(nodeRoot, 'environments') },
+  { name: 'implementation/', path: path.join(parentDir, 'implementation') },
+  { name: 'environments/', path: path.join(parentDir, 'environments') },
 ]
 const hasBundleDirs = bundleDirs.some(d => fs.existsSync(d.path))
 if (hasBundleDirs) {
@@ -55,7 +60,7 @@ if (fs.existsSync(pkgPath)) {
 }
 
 // Verbose: list available scripts and methods
-if (args.verbose) {
+if (input.verbose) {
   console.log('')
   console.log('=== Available Scripts ===')
   const scriptsPath = path.join(splectrumDir, 'scripts')
@@ -91,3 +96,5 @@ if (args.verbose) {
     console.log('  (no modules/ directory)')
   }
 }
+
+spl.output({ status: 'ok' })
