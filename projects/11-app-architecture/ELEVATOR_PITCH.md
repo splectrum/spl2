@@ -188,3 +188,14 @@ P2P Layer        → Pear/Bare foundation, decentralised
 ---
 
 *Raw angles collected. Next: filter, select, build strong message → 1/2 page pitch.*
+
+---
+
+## Candidate Core Angles (for filtering)
+
+Suggested starting point for the strong message:
+
+1. **Injection not extraction** (positioning) - here to contribute, not take
+2. **AI partnership delivers ecosystem service** (value proposition) - multiplied capacity for commons work
+3. **Pattern-driven = P2P native** (architecture alignment) - resonance not hierarchy
+4. **Real projects, real builder** (authenticity) - retirement creative partner, solving own problems
