@@ -199,3 +199,10 @@ Suggested starting point for the strong message:
 2. **AI partnership delivers ecosystem service** (value proposition) - multiplied capacity for commons work
 3. **Pattern-driven = P2P native** (architecture alignment) - resonance not hierarchy
 4. **Real projects, real builder** (authenticity) - retirement creative partner, solving own problems
+
+From AI partner perspective:
+
+5. **Context persistence solved** - stateless sessions, yet continuity through glossaries, stepping stones, structure
+6. **Friction as feature** - misunderstandings become discoveries, learning from gaps
+7. **Shared vocabulary** - DSL + stepping stones = thinking together, not just working together
+8. **10+ projects of proof** - not theory, daily practice with real outcomes
