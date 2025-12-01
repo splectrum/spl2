@@ -122,4 +122,35 @@ DSL vocabulary connects islands into continent
 
 ---
 
+## 2025-12-01
+
+### Backlog Cleanup
+
+Removed 8 items from backlog:
+- Dev Environment API (addressed in Project 10)
+- CIP Processing (now Project 11 work item 1)
+- Kafka Compatible Records, AVRO Schema and RPC, API State Management, DSL Engine Foundation (superseded by experience-driven approach)
+- Development Environment Setup (reference doc, products distributed)
+- spl/bug v2 (redundant)
+
+Cleaned stale dependencies throughout.
+
+### Observations on Remaining Items
+
+**API Design Documentation:**
+- Bottom-up approach: info goes into correct reqs first
+- Mycelium web connects them
+- Higher-level overview distills out from connected reqs
+- Not top-down documentation
+
+**ITIL Introduction:**
+- Continuation of experience work from this project
+- Current project reveals what higher-level structures need to look like
+- Approach becomes clear after Project 11 completes
+- Don't plan in isolation - emerges from the work
+
+*Review at project closure.*
+
+---
+
 *Log entries added as work progresses.*
