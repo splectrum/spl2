@@ -151,6 +151,20 @@ Cleaned stale dependencies throughout.
 
 *Review at project closure.*
 
+### CIP Cleanup
+
+Removed 8 CIPs:
+- CIP-000 (Document CIP Register) - will redefine CIPs from current work
+- CIP-001 (Product Register) - superseded, too bureaucratic
+- CIP-004 (AI Tooling Platform) - being blended in seamlessly
+- CIP-006 (N-Tier API Hierarchy) - will be done organically
+- CIP-007 (Glossary Tooling) - will be done organically
+- CIP-008 (App Overlay Pattern) - done/absorbed
+- CIP-013 (Design Spot Setup) - done/absorbed
+- CIP-015 (Cross-Cutting Layers) - done/absorbed
+
+8 CIPs remain: 002, 003, 005, 009-012, 014
+
 ---
 
 *Log entries added as work progresses.*
