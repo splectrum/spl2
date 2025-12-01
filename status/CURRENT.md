@@ -1,6 +1,6 @@
 # Current Status
 
-**Last Updated:** 2025-11-30
+**Last Updated:** 2025-12-01
 
 ---
 
@@ -9,49 +9,84 @@
 **Project 11: App Architecture**
 
 - Type: Exploration Project
-- Status: **Created - ready for initiation**
+- Status: **In Progress - Item 3 (App-based experience)**
 - Location: `projects/11-app-architecture/`
 
-### Vision
+### Current Focus
 
-Implement repo/node/app architecture:
-- Node as seat serving repo (one node, many apps)
-- Spot apps manage external data (name = spot folder)
-- System apps for internal functions (underscore prefix: _boot, _dev, _ops, _cli)
-- Location-aware routing (invokedFrom → spot → app)
-- Freestyle + formal in same app
+**requireSpl Pattern Implementation** - unified module/lib/script loading with consistent `create()` pattern.
 
-### Products
+Key deliverables completed:
+- `modules/hierarchy.json` - overlay layer configuration
+- Unified `requireSpl` handling lib, method, script file, inline script
+- Consistent interface: libs return utility objects, executables return `{ invoke() }`
+- Reference implementation: `pr09/console/hello`
+- Pattern documentation: `projects/11-app-architecture/reqs/requireSpl_pattern_v1.0.0.md`
 
-1. App Architecture Core
-2. _cli (evolved from cli-static)
-3. _dev (dev bundle as app)
-4. _ops (ops sidecar as app)
-5. projects spot app
-6. Single node consolidation
+### Next Steps
 
-### Design References
+1. App overlay implementation - app modules layering over node modules
+2. App lifecycle patterns - how apps declare their modules/hierarchy
 
-- `chats/immutables/repo_node_app_design_2025-11-30.md`
-- `chats/immutables/app_unification_discussion_2025-11-30.md`
+### Completed Work Items
+
+| # | Item | Status |
+|---|------|--------|
+| 1 | Backlog and CIP Consolidation | Done |
+| 2 | Splectrum node cleanup | Done |
+
+### In Progress
+
+| # | Item | Status |
+|---|------|--------|
+| 3 | App-based design and implementation experience | In progress - requireSpl pattern done |
+
+### Remaining
+
+| # | Item | Status |
+|---|------|--------|
+| 4 | Elevator pitch for Pear/Bare | Pending |
+| 5 | Splectrum node install | Pending |
 
 ---
 
-## Model Dev Environment
+## Key Implementation Details
 
-**Location:** `projects/10-dev-env-v0-bundle-continued/dev/v0/`
+### requireSpl Pattern
 
-The current development bundle. Contains working spl/dev and spl/ops implementations. Will be migrated to _dev app during this project.
+Two `create()` signatures:
+
+**Libs** - `create(record, { requireNonSpl })`:
+- Platform module access only
+- Returns utility object with methods
+
+**Methods** - `create(record, { requireSpl })`:
+- Lib access only (no direct platform)
+- Returns `{ invoke() }`
+- Uses meaningful lib calls, not raw fs/path
+
+See `reqs/requireSpl_pattern_v1.0.0.md` for full documentation.
+
+### Archived
+
+- `spl/dev` API moved to `archive/spl-dev-api/` - superseded by app-based approach
 
 ---
 
-## Recent Completions
+## Splectrum Node Structure
 
-| Project | Completed | Key Outcomes |
-|---------|-----------|--------------|
-| 10 - Dev Env v0 Bundle Continued | 2025-11-30 | Self-hosting dev cycle, spl/dev + spl/ops APIs, CLI pipeline, unified scripting, 6 design docs |
-| 09 - Console v5 Stream Native | 2025-11-26 | v0 dev env template, type hierarchy, lib resolution, selfeval inheritance |
-| 08 - Dev Environment API | 2025-11-20 | 4-level module structure, executable selfeval pattern, test runner |
+```
+splectrum/
+  lib/moduleBootstrap.js    # requireSpl, requireNonSpl, overlay resolution
+  modules/
+    hierarchy.json          # Layer configuration
+    bm_spl/                  # Bundle module
+      pr09/console/hello/   # Reference method implementation
+      spl/_lib/             # Core libs (spl, cli)
+  apps/cli-static/          # Current CLI app
+  scripts/                  # Freestyle scripts
+  runtime/                  # Session/request processing
+```
 
 ---
 
@@ -60,17 +95,16 @@ The current development bundle. Contains working spl/dev and spl/ops implementat
 **Starting a new session?**
 
 1. Read this file for current context
-2. Check `projects/INDEX.md` for full project status
-3. Check `projects/BACKLOG.md` for work queue
+2. Read `projects/11-app-architecture/DAILY_LOG.md` for detailed work history
+3. Read `projects/11-app-architecture/reqs/requireSpl_pattern_v1.0.0.md` for the implementation pattern
 
-**Looking up SPL2 concepts?**
-
-MANDATORY: Use glossaries as index - see CLAUDE.md "Glossary-First Lookup" section.
-- Understanding → STEPPING_STONES_GLOSSARY.md
-- Action → HOWTO_GLOSSARY.md
+**Key files to understand current state:**
+- `splectrum/lib/moduleBootstrap.js` - the unified requireSpl implementation
+- `splectrum/modules/bm_spl/pr09/console/hello/index.js` - reference method implementation
+- `splectrum/apps/cli-static/app.mjs` - simplified app handler using requireSpl
 
 ---
 
 ## Notes
 
-This file provides session context without requiring CLAUDE.md updates. Update when project status changes significantly.
+This file provides session context. Update when project status changes significantly.

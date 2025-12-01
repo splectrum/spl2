@@ -1,11 +1,18 @@
 // pr09/console/hello - simple greeting method
-// Receives: record, spl, requireSpl, requireNonSpl (same as scripts)
+//
+// Pattern: create(record, { requireSpl }) returns { invoke() }
 
-export function handle(record, spl) {
-  const input = spl.input()
+export async function create(record, { requireSpl }) {
+  const spl = await requireSpl('lib/spl', record)
 
-  console.log(input.message || 'Hello from pr09/console/hello!')
+  return {
+    async invoke() {
+      const input = spl.input()
 
-  spl.output({ greeted: true, message: input.message })
-  spl.completeRequest()
+      console.log(input.message || 'Hello from pr09/console/hello!')
+
+      spl.output({ greeted: true, message: input.message })
+      spl.completeRequest()
+    }
+  }
 }

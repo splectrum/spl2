@@ -8,7 +8,7 @@
 import { fileURLToPath } from 'url'
 import path from 'path'
 import fs from 'fs'
-import { requireSpl, requireNonSpl } from '../../lib/moduleBootstrap.js'
+import { requireSpl } from '../../lib/moduleBootstrap.js'
 import { startSession } from './session.mjs'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -61,78 +61,12 @@ Output: Writes to console, returns nothing.
 export async function handle(record) {
   const method = record.headers.spl.request.method
 
-  // Dispatch based on method type
-  if (method.startsWith('/')) {
-    // Library script - absolute path
-    await executeScript(record)
-  } else if (method === 'spl/script/inline') {
-    // Inline script
-    await executeInline(record)
-  } else {
-    // Module method
-    await executeMethod(record)
-  }
+  // Unified execution via requireSpl
+  const executable = await requireSpl(method, record)
+  await executable.invoke()
 
   // Output result
   console.log(JSON.stringify(record, null, 2))
-}
-
-// ============================================================================
-// Execution handlers - TODO: implement properly
-// ============================================================================
-
-/**
- * Wrap and execute script content
- * Same wrapper for inline and library scripts
- * @param {string} scriptContent - The script body
- * @param {Object} record - The request record
- */
-async function wrapAndExecute(scriptContent, record) {
-  // Same bootstrapping as formal implementations
-  const spl = await requireSpl('lib/spl', record)
-
-  // Wrap script with full splectrum access:
-  // - record: the record
-  // - spl: pre-loaded lib/spl (convenience)
-  // - requireSpl: load splectrum libs
-  // - requireNonSpl: load platform modules
-  // Scripts also have freedom for non-splectrum patterns (direct imports, etc)
-  const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor
-  const fn = new AsyncFunction('record', 'spl', 'requireSpl', 'requireNonSpl', scriptContent)
-
-  await fn(record, spl, requireSpl, requireNonSpl)
-}
-
-async function executeScript(record) {
-  const scriptPath = record.headers.spl.request.method
-  const fs = await import('fs')
-  const scriptContent = fs.readFileSync(scriptPath, 'utf-8')
-
-  await wrapAndExecute(scriptContent, record)
-}
-
-async function executeInline(record) {
-  const scriptContent = record.headers.spl.request.script
-
-  await wrapAndExecute(scriptContent, record)
-}
-
-async function executeMethod(record) {
-  const method = record.headers.spl.request.method
-  const nodeRoot = record.headers.spl.runtime.nodeRoot
-
-  // Resolve method path to module location
-  // e.g., pr09/console/hello → modules/bm_spl/pr09/console/hello/index.js
-  const modulePath = path.join(nodeRoot, 'modules', 'bm_spl', method, 'index.js')
-
-  // Import the module
-  const module = await import(modulePath)
-
-  // Bootstrap spl (same as scripts)
-  const spl = await requireSpl('lib/spl', record)
-
-  // Call handle with same signature as scripts
-  await module.handle(record, spl, requireSpl, requireNonSpl)
 }
 
 // ============================================================================

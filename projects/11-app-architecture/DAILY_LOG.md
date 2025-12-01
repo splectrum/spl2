@@ -235,6 +235,56 @@ Removed 8 CIPs:
 - Visible folders vs auxiliary (_reqs, _lib, _schemas)
 - One-to-one: apps/X ↔ runtime/X
 
+### requireSpl Pattern Implementation
+
+**Problem identified:**
+- Overlay infrastructure existed but wasn't wired into execution
+- `requireSpl()` hardcoded paths to `modules/bm_spl/`
+- Separate execute functions (executeScript, executeInline, executeMethod) with duplicated logic
+- Inconsistent patterns between libs and methods
+
+**Solution - Unified requireSpl:**
+
+Single entry point handling four URI patterns:
+1. `lib/...` → libs (bound utility object)
+2. `pkg/api/method` → methods via overlay (`{ invoke() }`)
+3. `/absolute/path` → script files (`{ invoke() }`)
+4. `spl/script/inline` → inline scripts (`{ invoke() }`)
+
+**Two create() signatures established:**
+
+| Type | Signature | Returns |
+|------|-----------|---------|
+| Libs | `create(record, { requireNonSpl })` | Utility object with methods |
+| Methods | `create(record, { requireSpl })` | `{ invoke() }` |
+
+**Key design decisions:**
+- Methods only get `requireSpl` - must use libs, no direct platform access
+- Libs only get `requireNonSpl` - wrap platform specifics
+- Consistent pattern = fast comprehension
+- Meaningful lib calls, not raw fs/path operations
+
+**Implementation:**
+- Created `modules/hierarchy.json` - layer configuration for overlay
+- Updated `moduleBootstrap.js` - unified requireSpl with overlay resolution
+- Simplified `app.mjs` from ~135 lines to ~70 lines
+- Simplified `session.mjs` - removed all execute* functions
+- Converted `pr09/console/hello` as reference implementation
+
+**Archived:**
+- `spl/dev` API moved to `archive/spl-dev-api/` - superseded by app-based approach
+
+**Documentation:**
+- Created `reqs/requireSpl_pattern_v1.0.0.md` - working document for the pattern
+
+**App handler now:**
+```js
+const executable = await requireSpl(method, record)
+await executable.invoke()
+```
+
+Two lines. Clean. Uniform.
+
 ---
 
 *Log entries added as work progresses.*

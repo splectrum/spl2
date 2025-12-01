@@ -1,0 +1,5 @@
+{
+  "layers": [
+    { "name": "bm_spl", "type": "bundle_module" }
+  ]
+}

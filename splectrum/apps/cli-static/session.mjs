@@ -6,7 +6,7 @@
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { requireSpl, requireNonSpl } from '../../lib/moduleBootstrap.js'
+import { requireSpl } from '../../lib/moduleBootstrap.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const sessionRoot = path.resolve(__dirname, '../../runtime/cli-static/requests')
@@ -49,8 +49,10 @@ export function startSession() {
       const content = fs.readFileSync(sourcePath, 'utf-8')
       const record = JSON.parse(content)
 
-      // Execute the request
-      await executeRequest(record)
+      // Execute via unified requireSpl
+      const method = record.headers.spl.request.method
+      const executable = await requireSpl(method, record)
+      await executable.invoke()
 
       // Remove from processing
       fs.unlinkSync(sourcePath)
@@ -71,47 +73,4 @@ export function startSession() {
       }
     }
   }
-}
-
-// ============================================================================
-// Request execution (same as app.mjs)
-// ============================================================================
-
-async function executeRequest(record) {
-  const method = record.headers.spl.request.method
-
-  if (method.startsWith('/')) {
-    await executeScript(record)
-  } else if (method === 'spl/script/inline') {
-    await executeInline(record)
-  } else {
-    await executeMethod(record)
-  }
-}
-
-async function wrapAndExecute(scriptContent, record) {
-  const spl = await requireSpl('lib/spl', record)
-  const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor
-  const fn = new AsyncFunction('record', 'spl', 'requireSpl', 'requireNonSpl', scriptContent)
-  await fn(record, spl, requireSpl, requireNonSpl)
-}
-
-async function executeScript(record) {
-  const scriptPath = record.headers.spl.request.method
-  const scriptContent = fs.readFileSync(scriptPath, 'utf-8')
-  await wrapAndExecute(scriptContent, record)
-}
-
-async function executeInline(record) {
-  const scriptContent = record.headers.spl.request.script
-  await wrapAndExecute(scriptContent, record)
-}
-
-async function executeMethod(record) {
-  const method = record.headers.spl.request.method
-  const nodeRoot = record.headers.spl.runtime.nodeRoot
-  const modulePath = path.join(nodeRoot, 'modules', 'bm_spl', method, 'index.js')
-  const module = await import(modulePath)
-  const spl = await requireSpl('lib/spl', record)
-  await module.handle(record, spl, requireSpl, requireNonSpl)
 }

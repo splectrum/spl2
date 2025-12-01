@@ -1,6 +1,11 @@
 // moduleBootstrap.js - Bootstrap for requiring splectrum and platform modules
 //
-// requireSpl(uri, record) → bound splectrum object (async)
+// requireSpl(uri, record) → object (async)
+//   - lib/...           → bound utility object
+//   - pkg/api/method    → { invoke() } via overlay
+//   - /absolute/path    → { invoke() } script file
+//   - spl/script/inline → { invoke() } inline script from record
+//
 // requireNonSpl(moduleName) → platform module
 // createOverlay(hierarchy) → overlay resolver
 // loadOverlay(hierarchyPath) → overlay resolver from file
@@ -8,6 +13,7 @@
 // Pre-load platform modules (sync at module load time)
 import * as fsModule from 'fs'
 import * as pathModule from 'path'
+import { fileURLToPath } from 'url'
 
 // Registry of platform modules used in splectrum
 // Key must exist to require - enforces explicit registration
@@ -20,26 +26,104 @@ const platformModules = {
 const fs = platformModules['fs']
 const path = platformModules['path']
 
+// Derive modules folder from this file's location (sibling to lib/)
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const modulesDir = path.join(__dirname, '..', 'modules')
+
+// Cached hierarchy
+let hierarchy = null
+
 /**
- * Require a splectrum lib or module
- * @param {string} uri - 'lib/spl', 'lib/spl/cli', or 'pkg/api/method'
+ * Load hierarchy.json from modules folder (lazy, cached)
+ * @returns {Object} Hierarchy with layers array
+ */
+function loadHierarchy() {
+  if (hierarchy) {
+    return hierarchy
+  }
+
+  const hierarchyPath = path.join(modulesDir, 'hierarchy.json')
+  if (!fs.existsSync(hierarchyPath)) {
+    throw new Error(`hierarchy.json not found: ${hierarchyPath}`)
+  }
+
+  hierarchy = JSON.parse(fs.readFileSync(hierarchyPath, 'utf8'))
+  return hierarchy
+}
+
+/**
+ * Resolve a file through overlay layers
+ * @param {string} nodePath - Module node path (e.g., 'spl/dev/cycle')
+ * @param {string} subPath - Path within node (e.g., 'index.js' or '_lib/spl.js')
+ * @returns {string|null} Absolute path to file, or null if not found
+ */
+function resolveOverlay(nodePath, subPath) {
+  const h = loadHierarchy()
+
+  for (const layer of h.layers) {
+    const filePath = path.join(modulesDir, layer.name, nodePath, subPath)
+    if (fs.existsSync(filePath)) {
+      return filePath
+    }
+  }
+
+  return null
+}
+
+/**
+ * Create executable wrapper for script content
+ * @param {string} scriptContent - Script source code
  * @param {Object} record - Record to bind
- * @returns {Promise<Object>} - Bound object
+ * @returns {Object} Object with invoke() method
+ */
+async function createScriptExecutable(scriptContent, record) {
+  const spl = await requireSpl('lib/spl', record)
+  const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor
+  const fn = new AsyncFunction('record', 'spl', 'requireSpl', 'requireNonSpl', scriptContent)
+
+  return {
+    async invoke() {
+      await fn(record, spl, requireSpl, requireNonSpl)
+    }
+  }
+}
+
+
+/**
+ * Require a splectrum lib, module, or script
+ * @param {string} uri - 'lib/spl', 'pkg/api/method', '/path/to/script.js', or 'spl/script/inline'
+ * @param {Object} record - Record to bind
+ * @returns {Promise<Object>} - Bound object or executable with invoke()
  */
 export async function requireSpl(uri, record) {
+  // 1. Lib resolution
   if (uri.startsWith('lib/')) {
-    // Lib resolution:
-    //   lib/spl     → modules/bm_spl/spl/_lib/spl.js (package level)
-    //   lib/spl/cli → modules/bm_spl/spl/cli/_lib/cli.js (API level)
-    const libPath = uri.replace('lib/', '')  // e.g., spl or spl/cli
+    const libPath = uri.replace('lib/', '')
     const parts = libPath.split('/')
-    const libName = parts[parts.length - 1]  // e.g., spl or cli
+    const libName = parts[parts.length - 1]
     const mod = await import(`../modules/bm_spl/${libPath}/_lib/${libName}.js`)
     return mod.create(record, { requireNonSpl })
   }
 
-  // Module resolution (pkg/api/method) - TODO
-  throw new Error(`Module resolution not yet implemented: ${uri}`)
+  // 2. Inline script
+  if (uri === 'spl/script/inline') {
+    const scriptContent = record.headers.spl.request.script
+    return createScriptExecutable(scriptContent, record)
+  }
+
+  // 3. Script file (absolute path)
+  if (uri.startsWith('/')) {
+    const scriptContent = fs.readFileSync(uri, 'utf-8')
+    return createScriptExecutable(scriptContent, record)
+  }
+
+  // 4. Module method (pkg/api/method) - resolve via overlay
+  const modulePath = resolveOverlay(uri, 'index.js')
+  if (!modulePath) {
+    throw new Error(`Module not found in any layer: ${uri}`)
+  }
+  const mod = await import(modulePath)
+  return mod.create(record, { requireSpl })
 }
 
 /**
