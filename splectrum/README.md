@@ -1,53 +1,55 @@
 # Splectrum Node
 
-This is the root Splectrum node for the spl2 repository.
+DSL engine entrypoint - JS package for Bare and Node.js.
 
 ## Quick Start
 
 ```bash
-# Add to PATH (in ~/.bashrc)
-export PATH="/home/herma/splectrum/spl2:$PATH"
+# From repo root
+./spl help
+./spl status
 
-# Run commands from anywhere
-spl spl/dev/deploy --name=my-env
-spl status
-spl help
+# Run method
+./spl spl/dev/cycle --name=my-env
+
+# Run script
+./spl ./scripts/status.js
 ```
 
-## Node Structure
+## Structure
 
 ```
 splectrum/
-├── README.md        # This file
-├── package.json     # Node identifier (name: "splectrum")
-├── docs/            # Additional documentation
-├── _reqs/           # Node requirements
-├── scripts/         # Script library
-├── spl.mjs          # Entry point implementation
-├── run.js           # Method runner
-├── lib/             # Library symlinks
-└── modules/         # Installed modules
+├── spl.mjs          # Entry point
+├── apps/            # Application containers
+├── lib/             # Exposed API libraries
+├── modules/         # Formal module bundles
+├── runtime/         # App session state
+├── scripts/         # Free scripts
+├── docs/            # Documentation
+├── _reqs/           # Requirement specs
+├── node_modules/    # npm dependencies
+└── package.json     # Package manifest
 ```
 
 ## Invocation Modes
 
 ```bash
-# Command mode (default) - package/api/method
-spl spl/dev/cycle --name=env-123
+# Method - package/api/method
+./spl spl/dev/cycle --name=env-123
 
-# Library mode - scripts from scripts/ folder
-spl status
-spl help
+# Script - from scripts/ folder
+./spl status
 
-# File mode - explicit path
-spl ./my-script.js --arg=value
+# File - explicit path
+./spl ./my-script.js
 
-# Inline mode - requires /* preamble
-spl "/* */ console.log(runtime.nodeRoot)"
+# Inline - requires /* preamble
+./spl "/* */ console.log(runtime.nodeRoot)"
 ```
 
 ## See Also
 
-- `docs/` - Additional documentation
-- `scripts/` - Available scripts
-- `_reqs/` - Node requirements
+- README.json - Structured metadata
+- _reqs/ - Requirement specifications
+- docs/ - Additional documentation

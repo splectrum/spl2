@@ -1,0 +1,11 @@
+{
+  "name": "modules",
+  "type": "folder",
+  "description": "Formal module bundles",
+  "children": {
+  },
+  "refs": {
+    "req": "../_reqs/modules.md",
+    "readme": "README.md"
+  }
+}

@@ -1,6 +1,0 @@
-{
-  "type": "method",
-  "title": "spl/dev/test",
-  "description": "Run selfevals for all nodes using hierarchy overlay",
-  "version": "1.0.0"
-}

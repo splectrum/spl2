@@ -1,6 +1,0 @@
-{
-  "type": "method",
-  "title": "spl/dev/publish",
-  "description": "Publish work module and merged base module with timestamps",
-  "version": "1.0.0"
-}

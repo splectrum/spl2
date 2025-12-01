@@ -1,0 +1,47 @@
+{
+  "name": "splectrum",
+  "type": "node",
+  "description": "DSL engine entrypoint - JS package for Bare and Node.js",
+  "entrypoint": "spl.mjs",
+  "platform": ["bare", "nodejs"],
+  "structure": {
+    "apps": {
+      "description": "Application containers",
+      "readme": "apps/README.json"
+    },
+    "lib": {
+      "description": "Exposed API libraries",
+      "readme": "lib/README.json"
+    },
+    "modules": {
+      "description": "Formal module bundles",
+      "readme": "modules/README.json"
+    },
+    "runtime": {
+      "description": "App session state",
+      "readme": "runtime/README.json"
+    },
+    "scripts": {
+      "description": "Free scripts",
+      "readme": "scripts/README.json"
+    },
+    "docs": {
+      "description": "Documentation",
+      "readme": "docs/README.json"
+    }
+  },
+  "auxiliary": {
+    "_reqs": {
+      "description": "Requirement specs",
+      "readme": "_reqs/README.json"
+    }
+  },
+  "refs": {
+    "req": "_reqs/splectrum_node.md",
+    "readme": "README.md"
+  },
+  "see_also": {
+    "glossary": "glossary/DSL_GLOSSARY.md",
+    "design": "design/API_DESIGN.md"
+  }
+}

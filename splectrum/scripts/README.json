@@ -1,0 +1,11 @@
+{
+  "name": "scripts",
+  "type": "folder",
+  "description": "Freestyle exploration and utilities",
+  "children": {
+  },
+  "refs": {
+    "req": "../_reqs/scripts.md",
+    "readme": "README.md"
+  }
+}

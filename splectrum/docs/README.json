@@ -1,0 +1,11 @@
+{
+  "name": "docs",
+  "type": "folder",
+  "description": "Documentation",
+  "children": {
+  },
+  "refs": {
+    "req": "../_reqs/docs.md",
+    "readme": "README.md"
+  }
+}

@@ -1,5 +1,0 @@
-{
-  "type": "api",
-  "version": "1.0.0",
-  "description": "Request lifecycle API - tracks request completion state"
-}

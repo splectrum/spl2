@@ -165,6 +165,76 @@ Removed 8 CIPs:
 
 8 CIPs remain: 002, 003, 005, 009-012, 014
 
+### Splectrum Node Cleanup
+
+**Removed:**
+- ops/ sidecar folder (ops functionality will come through app management/routing)
+- lib/overlay.js broken symlink
+- modules/bm_spl symlink → direct folder
+- modules/versions/ folder (old bundle manager pattern)
+
+**Discovered issue - Overlay not wired into execution:**
+- Overlay infrastructure exists (createOverlay, loadOverlay, hierarchy.json)
+- Currently only used for selfeval collection in spl/dev/test
+- NOT used for module/lib resolution during execution
+- requireSpl() bypasses overlay - hardcoded to modules/bm_spl/
+
+**Fix required (add to project work):**
+- Overlay for app should be active for code running within app AND within app's session
+- Original intent: sandwich node modules between app modules
+- Got disconnected during overlay work
+
+### Documentation Setup - Req Versioning Decision
+
+**Context:** Node structural items need requirement docs. Where do they live and how are they versioned?
+
+**Decision - Transitionary Approach:**
+
+| Location | Contains | Purpose |
+|----------|----------|---------|
+| Splectrum node `_reqs/` | Latest version | Self-contained, current truth |
+| DSL_GLOSSARY | Reference to node's latest | Index/lookup |
+| Active project | Previous version (if changed) | History/traceability |
+
+**Rationale:**
+- Node is self-contained (has its own docs)
+- Glossary stays simple (always points to current)
+- Projects capture when/why changes happened
+- No version clutter in node
+
+**Why transitionary:**
+- Current: splectrum node in repo is the "master" (single working node)
+- Future: distributable install packages (node, module, app packages)
+- Then: splectrum root becomes just one instance, not the master
+
+**Future approach (distributable packages):**
+- Reqs created in usual way: immutables within immutable repo container
+- Packages are frozen artifacts with frozen docs
+- Node is where we work; packages are what we ship
+
+### Node Documentation Created
+
+**Root level:**
+- README.json (mycelium web - spiders to children)
+- README.md (narrative)
+- _reqs/splectrum_node.md (spec)
+
+**Folder documentation completed:**
+- apps/ - Root node of apps structure, activity center
+- lib/ - Bootstrapping and dual entrypoint management, API library resolution
+- modules/ - Formal module bundles, package/api/method hierarchy
+- runtime/ - Internal processing engine with managed sessions
+- scripts/ - Freestyle exploration and utilities
+
+**Still to complete:**
+- docs/ folder documentation
+
+**Key patterns established:**
+- README.json links to children (mycelium web)
+- spl.mjs as entrypoint pattern (dual mode: CLI + programmatic)
+- Visible folders vs auxiliary (_reqs, _lib, _schemas)
+- One-to-one: apps/X ↔ runtime/X
+
 ---
 
 *Log entries added as work progresses.*

@@ -1,0 +1,17 @@
+{
+  "name": "lib",
+  "type": "folder",
+  "description": "Bootstrapping and dual entrypoint management",
+  "children": {
+    "entryPoint.js": {
+      "description": "Entry point handling"
+    },
+    "moduleBootstrap.js": {
+      "description": "Module loading, overlay resolution"
+    }
+  },
+  "refs": {
+    "req": "../_reqs/lib.md",
+    "readme": "README.md"
+  }
+}

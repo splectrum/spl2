@@ -1,0 +1,12 @@
+{
+  "name": "apps",
+  "type": "folder",
+  "description": "Root node of apps structure - activity center",
+  "entrypoint": "spl.mjs",
+  "children": {
+  },
+  "refs": {
+    "req": "../_reqs/apps.md",
+    "readme": "README.md"
+  }
+}
