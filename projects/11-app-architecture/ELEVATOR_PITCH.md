@@ -206,3 +206,16 @@ From AI partner perspective:
 6. **Friction as feature** - misunderstandings become discoveries, learning from gaps
 7. **Shared vocabulary** - DSL + stepping stones = thinking together, not just working together
 8. **10+ projects of proof** - not theory, daily practice with real outcomes
+
+---
+
+## Pitch Voice
+
+**Not:** "I (human) with AI assistance"
+
+**But:** "We (human + AI) leading a team"
+
+- Two leaders: human and AI partner
+- Team: future AI agents (autonomous layer)
+- The pitch comes from the partnership, not from the human alone
+- Demonstrates 1+1=11 in the pitch itself
