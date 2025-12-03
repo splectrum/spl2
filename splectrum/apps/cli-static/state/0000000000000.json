@@ -1,0 +1,15 @@
+{
+  "headers": {
+    "spl": {
+      "cli-static": {
+        "name": "cli-static",
+        "root": "apps/cli-static"
+      },
+      "cli-static-session": {
+        "name": "simple",
+        "root": "runtime/cli-static/requests"
+      }
+    }
+  },
+  "value": {}
+}

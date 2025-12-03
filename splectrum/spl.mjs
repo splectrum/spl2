@@ -9,7 +9,6 @@
 //   4. Library:  spl status
 
 import { requireSpl } from './lib/moduleBootstrap.js'
-import { handle as cliStaticHandle } from './apps/cli-static/spl.mjs'
 
 // ============================================================================
 // Create record first thing - all input captured
@@ -79,7 +78,12 @@ switch (mode) {
 record.value = null
 
 // ============================================================================
-// Hand off to cli-static app
+// Route to app via spl/cli-static/execute
 // ============================================================================
 
-await cliStaticHandle(record)
+// Terminal routing: cli-static app handles terminal requests
+const appHandler = await requireSpl('spl/cli-static/execute', record)
+await appHandler.invoke()
+
+// Output result
+console.log(JSON.stringify(record, null, 2))

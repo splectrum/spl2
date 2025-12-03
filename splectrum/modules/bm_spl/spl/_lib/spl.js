@@ -194,6 +194,42 @@ export function create(record, { requireNonSpl }) {
     raiseError(message) {
       record.headers.spl.runtime.error = message
       record.headers.spl.request.completed = true
+    },
+
+    /**
+     * Consume Latest - read most recent record from topic folder
+     *
+     * Pairs with faf() for state save/load pattern:
+     * - faf() writes timestamped records (never overwrites)
+     * - consumeLatest() reads the latest by filename sort
+     *
+     * @param {string} topic - Topic folder path (relative to nodeRoot or absolute)
+     * @returns {Object|null} - Parsed record or null if topic empty/missing
+     */
+    consumeLatest(topic) {
+      const nodeRoot = record.headers.spl.runtime.nodeRoot
+      if (!nodeRoot) return null
+
+      // Resolve topic path
+      const topicPath = path.isAbsolute(topic)
+        ? topic
+        : path.join(nodeRoot, topic)
+
+      // Check if folder exists
+      if (!fs.existsSync(topicPath)) return null
+
+      // List json files, sort descending (latest first)
+      const files = fs.readdirSync(topicPath)
+        .filter(f => f.endsWith('.json'))
+        .sort()
+        .reverse()
+
+      if (files.length === 0) return null
+
+      // Read and parse latest
+      const latestPath = path.join(topicPath, files[0])
+      const content = fs.readFileSync(latestPath, 'utf-8')
+      return JSON.parse(content)
     }
   }
 }
