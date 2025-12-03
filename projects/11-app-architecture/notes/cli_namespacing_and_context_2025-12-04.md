@@ -1,7 +1,13 @@
-# CLI Namespacing and Context Management
+# Splectrum Scripting Layer and Context Management
 
 **Date:** 2025-12-04
 **Context:** Project 11, Item 3 - Development Experience discussion (continued)
+
+---
+
+## Scope
+
+This document describes the **Splectrum scripting layer** - a client-agnostic scripting syntax that can be delivered via CLI, web UI, API, or any future client. The CLI is just one transport.
 
 ---
 
@@ -115,6 +121,40 @@ Proceed? [y/n]
 - Help: "What can this method do?"
 - Confirmation: "What will this method do right now?"
 
+### Confirmation for All Operations (Functional Help)
+
+Confirmation isn't just for state changes. Even read-only operations benefit:
+
+```
+$ spl list-methods
+
+Will list methods in: spl/project/
+  Showing: all methods (create, plan, run, close)
+  Format: name, description, last modified
+
+Proceed? [y/n]
+```
+
+**Why this matters:**
+
+Results alone don't explain themselves:
+```
+create    Create a new project       2025-12-04
+plan      Plan project work          2025-12-04
+```
+
+Is this all methods? Just this context? What scope?
+
+**Confirmation provides metadata:**
+- Results = the data
+- Confirmation = what, where, how (the context for the data)
+
+**Every invocation teaches:**
+
+The confirmation IS the documentation for that specific call. Not "here's what this command does in general" but "here's what this command will do right now with your current context."
+
+Run any command → read confirmation → understand before seeing results.
+
 ---
 
 ## Scoped Context: `with` vs `set`
@@ -186,12 +226,91 @@ One confirmation for the batch.
 
 ---
 
+## Two Layers: Formal and Fluent
+
+### The Layering
+
+**Formal layer (strict):**
+- Full namespace always
+- Explicit everything
+- No ambiguity
+- The actual implementation
+
+**Scripting layer (fluent):**
+- Context scoping (`with ... do`)
+- Short forms
+- Natural flow
+- Syntactic sugar that resolves to formal calls
+
+```
+# Fluent scripting
+with api-context spl/project do
+new-method create
+new-method plan
+
+# Resolves to formal calls
+spl spl/dev/new-method --target=spl/project/create
+spl spl/dev/new-method --target=spl/project/plan
+```
+
+### Why This Matters
+
+- Formal layer is stable, testable, unambiguous - the foundation
+- Scripting layer evolves independently - ergonomics without touching core
+- We can be strict underneath and friendly on top
+
+### Implementation Path
+
+1. Build formal layer first (full namespace, explicit everything)
+2. Add scripting layer on top (parser that resolves to formal calls)
+3. Scripting is just transformation - no new execution semantics
+
+The formal layer never compromises. The scripting layer is pure convenience.
+
+---
+
+## Client-Agnostic Scripting
+
+The `with ... do` syntax isn't a CLI feature. It's a **Splectrum scripting language**.
+
+```
+with api-context spl/project do
+new-method create
+new-method plan
+new-method close
+```
+
+This can run from:
+- CLI (bash heredoc)
+- Web client
+- API call
+- File (`.spl` script?)
+- Any future client
+
+**The CLI is just one transport.**
+
+The script itself is client-agnostic. Splectrum parses and executes it. The client just delivers it.
+
+```
+# From CLI
+$ spl < script.spl
+
+# From API
+POST /execute
+{ "script": "with api-context spl/project do\nnew-method create\n..." }
+
+# From web UI
+[text area] → Execute
+```
+
+---
+
 ## Implementation Priority
 
 **Start simple:**
 1. `set` for persistent context
 2. Context visible in output
-3. Interactive confirmation for state changes
+3. Interactive confirmation for all operations (functional help)
 
 **Add later (higher maturity):**
 4. `with` for scoped context
@@ -225,3 +344,8 @@ Full namespace is always safe. Short forms become safe with:
 ## Origin
 
 Emerged from discussion about how AI reliably tracks CLI state. The user pushed on: "Would you remember what state the CLI is in?" - leading to solutions that don't require memory: visible context, confirmation prompts, scoped execution.
+
+Key realizations during discussion:
+1. The `with ... do` syntax is client-agnostic - a Splectrum scripting language, not CLI-specific
+2. This enables strict formal implementation with fluent scripting on top
+3. Confirmation serves as functional help for ALL operations, not just state changes - explaining what will happen before showing results
