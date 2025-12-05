@@ -1,6 +1,6 @@
 # Current Status
 
-**Last Updated:** 2025-12-02
+**Last Updated:** 2025-12-06
 
 ---
 
@@ -14,18 +14,29 @@
 
 ### Current Focus
 
-**API-as-App Model** - apps are APIs with persisted state, methods execute within that state.
+**Container Implementation** - base structural type with inherited API.
 
 Key deliverables completed:
 - App-session pipeline with proper inbox/outbox pattern
 - State management via `faf`/`consumeLatest` pair
 - Session as async processor with self-destructing watchers (short-TTL mode)
 - Clean separation: app orchestrates, session processes
+- Container structure set up at `splectrum/apps/cli-static/modules/work_module/spl/container/`
+- Plain req v1.1.0 created (added Version and Models sections)
+
+Design decisions made (2025-12-05/06):
+- **Container** = universal structural unit (replacing "folder-node")
+- Types are APIs in normal hierarchy (spl/container, spl/api, spl/method)
+- Runtime resolution with inheritance (folder → type chain → lib)
+- Spider principle: each entrypoint describes its own contents
+- Underscore folders have task entrypoints (`<foldername>.json`)
+- API groupings are organizational only (in README.json)
 
 ### Next Steps
 
-1. Development experience - streamlined design and implementation workflow
-2. Long-lived session mode (app-session pair initialization)
+1. Write `container_v1.0.0.md` req
+2. Implement container methods (grouped as CRUD, Types, XPath)
+3. Long-lived session mode (app-session pair initialization)
 
 ### Completed Work Items
 
@@ -131,14 +142,24 @@ splectrum/
 **Starting a new session?**
 
 1. Read this file for current context
-2. Read `projects/11-app-architecture/notes/entrypoint_pipeline_discussion_2025-12-02.md` for design details
+2. Read `projects/11-app-architecture/notes/type_carries_tooling_2025-12-05.md` for current design direction
 3. Read `projects/11-app-architecture/DAILY_LOG.md` for work history
 
-**Key files to understand current state:**
+**Key design documents (Dec 2025):**
+- `notes/type_carries_tooling_2025-12-05.md` - container API, whoami, select, resolution approach, req decisions
+- `notes/design_implementation_app_decisions_2025-12-04.md` - verbs, PAC pattern
+- `notes/cli_namespacing_and_context_2025-12-04.md` - scripting layer, context management
+- `notes/natural_language_bridge_2025-12-04.md` - DSL glossary as semantic foundation
+- `notes/executable_documentation_principle_2025-12-03.md` - scripts as howtos
+
+**Key implementation locations:**
+- `splectrum/apps/cli-static/modules/work_module/spl/container/` - container being implemented
 - `splectrum/spl.mjs` - node entrypoint, routes to app
-- `splectrum/modules/bm_spl/spl/cli-static/execute/index.js` - app handler
-- `splectrum/modules/bm_spl/spl/cli-static-session/start/index.js` - session start
 - `splectrum/modules/bm_spl/spl/_lib/spl.js` - core lib with faf/consumeLatest
+
+**Req structure:**
+- Using plain req v1.1.0 (projects/11-app-architecture/reqs/plain_req_v1.1.0.md)
+- Next: write container_v1.0.0.md
 
 ---
 

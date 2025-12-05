@@ -1,0 +1,5 @@
+{
+  "description": "Container self-evaluations",
+  "runner": "spl/selfeval/run",
+  "entries": []
+}

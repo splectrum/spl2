@@ -287,4 +287,95 @@ Two lines. Clean. Uniform.
 
 ---
 
+## 2025-12-05
+
+### Development Experience Design (continued from Dec 4)
+
+Session recovered design discussion from interrupted Dec 4 session. Key documents from that session:
+- `notes/cli_namespacing_and_context_2025-12-04.md`
+- `notes/natural_language_bridge_2025-12-04.md`
+- `notes/design_implementation_app_decisions_2025-12-04.md`
+
+### Type Carries Tooling
+
+Major design direction: dev tools (create, update, inspect) aren't standalone - they're methods on types. Every structural unit inherits its type's API.
+
+**Key concepts:**
+- Container: universal structural unit (folder node)
+- Types are APIs in the normal hierarchy
+- Type chain = API inheritance chain
+- Module layering enables/disables tooling (type module present = tooling available)
+
+**Container API:**
+- `whoami` - structural introspection at any level
+- `select` - XPath-style queries with content predicates
+- `create` - scaffold new container structure (PAC)
+
+**XPath for folder structure:**
+- Node = folder, Attribute = file
+- `select "//method[@_reqs contains 'CIP-003']"` - structure + content query
+- Universal applicability: modules, repo, docs, mycelium web
+
+### Resolution Approach
+
+Runtime layer resolution with inheritance:
+1. Check folder exists → load index.js → wrap → return
+2. No folder → walk type chain → find in type lib → wrap → return
+
+Simplified method pattern under consideration: methods as plain functions, resolver provides wrapper.
+
+### Container Structure Established
+
+Set up work module at `splectrum/apps/cli-static/modules/work_module/spl/container/`:
+
+```
+spl/container/
+  _lib/lib.json
+  _reqs/reqs.json
+  _schemas/schemas.json
+  _selfevals/selfevals.json
+  _tests/tests.json
+  README.md
+  README.json
+  index.js
+```
+
+**Naming conventions:**
+- Visible folders: README.md + README.json
+- Internal folders (`_*`): task-specific entrypoint `<foldername>.json`
+
+**Spider principle:** Each folder with entrypoint describes its own contents. Parent just links, doesn't duplicate.
+
+### Req Structure Discussion
+
+Preparing to write container reqs. Reviewed existing `reqs_v1.0.0.md` for pattern.
+
+**Plain req structure:**
+- Type: plain req
+- Extends: (if applicable)
+- Version:
+- Spec
+- Self-eval
+- Comments: (optional)
+- Models: (populated at project closure)
+
+**Project as transaction:** Req version becomes immutable at project closure. Model examples emerge from the project work itself.
+
+### Vocabulary Decisions
+
+- **Container:** structural unit (folder node) - distinct from splectrum node
+- Event record vs State record: under consideration for faf/consumeLatest semantics
+
+### Work Items Identified
+
+1. Session implementation change (for later):
+   - Don't delete from processing (preserve history)
+   - Full record of processing steps
+
+2. Type module migration:
+   - Keep type module until useful stuff extracted into spl package
+   - Types become APIs in normal spl hierarchy
+
+---
+
 *Log entries added as work progresses.*

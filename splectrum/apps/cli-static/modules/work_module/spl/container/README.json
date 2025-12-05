@@ -1,0 +1,14 @@
+{
+  "type": "container",
+  "version": "1.0.0",
+  "description": "Base structural type for SPL2 hierarchy - the universal folder node",
+  "extends": null,
+  "children": {
+    "_lib": "lib.json",
+    "_reqs": "reqs.json",
+    "_schemas": "schemas.json",
+    "_selfevals": "selfevals.json",
+    "_tests": "tests.json"
+  },
+  "methods": ["whoami", "select", "create"]
+}
