@@ -1,6 +1,6 @@
 # Current Status
 
-**Last Updated:** 2025-12-06
+**Last Updated:** 2025-12-06 (session 2)
 
 ---
 
@@ -34,9 +34,27 @@ Design decisions made (2025-12-05/06):
 
 ### Next Steps
 
-1. Write `container_v1.0.0.md` req
+1. Write container reqs (two separate reqs, single concern each):
+   - `container_type_v1.0.0.md` - structural contract (what a container IS)
+   - `container_api_v1.0.0.md` - API definition (what a container CAN DO)
 2. Implement container methods (grouped as CRUD, Types, XPath)
 3. Long-lived session mode (app-session pair initialization)
+
+### Key Insight (this session)
+
+**Type duality** - every type has two concerns:
+- **Type definition** - constraints on instances/derived types (structural)
+- **Type implementation** - API methods the type provides (functional)
+
+This applies to all types (container, api, method, package). Two reqs per type:
+- `<type>_type_v1.0.0.md` - the contract
+- `<type>_api_v1.0.0.md` - the implementation
+
+Selfevals split accordingly:
+- Type selfevals: "Is this a valid container?" (structural)
+- API selfevals: "Do the methods work?" (behavioral)
+
+Method reqs live on the method container itself.
 
 ### Completed Work Items
 
@@ -159,7 +177,12 @@ splectrum/
 
 **Req structure:**
 - Using plain req v1.1.0 (projects/11-app-architecture/reqs/plain_req_v1.1.0.md)
-- Next: write container_v1.0.0.md
+- Type duality: `<type>_type_v*.md` (contract) + `<type>_api_v*.md` (implementation)
+- Next: write container_type_v1.0.0.md and container_api_v1.0.0.md
+
+**Elevator pitch materials:**
+- `projects/11-app-architecture/elevator-pitch/` - overview and block files
+- Main doc: `CONVERSATION_2025-12-06.md` - ready for use
 
 ---
 
