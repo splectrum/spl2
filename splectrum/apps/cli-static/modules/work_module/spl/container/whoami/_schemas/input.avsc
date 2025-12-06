@@ -1,0 +1,13 @@
+{
+  "type": "record",
+  "name": "WhoamiInput",
+  "namespace": "spl.container.whoami",
+  "fields": [
+    {
+      "name": "path",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Path to container, defaults to current context"
+    }
+  ]
+}

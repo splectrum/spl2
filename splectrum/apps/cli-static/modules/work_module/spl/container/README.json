@@ -1,14 +1,8 @@
 {
-  "type": "container",
-  "version": "1.0.0",
-  "description": "Base structural type for SPL2 hierarchy - the universal folder node",
-  "extends": null,
-  "children": {
-    "_lib": "lib.json",
-    "_reqs": "reqs.json",
-    "_schemas": "schemas.json",
-    "_selfevals": "selfevals.json",
-    "_tests": "tests.json"
+  "api": {
+    "types": ["whoami", "typeof"],
+    "crud": ["create", "read", "delete"],
+    "xpath": ["select"]
   },
-  "methods": ["whoami", "select", "create"]
+  "purpose": "Container type definition - base structural unit for all containers"
 }

@@ -27,21 +27,22 @@ README files are visible container documentation in two formats serving differen
 **README.json initial structure:**
 ```json
 {
-  "type": "container",
-  "purpose": "Brief description of what this container is",
-  "children": {
-    "visible": [],
-    "internal": ["_lib", "_reqs", "_schemas", "_selfevals", "_tests"]
-  },
-  "links": {}
+  "api": {},
+  "purpose": "Brief description of what this container is"
 }
 ```
 
-- `type` - container type (container, package, api, method)
+or for method:
+```json
+{
+  "method": {},
+  "purpose": "Brief description of what this method does"
+}
+```
+
+- Type key (`api`, `method`, `package`, etc.) indicates container type
 - `purpose` - one-line description
-- `children.visible` - child containers (navigable)
-- `children.internal` - internal folders (underscore prefix)
-- `links` - mycelium web references to related containers
+- Structure minimal; will evolve through whoami/PAC help implementation
 
 **Relationship:**
 - Both describe the same container
@@ -55,7 +56,7 @@ README files are visible container documentation in two formats serving differen
 
 - [ ] README.md present (natural language)
 - [ ] README.json present (strict schema)
-- [ ] README.json has type, purpose, children fields
+- [ ] README.json has type key and purpose field
 - [ ] Both describe the same container
 
 ## Comments

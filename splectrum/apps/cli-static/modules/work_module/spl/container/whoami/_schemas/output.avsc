@@ -1,0 +1,18 @@
+{
+  "type": "record",
+  "name": "WhoamiOutput",
+  "namespace": "spl.container.whoami",
+  "fields": [
+    {
+      "name": "type",
+      "type": "string",
+      "doc": "Container type (container, api, method, package, module, modules)"
+    },
+    {
+      "name": "purpose",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "One-line description of the container"
+    }
+  ]
+}
