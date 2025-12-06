@@ -55,7 +55,7 @@ Design decisions made (2025-12-05/06):
 
 | # | Item | Status |
 |---|------|--------|
-| 4 | Elevator pitch for Pear/Bare | Pending |
+| 4 | Elevator pitch for Pear/Bare | In progress - overview document ready |
 | 5 | Splectrum node install | Pending |
 
 ---

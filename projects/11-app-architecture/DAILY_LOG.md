@@ -378,4 +378,72 @@ Preparing to write container reqs. Reviewed existing `reqs_v1.0.0.md` for patter
 
 ---
 
+## 2025-12-06
+
+### Elevator Pitch Work (Item 4)
+
+Substantial progress on elevator pitch preparation for Pear/Bare conversation.
+
+**Created `elevator-pitch/` folder with:**
+
+**Main document: `CONVERSATION_2025-12-06.md`**
+- The Triangle diagram: Splectrum (Functionality) / HAICC (Methodology) / Mycelium (Data Layer)
+- One-liner: "AI-first integration platform for P2P ecosystem"
+- Stack diagram with deep penetration between Splectrum and Mycelium
+- HAICC section: Thriving on Creative vs Formal Tension
+- DSL Engine: triangle of modes, language evolution as capability driver
+- Mycelium: P2P fit through familiar patterns
+- Enabler platform: toolbox for integration and management
+
+**Supporting block files:**
+- `HAICC_BLOCK.md` - expanding spectrum, autonomy test, formalisation flow
+- `DSL_ENGINE_BLOCK.md` - triangle, vertical/horizontal structure
+- `MYCELIUM_BLOCK.md` - physical layer, P2P fit, integration fabric
+- `STACK_BLOCK.md` - vertical layers, interpenetration
+- `INTEGRATION_BLOCK.md` - AI-first enabler platform positioning
+
+**Key clarifications emerged:**
+
+1. **HAICC expanding spectrum:**
+   ```
+   ◄── Expanding Creativeness       Increased Formal Implementation ──►
+            Human+AI ─────── AI ─────── Agents
+   ```
+   - Both ends grow outward as system matures
+   - Self-contained reqs enable autonomy (no orchestration)
+
+2. **The Autonomy Test:**
+   - Complete requirements = AI Autonomy
+   - Incomplete requirements = Equal Human-AI Collaborative Partnership
+   - Human paradox: "Be more creative by trying to make yourself redundant"
+
+3. **Freestyle ↔ Formal dualism runs through all layers:**
+   - HAICC: Natural language reqs ↔ Complete spec reqs
+   - DSL Engine: Free scripting ↔ API formalism
+   - Mycelium: Self-contained units ↔ Full repo structure
+
+4. **AI-first with human as enabler of autonomy** - platform shaped for AI, human enables AI to not need human
+
+5. **Splectrum as toolbox:**
+   - Focus on integration and management of solutions
+   - Tools to create solutions natively
+   - Wraps external applications into the language engine
+
+6. **Mycelium multimodal DL APIs:** streaming, document, transactional, native
+
+7. **Language evolution is primary driver of increased capabilities**
+
+**New insight - shift left / shift right dynamic:**
+- Shift left: Human+AI tackles new ground (creative)
+- Shift right: Mature work formalises, delegates to agents
+- Capacity freed on right returns to tackle new ground on left
+
+**The Triangle as visual anchor:**
+- Splectrum (Functionality) at apex
+- HAICC (Methodology) and Mycelium (Data Layer) at base
+- Deep interconnection between all three
+- "A functionality platform, strongly underpinned by a methodology and appropriate data layer"
+
+---
+
 *Log entries added as work progresses.*
