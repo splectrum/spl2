@@ -1,4 +1,5 @@
 {
   "method": {},
+  "implements": "spl/method",
   "purpose": "Returns type and description of a container"
 }

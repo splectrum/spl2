@@ -86,4 +86,11 @@ const appHandler = await requireSpl('spl/cli-static/execute', record)
 await appHandler.invoke()
 
 // Output result
-console.log(JSON.stringify(record, null, 2))
+const metaoutput = record.headers.spl.request.metaoutput
+const output = record.headers.spl.request.output
+if (metaoutput) {
+  console.log(metaoutput)
+}
+if (output) {
+  console.log(JSON.stringify(output, null, 2))
+}

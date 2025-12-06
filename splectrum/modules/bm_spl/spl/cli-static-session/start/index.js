@@ -58,25 +58,26 @@ export async function create(record, { requireSpl }) {
         const sourcePath = path.join(processingDir, filename)
         if (!fs.existsSync(sourcePath)) return
 
-        try {
-          // Read and parse request
-          const content = fs.readFileSync(sourcePath, 'utf-8')
-          const requestRecord = JSON.parse(content)
+        // Read and parse request
+        const content = fs.readFileSync(sourcePath, 'utf-8')
+        const requestRecord = JSON.parse(content)
+        const requestSpl = await requireSpl('lib/spl', requestRecord)
 
+        try {
           // Execute the method
           const method = requestRecord.headers.spl.request.method
           const executable = await requireSpl(method, requestRecord)
           await executable.invoke()
-
-          // Remove from processing
-          fs.unlinkSync(sourcePath)
-
-          // FAF result to outbox
-          const requestSpl = await requireSpl('lib/spl', requestRecord)
-          requestSpl.faf(outboxDir, { sync: true })
         } catch (err) {
-          console.error(`Session error processing ${filename}:`, err.message)
+          // Set error in metaoutput
+          requestSpl.output(`Error: ${err.message}`, null)
         }
+
+        // Remove from processing
+        fs.unlinkSync(sourcePath)
+
+        // FAF result to outbox
+        requestSpl.faf(outboxDir, { sync: true })
 
         // Self-destruct
         processingWatcher.close()

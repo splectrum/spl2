@@ -446,4 +446,78 @@ Substantial progress on elevator pitch preparation for Pear/Bare conversation.
 
 ---
 
+## 2025-12-07
+
+### Container Implementation - whoami method working
+
+**Major implementation milestone:** First formal method (`spl/container/whoami`) executing through full pipeline.
+
+**Container reqs created (16 files):**
+- `spl/container/_reqs/` - type/instance pairs for container, readme, index, lib, reqs, schemas, selfevals, tests
+- Naming convention: `<thing>_type_v1.0.0.md` (structural) and `<thing>_instance_v1.0.0.md` (content)
+
+**Type hierarchy containers created:**
+- `spl/api` - API type (extends spl/container)
+- `spl/method` - method type (extends spl/container)
+- `spl/package` - package type (skeleton)
+- `spl/module` - module type (skeleton)
+- `spl/modules` - modules spot type (skeleton)
+
+**whoami method implemented:**
+- Location: `apps/cli-static/modules/work_module/spl/container/whoami/`
+- Shows container type, purpose, extends/implements, API facets
+- Works via inheritance: `spl/api/whoami` resolves to `spl/container/whoami`
+
+**Key implementation changes:**
+
+1. **Simplified method pattern:**
+   ```js
+   export default async function(record, requireSpl, resolveSpl) {
+     // implementation
+   }
+   ```
+   No create/invoke wrapper for methods. Libs still use `create()`.
+
+2. **Output pair pattern:**
+   - `spl.output(meta, data)` - always two args
+   - `spl.extractOutput(sourceRecord)` - lifts output pair between records
+   - CLI prints metaoutput as text, output as JSON (if present)
+
+3. **resolveSpl added:**
+   - Companion to requireSpl (resolve without instantiate)
+   - Used to find container paths for whoami
+
+4. **Overlay resolution with inheritance:**
+   - Checks `implements` first (instance → type)
+   - Then follows `extends` chain (type → parent type)
+   - README.json carries `extends` and `implements` properties
+
+5. **App overlay support:**
+   - `apps/cli-static/modules/hierarchy.json` - app layer configuration
+   - `enableAppOverlay` flag in app state toggles app modules
+   - App layers checked first, then splectrum layers
+
+6. **Session error handling:**
+   - Errors now return gracefully in metaoutput
+   - No more hanging on method resolution failures
+
+**Vocabulary decisions:**
+- `apiFacet` - organizational grouping of methods within an API
+- Switched to camelCase for DSL glossary terms
+
+**Files modified:**
+- `splectrum/lib/moduleBootstrap.js` - overlay resolution with inheritance, resolveSpl
+- `splectrum/modules/bm_spl/spl/_lib/spl.js` - output(meta, data), extractOutput()
+- `splectrum/modules/bm_spl/spl/cli-static-session/start/index.js` - error handling
+- `splectrum/spl.mjs` - CLI output handling
+- `splectrum/apps/cli-static/state/0000000000000.json` - enableAppOverlay flag
+- `splectrum/apps/cli-static/modules/hierarchy.json` - created
+
+### TODO (next session)
+
+1. **Update spl/app state.avsc schema** - base schema extended by spl/cli-static
+2. **Better error handling** - both resolve errors and method internal errors need cleaner handling
+
+---
+
 *Log entries added as work progresses.*

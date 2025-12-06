@@ -51,19 +51,138 @@ function loadHierarchy() {
   return hierarchy
 }
 
+// Cached app hierarchies by app name
+const appHierarchies = new Map()
+
 /**
- * Resolve a file through overlay layers
- * @param {string} nodePath - Module node path (e.g., 'spl/dev/cycle')
- * @param {string} subPath - Path within node (e.g., 'index.js' or '_lib/spl.js')
+ * Load app hierarchy.json (lazy, cached)
+ * @param {string} appModulesDir - App modules directory path
+ * @returns {Object|null} Hierarchy with layers array, or null if not found
+ */
+function loadAppHierarchy(appModulesDir) {
+  if (appHierarchies.has(appModulesDir)) {
+    return appHierarchies.get(appModulesDir)
+  }
+
+  const hierarchyPath = path.join(appModulesDir, 'hierarchy.json')
+  if (!fs.existsSync(hierarchyPath)) {
+    appHierarchies.set(appModulesDir, null)
+    return null
+  }
+
+  const hierarchy = JSON.parse(fs.readFileSync(hierarchyPath, 'utf8'))
+  appHierarchies.set(appModulesDir, hierarchy)
+  return hierarchy
+}
+
+/**
+ * Check a single path in app modules and splectrum modules
+ * @param {string} nodePath - Module node path
+ * @param {string} subPath - Path within node
+ * @param {string} nodeRoot - Node root path
+ * @param {string} appAPI - App API (e.g., 'spl/cli-static')
+ * @param {boolean} enableAppOverlay - Whether app overlay is enabled
  * @returns {string|null} Absolute path to file, or null if not found
  */
-function resolveOverlay(nodePath, subPath) {
-  const h = loadHierarchy()
+function checkPath(nodePath, subPath, nodeRoot, appAPI, enableAppOverlay) {
+  // 1. Check app modules first (if app overlay is enabled)
+  if (enableAppOverlay && nodeRoot && appAPI) {
+    const appName = appAPI.replace('spl/', '')
+    const appModulesDir = path.join(nodeRoot, 'apps', appName, 'modules')
+    const appHierarchy = loadAppHierarchy(appModulesDir)
 
+    if (appHierarchy) {
+      for (const layer of appHierarchy.layers) {
+        const appFilePath = path.join(appModulesDir, layer.name, nodePath, subPath)
+        if (fs.existsSync(appFilePath)) {
+          return appFilePath
+        }
+      }
+    }
+  }
+
+  // 2. Fall back to splectrum modules
+  const h = loadHierarchy()
   for (const layer of h.layers) {
     const filePath = path.join(modulesDir, layer.name, nodePath, subPath)
     if (fs.existsSync(filePath)) {
       return filePath
+    }
+  }
+
+  return null
+}
+
+/**
+ * Read README.json from a container path
+ * @param {string} containerPath - Container path (e.g., 'spl/api')
+ * @param {string} nodeRoot - Node root path
+ * @param {string} appAPI - App API
+ * @param {boolean} enableAppOverlay - Whether app overlay is enabled
+ * @returns {Object|null} Parsed README.json or null
+ */
+function readContainerReadme(containerPath, nodeRoot, appAPI, enableAppOverlay) {
+  const readmePath = checkPath(containerPath, 'README.json', nodeRoot, appAPI, enableAppOverlay)
+  if (!readmePath) return null
+  try {
+    return JSON.parse(fs.readFileSync(readmePath, 'utf8'))
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Resolve a file through overlay layers, following implements then extends chain
+ * @param {string} nodePath - Module node path (e.g., 'spl/dev/cycle')
+ * @param {string} subPath - Path within node (e.g., 'index.js' or '_lib/spl.js')
+ * @param {Object} record - Record with runtime context
+ * @returns {string|null} Absolute path to file, or null if not found
+ */
+function resolveOverlay(nodePath, subPath, record) {
+  const nodeRoot = record?.headers?.spl?.runtime?.nodeRoot
+  const appAPI = record?.headers?.spl?.runtime?.appAPI
+
+  // Get enableAppOverlay from app state (appAPI is 'spl/cli-static', header key is 'cli-static')
+  const appName = appAPI?.replace('spl/', '')
+  const enableAppOverlay = appName ? record?.headers?.spl?.[appName]?.enableAppOverlay : false
+
+  // Direct check first
+  const direct = checkPath(nodePath, subPath, nodeRoot, appAPI, enableAppOverlay)
+  if (direct) return direct
+
+  // If looking for a method (path has 3+ segments like spl/api/whoami), follow inheritance
+  const segments = nodePath.split('/')
+  if (segments.length >= 3) {
+    const methodName = segments[segments.length - 1]
+    let containerPath = segments.slice(0, -1).join('/')
+    const visited = new Set()
+
+    while (containerPath && !visited.has(containerPath)) {
+      visited.add(containerPath)
+      const readme = readContainerReadme(containerPath, nodeRoot, appAPI, enableAppOverlay)
+      if (!readme) break
+
+      // Check implements first (instance -> type)
+      if (readme.implements) {
+        const typeMethodPath = `${readme.implements}/${methodName}`
+        const found = checkPath(typeMethodPath, subPath, nodeRoot, appAPI, enableAppOverlay)
+        if (found) return found
+        // Continue from the type
+        containerPath = readme.implements
+        continue
+      }
+
+      // Then check extends (type -> parent type)
+      if (readme.extends) {
+        const parentMethodPath = `${readme.extends}/${methodName}`
+        const found = checkPath(parentMethodPath, subPath, nodeRoot, appAPI, enableAppOverlay)
+        if (found) return found
+        // Continue up the chain
+        containerPath = readme.extends
+        continue
+      }
+
+      break
     }
   }
 
@@ -118,11 +237,22 @@ export async function requireSpl(uri, record) {
   }
 
   // 4. Module method (pkg/api/method) - resolve via overlay
-  const modulePath = resolveOverlay(uri, 'index.js')
+  const modulePath = resolveOverlay(uri, 'index.js', record)
   if (!modulePath) {
     throw new Error(`Module not found in any layer: ${uri}`)
   }
   const mod = await import(modulePath)
+  // Methods export default function, not create()
+  if (typeof mod.default === 'function') {
+    // Create bound resolveSpl for this record
+    const boundResolveSpl = (nodePath, filename) => resolveSpl(nodePath, filename, record)
+    return {
+      async invoke() {
+        await mod.default(record, requireSpl, boundResolveSpl)
+      }
+    }
+  }
+  // Fallback for create() pattern (libs, older modules)
   return mod.create(record, { requireSpl })
 }
 
@@ -136,6 +266,17 @@ export function requireNonSpl(moduleName) {
     throw new Error(`Unregistered platform module: ${moduleName}. Add to moduleBootstrap.js`)
   }
   return platformModules[moduleName]
+}
+
+/**
+ * Resolve a splectrum path to filesystem path (without instantiation)
+ * @param {string} nodePath - Module node path (e.g., 'spl/container')
+ * @param {string} filename - File to resolve (e.g., 'README.json')
+ * @param {Object} record - Record with runtime context
+ * @returns {string|null} Absolute path to file, or null if not found
+ */
+export function resolveSpl(nodePath, filename, record) {
+  return resolveOverlay(nodePath, filename, record)
 }
 
 // ============================================================================

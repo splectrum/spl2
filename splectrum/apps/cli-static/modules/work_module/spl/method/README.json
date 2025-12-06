@@ -1,4 +1,5 @@
 {
-  "api": {},
+  "method": {},
+  "extends": "spl/container",
   "purpose": "Method type definition - what all methods must be"
 }

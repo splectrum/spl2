@@ -1,4 +1,5 @@
 {
   "api": {},
+  "extends": "spl/container",
   "purpose": "API type definition - what all APIs must be"
 }

@@ -3,7 +3,8 @@
     "spl": {
       "cli-static": {
         "name": "cli-static",
-        "root": "apps/cli-static"
+        "root": "apps/cli-static",
+        "enableAppOverlay": true
       },
       "cli-static-session": {
         "name": "simple",

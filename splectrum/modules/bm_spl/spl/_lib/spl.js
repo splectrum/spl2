@@ -173,11 +173,22 @@ export function create(record, { requireNonSpl }) {
     },
 
     /**
-     * Set output on record (for scripts)
-     * @param {*} value - Output value
+     * Set output pair on record
+     * @param {*} meta - Metaoutput (narrative/help)
+     * @param {*} data - Data output (payload, or null if none)
      */
-    output(value) {
-      record.headers.spl.request.output = value
+    output(meta, data) {
+      record.headers.spl.request.metaoutput = meta
+      record.headers.spl.request.output = data
+    },
+
+    /**
+     * Extract output pair from another record and set on this record
+     * @param {Object} sourceRecord - Record to extract output from
+     */
+    extractOutput(sourceRecord) {
+      record.headers.spl.request.metaoutput = sourceRecord.headers.spl.request.metaoutput
+      record.headers.spl.request.output = sourceRecord.headers.spl.request.output
     },
 
     /**

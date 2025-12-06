@@ -76,8 +76,8 @@ export async function create(record, { requireSpl }) {
       // 5. Wait for response on outbox
       const result = await resultPromise
 
-      // 6. Return result - transfer output to original record
-      spl.output(result.headers.spl.request.output)
+      // 6. Return result - extract output pair from session response
+      spl.extractOutput(result)
       spl.completeRequest()
     }
   }

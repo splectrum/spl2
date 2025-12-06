@@ -6,20 +6,17 @@
 
 ## Spec
 
-Returns the type and description of a container by reading its README.json.
+Returns the type and description of the parent container by reading its README.json.
 
-**Input:**
-- `path` - (optional) path to container, defaults to current context
+**Input:** None
 
 **Output:**
-- `type` - container type (container, api, method, package, module, modules)
+- `type` - container type (api, method, package, module, modules)
 - `purpose` - one-line description
-- `implements` - what type this container implements
-- `children` - list of visible and internal children
 
 **Behavior:**
-1. Resolve path to container (default: current context)
-2. Read README.json from container
+1. Resolve parent container from method path (spl/container/whoami → spl/container)
+2. Read README.json from parent container
 3. Return structured response
 
 **Content constraints:** None.
