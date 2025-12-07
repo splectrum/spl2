@@ -529,6 +529,28 @@ Bootstrap sequence:
 
 See `notes/module_lib_bootstrap_2025-12-07.md` for full design.
 
+### PAC Handler Design
+
+Key insight: PAC is a handler concern, not a method concern. In spl1, execution handling was internal. In spl2, we opened up the design - handlers orchestrate the confirmation flow.
+
+**Universal method flags:**
+- `--dry-run` - preview only, no action
+- `--silent` - omit narrative (data only)
+
+**PAC flow:**
+1. Handler sees `--pac`, runs method with `--dry-run`
+2. Outbox handler prompts for confirmation (handler-specific UX)
+3. On confirm, re-submits with `--silent` (no `--dry-run`)
+
+**Handler implementations vary:**
+- CLI: terminal prompt
+- Browser: dialog/modal
+- AI agent: autonomous decision within bounds
+
+Methods stay pure. Handler is pluggable. Same method works across all contexts.
+
+See `notes/pac_handler_design_2025-12-07.md` for full design.
+
 ### TODO (next session)
 
 1. **Implement module.js** - universal lib with unified interface (high priority)
