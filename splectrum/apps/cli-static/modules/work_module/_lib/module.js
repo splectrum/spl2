@@ -239,13 +239,17 @@ export function create(record) {
       return platformModules[uri]
     }
 
-    // 2. Splectrum libs: lib/spl -> modules/bm_spl/spl/_lib/spl.js
+    // 2. Splectrum libs: lib/spl/container/selfeval -> spl/container/selfeval/_lib/selfeval.js
     if (uri.startsWith('lib/')) {
       const libPath = uri.replace('lib/', '')
       const parts = libPath.split('/')
       const libName = parts[parts.length - 1]
-      // TODO: resolve via overlay instead of hardcoded path
-      const mod = await import(path.join(modulesDir, 'bm_spl', libPath, '_lib', `${libName}.js`))
+      // Resolve lib through overlay
+      const libFilePath = internalResolve(libPath, `_lib/${libName}.js`)
+      if (!libFilePath) {
+        throw new Error(`Lib not found in any layer: ${uri}`)
+      }
+      const mod = await import(libFilePath)
       return mod.create(module)
     }
 

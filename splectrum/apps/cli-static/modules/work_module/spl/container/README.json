@@ -1,6 +1,6 @@
 {
   "api": {
-    "types": ["whoami", "typeof"],
+    "introspection": ["whoami", "typeof", "selfeval"],
     "crud": ["create", "read", "delete"],
     "xpath": ["select"]
   },

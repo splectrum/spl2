@@ -1,6 +1,6 @@
 # Current Status
 
-**Last Updated:** 2025-12-07 (late night session)
+**Last Updated:** 2025-12-08
 
 ---
 
@@ -9,41 +9,61 @@
 **Project 11: App Architecture**
 
 - Type: Exploration Project
-- Status: **In Progress - Items 1-6 complete, ready for practical use**
+- Status: **In Progress - Selfeval method complete, patterns refined**
 - Location: `projects/11-app-architecture/`
 
 ### Current Focus
 
-**App-based design experience complete** - all 6 items done, ready for practical use.
+**Selfeval implementation complete** - first full introspection method following all established patterns.
 
-Key deliverables:
-- **Items 1-4:** Module.js universal interface, full pipeline working
-- **Item 5:** `--dry-run` and `--silent` flags with schema-first design
-- **Item 6:** PAC (Prompt for Action Confirmation) at handler level
+Key deliverables this session:
+- `spl/container/selfeval` - complete method with all flags
+- API facet renamed: "types" → "introspection"
+- Code organization patterns refined (index.js/lib separation)
+- Requirements updated for index_type and lib_type
 
 ### What's Working
 
-- `spl spl/container/whoami` - full pipeline execution
-- `spl spl/container/whoami --silent` - suppress narrative
-- `spl spl/container/whoami --dry-run` - preview only (no data actions)
-- `spl spl/container/whoami --pac` - preview → confirm → execute
-- Base schemas at container level with compatibility-based inheritance
-- CLI normalizes kebab-case to camelCase
+```bash
+spl spl/container/whoami                 # structural introspection
+spl spl/container/selfeval               # validation (full detail)
+spl spl/container/selfeval --fail-fast   # quiet mode, stop on failure
+spl spl/container/selfeval --report      # JSON only
+spl spl/container/selfeval --dry-run     # list facets
+```
+
+### Key Patterns Established
+
+**index.js:**
+- Only spl lib imports
+- Flow reflects spec from req
+- Comments explain steps
+- Clean, readable as documentation
+
+**Libs (main/auxiliary):**
+- `lib/spl/x/y` → main lib (no extension)
+- `lib/spl/x/y/z.js` → auxiliary (with .js)
+- Main: meaningful steps, header docs
+- Auxiliary: facets, helpers
+
+**Output modes (graduated disclosure):**
+- Default: freetext summary
+- `--fail-fast`: quiet, stop on failure
+- `--report`: structured JSON only
+- `--verbose`: both
 
 ### Key Files
 
-- `apps/cli-static/modules/work_module/_lib/module.js` - universal module interface (simplified with import maps)
-- `apps/cli-static/modules/work_module/spl/container/_schemas/` - base input/metaoutput schemas
-- `modules/bm_spl/spl/cli-static/execute/index.js` - PAC handler flow
-- `package.json` - import maps for Node/Bare platform switching
-
-### Recent Change
-
-**Import maps simplification:** Platform switching now declarative via package.json imports field. Removed ~40 lines of platform detection code. Same code runs on Node and Bare.
+- `apps/cli-static/modules/work_module/spl/container/selfeval/` - selfeval method
+- `apps/cli-static/modules/work_module/spl/container/_reqs/index_type_v1.0.0.md` - index.js pattern
+- `apps/cli-static/modules/work_module/spl/container/_reqs/lib_type_v1.0.0.md` - lib pattern
+- `projects/11-app-architecture/notes/selfeval_design_2025-12-08.md` - design notes
 
 ### Next Steps
 
-- Selfevals implementation (schema validation, container structure)
+- Split selfeval lib when runners grow
+- Implement schemas runner
+- Update whoami with same patterns
 - Container methods: `select`, `create`
 
 ### Work Items
@@ -52,7 +72,7 @@ Key deliverables:
 |---|------|--------|
 | 1 | Backlog and CIP Consolidation | Done |
 | 2 | Splectrum node cleanup | Done |
-| 3 | App-based design and implementation experience | In progress (items 1-4 of 6 done) |
+| 3 | App-based design and implementation experience | In progress (items 1-6 done, selfeval complete) |
 | 4 | Elevator pitch for Pear/Bare | Ready (`elevator-pitch/`) |
 | 5 | Splectrum node install | Pending |
 
@@ -63,13 +83,13 @@ Key deliverables:
 **Starting a new session?**
 
 1. Read this file for current context
-2. Read `projects/11-app-architecture/DAILY_LOG.md` (latest entry) for detailed work history
-3. Read `projects/11-app-architecture/notes/type_carries_tooling_2025-12-05.md` for design direction
+2. Read `projects/11-app-architecture/DAILY_LOG.md` (2025-12-08 entry) for detailed work history
+3. Read `projects/11-app-architecture/notes/selfeval_design_2025-12-08.md` for selfeval design
 
-**Key implementation locations:**
-- `splectrum/apps/cli-static/modules/work_module/spl/container/` - container and whoami method
-- `splectrum/lib/moduleBootstrap.js` - requireSpl, resolveSpl, overlay resolution
-- `splectrum/modules/bm_spl/spl/_lib/spl.js` - core lib
+**Reference implementations:**
+- `spl/container/selfeval/` - complete method following all patterns
+- `spl/container/selfeval/index.js` - clean index.js example
+- `spl/container/selfeval/_lib/selfeval.js` - main lib example
 
 ---
 

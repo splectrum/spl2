@@ -802,4 +802,99 @@ Discovered Bare uses import maps in package.json for Node.js compatibility. Test
 
 ---
 
+## 2025-12-08
+
+### Selfeval Method Implementation
+
+Implemented `spl/container/selfeval` - first full introspection method following all established patterns.
+
+**API facet renamed:** "types" → "introspection"
+- `whoami` - "What am I?"
+- `typeof` - "What type am I?"
+- `selfeval` - "Am I valid?"
+
+**Method structure:**
+```
+spl/container/selfeval/
+  _lib/
+    selfeval.js       # main lib with runners
+  _reqs/
+    selfeval_method_v1.0.0.md
+  _selfevals/
+    selfevals.json
+    selfeval_structure.json
+  index.js            # clean flow, spl imports only
+  README.md
+  README.json
+```
+
+**Flags implemented:**
+- `--facet=<name>` - run specific facet (default: all)
+- `--dry-run` - list facets without executing
+- `--fail-fast` - quiet mode, stop on first failure
+- `--report` - structured JSON only
+- `--verbose` - both freetext and JSON
+
+**Output modes (graduated disclosure):**
+```bash
+spl spl/container/selfeval               # full detail
+spl spl/container/selfeval --fail-fast   # "[structure] OK" or stop on failure
+spl spl/container/selfeval --report      # JSON only
+spl spl/container/selfeval --verbose     # text + JSON
+```
+
+### Code Organization Patterns
+
+**index.js pattern refined:**
+- Only spl lib imports (`module.require('lib/...')`)
+- Flow reflects spec from req
+- Comments explain each step
+- Clean, readable as documentation
+
+**Lib pattern refined:**
+- Main lib: meaningful implementation steps, header docs
+- Auxiliary libs: `.js` suffix, for facets/helpers
+- Resolution: `lib/x/y` → main, `lib/x/y/z.js` → auxiliary
+
+### Requirements Updated
+
+**index_type_v1.0.0.md:**
+- Updated to `(module)` signature
+- Only spl lib imports required
+- Flow must reflect spec
+- Header comment + step comments
+
+**lib_type_v1.0.0.md:**
+- Main/auxiliary lib convention documented
+- Main libs: meaningful steps, header docs, clean structure
+- Auxiliary libs: facets, helpers, split when large
+- Future: AI agent code quality checks
+
+### Bug Fixed
+
+**module.js lib resolution:** Was using undefined `modulesDir`, changed to `getModulesDir()`. Also updated to use overlay resolution instead of hardcoded `bm_spl` path.
+
+### Files Created
+
+- `spl/container/selfeval/` - complete method container
+- `spl/container/_selfevals/selfeval_structure.json` - container structure constraints
+- `projects/11-app-architecture/notes/selfeval_design_2025-12-08.md` - design notes
+
+### Files Modified
+
+- `spl/container/README.json` - "types" → "introspection", added "selfeval"
+- `spl/container/_selfevals/selfevals.json` - updated format
+- `spl/container/_reqs/index_type_v1.0.0.md` - new module signature, constraints
+- `spl/container/_reqs/lib_type_v1.0.0.md` - main/auxiliary pattern, quality guidance
+- `apps/cli-static/modules/work_module/_lib/module.js` - fixed lib resolution
+
+### Next Steps
+
+- Split selfeval lib when runners grow (structure.js, schemas.js as auxiliaries)
+- Implement schemas runner
+- Update whoami with same patterns (--report, --verbose, --fail-fast)
+- Container methods: `select`, `create`
+
+---
+
 *Log entries added as work progresses.*
