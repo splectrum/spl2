@@ -72,6 +72,7 @@ spl spl/container/whoami --report=debug
 
 ### Next Steps
 
+- **DSL glossary req integration**: Currently only using type/description from dsl.json. The `req` field points to detailed requirement files - investigate pulling spec content at debug level.
 - Implement remaining whoami facets: reqs, lib, methods, selfevals, tests
 - --levels flag for type chain traversal
 - Update selfeval to use gradedOutput pattern
