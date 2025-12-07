@@ -132,7 +132,7 @@ function readContainerReadme(containerPath, nodeRoot, appAPI, enableAppOverlay) 
 }
 
 /**
- * Resolve a file through overlay layers, following implements then extends chain
+ * Resolve a file through overlay layers, following instantiates then extends chain
  * @param {string} nodePath - Module node path (e.g., 'spl/dev/cycle')
  * @param {string} subPath - Path within node (e.g., 'index.js' or '_lib/spl.js')
  * @param {Object} record - Record with runtime context
@@ -162,13 +162,13 @@ function resolveOverlay(nodePath, subPath, record) {
       const readme = readContainerReadme(containerPath, nodeRoot, appAPI, enableAppOverlay)
       if (!readme) break
 
-      // Check implements first (instance -> type)
-      if (readme.implements) {
-        const typeMethodPath = `${readme.implements}/${methodName}`
+      // Check instantiates first (instance -> type)
+      if (readme.instantiates) {
+        const typeMethodPath = `${readme.instantiates}/${methodName}`
         const found = checkPath(typeMethodPath, subPath, nodeRoot, appAPI, enableAppOverlay)
         if (found) return found
         // Continue from the type
-        containerPath = readme.implements
+        containerPath = readme.instantiates
         continue
       }
 

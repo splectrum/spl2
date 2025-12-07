@@ -551,11 +551,36 @@ Methods stay pure. Handler is pluggable. Same method works across all contexts.
 
 See `notes/pac_handler_design_2025-12-07.md` for full design.
 
-### TODO (next session)
+### Implementation Plan (from design discussion)
 
-1. **Implement module.js** - universal lib with unified interface (high priority)
-2. **Update spl/app state.avsc schema** - base schema extended by spl/cli-static
-3. **Better error handling** - both resolve errors and method internal errors need cleaner handling
+1. **Create spl/module type** - DONE
+2. **Create work_module as instance** - next
+3. **Create `_lib/module.js`** - full interface with all utilities
+4. **Update invocation signatures** - all contexts receive `module` only
+5. **Update moduleBootstrap.js** - app-first module.js resolution (simplified overlay just to find module.js)
+6. **Add `--dry-run` and `--silent`** - to whoami as reference implementation
+7. **PAC at handler level** - outbox handler intercepts `--pac`, orchestrates confirmation flow
+
+### Terminology Fix
+
+Changed `implements` to `instantiates` throughout:
+- `instantiates` = instance → type (whoami instantiates spl/method)
+- `extends` = type → parent type (spl/method extends spl/container)
+
+### Key Principle (from this session)
+
+**No reqs = collaborative mode.** Don't run ahead implementing. Discuss first.
+
+### Current State
+
+- spl/module type created (instantiates spl/api, extends spl/container)
+- module.js skeleton exists at `modules/_lib/module.js` (needs full implementation)
+- Terminology fixed in moduleBootstrap.js and whoami
+
+### Other TODOs
+
+- Update spl/app state.avsc schema (base extended by spl/cli-static)
+- Better error handling (resolve and method internal)
 
 ---
 

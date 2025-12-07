@@ -1,4 +1,6 @@
 {
-  "api": {},
+  "module": {},
+  "instantiates": "spl/api",
+  "extends": "spl/container",
   "purpose": "Module type definition - what all modules must be"
 }

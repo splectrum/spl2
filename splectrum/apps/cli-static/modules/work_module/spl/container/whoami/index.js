@@ -1,5 +1,5 @@
 // spl/container/whoami - Returns type and description of a container
-// Implements: spl/method
+// Instantiates: spl/method
 
 import fs from 'fs'
 
@@ -32,8 +32,8 @@ export default async function(record, requireSpl, resolveSpl) {
     text += `Type: ${type}\n`
     text += `Purpose: ${readme.purpose || '(none)'}\n`
 
-    if (readme.implements) {
-      text += `Implements: ${readme.implements}\n`
+    if (readme.instantiates) {
+      text += `Instantiates: ${readme.instantiates}\n`
     }
     if (readme.extends) {
       text += `Extends: ${readme.extends}\n`
