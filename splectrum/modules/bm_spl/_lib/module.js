@@ -7,59 +7,23 @@
 // Methods receive: module (single arg)
 // Libs receive: module (single arg)
 // Scripts receive: module (injected)
+//
+// Platform compatibility: Uses import maps in package.json for Node/Bare switching.
+// See package.json "imports" field for mappings (fs -> bare-fs, etc.)
 
 // ============================================================================
-// Platform Bootstrap (adhoc logic for fs/path, then load mapping)
+// Platform Modules (via import maps - package.json handles Node/Bare switching)
 // ============================================================================
 
-const isNode = typeof process !== 'undefined' && process.versions?.node
-const isBare = typeof Bare !== 'undefined'
+const fs = await import('fs').then(m => m.default ?? m)
+const path = await import('path').then(m => m.default ?? m)
+const url = await import('url').then(m => m.default ?? m)
 
-// Adhoc bootstrap: get fs and path first (hardcoded per platform)
-let fs, path
-if (isNode) {
-  fs = (await import('fs')).default ?? await import('fs')
-  path = (await import('path')).default ?? await import('path')
-} else if (isBare) {
-  // Bare equivalents - direct requires
-  // TODO: Update when Bare module names are known
-  throw new Error('Bare platform bootstrap not yet implemented')
-} else {
-  throw new Error('Unknown platform - cannot bootstrap fs/path')
-}
+// Platform modules cache - loaded on demand
+const platformModules = { fs, path, url }
 
-// Load platform module mapping from file
-const { fileURLToPath } = await import('url')
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-const mappingPath = path.join(__dirname, 'platform-modules.json')
-const platformMapping = JSON.parse(fs.readFileSync(mappingPath, 'utf8'))
-
-// Platform key for mapping lookup
-const platform = isNode ? 'node' : isBare ? 'bare' : null
-
-/**
- * Require a platform module using the mapping file
- * @param {string} moduleName - Logical module name (e.g., 'fs', 'path', 'os')
- * @returns {Promise<Object>} - Platform module
- */
-async function requirePlatform(moduleName) {
-  const mapping = platformMapping[moduleName]
-  if (!mapping) {
-    throw new Error(`Unknown platform module: ${moduleName}. Add to platform-modules.json`)
-  }
-
-  const actualModule = mapping[platform]
-  if (!actualModule) {
-    throw new Error(`No ${platform} mapping for module: ${moduleName}`)
-  }
-
-  const mod = await import(actualModule)
-  return mod.default ?? mod
-}
-
-// Platform modules registry - loaded on demand
-const platformModules = { fs, path }
+// Known platform modules (can be loaded via module.require)
+const knownPlatformModules = ['fs', 'path', 'os', 'url', 'crypto', 'events']
 
 // ============================================================================
 // Overlay Resolution (brought into library from bootstrap)
@@ -244,28 +208,33 @@ function findUniqueFilename(folder, filename, dedupe) {
  * @returns {Object} - Bound module interface
  */
 export function create(record) {
-  // Extract runtime context
-  const nodeRoot = record.headers.spl.runtime.nodeRoot
-  const appAPI = record.headers.spl.runtime.appAPI
-  const appName = appAPI?.replace('spl/', '')
-  const enableAppOverlay = appName ? record.headers.spl?.[appName]?.enableAppOverlay : false
-
-  // Derive modules directory from node root
-  const modulesDir = nodeRoot ? path.join(nodeRoot, 'modules') : null
+  // Dynamic getters - read from record each time (record may be mutated after module creation)
+  const getNodeRoot = () => record.headers.spl.runtime.nodeRoot
+  const getAppAPI = () => record.headers.spl.runtime.appAPI
+  const getAppName = () => getAppAPI()?.replace('spl/', '')
+  const getEnableAppOverlay = () => {
+    const appName = getAppName()
+    return appName ? record.headers.spl?.[appName]?.enableAppOverlay : false
+  }
+  const getModulesDir = () => {
+    const nodeRoot = getNodeRoot()
+    return nodeRoot ? path.join(nodeRoot, 'modules') : null
+  }
 
   // Internal resolve function
   const internalResolve = (nodePath, filename) => {
+    const modulesDir = getModulesDir()
     if (!modulesDir) return null
-    return resolveOverlay(nodePath, filename, nodeRoot, appAPI, enableAppOverlay, modulesDir)
+    return resolveOverlay(nodePath, filename, getNodeRoot(), getAppAPI(), getEnableAppOverlay(), modulesDir)
   }
 
   // Internal require function
   const internalRequire = async (uri) => {
-    // 1. Platform modules (no slashes, in mapping file)
-    if (!uri.includes('/') && uri in platformMapping) {
+    // 1. Platform modules (no slashes, known module name)
+    if (!uri.includes('/') && knownPlatformModules.includes(uri)) {
       // Check cache first
       if (!(uri in platformModules)) {
-        platformModules[uri] = await requirePlatform(uri)
+        platformModules[uri] = await import(uri).then(m => m.default ?? m)
       }
       return platformModules[uri]
     }
@@ -338,13 +307,35 @@ export function create(record) {
     },
 
     /**
+     * Set input flag on record
+     * @param {string} key - Flag name
+     * @param {*} value - Flag value (true to set, undefined to delete)
+     */
+    setInputFlag(key, value) {
+      if (!record.headers.spl.request.input) {
+        record.headers.spl.request.input = {}
+      }
+      if (value === undefined) {
+        delete record.headers.spl.request.input[key]
+      } else {
+        record.headers.spl.request.input[key] = value
+      }
+    },
+
+    /**
      * Set output pair on record
+     * Respects flags: --silent skips metaoutput, --dry-run skips data output
      * @param {*} meta - Metaoutput (narrative/help)
      * @param {*} data - Data output (payload, or null if none)
      */
     output(meta, data) {
-      record.headers.spl.request.metaoutput = meta
-      record.headers.spl.request.output = data
+      const input = record.headers.spl.request.input || {}
+      if (!input.silent) {
+        record.headers.spl.request.metaoutput = meta
+      }
+      if (!input.dryRun) {
+        record.headers.spl.request.output = data
+      }
     },
 
     /**
@@ -354,6 +345,22 @@ export function create(record) {
     extractOutput(sourceRecord) {
       record.headers.spl.request.metaoutput = sourceRecord.headers.spl.request.metaoutput
       record.headers.spl.request.output = sourceRecord.headers.spl.request.output
+    },
+
+    /**
+     * Snapshot the record state (deep clone)
+     * @returns {Object} - Cloned record
+     */
+    snapshotRecord() {
+      return JSON.parse(JSON.stringify(record))
+    },
+
+    /**
+     * Restore record state from snapshot
+     * @param {Object} snapshot - Previously snapshotted record
+     */
+    restoreRecord(snapshot) {
+      Object.assign(record, JSON.parse(JSON.stringify(snapshot)))
     },
 
     // ========================================================================
@@ -402,6 +409,7 @@ export function create(record) {
      * @returns {string} - Path where record was written
      */
     faf(destination, options = {}) {
+      const nodeRoot = getNodeRoot()
       if (!nodeRoot) return null
 
       // Clone immediately - record may mutate before async write completes
@@ -443,6 +451,7 @@ export function create(record) {
      * @returns {Object|null} - Parsed record or null if topic empty/missing
      */
     consumeLatest(topic) {
+      const nodeRoot = getNodeRoot()
       if (!nodeRoot) return null
 
       const topicPath = path.isAbsolute(topic)
@@ -471,9 +480,7 @@ export function create(record) {
      * Get node root from record
      * @returns {string|null}
      */
-    getNodeRoot() {
-      return nodeRoot
-    },
+    getNodeRoot,
 
     /**
      * Get the record's unique identifier
@@ -487,9 +494,7 @@ export function create(record) {
      * Get current app API
      * @returns {string|null}
      */
-    getAppAPI() {
-      return appAPI
-    },
+    getAppAPI,
 
     /**
      * Get the request method path
@@ -518,6 +523,7 @@ export function create(record) {
      * @param {Object} context - Additional context
      */
     raiseAsyncError(error, context = {}) {
+      const nodeRoot = getNodeRoot()
       if (!nodeRoot) return
 
       const errorRecord = JSON.parse(JSON.stringify(record))

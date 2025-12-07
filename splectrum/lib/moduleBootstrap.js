@@ -2,26 +2,16 @@
 //
 // Single responsibility: find and load module.js (app-first, then splectrum)
 // All other functionality is in module.js itself.
+//
+// Platform compatibility: Uses import maps in package.json for Node/Bare switching.
 
 // ============================================================================
-// Platform Bootstrap (adhoc Node/Bare switch for fs, path, url)
+// Platform Modules (via import maps - package.json handles Node/Bare switching)
 // ============================================================================
 
-const isNode = typeof process !== 'undefined' && process.versions?.node
-const isBare = typeof Bare !== 'undefined'
-
-let fs, path, fileURLToPath
-
-if (isNode) {
-  fs = (await import('fs')).default ?? await import('fs')
-  path = (await import('path')).default ?? await import('path')
-  fileURLToPath = (await import('url')).fileURLToPath
-} else if (isBare) {
-  // Bare equivalents - to be implemented
-  throw new Error('Bare platform bootstrap not yet implemented')
-} else {
-  throw new Error('Unknown platform - cannot bootstrap')
-}
+const fs = await import('fs').then(m => m.default ?? m)
+const path = await import('path').then(m => m.default ?? m)
+const { fileURLToPath } = await import('url')
 
 // Derive node root from this file's location (sibling to lib/)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))

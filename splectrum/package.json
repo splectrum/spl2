@@ -7,5 +7,13 @@
   "activeVersion": "bm_spl-1764165335779",
   "previousVersion": null,
   "installedAt": "2025-11-26T14:29:54.556Z",
-  "rolledBackFrom": "bm_spl-1764167374419"
+  "rolledBackFrom": "bm_spl-1764167374419",
+  "imports": {
+    "fs": { "bare": "bare-fs", "default": "fs" },
+    "fs/*": { "bare": "bare-fs/*", "default": "fs/*" },
+    "path": { "bare": "bare-path", "default": "path" },
+    "path/*": { "bare": "bare-path/*", "default": "path/*" },
+    "os": { "bare": "bare-os", "default": "os" },
+    "url": { "bare": "bare-url", "default": "url" }
+  }
 }

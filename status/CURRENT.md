@@ -1,6 +1,6 @@
 # Current Status
 
-**Last Updated:** 2025-12-07 (night session)
+**Last Updated:** 2025-12-07 (late night session)
 
 ---
 
@@ -32,14 +32,19 @@ Key deliverables:
 
 ### Key Files
 
-- `apps/cli-static/modules/work_module/_lib/module.js` - universal module interface
+- `apps/cli-static/modules/work_module/_lib/module.js` - universal module interface (simplified with import maps)
 - `apps/cli-static/modules/work_module/spl/container/_schemas/` - base input/metaoutput schemas
 - `modules/bm_spl/spl/cli-static/execute/index.js` - PAC handler flow
-- `modules/bm_spl/spl/cli/_lib/cli.js` - kebab→camelCase normalization
+- `package.json` - import maps for Node/Bare platform switching
+
+### Recent Change
+
+**Import maps simplification:** Platform switching now declarative via package.json imports field. Removed ~40 lines of platform detection code. Same code runs on Node and Bare.
 
 ### Next Steps
 
-Ready to build practical functionality using the established patterns.
+- Selfevals implementation (schema validation, container structure)
+- Container methods: `select`, `create`
 
 ### Work Items
 

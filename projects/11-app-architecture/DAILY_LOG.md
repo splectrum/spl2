@@ -762,4 +762,44 @@ Items 1-6 of "App-based design experience" complete. Ready for practical use.
 
 ---
 
+## 2025-12-07 (Late Night Session)
+
+### Import Maps Simplification
+
+Discovered Bare uses import maps in package.json for Node.js compatibility. Tested and confirmed it works in Node too.
+
+**Before:** Manual platform detection + platform-modules.json mapping file
+**After:** Declarative import maps in package.json
+
+**package.json imports added:**
+```json
+{
+  "imports": {
+    "fs": { "bare": "bare-fs", "default": "fs" },
+    "path": { "bare": "bare-path", "default": "path" },
+    "os": { "bare": "bare-os", "default": "os" },
+    "url": { "bare": "bare-url", "default": "url" }
+  }
+}
+```
+
+**module.js simplified:**
+- Removed `isNode`, `isBare` detection
+- Removed `requirePlatform()` function
+- Removed `platform-modules.json` loading
+- Now uses simple `await import('fs')` - runtime resolves via import maps
+
+**Files removed:**
+- `apps/cli-static/modules/work_module/_lib/platform-modules.json`
+- `modules/bm_spl/_lib/platform-modules.json`
+
+**Result:** ~40 lines removed, platform switching is now declarative. Same code runs on Node and Bare.
+
+### Next Steps
+
+- Selfevals implementation (schema validation, container structure)
+- Container methods: `select`, `create`
+
+---
+
 *Log entries added as work progresses.*
