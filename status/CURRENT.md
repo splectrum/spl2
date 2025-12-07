@@ -28,10 +28,11 @@ See `projects/11-app-architecture/DAILY_LOG.md` (2025-12-07) for implementation 
 
 ### Next Steps
 
-1. Update spl/app state.avsc schema (base extended by spl/cli-static)
-2. Better error handling (resolve and method internal)
-3. Implement more container methods (CRUD, XPath)
-4. Long-lived session mode
+1. **Implement module.js** - universal lib with unified interface (high priority)
+   - See `notes/module_lib_bootstrap_2025-12-07.md` for design
+2. Update spl/app state.avsc schema (base extended by spl/cli-static)
+3. Better error handling (resolve and method internal)
+4. Implement more container methods (CRUD, XPath)
 
 ### Work Items
 

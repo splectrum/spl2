@@ -513,10 +513,27 @@ Substantial progress on elevator pitch preparation for Pear/Bare conversation.
 - `splectrum/apps/cli-static/state/0000000000000.json` - enableAppOverlay flag
 - `splectrum/apps/cli-static/modules/hierarchy.json` - created
 
+### Module Lib Design Discussion
+
+Identified inconsistency in interfaces across execution contexts (scripts get spl, methods get requireSpl, libs get requireNonSpl). Proposed unified `module` interface:
+
+- Single universal lib all contexts receive
+- Contains all core utilities: input, output, require, resolve, faf, consumeLatest, runtime access
+- Additional libs only for specialized domain concerns
+
+Bootstrap sequence:
+1. Raw bootstrap (platform-independent overlay logic)
+2. Load module.js - **app modules first, then splectrum** (allows boot/system app isolation)
+3. Instantiate module bound to record
+4. All execution uses module interface
+
+See `notes/module_lib_bootstrap_2025-12-07.md` for full design.
+
 ### TODO (next session)
 
-1. **Update spl/app state.avsc schema** - base schema extended by spl/cli-static
-2. **Better error handling** - both resolve errors and method internal errors need cleaner handling
+1. **Implement module.js** - universal lib with unified interface (high priority)
+2. **Update spl/app state.avsc schema** - base schema extended by spl/cli-static
+3. **Better error handling** - both resolve errors and method internal errors need cleaner handling
 
 ---
 
