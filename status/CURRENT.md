@@ -9,61 +9,72 @@
 **Project 11: App Architecture**
 
 - Type: Exploration Project
-- Status: **In Progress - Selfeval method complete, patterns refined**
+- Status: **In Progress - gradedOutput complete, whoami schemas facet working**
 - Location: `projects/11-app-architecture/`
 
 ### Current Focus
 
-**Selfeval implementation complete** - first full introspection method following all established patterns.
+**gradedOutput and whoami v2 implementation** - established patterns for graded disclosure across introspection methods.
 
 Key deliverables this session:
-- `spl/container/selfeval` - complete method with all flags
-- API facet renamed: "types" → "introspection"
-- Code organization patterns refined (index.js/lib separation)
-- Requirements updated for index_type and lib_type
+- `module.gradedOutput()` - four-level output with orthogonal text/data axes
+- `module.requiredLevel()` - helper for methods to know required depth
+- `spl/container/whoami` v2 - comprehensive introspection (schemas facet)
+- `glossary/dsl.json` - JSON glossary for programmatic access
 
 ### What's Working
 
 ```bash
-spl spl/container/whoami                 # structural introspection
-spl spl/container/selfeval               # validation (full detail)
-spl spl/container/selfeval --fail-fast   # quiet mode, stop on failure
-spl spl/container/selfeval --report      # JSON only
-spl spl/container/selfeval --dry-run     # list facets
+# gradedOutput with four levels
+spl spl/container/whoami --silent    # topline
+spl spl/container/whoami             # summary
+spl spl/container/whoami --verbose   # detail (with fields)
+spl spl/container/whoami --debug     # debug (with DSL glossary)
+
+# Facet filtering
+spl spl/container/whoami --facet=schemas
+
+# Report flag (orthogonal)
+spl spl/container/whoami --report
+spl spl/container/whoami --report=debug
 ```
 
 ### Key Patterns Established
 
-**index.js:**
-- Only spl lib imports
-- Flow reflects spec from req
-- Comments explain steps
-- Clean, readable as documentation
+**gradedOutput:**
+- Four levels: topline, summary, detail, debug
+- Text flags: --silent (topline), default (summary), --verbose (detail), --debug (debug)
+- Data flags: --report[=level] - orthogonal axis
+- Most verbose wins if multiple flags
+- requiredLevel() returns max of text and data levels
 
-**Libs (main/auxiliary):**
-- `lib/spl/x/y` → main lib (no extension)
-- `lib/spl/x/y/z.js` → auxiliary (with .js)
-- Main: meaningful steps, header docs
-- Auxiliary: facets, helpers
+**whoami facet grading:**
+| Level | Output |
+|-------|--------|
+| topline | `schemas - input.avsc, metaoutput.avsc` |
+| summary | entries with descriptions |
+| detail | + field details from .avsc files |
+| debug | + DSL glossary meanings |
 
-**Output modes (graduated disclosure):**
-- Default: freetext summary
-- `--fail-fast`: quiet, stop on failure
-- `--report`: structured JSON only
-- `--verbose`: both
+**DSL glossary integration:**
+- `glossary/dsl.json` - machine-readable vocabulary
+- Debug level shows platform-wide term definitions
+- Horizontal language consistency
 
 ### Key Files
 
-- `apps/cli-static/modules/work_module/spl/container/selfeval/` - selfeval method
-- `apps/cli-static/modules/work_module/spl/container/_reqs/index_type_v1.0.0.md` - index.js pattern
-- `apps/cli-static/modules/work_module/spl/container/_reqs/lib_type_v1.0.0.md` - lib pattern
-- `projects/11-app-architecture/notes/selfeval_design_2025-12-08.md` - design notes
+- `work_module/_lib/module.js` - gradedOutput, requiredLevel
+- `work_module/_reqs/module_instance_v1.0.0.md` - graded output spec
+- `spl/container/whoami/` - v2 implementation
+- `spl/container/whoami/_reqs/spl_container_whoami_v2.0.0.md` - comprehensive spec
+- `glossary/dsl.json` - JSON glossary
+- `splectrum/scripts/test-graded-output.js` - 19 tests
 
 ### Next Steps
 
-- Split selfeval lib when runners grow
-- Implement schemas runner
-- Update whoami with same patterns
+- Implement remaining whoami facets: reqs, lib, methods, selfevals, tests
+- --levels flag for type chain traversal
+- Update selfeval to use gradedOutput pattern
 - Container methods: `select`, `create`
 
 ### Work Items
@@ -72,7 +83,7 @@ spl spl/container/selfeval --dry-run     # list facets
 |---|------|--------|
 | 1 | Backlog and CIP Consolidation | Done |
 | 2 | Splectrum node cleanup | Done |
-| 3 | App-based design and implementation experience | In progress (items 1-6 done, selfeval complete) |
+| 3 | App-based design and implementation experience | In progress (gradedOutput, whoami v2) |
 | 4 | Elevator pitch for Pear/Bare | Ready (`elevator-pitch/`) |
 | 5 | Splectrum node install | Pending |
 
@@ -83,13 +94,13 @@ spl spl/container/selfeval --dry-run     # list facets
 **Starting a new session?**
 
 1. Read this file for current context
-2. Read `projects/11-app-architecture/DAILY_LOG.md` (2025-12-08 entry) for detailed work history
-3. Read `projects/11-app-architecture/notes/selfeval_design_2025-12-08.md` for selfeval design
+2. Read `projects/11-app-architecture/DAILY_LOG.md` (2025-12-08 entries) for detailed work history
+3. Key specs: `work_module/_reqs/module_instance_v1.0.0.md`, `whoami/_reqs/spl_container_whoami_v2.0.0.md`
 
 **Reference implementations:**
-- `spl/container/selfeval/` - complete method following all patterns
-- `spl/container/selfeval/index.js` - clean index.js example
-- `spl/container/selfeval/_lib/selfeval.js` - main lib example
+- `module.gradedOutput()` - graded disclosure pattern
+- `spl/container/whoami` - uses gradedOutput, DSL glossary integration
+- `splectrum/scripts/test-graded-output.js` - test patterns
 
 ---
 

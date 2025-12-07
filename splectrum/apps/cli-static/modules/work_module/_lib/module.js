@@ -343,6 +343,85 @@ export function create(record) {
     },
 
     /**
+     * Get required output level based on text and report flags
+     *
+     * Returns the max of text level and report level.
+     * Methods use this to know what depth of content to produce.
+     *
+     * @returns {string} - 'topline', 'summary', 'detail', or 'debug'
+     */
+    requiredLevel() {
+      const input = record.headers.spl.request.input || {}
+      const levelOrder = ['topline', 'summary', 'detail', 'debug']
+
+      // Text level
+      let textLevel = 'summary'
+      if (input.silent) textLevel = 'topline'
+      if (input.verbose) textLevel = 'detail'
+      if (input.debug) textLevel = 'debug'
+
+      // Data level
+      let dataLevel = null
+      if (input.report) {
+        dataLevel = (input.report === true) ? 'summary' :
+                    ['topline', 'summary', 'detail', 'debug'].includes(input.report) ? input.report : 'summary'
+      }
+
+      // Return max
+      const textIdx = levelOrder.indexOf(textLevel)
+      const dataIdx = dataLevel ? levelOrder.indexOf(dataLevel) : -1
+      return levelOrder[Math.max(textIdx, dataIdx)]
+    },
+
+    /**
+     * Graded output - append chunk at selected disclosure level
+     *
+     * Text flags (metaoutput):
+     *   --silent  → topline
+     *   (default) → summary
+     *   --verbose → detail
+     *   --debug   → debug
+     *   Most verbose wins if multiple present.
+     *
+     * Data flags (output):
+     *   (not set)       → none
+     *   --report        → summary
+     *   --report=detail → detail
+     *   --report=debug  → debug
+     *
+     * @param {Object} chunk - { topline, summary, detail, debug }
+     */
+    gradedOutput({ topline, summary, detail, debug }) {
+      const input = record.headers.spl.request.input || {}
+      const levels = { topline, summary, detail, debug }
+
+      // Text level - most verbose wins
+      let textLevel = 'summary'
+      if (input.silent) textLevel = 'topline'
+      if (input.verbose) textLevel = 'detail'
+      if (input.debug) textLevel = 'debug'
+
+      // Append to metaoutput
+      if (levels[textLevel]) {
+        const existing = record.headers.spl.request.metaoutput || ''
+        const chunk = levels[textLevel]
+        const separator = existing ? '\n' : ''
+        record.headers.spl.request.metaoutput = existing + separator + chunk
+      }
+
+      // Data level - based on --report value
+      if (input.report) {
+        const dataLevel = (input.report === true) ? 'summary' :
+                          ['topline', 'summary', 'detail', 'debug'].includes(input.report) ? input.report : 'summary'
+
+        if (levels[dataLevel]) {
+          const existing = record.headers.spl.request.output || []
+          record.headers.spl.request.output = [...existing, levels[dataLevel]]
+        }
+      }
+    },
+
+    /**
      * Extract output pair from another record and set on this record
      * @param {Object} sourceRecord - Record to extract output from
      */

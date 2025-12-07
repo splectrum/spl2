@@ -897,4 +897,114 @@ spl spl/container/selfeval --verbose     # text + JSON
 
 ---
 
+## 2025-12-08 (continued)
+
+### Graded Output Pattern
+
+Discussed output handling across introspection methods. Key insight: separate execution flags from output flags.
+
+**Lib produces graded chunks:**
+```js
+return {
+  data: { /* structured result */ },
+  output: {
+    topline: "Container valid: 3 facets",
+    overview: ["Container valid: 3 facets", "  methods: 2", ...],
+    detail: ["Container valid: 3 facets", "Methods:", "  selfeval ✓", ...]
+  }
+}
+```
+
+**Module.output() selects level:**
+- `--silent` → topline
+- (default) → overview
+- `--verbose` → detail + JSON
+- `--report` → JSON only
+
+**Separation of concerns:**
+- Lib owns domain knowledge (what to say at each level)
+- Module owns presentation (which level to show, how to format)
+
+Pattern captured in `work_module/_reqs/module_instance_v1.0.0.md`.
+
+### Design & Implementation Experience
+
+**Common sense, low friction approach:**
+
+At functional implementation time, do the minimum to reach autonomy. Once autonomous, AI agents handle formal implementation work in batches.
+
+- Don't over-formalize req structure now
+- Reqs can spider out to more detail later (or not)
+- Capture design decisions, let structure evolve
+- Selfevals accompany reqs - AI agents complete the formal work
+- Root node naming exception: `module_instance` not `work_module_instance` (contents will move)
+
+**Key principle:** Minimal and complete at each stage. Formalization is work for later batches.
+
+### gradedOutput Refinements
+
+Refined the graded output design through discussion:
+
+**Four levels with flag mapping:**
+| Flag | Level |
+|------|-------|
+| --silent | topline |
+| (default) | summary |
+| --verbose | detail |
+| --debug | debug |
+
+**Two orthogonal axes:**
+- Text level (metaoutput): controlled by silent/verbose/debug
+- Data level (output): controlled by --report[=level]
+
+**requiredLevel() helper:** Returns max of text and data levels. Methods use this to know what depth of content to produce.
+
+**Key refinements:**
+- --silent means topline (minimal), not none
+- Most verbose wins if multiple flags
+- --report is orthogonal, not exclusive
+- DSL glossary integration at debug level for horizontal language consistency
+
+### whoami v2 Design
+
+Comprehensive container introspection with three orthogonal dimensions:
+
+1. **Chain depth** (--levels): 0, 1, 2, ... full
+2. **Facet filter** (--facet): reqs, lib, methods, selfevals, schemas, tests
+3. **Detail level**: graded output flags
+
+**Facet grading (schemas example):**
+| Level | Output |
+|-------|--------|
+| topline | `schemas - input.avsc, metaoutput.avsc` |
+| summary | entries with descriptions |
+| detail | + field details from .avsc files |
+| debug | + DSL glossary meanings |
+
+**Key insight:** At debug level, whoami replaces ad-hoc file scanning. One call = complete understanding.
+
+### whoami Implementation (schemas facet)
+
+Implemented first facet following established patterns:
+
+```bash
+spl spl/container/whoami --silent    # topline
+spl spl/container/whoami             # summary
+spl spl/container/whoami --verbose   # detail
+spl spl/container/whoami --debug     # debug + DSL
+spl spl/container/whoami --facet=schemas --report  # with data
+```
+
+**Files created:**
+- `whoami/_lib/whoami.js` - lib with loadSchemasFacet, outputSchemasFacet
+- `whoami/_reqs/spl_container_whoami_v2.0.0.md` - comprehensive spec
+
+**Other facets:** Placeholder "not implemented" messages.
+
+### Test Coverage
+
+19/19 tests passing for gradedOutput and requiredLevel.
+
+---
+
 *Log entries added as work progresses.*

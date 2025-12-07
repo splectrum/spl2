@@ -1,53 +1,28 @@
-// spl/container/whoami - Returns type and description of a container
+// spl/container/whoami - Container introspection
 // Instantiates: spl/method
+//
+// Returns structured information about a container at configurable depth.
+// Flags: --facet=<name>, --levels=<n>, --silent, --verbose, --debug, --report
 
 export default async function(module) {
-  const fs = await module.require('fs')
+  const whoami = await module.require('lib/spl/container/whoami')
+  const input = module.input()
 
-  // Get parent container path from method path
-  const methodPath = module.getMethod()
-  const containerPath = methodPath.split('/').slice(0, -1).join('/')
+  // Get container path
+  const containerPath = whoami.getContainerPath()
 
-  // Resolve README.json through overlay
-  const readmePath = module.resolve(containerPath, 'README.json')
+  // Filter to specific facet if requested
+  const facet = input.facet || 'all'
 
-  if (!readmePath) {
-    module.output(`Container not found: ${containerPath}`, null)
-    return
+  // For now, only schemas facet is implemented
+  if (facet === 'all' || facet === 'schemas') {
+    const schemas = await whoami.loadSchemasFacet(containerPath)
+    await whoami.outputSchemasFacet(schemas)
   }
 
-  let text = ''
-
-  try {
-    const content = fs.readFileSync(readmePath, 'utf8')
-    const readme = JSON.parse(content)
-
-    // Derive type from key (api, method, package, module, modules)
-    const typeKeys = ['api', 'method', 'package', 'module', 'modules']
-    const type = typeKeys.find(k => k in readme) || 'unknown'
-
-    text += `Container: ${containerPath}\n`
-    text += `Type: ${type}\n`
-    text += `Purpose: ${readme.purpose || '(none)'}\n`
-
-    if (readme.instantiates) {
-      text += `Instantiates: ${readme.instantiates}\n`
-    }
-    if (readme.extends) {
-      text += `Extends: ${readme.extends}\n`
-    }
-
-    // If API with facets, show them
-    if (type === 'api' && readme.api && Object.keys(readme.api).length > 0) {
-      text += `\nAPI Facets:\n`
-      for (const [facet, methods] of Object.entries(readme.api)) {
-        text += `  ${facet}: ${methods.join(', ')}\n`
-      }
-    }
-
-  } catch (err) {
-    text = `Error reading ${containerPath}: ${err.message}\n`
+  // Not available
+  if (facet !== 'all' && facet !== 'schemas') {
+    const msg = `${facet} - not available`
+    module.gradedOutput({ topline: msg, summary: msg, detail: msg, debug: msg })
   }
-
-  module.output(text, null)
 }
