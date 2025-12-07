@@ -1,0 +1,26 @@
+{
+  "fs": {
+    "node": "fs",
+    "bare": "bare-fs"
+  },
+  "path": {
+    "node": "path",
+    "bare": "bare-path"
+  },
+  "os": {
+    "node": "os",
+    "bare": "bare-os"
+  },
+  "url": {
+    "node": "url",
+    "bare": "bare-url"
+  },
+  "crypto": {
+    "node": "crypto",
+    "bare": "bare-crypto"
+  },
+  "events": {
+    "node": "events",
+    "bare": "bare-events"
+  }
+}

@@ -1,6 +1,6 @@
 # Current Status
 
-**Last Updated:** 2025-12-07
+**Last Updated:** 2025-12-07 (night session)
 
 ---
 
@@ -9,33 +9,37 @@
 **Project 11: App Architecture**
 
 - Type: Exploration Project
-- Status: **In Progress - Item 3 (App-based experience)**
+- Status: **In Progress - Items 1-6 complete, ready for practical use**
 - Location: `projects/11-app-architecture/`
 
 ### Current Focus
 
-**Container Implementation** - first formal method working through full pipeline.
+**App-based design experience complete** - all 6 items done, ready for practical use.
 
-Key deliverables completed:
-- App-session pipeline with proper inbox/outbox pattern
-- State management via `faf`/`consumeLatest` pair
-- **whoami method** executing via inheritance chain
-- **Overlay resolution** with implements/extends support
-- **App overlay** with enableAppOverlay flag
-- **Session error handling** - graceful error return
+Key deliverables:
+- **Items 1-4:** Module.js universal interface, full pipeline working
+- **Item 5:** `--dry-run` and `--silent` flags with schema-first design
+- **Item 6:** PAC (Prompt for Action Confirmation) at handler level
 
-See `projects/11-app-architecture/DAILY_LOG.md` (2025-12-07) for implementation details.
+### What's Working
+
+- `spl spl/container/whoami` - full pipeline execution
+- `spl spl/container/whoami --silent` - suppress narrative
+- `spl spl/container/whoami --dry-run` - preview only (no data actions)
+- `spl spl/container/whoami --pac` - preview → confirm → execute
+- Base schemas at container level with compatibility-based inheritance
+- CLI normalizes kebab-case to camelCase
+
+### Key Files
+
+- `apps/cli-static/modules/work_module/_lib/module.js` - universal module interface
+- `apps/cli-static/modules/work_module/spl/container/_schemas/` - base input/metaoutput schemas
+- `modules/bm_spl/spl/cli-static/execute/index.js` - PAC handler flow
+- `modules/bm_spl/spl/cli/_lib/cli.js` - kebab→camelCase normalization
 
 ### Next Steps
 
-1. **Create work_module as instance of spl/module** - add README.json at work_module root
-2. **Create `_lib/module.js`** - full implementation with all utilities
-3. **Update invocation signatures** - all contexts receive `module` only
-4. **Update moduleBootstrap.js** - simplified overlay to find module.js (app-first)
-5. **Add `--dry-run` and `--silent`** to whoami
-6. **PAC at handler level**
-
-See `notes/module_lib_bootstrap_2025-12-07.md` and `notes/pac_handler_design_2025-12-07.md` for design.
+Ready to build practical functionality using the established patterns.
 
 ### Work Items
 
@@ -43,7 +47,7 @@ See `notes/module_lib_bootstrap_2025-12-07.md` and `notes/pac_handler_design_202
 |---|------|--------|
 | 1 | Backlog and CIP Consolidation | Done |
 | 2 | Splectrum node cleanup | Done |
-| 3 | App-based design and implementation experience | In progress |
+| 3 | App-based design and implementation experience | In progress (items 1-4 of 6 done) |
 | 4 | Elevator pitch for Pear/Bare | Ready (`elevator-pitch/`) |
 | 5 | Splectrum node install | Pending |
 

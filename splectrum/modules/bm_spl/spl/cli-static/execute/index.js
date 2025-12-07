@@ -1,84 +1,127 @@
 // spl/cli-static/execute - CLI Static App execute method
 //
-// Pattern: create(record, { requireSpl }) returns { invoke() }
-//
 // App handler with proper inbox/outbox pattern:
 // 1. Load app state
 // 2. Start session (watchers running)
-// 3. Start outbox watcher
-// 4. FAF request to session inbox
-// 5. Wait for response on outbox
-// 6. Return result to client
+// 3. Handle PAC if requested (dry-run, prompt, execute)
+// 4. Or: direct execution (FAF to inbox, wait on outbox)
+// 5. Return result to client
 
-import fs from 'fs'
-import path from 'path'
+import * as readline from 'readline'
 
-export async function create(record, { requireSpl }) {
-  const spl = await requireSpl('lib/spl', record)
+export default async function(module) {
+  const fs = await module.require('fs')
+  const path = await module.require('path')
+  const nodeRoot = module.getNodeRoot()
 
-  return {
-    async invoke() {
-      const runtime = record.headers.spl.runtime
-      const nodeRoot = runtime.nodeRoot
+  // 1. Load app state
+  const appAPI = 'spl/cli-static'
+  const appRoot = 'apps/cli-static'
+  const stateTopic = `${appRoot}/state`
+  const appState = module.consumeLatest(stateTopic)
 
-      // 1. Load app state
-      const appAPI = 'spl/cli-static'
-      const appRoot = 'apps/cli-static'
-      const stateTopic = `${appRoot}/state`
-      const appState = spl.consumeLatest(stateTopic)
+  if (!appState) {
+    module.raiseError(`App state not found: ${stateTopic}`)
+    return
+  }
 
-      if (!appState) {
-        spl.raiseError(`App state not found: ${stateTopic}`)
-        return
-      }
+  const sessionConfig = appState.headers.spl['cli-static-session']
+  const inboxDir = path.join(nodeRoot, sessionConfig.root, 'inbox')
+  const outboxDir = path.join(nodeRoot, sessionConfig.root, 'outbox')
 
-      // Set up headers from app state
-      record.headers.spl['cli-static'] = appState.headers.spl['cli-static']
-      record.headers.spl['cli-static-session'] = appState.headers.spl['cli-static-session']
+  // 2. Snapshot original record before any modifications
+  const originalRecord = module.snapshotRecord()
 
-      // Set runtime
-      runtime.appAPI = appAPI
-      runtime.sessionAPI = 'spl/cli-static-session'
+  // 3. Start session helper (one-shot watchers)
+  const sessionStart = await module.require('spl/cli-static-session/start')
 
-      // Get session paths from app state
-      const sessionConfig = appState.headers.spl['cli-static-session']
-      const inboxDir = path.join(nodeRoot, sessionConfig.root, 'inbox')
-      const outboxDir = path.join(nodeRoot, sessionConfig.root, 'outbox')
+  async function startSession() {
+    await sessionStart.invoke()
+    module.restoreRecord(originalRecord)  // Clear session pollution
+  }
 
-      // 2. Start session (watchers running in background)
-      const sessionStart = await requireSpl('spl/cli-static-session/start', record)
-      await sessionStart.invoke()
+  // Helper: watch outbox, FAF to inbox, wait for response
+  async function executeAndWait() {
+    return new Promise((resolve, reject) => {
+      const outboxWatcher = fs.watch(outboxDir, (event, filename) => {
+        if (event !== 'rename') return
+        if (!filename?.endsWith('.json')) return
+        const filePath = path.join(outboxDir, filename)
+        if (!fs.existsSync(filePath)) return
 
-      // 3. Start outbox watcher (app's responsibility)
-      const resultPromise = new Promise((resolve, reject) => {
-        const outboxWatcher = fs.watch(outboxDir, (event, filename) => {
-          if (event !== 'rename') return
-          if (!filename?.endsWith('.json')) return
-          const filePath = path.join(outboxDir, filename)
-          if (!fs.existsSync(filePath)) return
-
-          try {
-            const content = fs.readFileSync(filePath, 'utf-8')
-            const result = JSON.parse(content)
-            fs.unlinkSync(filePath)  // consume from outbox
-            outboxWatcher.close()
-            resolve(result)
-          } catch (err) {
-            outboxWatcher.close()
-            reject(err)
-          }
-        })
+        try {
+          const content = fs.readFileSync(filePath, 'utf-8')
+          const result = JSON.parse(content)
+          fs.unlinkSync(filePath)  // consume from outbox
+          outboxWatcher.close()
+          resolve(result)
+        } catch (err) {
+          outboxWatcher.close()
+          reject(err)
+        }
       })
 
-      // 4. FAF request to session inbox
-      spl.faf(inboxDir, { sync: true })
-
-      // 5. Wait for response on outbox
-      const result = await resultPromise
-
-      // 6. Return result - extract output pair from session response
-      spl.extractOutput(result)
-      spl.completeRequest()
-    }
+      module.faf(inboxDir, { sync: true })
+    })
   }
+
+  // Helper: prompt user for confirmation
+  async function promptConfirm(message) {
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    })
+
+    return new Promise((resolve) => {
+      rl.question(message, (answer) => {
+        rl.close()
+        resolve(answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes')
+      })
+    })
+  }
+
+  // 3. Check for PAC flow
+  const input = module.input()
+
+  if (input.pac) {
+    // PAC flow: dry-run → preview → confirm → execute
+
+    // Start session, set dryRun for preview
+    await startSession()
+    module.setInputFlag('pac', undefined)
+    module.setInputFlag('dryRun', true)
+
+    const preview = await executeAndWait()
+
+    // Show preview (metaoutput)
+    const metaoutput = preview.headers?.spl?.request?.metaoutput
+    if (metaoutput) {
+      console.log('\n--- Preview ---')
+      console.log(metaoutput)
+      console.log('---------------\n')
+    }
+
+    // Prompt for confirmation
+    const confirmed = await promptConfirm('Proceed? [y/N] ')
+
+    if (confirmed) {
+      // Restart session, restore original, set silent for actual execution
+      await startSession()
+      module.setInputFlag('pac', undefined)
+      module.setInputFlag('silent', true)
+
+      const result = await executeAndWait()
+      module.extractOutput(result)
+    } else {
+      module.output('Cancelled.', null)
+    }
+
+  } else {
+    // Direct execution
+    await startSession()
+    const result = await executeAndWait()
+    module.extractOutput(result)
+  }
+
+  module.completeRequest()
 }

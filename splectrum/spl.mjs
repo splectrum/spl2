@@ -1,6 +1,6 @@
 // spl.mjs - Splectrum CLI entry point
 //
-// Creates record first thing, uses requireSpl to bind libs to record.
+// Creates record first thing, uses module interface for execution.
 //
 // Invocation modes:
 //   1. Command:  spl spl/dev/cycle --name=env-123
@@ -8,7 +8,7 @@
 //   3. File:     spl ./workflow.js --env=prod
 //   4. Library:  spl status
 
-import { requireSpl } from './lib/moduleBootstrap.js'
+import { loadModule } from './lib/moduleBootstrap.js'
 
 // ============================================================================
 // Create record first thing - all input captured
@@ -39,11 +39,19 @@ const record = {
 }
 
 // ============================================================================
+// Load module lib (no app context yet - splectrum only)
+// ============================================================================
+
+const moduleLib = await loadModule('cli-static')
+const module = moduleLib.create(record)
+
+// ============================================================================
 // Process CLI state
 // ============================================================================
 
-const cli = await requireSpl('lib/spl/cli', record)
-const spl = await requireSpl('lib/spl', record)
+// CLI lib is entrypoint infrastructure - receives module + raw record
+const { create: createCli } = await import('./modules/bm_spl/spl/cli/_lib/cli.js')
+const cli = await createCli(module, record)
 
 cli.resolveNode()
 cli.detectMode()
@@ -51,7 +59,7 @@ cli.parseArgs()
 if (cli.isExternalScriptFile()) cli.loadExternalScriptFile()
 
 if (!cli.validate()) {
-  spl.faf(cli.resolveErrorTopic(), { sync: true })
+  module.faf(cli.resolveErrorTopic(), { sync: true })
   cli.handleError()
 }
 
@@ -78,11 +86,24 @@ switch (mode) {
 record.value = null
 
 // ============================================================================
+// Set up app context before routing
+// ============================================================================
+
+// Load app state and set on record
+const appStateTopic = 'apps/cli-static/state'
+const appState = module.consumeLatest(appStateTopic)
+if (appState) {
+  record.headers.spl['cli-static'] = appState.headers.spl['cli-static']
+  record.headers.spl['cli-static-session'] = appState.headers.spl['cli-static-session']
+  record.headers.spl.runtime.appAPI = 'spl/cli-static'
+}
+
+// ============================================================================
 // Route to app via spl/cli-static/execute
 // ============================================================================
 
 // Terminal routing: cli-static app handles terminal requests
-const appHandler = await requireSpl('spl/cli-static/execute', record)
+const appHandler = await module.require('spl/cli-static/execute')
 await appHandler.invoke()
 
 // Output result

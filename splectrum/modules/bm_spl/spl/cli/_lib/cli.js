@@ -1,23 +1,28 @@
 // cli.js - CLI entry point utilities
 //
-// Bound pattern: create(record, { requireNonSpl }) returns object with methods
+// Bound pattern: create(module, record) returns object with methods
 // that read/write record internally. Caller doesn't know property paths.
-
-let fs, path
+//
+// Note: This lib is entrypoint infrastructure specific to spl.mjs.
+// It receives raw record because it builds the record structure.
 
 // Script preamble - inline scripts must start with this
 const SCRIPT_PREAMBLE = '/*'
 
+// Convert kebab-case to camelCase (--dry-run → dryRun)
+function kebabToCamel(str) {
+  return str.replace(/-([a-z])/g, (_, c) => c.toUpperCase())
+}
+
 /**
  * Create CLI bound to record
- * @param {Object} record - The CLI record
- * @param {Object} deps - Dependencies from bootstrap
- * @param {Function} deps.requireNonSpl - Platform module loader
+ * @param {Object} module - Module interface (for platform requires)
+ * @param {Object} record - The CLI record (raw access for setup)
  * @returns {Object} - Bound CLI methods
  */
-export function create(record, { requireNonSpl }) {
-  fs = requireNonSpl('fs')
-  path = requireNonSpl('path')
+export async function create(module, record) {
+  const fs = await module.require('fs')
+  const path = await module.require('path')
 
   // Internal: resolve script by name from scripts/ folder
   function resolveScript(scriptName, nodeRoot) {
@@ -156,7 +161,8 @@ export function create(record, { requireNonSpl }) {
       for (let i = startIndex; i < argv.length; i++) {
         const arg = argv[i]
         if (arg.startsWith('--')) {
-          const [key, ...valueParts] = arg.slice(2).split('=')
+          const [rawKey, ...valueParts] = arg.slice(2).split('=')
+          const key = kebabToCamel(rawKey)
           input[key] = valueParts.length > 0 ? valueParts.join('=') : true
         } else {
           // Positional args as numeric string keys

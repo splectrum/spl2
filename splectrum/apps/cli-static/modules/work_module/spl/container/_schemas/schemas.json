@@ -1,4 +1,7 @@
 {
-  "description": "Container schemas",
-  "entries": []
+  "description": "Container schemas - universal handler flags and output structure",
+  "entries": [
+    {"name": "input.avsc", "description": "Universal handler flags (dryRun, silent)"},
+    {"name": "metaoutput.avsc", "description": "Narrative output structure"}
+  ]
 }

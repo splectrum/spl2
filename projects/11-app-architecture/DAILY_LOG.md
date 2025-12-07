@@ -584,4 +584,182 @@ Changed `implements` to `instantiates` throughout:
 
 ---
 
+## 2025-12-07 (Evening Session)
+
+### Module.js Implementation Complete (Items 1-4)
+
+Major refactoring session - universal module interface now working through full pipeline.
+
+**Item 1: Instance structures**
+- `work_module/README.json` → `{"instantiates": "spl/module"}`
+- `work_module/spl/README.json` → `{"instantiates": "spl/package"}`
+
+**Item 2: module.js created**
+
+Location: `apps/cli-static/modules/work_module/_lib/module.js`
+
+Platform bootstrap pattern:
+1. Adhoc Node/Bare switch loads fs/path first
+2. Load `platform-modules.json` mapping file
+3. `requirePlatform()` uses mapping for all other modules
+
+Interface implemented:
+- `module.input()` / `module.output(meta, data)` / `module.extractOutput()`
+- `module.require(uri)` - handles platform modules, libs, commands, scripts
+- `module.resolve(nodePath, filename)` - overlay resolution
+- `module.faf()` / `module.consumeLatest()`
+- `module.getNodeRoot()` / `module.getAppAPI()` / `module.getRecordId()` / `module.getMethod()`
+- `module.raiseError()` / `module.raiseAsyncError()` / `module.completeRequest()`
+
+Key design: Dynamic getters read from record each time (not captured at creation). This allows record to be mutated after module creation (needed for CLI setup).
+
+**Item 3: Invocation signatures updated**
+
+All methods now receive single `module` arg:
+- `export default async function(module)` - methods
+- CLI lib special case: `create(module, record)` - needs raw record for setup
+
+Files updated:
+- `spl/container/whoami/index.js`
+- `spl/cli-static/execute/index.js`
+- `spl/cli-static-session/start/index.js`
+- `spl/cli/_lib/cli.js`
+
+**Item 4: moduleBootstrap.js simplified**
+
+From ~440 lines to ~80 lines. Single responsibility:
+- Adhoc platform bootstrap (fs, path, url)
+- `loadModule(appName?)` - finds module.js via hierarchy (app-first, then splectrum)
+
+**spl.mjs changes:**
+- Uses `loadModule('cli-static')`
+- Sets app context on record after CLI processing (appAPI, enableAppOverlay)
+- Uses `module.require()` for app execution
+
+**Testing:**
+```
+$ spl spl/container/whoami
+Container: spl/container
+Type: api
+Purpose: Container type definition...
+```
+
+Full pipeline working: CLI → execute → session → whoami → output
+
+### Files Created/Modified
+
+New:
+- `apps/cli-static/modules/work_module/_lib/module.js`
+- `apps/cli-static/modules/work_module/_lib/platform-modules.json`
+- `apps/cli-static/modules/work_module/README.json`
+- `apps/cli-static/modules/work_module/spl/README.json`
+- `modules/bm_spl/_lib/module.js` (copy for fallback)
+- `modules/bm_spl/_lib/platform-modules.json` (copy for fallback)
+
+Modified:
+- `lib/moduleBootstrap.js` - simplified
+- `spl.mjs` - new module pattern
+- `modules/bm_spl/spl/cli/_lib/cli.js` - new signature
+- `modules/bm_spl/spl/cli-static/execute/index.js` - new signature
+- `modules/bm_spl/spl/cli-static-session/start/index.js` - new signature
+- `apps/cli-static/modules/work_module/spl/container/whoami/index.js` - new signature
+
+---
+
+## 2025-12-07 (Night Session)
+
+### Items 5-6 Complete: Flags and PAC
+
+**Item 5: --dry-run and --silent flags**
+
+Schema-first approach at container level:
+
+**Base schemas created (`spl/container/_schemas/`):**
+- `input.avsc` - universal handler flags: `dryRun`, `silent`
+- `metaoutput.avsc` - natural language output: `freetext` (string array)
+
+**Schema naming convention:**
+- Name carries full path: `spl.container.input`, `spl.container.whoami.output`
+- Namespace reserved for future hive isolation (versioning, multi-tenant)
+- Derived schemas only created when extending (no copy if identical to base)
+- Compatibility checking validates "inheritance" contract
+
+**CLI normalization:**
+- `--dry-run` → `dryRun` (kebab to camelCase in cli.js)
+
+**module.output() respects flags:**
+- `silent`: skips metaoutput
+- `dryRun`: skips data output
+
+**Item 6: PAC at handler level**
+
+PAC (Prompt for Action Confirmation) implemented in `spl/cli-static/execute`:
+
+**Flow:**
+1. `--pac` detected in input
+2. Start session, set `dryRun`, execute
+3. Show preview (metaoutput from dry-run)
+4. Prompt: "Proceed? [y/N]"
+5. If confirmed: restore original, set `silent`, restart session, execute
+6. If cancelled: output "Cancelled."
+
+**New module methods:**
+- `setInputFlag(key, value)` - modify input flags
+- `snapshotRecord()` / `restoreRecord(snapshot)` - save/restore record state
+
+**Key insight:** Must snapshot record before sessionStart.invoke() pollutes it. Restore before each FAF to ensure clean state.
+
+**Testing:**
+```
+$ spl spl/container/whoami --pac
+--- Preview ---
+Container: spl/container
+...
+---------------
+Proceed? [y/N] y
+(silent execution, no duplicate output)
+```
+
+### Schema Design Decisions
+
+**Metaoutput structure:**
+- `freetext`: array of strings (not single string)
+- Easy to build up incrementally
+- Handler decides rendering (CLI joins with newlines, browser might use paragraphs)
+- Doc: "Natural language output" (human + AI readable)
+
+**No inheritance in Avro - compatibility checking instead:**
+- Base schema defines common fields
+- Derived can be checked for compatibility with base
+- If compatible, data valid for derived is also valid for base
+- Naming convention signals relationship, compatibility check verifies
+
+**When to create derived schema:**
+- Only if adding fields beyond base
+- Otherwise, resolution picks up base schema
+- Reduces maintenance burden
+
+### Files Modified
+
+**New:**
+- `spl/container/_schemas/input.avsc`
+- `spl/container/_schemas/metaoutput.avsc`
+- `spl/container/whoami/_schemas/schemas.json`
+
+**Modified:**
+- `apps/cli-static/modules/work_module/_lib/module.js` - setInputFlag, snapshotRecord, restoreRecord, output respects flags
+- `modules/bm_spl/spl/cli/_lib/cli.js` - kebabToCamel normalization
+- `modules/bm_spl/spl/cli-static/execute/index.js` - PAC flow with session restart
+
+**Deleted:**
+- `spl/container/whoami/_schemas/input.avsc` - uses base
+- `spl/container/whoami/_schemas/output.avsc` - whoami is metadata function, uses metaoutput
+- `spl/container/whoami/_schemas/metaoutput.avsc` - uses base
+
+### Work Item Status
+
+Items 1-6 of "App-based design experience" complete. Ready for practical use.
+
+---
+
 *Log entries added as work progresses.*

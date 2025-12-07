@@ -1,20 +1,18 @@
 // spl/container/whoami - Returns type and description of a container
 // Instantiates: spl/method
 
-import fs from 'fs'
-
-export default async function(record, requireSpl, resolveSpl) {
-  const spl = await requireSpl('lib/spl', record)
+export default async function(module) {
+  const fs = await module.require('fs')
 
   // Get parent container path from method path
-  const methodPath = record.headers.spl.request.method
+  const methodPath = module.getMethod()
   const containerPath = methodPath.split('/').slice(0, -1).join('/')
 
   // Resolve README.json through overlay
-  const readmePath = resolveSpl(containerPath, 'README.json')
+  const readmePath = module.resolve(containerPath, 'README.json')
 
   if (!readmePath) {
-    spl.output(`Container not found: ${containerPath}`, null)
+    module.output(`Container not found: ${containerPath}`, null)
     return
   }
 
@@ -51,5 +49,5 @@ export default async function(record, requireSpl, resolveSpl) {
     text = `Error reading ${containerPath}: ${err.message}\n`
   }
 
-  spl.output(text, null)
+  module.output(text, null)
 }

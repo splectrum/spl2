@@ -1,0 +1,18 @@
+{
+  "type": "record",
+  "name": "spl.container.input",
+  "fields": [
+    {
+      "name": "dryRun",
+      "type": "boolean",
+      "default": false,
+      "doc": "Preview only, no action taken"
+    },
+    {
+      "name": "silent",
+      "type": "boolean",
+      "default": false,
+      "doc": "Omit narrative, data only"
+    }
+  ]
+}
