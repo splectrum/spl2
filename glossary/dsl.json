@@ -1,236 +1,241 @@
 {
-  "description": "DSL Glossary - SPL2 Domain-Specific Language vocabulary",
-  "requirements": "chats/immutables/glossary_requirements_v1.0.0.md",
+  "description": "Splectrum vocabulary for horizontal meaning consistency",
+  "requirements": "projects/11-app-architecture/reqs/dsl_glossary_v2.0.0.md",
   "terms": {
     "api": {
-      "type": "branch",
-      "description": "Module node within a package; groups related methods under a common namespace; has state",
+      "category": "native",
+      "description": "managed API unit with inheritance hierarchy; mapped one-to-one to a data container",
       "req": "projects/06-glossary-term-requirements/reqs/api_v1.0.0.md"
     },
-    "api_overview": {
-      "type": "Structure",
-      "description": "Overview document for an API. Inventory and top-level interface - what the API is, what it consists of, method signatures",
-      "req": "projects/08-dev-environment-api/api_overview_req_v1.0.0.md"
-    },
-    "branch": {
-      "type": "module_node",
-      "description": "Non-leaf node with batch capability; can contain child nodes; base for module_root, package, api",
-      "req": "projects/09-console-v5-stream-native/branch_v1.0.0.md"
-    },
     "clear": {
-      "type": "verb",
-      "description": "App-internal command to remove a specific context value; inverse of set",
+      "category": "native",
+      "description": "remove the current state",
       "req": "projects/11-app-architecture/reqs/clear_v1.0.0.md"
     },
     "create": {
-      "type": "method",
-      "description": "Method name for creation operations; bring something into existence that did not exist before",
-      "req": "projects/08-dev-environment-api/create_v1.0.0.md"
+      "category": "native",
+      "description": "to make a new item (API method)",
+      "req": "projects/11-app-architecture/reqs/create_v1.1.0.md"
     },
     "cycle": {
-      "type": "method",
-      "description": "Method name for iterative execution; run one iteration of a repeating process with return-and-resume pattern",
-      "req": "projects/08-dev-environment-api/cycle_v1.0.0.md"
+      "category": "native",
+      "description": "to do one or more iterations (API method)",
+      "req": "projects/11-app-architecture/reqs/cycle_v1.1.0.md"
     },
     "debug": {
-      "type": "flag",
-      "description": "Invocation flag to enable maximum verbosity output; diagnostic mode with full context",
-      "req": null
+      "category": "native",
+      "description": "maximal information; mainly used in metadata",
+      "req": "projects/11-app-architecture/reqs/debug_v1.0.0.md"
+    },
+    "detail": {
+      "category": "native",
+      "description": "full description; mainly used in metadata",
+      "req": "projects/11-app-architecture/reqs/detail_v1.0.0.md"
     },
     "destroy": {
-      "type": "method",
-      "description": "Method name for destruction operations; tear down and remove, freeing resources",
-      "req": "projects/08-dev-environment-api/destroy_v1.0.0.md"
+      "category": "native",
+      "description": "to delete permanently (API method)",
+      "req": "projects/11-app-architecture/reqs/destroy_v1.1.0.md"
     },
     "dryRun": {
-      "type": "flag",
-      "description": "Invocation flag for preview mode; show what would happen without taking action; no side effects",
-      "req": null
+      "category": "native",
+      "description": "show execution plan without applying state changes",
+      "req": "projects/11-app-architecture/reqs/dryRun_v1.0.0.md"
     },
     "execution": {
-      "type": "api",
-      "description": "Request execution management API; handles pipeline execution within runtime context",
-      "req": "projects/06-glossary-term-requirements/reqs/execution_v1.0.0.md"
+      "category": "native",
+      "description": "the act of running a process",
+      "req": "projects/11-app-architecture/reqs/execution_v1.1.0.md"
     },
     "extract": {
-      "type": "method",
-      "description": "Method name for extraction operations; remove and retrieve something from a container or system",
-      "req": "projects/08-dev-environment-api/extract_v1.0.0.md"
+      "category": "native",
+      "description": "to take out of a larger unit (API method)",
+      "req": "projects/11-app-architecture/reqs/extract_v1.1.0.md"
     },
     "failFast": {
-      "type": "flag",
-      "description": "Invocation flag to stop on first failure; quiet mode that exits early on error",
-      "req": null
+      "category": "native",
+      "description": "abort a process at earliest error occurrence",
+      "req": "projects/11-app-architecture/reqs/failFast_v1.0.0.md"
     },
     "greet": {
-      "type": "method",
-      "description": "Method name for outputting greetings; common behavior pattern",
-      "req": "projects/06-glossary-term-requirements/reqs/greet_v1.0.0.md"
+      "category": "native",
+      "description": "give sign of welcome (API method)",
+      "req": "projects/11-app-architecture/reqs/greet_v1.1.0.md"
     },
     "headers": {
-      "type": "Property",
-      "description": "Metadata component of Kafka-compatible record; hierarchical nested object",
-      "req": "projects/06-glossary-term-requirements/reqs/headers_v1.0.0.md"
+      "category": "native",
+      "description": "section of metadata (e.g. in Kafka record)",
+      "req": "projects/11-app-architecture/reqs/headers_v1.1.0.md"
     },
     "hello": {
-      "type": "method",
-      "description": "Method name for announcing presence; common behavior pattern",
-      "req": "projects/06-glossary-term-requirements/reqs/hello_v1.0.0.md"
+      "category": "native",
+      "description": "greeting, request for attention (API method)",
+      "req": "projects/11-app-architecture/reqs/hello_v1.1.0.md"
     },
     "install": {
-      "type": "method",
-      "description": "Method name for installation operations; add components to existing structure",
-      "req": "projects/08-dev-environment-api/install_v1.0.0.md"
+      "category": "native",
+      "description": "to put in position ready for use (API method)",
+      "req": "projects/11-app-architecture/reqs/install_v1.1.0.md"
     },
     "invoke": {
-      "type": "method",
-      "description": "Method name for invoking a single method with execution context; atomic invocation",
-      "req": "projects/06-glossary-term-requirements/reqs/invoke_v1.0.0.md"
+      "category": "native",
+      "description": "to activate a function (API method)",
+      "req": "projects/11-app-architecture/reqs/invoke_v1.1.0.md"
     },
     "key": {
-      "type": "Property",
-      "description": "Primary key component of Kafka-compatible record; implements primary_key",
-      "req": "projects/06-glossary-term-requirements/reqs/key_v1.0.0.md"
+      "category": "native",
+      "description": "identifier (e.g. for Kafka record)",
+      "req": "projects/11-app-architecture/reqs/key_v1.1.0.md"
     },
     "major": {
-      "type": "Version component",
-      "description": "First component of semver; increment for breaking changes",
-      "req": "projects/06-glossary-term-requirements/reqs/major_v1.0.0.md"
+      "category": "native",
+      "description": "1st part of version; for disruptive upgrades",
+      "req": "projects/11-app-architecture/reqs/major_v1.1.0.md"
     },
     "method": {
-      "type": "module_node",
-      "description": "Invokable leaf node; contains implementation in index.js",
-      "req": "projects/06-glossary-term-requirements/reqs/method_v1.0.0.md"
+      "category": "native",
+      "description": "handler that is a member of an apiFacet of a Splectrum API",
+      "req": "projects/11-app-architecture/reqs/method_v1.1.0.md"
+    },
+    "module": {
+      "category": "native",
+      "description": "collection of Splectrum code packages",
+      "req": "projects/11-app-architecture/reqs/module_v1.1.0.md"
+    },
+    "modules": {
+      "category": "native",
+      "description": "collection of Splectrum code modules",
+      "req": "projects/11-app-architecture/reqs/modules_v1.1.0.md"
     },
     "minor": {
-      "type": "Version component",
-      "description": "Second component of semver; increment for new backward-compatible features",
-      "req": "projects/06-glossary-term-requirements/reqs/minor_v1.0.0.md"
+      "category": "native",
+      "description": "2nd part of version; for non-disruptive upgrades",
+      "req": "projects/11-app-architecture/reqs/minor_v1.1.0.md"
     },
-    "module_node": {
-      "type": "Structure",
-      "description": "Base structural type for SPL2 hierarchy; all nodes derive from module_node; has index.js with standard async signature",
-      "req": "projects/09-console-v5-stream-native/module_node_v1.1.0.md"
+    "bareVersion": {
+      "category": "native",
+      "description": "version of the Bare executable",
+      "req": "projects/11-app-architecture/reqs/bareVersion_v1.0.0.md"
     },
-    "module_root": {
-      "type": "branch",
-      "description": "Root node of a module bundle; entry point for module-level operations",
-      "req": "projects/09-console-v5-stream-native/module_root_v1.0.0.md"
-    },
-    "node_version": {
-      "type": "Property",
-      "description": "Node.js version of execution environment",
-      "req": "projects/06-glossary-term-requirements/reqs/node_version_v1.0.0.md"
+    "nodeVersion": {
+      "category": "native",
+      "description": "version of the Node executable",
+      "req": "projects/11-app-architecture/reqs/nodeVersion_v1.0.0.md"
     },
     "nopac": {
-      "type": "flag",
-      "description": "Invocation flag to skip confirmation prompt; opposite of pac; enables scripting mode",
+      "category": "native",
+      "description": "no prompt and confirm; no dryRun prior to execution",
       "req": "projects/11-app-architecture/reqs/nopac_v1.0.0.md"
     },
     "pac": {
-      "type": "flag",
-      "description": "Invocation flag to force confirmation prompt (Prompt And Confirm); enables functional help",
+      "category": "native",
+      "description": "prompt with dryRun to confirm execution",
       "req": "projects/11-app-architecture/reqs/pac_v1.0.0.md"
     },
     "package": {
-      "type": "branch",
-      "description": "Top-level module node; root of an API tree",
-      "req": "projects/06-glossary-term-requirements/reqs/package_v1.0.0.md"
+      "category": "native",
+      "description": "managed collection",
+      "req": "projects/11-app-architecture/reqs/package_v1.1.0.md"
     },
     "patch": {
-      "type": "Version component",
-      "description": "Third component of semver; increment for backward-compatible bug fixes",
-      "req": "projects/06-glossary-term-requirements/reqs/patch_v1.0.0.md"
+      "category": "native",
+      "description": "3rd part of version; for minor fixes",
+      "req": "projects/11-app-architecture/reqs/patch_v1.1.0.md"
     },
-    "primary_key": {
-      "type": "Concept",
-      "description": "Record identity in Kafka/streaming; determines partitioning, consumer groups, record set shaping",
-      "req": "projects/06-glossary-term-requirements/reqs/primary_key_v1.0.0.md"
-    },
-    "prXX": {
-      "type": "package",
-      "description": "Reserved naming pattern for internal test packages; not for external deployment",
-      "req": "projects/06-glossary-term-requirements/reqs/prXX_v1.0.0.md"
-    },
-    "report": {
-      "type": "flag",
-      "description": "Invocation flag to include structured data output; can specify level (report, report=detail, report=debug)",
+    "PK": {
+      "category": "native",
+      "description": "see primaryKey",
       "req": null
     },
+    "primaryKey": {
+      "category": "native",
+      "description": "unique identifier (e.g. of Kafka record)",
+      "req": "projects/11-app-architecture/reqs/primaryKey_v1.1.0.md"
+    },
+    "prXX": {
+      "category": "native",
+      "description": "used as package name for project associated code or data",
+      "req": "projects/11-app-architecture/reqs/prXX_v1.1.0.md"
+    },
+    "report": {
+      "category": "native",
+      "description": "structured data set; written account of state",
+      "req": "projects/11-app-architecture/reqs/report_v1.0.0.md"
+    },
     "reset": {
-      "type": "verb",
-      "description": "App-internal command to reset all context to defaults; bulk clear operation",
+      "category": "native",
+      "description": "set current state to default",
       "req": "projects/11-app-architecture/reqs/reset_v1.0.0.md"
     },
     "run": {
-      "type": "method",
-      "description": "Method name for executing/starting a process; entry point",
-      "req": "projects/06-glossary-term-requirements/reqs/run_v1.0.0.md"
+      "category": "native",
+      "description": "to execute a script (API method)",
+      "req": "projects/11-app-architecture/reqs/run_v1.1.0.md"
     },
     "runtime": {
-      "type": "api",
-      "description": "API for runtime context management; the context within which execution contexts run",
-      "req": "projects/06-glossary-term-requirements/reqs/runtime_v1.0.0.md"
+      "category": "native",
+      "description": "the context in which a process executes",
+      "req": "projects/11-app-architecture/reqs/runtime_v1.1.0.md"
     },
-    "runtime_id": {
-      "type": "Property",
-      "description": "Unique identifier for runtime execution instance",
-      "req": "projects/06-glossary-term-requirements/reqs/runtime_id_v1.0.0.md"
+    "runtimeId": {
+      "category": "native",
+      "description": "unique identifier of an execution context",
+      "req": "projects/11-app-architecture/reqs/runtimeId_v1.1.0.md"
     },
     "set": {
-      "type": "verb",
-      "description": "App-internal command to set a context value; establishes named context for subsequent operations",
+      "category": "native",
+      "description": "give something a specific value",
       "req": "projects/11-app-architecture/reqs/set_v1.0.0.md"
     },
     "silent": {
-      "type": "flag",
-      "description": "Invocation flag for minimal output; topline level only",
+      "category": "foreign",
+      "description": "conventional flag for suppressed output; maps to topline",
       "req": "projects/11-app-architecture/reqs/silent_v1.0.0.md"
     },
+    "summary": {
+      "category": "native",
+      "description": "compact description; mainly used in metadata",
+      "req": "projects/11-app-architecture/reqs/summary_v1.0.0.md"
+    },
     "spl": {
-      "type": "package",
-      "description": "Core Splectrum package; contains runtime infrastructure APIs",
-      "req": "projects/06-glossary-term-requirements/reqs/spl_v1.0.0.md"
+      "category": "native",
+      "description": "acronym of Splectrum",
+      "req": "projects/11-app-architecture/reqs/spl_v1.1.0.md"
     },
-    "spl__dev": {
-      "type": "api",
-      "description": "Dev Environment API for autonomous development with test-driven implementation; manages ephemeral dev environments and work package execution",
-      "req": "projects/08-dev-environment-api/spl_dev_api_v1.0.0.md"
-    },
-    "start_time": {
-      "type": "Property",
-      "description": "Timestamp when something began; general initiation time marker",
-      "req": "projects/06-glossary-term-requirements/reqs/start_time_v1.0.0.md"
+    "startTime": {
+      "category": "native",
+      "description": "timestamp of commencement",
+      "req": "projects/11-app-architecture/reqs/startTime_v1.1.0.md"
     },
     "status": {
-      "type": "method",
-      "description": "Method name for status query operations; report current state without modification (read-only)",
-      "req": "projects/08-dev-environment-api/status_v1.0.0.md"
+      "category": "native",
+      "description": "the current state",
+      "req": "projects/11-app-architecture/reqs/status_v1.1.0.md"
     },
     "submit": {
-      "type": "method",
-      "description": "Method name for submission operations; provide work or input for processing",
-      "req": "projects/08-dev-environment-api/submit_v1.0.0.md"
+      "category": "native",
+      "description": "to send to another system/person",
+      "req": "projects/11-app-architecture/reqs/submit_v1.1.0.md"
+    },
+    "topline": {
+      "category": "native",
+      "description": "title-style summary; mainly used in metadata",
+      "req": "projects/11-app-architecture/reqs/topline_v1.0.0.md"
     },
     "value": {
-      "type": "Property",
-      "description": "Contents component of key-value pair; used with designated key property",
-      "req": "projects/06-glossary-term-requirements/reqs/value_v1.0.0.md"
-    },
-    "verb": {
-      "type": "Structure",
-      "description": "App-internal command; single-word operation that cannot clash with package names (packages are nouns)",
-      "req": "projects/11-app-architecture/reqs/verb_v1.0.0.md"
+      "category": "native",
+      "description": "data payload (e.g. in Kafka record)",
+      "req": "projects/11-app-architecture/reqs/value_v1.1.0.md"
     },
     "verbose": {
-      "type": "flag",
-      "description": "Invocation flag for detail output; full explanation mode",
+      "category": "foreign",
+      "description": "conventional flag for expanded output; maps to detail",
       "req": "projects/11-app-architecture/reqs/verbose_v1.0.0.md"
     },
     "version": {
-      "type": "Property",
-      "description": "Version identifier using semantic versioning; platform-wide scheme",
-      "req": "projects/06-glossary-term-requirements/reqs/version_v1.0.0.md"
+      "category": "native",
+      "description": "unique identifier of a code or data unit; typically format v1.0.0",
+      "req": "projects/11-app-architecture/reqs/version_v1.1.0.md"
     }
   }
 }
