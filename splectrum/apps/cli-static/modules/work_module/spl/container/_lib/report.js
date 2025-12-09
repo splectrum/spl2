@@ -3,11 +3,11 @@
 // Transforms index.json (flat facts) into four-level structure
 // (topline/summary/detail).
 //
-// One function per facet type - each facet has its own structure.
-// No composition - caller decides how to combine.
+// Hierarchical: container wraps facets as children.
 //
 // Exports:
-//   buildIdentity(indexJson)   - identity facet from root index.json
+//   buildContainer(indexJson)  - container (name, type, extends, instantiates, purpose)
+//   buildApi(indexJson)        - api facet (apiFacets, methodCount)
 //   buildHandler(content)      - handler facet from index.js content
 //   buildSchemas(indexJson)    - schemas facet from _schemas/index.json
 //   buildLib(indexJson)        - lib facet from _lib/index.json
@@ -16,36 +16,50 @@
 export function create(module) {
 
   return {
-    // Build identity facet from root index.json
-    buildIdentity(identity) {
-      const apiFacets = identity.api ? Object.keys(identity.api) : []
-      const methodCount = countMethods(identity)
-
+    // Build container (facets added by orchestrator)
+    buildContainer(identity) {
       return {
-        name: 'identity',
+        name: 'container',
         topline: {
           containerName: identity.name,
           type: identity.type || 'container',
           extends: identity.extends,
-          instantiates: identity.instantiates,
-          apiFacets,
-          methodCount
+          instantiates: identity.instantiates
         },
         summary: {
           containerName: identity.name,
           type: identity.type || 'container',
-          purpose: identity.purpose,
           extends: identity.extends,
           instantiates: identity.instantiates,
-          apiFacets,
-          methodCount
+          purpose: identity.purpose
         },
         detail: {
           containerName: identity.name,
           type: identity.type || 'container',
-          purpose: identity.purpose,
           extends: identity.extends,
           instantiates: identity.instantiates,
+          purpose: identity.purpose
+        },
+        facets: []  // populated by orchestrator
+      }
+    },
+
+    // Build api facet - what this container can do
+    buildApi(identity) {
+      const apiFacets = identity.api ? Object.keys(identity.api) : []
+      const methodCount = countMethods(identity)
+
+      return {
+        name: 'api',
+        topline: {
+          apiFacets,
+          methodCount
+        },
+        summary: {
+          apiFacets,
+          methodCount
+        },
+        detail: {
           api: identity.api
         }
       }
@@ -93,20 +107,37 @@ export function create(module) {
       }
     },
 
-    // Build lib facet from _lib/index.json
-    buildLib(manifest) {
+    // Build lib facet from _lib/index.json and file contents
+    // manifest.files is object: { "file.js": { req, exports } }
+    // fileContents is object: { "file.js": "source code..." }
+    buildLib(manifest, fileContents = {}) {
+      const manifestFiles = manifest.files || {}
+      const fileNames = Object.keys(manifestFiles)
+
+      // Summary: from manifest (index.json)
+      const summaryFiles = {}
+      for (const [fileName, meta] of Object.entries(manifestFiles)) {
+        summaryFiles[fileName] = { exports: meta.exports || [] }
+      }
+
+      // Detail: from source (extracted)
+      const detailFiles = {}
+      for (const [fileName, content] of Object.entries(fileContents)) {
+        detailFiles[fileName] = { exports: extractExports(content) }
+      }
+
       return {
         name: 'lib',
         topline: {
-          files: manifest.files || []
+          files: fileNames
         },
         summary: {
           purpose: manifest.purpose,
-          files: manifest.files || []
+          files: summaryFiles
         },
         detail: {
           purpose: manifest.purpose,
-          files: manifest.files || []
+          files: detailFiles
         }
       }
     },
@@ -139,4 +170,28 @@ function countMethods(identity) {
     if (Array.isArray(facet)) count += facet.length
   }
   return count
+}
+
+// Extract exported function names from source code
+// Handles: return { foo() {}, bar: function() {} } pattern in create() factory
+function extractExports(content) {
+  const exports = []
+
+  // Find method definitions in the returned object
+  // Pattern 1: methodName(args) { - method shorthand
+  // Pattern 2: methodName: function - traditional
+  // Pattern 3: methodName: async function
+  // Pattern 4: async methodName(args) { - async shorthand
+
+  // Method shorthand: name( or async name(
+  const shorthandMatches = content.matchAll(/^\s+(?:async\s+)?(\w+)\s*\([^)]*\)\s*\{/gm)
+  for (const match of shorthandMatches) {
+    const name = match[1]
+    // Skip create function itself and common non-export names
+    if (!['create', 'if', 'for', 'while', 'switch', 'catch', 'function'].includes(name)) {
+      exports.push(name)
+    }
+  }
+
+  return [...new Set(exports)] // dedupe
 }

@@ -1,0 +1,10 @@
+{
+  "name": "selfevals",
+  "purpose": "Container self-evaluation runners",
+  "runners": {
+    "lib": {
+      "file": "lib_runner.js",
+      "description": "Check lib exports match manifest"
+    }
+  }
+}

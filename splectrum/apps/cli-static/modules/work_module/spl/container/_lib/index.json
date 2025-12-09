@@ -1,5 +1,22 @@
 {
   "name": "lib",
-  "purpose": "Container core libs - report building and freetext rendering",
-  "files": ["report.js", "freetext.js"]
+  "purpose": "Container core libs - report building, freetext rendering, selfeval framework",
+  "files": {
+    "report.js": {
+      "exports": ["buildContainer", "buildApi", "buildHandler", "buildSchemas", "buildLib", "buildReqs"]
+    },
+    "freetext.js": {
+      "exports": [
+        "renderContainerTopline", "renderContainerSummary", "renderContainerDetail",
+        "renderApiTopline", "renderApiSummary", "renderApiDetail",
+        "renderHandlerTopline", "renderHandlerSummary", "renderHandlerDetail",
+        "renderSchemasTopline", "renderSchemasSummary", "renderSchemasDetail",
+        "renderLibTopline", "renderLibSummary", "renderLibDetail",
+        "renderReqsTopline", "renderReqsSummary", "renderReqsDetail"
+      ]
+    },
+    "selfeval.js": {
+      "exports": ["loadRegistry", "loadRunner", "runAll", "renderFreetext"]
+    }
+  }
 }

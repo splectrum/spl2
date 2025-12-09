@@ -77,7 +77,7 @@ export function create(module) {
   return {
     getContainerPath,
 
-    // Build structured report as array of facets
+    // Build structured report - container with nested facets
     async buildReport() {
       const path = await getPath()
       const report = await getReport()
@@ -87,98 +87,87 @@ export function create(module) {
 
       // Read container identity
       const identity = await readJson(path.join(containerFsPath, 'index.json'))
-      if (!identity) return []
+      if (!identity) return null
 
-      // Build facet reports
-      const facets = []
+      // Build container with nested facets
+      const container = report.buildContainer(identity)
 
-      // Identity facet (includes container-level info)
-      const identityReport = report.buildIdentity(identity)
-      facets.push(identityReport)
+      // Api facet (what this container can do)
+      container.facets.push(report.buildApi(identity))
 
       // Handler facet
       const handlerContent = await readFile(path.join(containerFsPath, 'index.js'))
       if (handlerContent) {
-        const handlerReport = report.buildHandler(handlerContent)
-        facets.push(handlerReport)
+        container.facets.push(report.buildHandler(handlerContent))
       }
 
       // Schemas facet
       const schemasManifest = await readJson(path.join(containerFsPath, '_schemas', 'index.json'))
       if (schemasManifest) {
-        const schemasReport = report.buildSchemas(schemasManifest)
-        facets.push(schemasReport)
+        container.facets.push(report.buildSchemas(schemasManifest))
       }
 
       // Lib facet
       const libManifest = await readJson(path.join(containerFsPath, '_lib', 'index.json'))
       if (libManifest) {
-        const libReport = report.buildLib(libManifest)
-        facets.push(libReport)
+        // Read lib file contents for export extraction
+        const libFileContents = {}
+        const libFiles = libManifest.files || {}
+        for (const fileName of Object.keys(libFiles)) {
+          const content = await readFile(path.join(containerFsPath, '_lib', fileName))
+          if (content) libFileContents[fileName] = content
+        }
+        container.facets.push(report.buildLib(libManifest, libFileContents))
       }
 
       // Reqs facet
       const reqsManifest = await readJson(path.join(containerFsPath, '_reqs', 'index.json'))
       if (reqsManifest) {
-        const reqsReport = report.buildReqs(reqsManifest)
-        facets.push(reqsReport)
+        container.facets.push(report.buildReqs(reqsManifest))
       }
 
-      // Return as array (single entry for now, multi-container later)
-      return [{ facets }]
+      return container
     },
 
-    // Render freetext from report at level
-    async renderFreetext(reportArray, level = 'topline') {
+    // Render freetext from container report at level
+    async renderFreetext(container, level = 'topline') {
       const freetext = await getFreetext()
       const levelNum = { topline: 1, summary: 2, detail: 3, enriched: 4 }[level] || 1
 
+      if (!container) return ''
+
       const lines = []
 
-      for (const entry of reportArray) {
-        for (const facet of entry.facets) {
-          // Identity is special - has container line + facet line
-          if (facet.name === 'identity') {
-            const result = freetext.renderIdentityTopline(facet)
-            lines.push(result.containerLine)
-            lines.push('  ' + result.facetLine)
+      // Container headline
+      lines.push(freetext.renderContainerTopline(container))
 
-            if (levelNum >= 2) {
-              const summary = freetext.renderIdentitySummary(facet)
-              if (summary) lines.push('    ' + summary)
-            }
-            if (levelNum >= 3) {
-              const detail = freetext.renderIdentityDetail(facet)
-              if (detail) {
-                for (const line of detail.split('\n')) {
-                  if (line) lines.push('    ' + line)
-                }
-              }
-            }
-          } else {
-            // Other facets: just facet line
-            const toplineRenderer = `render${capitalize(facet.name)}Topline`
-            if (freetext[toplineRenderer]) {
-              lines.push('  ' + freetext[toplineRenderer](facet))
-            }
+      if (levelNum >= 2) {
+        const summary = freetext.renderContainerSummary(container)
+        if (summary) lines.push('  ' + summary)
+      }
 
-            if (levelNum >= 2) {
-              const summaryRenderer = `render${capitalize(facet.name)}Summary`
-              if (freetext[summaryRenderer]) {
-                const summary = freetext[summaryRenderer](facet)
-                if (summary) lines.push('    ' + summary)
-              }
-            }
+      // Facets (children of container)
+      for (const facet of container.facets) {
+        const toplineRenderer = `render${capitalize(facet.name)}Topline`
+        if (freetext[toplineRenderer]) {
+          lines.push('  ' + freetext[toplineRenderer](facet))
+        }
 
-            if (levelNum >= 3) {
-              const detailRenderer = `render${capitalize(facet.name)}Detail`
-              if (freetext[detailRenderer]) {
-                const detail = freetext[detailRenderer](facet)
-                if (detail) {
-                  for (const line of detail.split('\n')) {
-                    if (line) lines.push('    ' + line)
-                  }
-                }
+        if (levelNum >= 2) {
+          const summaryRenderer = `render${capitalize(facet.name)}Summary`
+          if (freetext[summaryRenderer]) {
+            const summary = freetext[summaryRenderer](facet)
+            if (summary) lines.push('    ' + summary)
+          }
+        }
+
+        if (levelNum >= 3) {
+          const detailRenderer = `render${capitalize(facet.name)}Detail`
+          if (freetext[detailRenderer]) {
+            const detail = freetext[detailRenderer](facet)
+            if (detail) {
+              for (const line of detail.split('\n')) {
+                if (line) lines.push('    ' + line)
               }
             }
           }

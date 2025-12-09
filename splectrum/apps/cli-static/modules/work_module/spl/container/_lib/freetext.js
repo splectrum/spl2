@@ -1,13 +1,14 @@
 // freetext.js - Render four-level structure to natural language
 //
 // Transforms four-level structure into natural language text.
-// Each function renders ONE level of ONE facet.
+// Each function renders ONE level of ONE component.
 // No composition - caller decides how to combine.
 //
-// Exports per facet type:
-//   renderIdentityTopline(report)   - identity topline
-//   renderIdentitySummary(report)   - identity summary
-//   renderHandlerTopline(report)    - handler topline
+// Exports:
+//   renderContainerTopline(report)  - container headline (name - type, lineage)
+//   renderContainerSummary(report)  - container purpose
+//   renderApiTopline(report)        - api facet (facet count, method count)
+//   renderHandlerTopline(report)    - handler facet
 //   etc.
 
 export function create(module) {
@@ -20,36 +21,40 @@ export function create(module) {
   }
 
   return {
-    // === Identity (includes container-level info) ===
+    // === Container ===
 
-    renderIdentityTopline(report) {
+    renderContainerTopline(report) {
       const t = report.topline
-      // Container line: name - type (methods)
-      let containerLine
-      if (t.type === 'API' && t.methodCount > 0) {
-        containerLine = `${t.containerName} - ${t.type} (${t.methodCount} methods)`
-      } else {
-        containerLine = `${t.containerName} - ${t.type}`
-      }
-
-      // Identity line: extends, apiFacets
-      const parts = []
+      const parts = [`${t.containerName} - ${t.type}`]
       if (t.extends) parts.push(`extends ${t.extends}`)
-      if (t.apiFacets && t.apiFacets.length > 0) {
-        parts.push(`${t.apiFacets.length} apiFacet${t.apiFacets.length > 1 ? 's' : ''}`)
-      }
-      const rollup = parts.length > 0 ? parts.join(', ') : 'base'
-      const identityLine = `identity - ${rollup}`
-
-      return { containerLine, facetLine: identityLine }
+      if (t.instantiates) parts.push(`instantiates ${t.instantiates}`)
+      return parts.join(' | ')
     },
 
-    renderIdentitySummary(report) {
+    renderContainerSummary(report) {
       const s = report.summary
       return s.purpose || ''
     },
 
-    renderIdentityDetail(report) {
+    renderContainerDetail(report) {
+      return ''
+    },
+
+    // === Api (what this container CAN DO) ===
+
+    renderApiTopline(report) {
+      const t = report.topline
+      if (t.methodCount > 0) {
+        return `api - ${t.apiFacets.length} facets, ${t.methodCount} methods`
+      }
+      return 'api - none'
+    },
+
+    renderApiSummary(report) {
+      return ''
+    },
+
+    renderApiDetail(report) {
       const d = report.detail
       if (!d.api) return ''
       const lines = []
@@ -104,7 +109,15 @@ export function create(module) {
     },
 
     renderLibDetail(report) {
-      return ''
+      const d = report.detail
+      if (!d.files) return ''
+
+      const lines = []
+      for (const [fileName, info] of Object.entries(d.files)) {
+        const exports = info.exports || []
+        lines.push(`${fileName}: ${exports.join(', ')}`)
+      }
+      return lines.join('\n')
     },
 
     // === Reqs ===
