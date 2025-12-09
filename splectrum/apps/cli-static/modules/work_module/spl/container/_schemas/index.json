@@ -1,0 +1,5 @@
+{
+  "name": "schemas",
+  "purpose": "Universal handler flags and output structure",
+  "files": ["input.avsc", "metaoutput.avsc"]
+}

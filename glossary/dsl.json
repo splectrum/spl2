@@ -4,27 +4,22 @@
   "terms": {
     "api": {
       "category": "native",
-      "description": "managed API unit with inheritance hierarchy; mapped one-to-one to a data container",
+      "description": "container type for a managed, stacked, self-contained unit; can have multiple apiFacets",
       "req": "projects/06-glossary-term-requirements/reqs/api_v1.0.0.md"
     },
-    "clear": {
+    "apiFacet": {
       "category": "native",
-      "description": "remove the current state",
-      "req": "projects/11-app-architecture/reqs/clear_v1.0.0.md"
+      "description": "a collection of methods within an api; maps to common understanding of API",
+      "req": "projects/11-app-architecture/reqs/apiFacet_v1.0.0.md"
     },
-    "create": {
+    "container": {
       "category": "native",
-      "description": "to make a new item (API method)",
-      "req": "projects/11-app-architecture/reqs/create_v1.1.0.md"
-    },
-    "cycle": {
-      "category": "native",
-      "description": "to do one or more iterations (API method)",
-      "req": "projects/11-app-architecture/reqs/cycle_v1.1.0.md"
+      "description": "envelope around a data structure, can be code; the most elementary building block in splectrum",
+      "req": "projects/11-app-architecture/reqs/container_v1.0.0.md"
     },
     "debug": {
-      "category": "native",
-      "description": "maximal information; mainly used in metadata",
+      "category": "foreign",
+      "description": "conventional flag for maximum output; maps to enriched",
       "req": "projects/11-app-architecture/reqs/debug_v1.0.0.md"
     },
     "detail": {
@@ -32,55 +27,55 @@
       "description": "full description; mainly used in metadata",
       "req": "projects/11-app-architecture/reqs/detail_v1.0.0.md"
     },
-    "destroy": {
-      "category": "native",
-      "description": "to delete permanently (API method)",
-      "req": "projects/11-app-architecture/reqs/destroy_v1.1.0.md"
-    },
     "dryRun": {
       "category": "native",
       "description": "show execution plan without applying state changes",
       "req": "projects/11-app-architecture/reqs/dryRun_v1.0.0.md"
     },
-    "execution": {
+    "enriched": {
       "category": "native",
-      "description": "the act of running a process",
-      "req": "projects/11-app-architecture/reqs/execution_v1.1.0.md"
+      "description": "full content plus context (DSL lookups, cross-references); maximum output level",
+      "req": "projects/11-app-architecture/reqs/enriched_v1.0.0.md"
     },
-    "extract": {
+    "extends": {
       "category": "native",
-      "description": "to take out of a larger unit (API method)",
-      "req": "projects/11-app-architecture/reqs/extract_v1.1.0.md"
+      "description": "adds to an existing type, typically a container type",
+      "req": "projects/11-app-architecture/reqs/extends_v1.0.0.md"
     },
     "failFast": {
       "category": "native",
       "description": "abort a process at earliest error occurrence",
       "req": "projects/11-app-architecture/reqs/failFast_v1.0.0.md"
     },
-    "greet": {
+    "faf": {
       "category": "native",
-      "description": "give sign of welcome (API method)",
-      "req": "projects/11-app-architecture/reqs/greet_v1.1.0.md"
+      "description": "fire and forget, to save a data state record typically async",
+      "req": "projects/11-app-architecture/reqs/faf_v1.0.0.md"
+    },
+    "facet": {
+      "category": "native",
+      "description": "an aspect of, used extensively in splectrum (e.g. apiFacet)",
+      "req": "projects/11-app-architecture/reqs/facet_v1.0.0.md"
+    },
+    "freetext": {
+      "category": "native",
+      "description": "natural language output (vs structured data output)",
+      "req": "projects/11-app-architecture/reqs/freetext_v1.0.0.md"
+    },
+    "handler": {
+      "category": "native",
+      "description": "functional implementation; can be script, formal method, or informal method at API, package, or module level",
+      "req": "projects/11-app-architecture/reqs/handler_v1.0.0.md"
     },
     "headers": {
       "category": "native",
       "description": "section of metadata (e.g. in Kafka record)",
       "req": "projects/11-app-architecture/reqs/headers_v1.1.0.md"
     },
-    "hello": {
+    "instantiates": {
       "category": "native",
-      "description": "greeting, request for attention (API method)",
-      "req": "projects/11-app-architecture/reqs/hello_v1.1.0.md"
-    },
-    "install": {
-      "category": "native",
-      "description": "to put in position ready for use (API method)",
-      "req": "projects/11-app-architecture/reqs/install_v1.1.0.md"
-    },
-    "invoke": {
-      "category": "native",
-      "description": "to activate a function (API method)",
-      "req": "projects/11-app-architecture/reqs/invoke_v1.1.0.md"
+      "description": "create an instance of, typically a container type",
+      "req": "projects/11-app-architecture/reqs/instantiates_v1.0.0.md"
     },
     "key": {
       "category": "native",
@@ -96,6 +91,11 @@
       "category": "native",
       "description": "handler that is a member of an apiFacet of a Splectrum API",
       "req": "projects/11-app-architecture/reqs/method_v1.1.0.md"
+    },
+    "metaoutput": {
+      "category": "native",
+      "description": "metadata that accompanies output data, in splectrum a continuous stream alongside data",
+      "req": "projects/11-app-architecture/reqs/metaoutput_v1.0.0.md"
     },
     "module": {
       "category": "native",
@@ -127,6 +127,11 @@
       "description": "no prompt and confirm; no dryRun prior to execution",
       "req": "projects/11-app-architecture/reqs/nopac_v1.0.0.md"
     },
+    "overlay": {
+      "category": "native",
+      "description": "putting one structure on top of another, creating a layered stack",
+      "req": "projects/11-app-architecture/reqs/overlay_v1.0.0.md"
+    },
     "pac": {
       "category": "native",
       "description": "prompt with dryRun to confirm execution",
@@ -157,20 +162,15 @@
       "description": "used as package name for project associated code or data",
       "req": "projects/11-app-architecture/reqs/prXX_v1.1.0.md"
     },
+    "record": {
+      "category": "native",
+      "description": "Kafka-style message structure; native internal data structure",
+      "req": "projects/11-app-architecture/reqs/record_v1.0.0.md"
+    },
     "report": {
       "category": "native",
       "description": "structured data set; written account of state",
       "req": "projects/11-app-architecture/reqs/report_v1.0.0.md"
-    },
-    "reset": {
-      "category": "native",
-      "description": "set current state to default",
-      "req": "projects/11-app-architecture/reqs/reset_v1.0.0.md"
-    },
-    "run": {
-      "category": "native",
-      "description": "to execute a script (API method)",
-      "req": "projects/11-app-architecture/reqs/run_v1.1.0.md"
     },
     "runtime": {
       "category": "native",
@@ -182,10 +182,15 @@
       "description": "unique identifier of an execution context",
       "req": "projects/11-app-architecture/reqs/runtimeId_v1.1.0.md"
     },
-    "set": {
+    "schema": {
       "category": "native",
-      "description": "give something a specific value",
-      "req": "projects/11-app-architecture/reqs/set_v1.0.0.md"
+      "description": "description of (data) structure; Splectrum uses AVRO format",
+      "req": "projects/11-app-architecture/reqs/schema_v1.0.0.md"
+    },
+    "selfeval": {
+      "category": "native",
+      "description": "universal API method for self testing against requirements, available on all containers",
+      "req": "projects/11-app-architecture/reqs/selfeval_v1.0.0.md"
     },
     "silent": {
       "category": "foreign",
@@ -202,25 +207,15 @@
       "description": "acronym of Splectrum",
       "req": "projects/11-app-architecture/reqs/spl_v1.1.0.md"
     },
-    "startTime": {
-      "category": "native",
-      "description": "timestamp of commencement",
-      "req": "projects/11-app-architecture/reqs/startTime_v1.1.0.md"
-    },
-    "status": {
-      "category": "native",
-      "description": "the current state",
-      "req": "projects/11-app-architecture/reqs/status_v1.1.0.md"
-    },
-    "submit": {
-      "category": "native",
-      "description": "to send to another system/person",
-      "req": "projects/11-app-architecture/reqs/submit_v1.1.0.md"
-    },
     "topline": {
       "category": "native",
       "description": "title-style summary; mainly used in metadata",
       "req": "projects/11-app-architecture/reqs/topline_v1.0.0.md"
+    },
+    "typeof": {
+      "category": "native",
+      "description": "the top level type, typically of a container",
+      "req": "projects/11-app-architecture/reqs/typeof_v1.0.0.md"
     },
     "value": {
       "category": "native",
@@ -236,6 +231,11 @@
       "category": "native",
       "description": "unique identifier of a code or data unit; typically format v1.0.0",
       "req": "projects/11-app-architecture/reqs/version_v1.1.0.md"
+    },
+    "whoami": {
+      "category": "native",
+      "description": "universal API method for introspection, available on all containers",
+      "req": "projects/11-app-architecture/reqs/whoami_v1.0.0.md"
     }
   }
 }

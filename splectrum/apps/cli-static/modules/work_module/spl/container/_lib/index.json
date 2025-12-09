@@ -1,0 +1,5 @@
+{
+  "name": "lib",
+  "purpose": "Container core libs - report building and freetext rendering",
+  "files": ["report.js", "freetext.js"]
+}

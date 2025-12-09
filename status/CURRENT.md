@@ -1,6 +1,6 @@
 # Current Status
 
-**Last Updated:** 2025-12-09
+**Last Updated:** 2025-12-10
 
 ---
 
@@ -9,44 +9,85 @@
 **Project 11: App Architecture**
 
 - Type: Exploration Project
-- Status: **In Progress - DSL glossary v2 structure complete**
+- Status: **In Progress - container libs refactor complete**
 - Location: `projects/11-app-architecture/`
 
 ### Current Focus
 
-**DSL glossary restructure** - established horizontal meaning vocabulary with category system.
+**Container libs architecture** - report.js and freetext.js in spl/container/_lib.
 
-This session:
-- Evolved dsl.json from `type` field to `category` (native/foreign/dialect)
-- Native = Splectrum's own vocabulary
-- Foreign = conventional terms with mappings (e.g., verbose → detail, silent → topline)
-- Horizontal meanings focused on AI consumption
-- Created ~40 DSL meaning req files in `projects/11-app-architecture/reqs/`
+This session completed:
+- Renamed README.json → index.json (flat facts pattern)
+- Renamed reqs: readme_type → identity_type, index_type → handler_type
+- Created spl/container/_lib/report.js (builds four-level structure from flat facts)
+- Created spl/container/_lib/freetext.js (renders structure to natural language)
+- Refactored whoami to use container libs via orchestrator pattern
+- Updated lib overlay: `.js` suffix for direct lib files (`lib/spl/container/report.js`)
 
-### Key Patterns Established
+### Key Design Decisions
 
-**DSL glossary v2:**
-- `category`: native/foreign/dialect (provenance, like dictionary marking foreign origin)
-- `description`: horizontal meaning, not implementation details
-- `req`: path to detailed requirement file
-- Output levels: topline, summary, detail, debug (native terms)
-- silent/verbose mapped as foreign to native terms
+**Container libs architecture:**
+- `report.js` - flat facts → four-level structure (per facet, no composition)
+- `freetext.js` - four-level structure → natural language (per facet per level, no composition)
+- `whoami.js` (method lib) - orchestration: component selection, accumulation, level combination
 
-**meandering:** Added as stepping stone - productive exploration through discussion; what appears as tangent is valuable discovery.
+**Lib require pattern:**
+- `lib/spl/container/selfeval` → `spl/container/selfeval/_lib/selfeval.js` (container's main lib)
+- `lib/spl/container/report.js` → `spl/container/_lib/report.js` (direct lib file with .js suffix)
+
+**Flat facts pattern:**
+- index.json holds raw facts, easy to edit
+- report.js builds four-level structure (topline/summary/detail/enriched)
+- freetext.js renders to natural language
+- No README.md - whoami generates freetext
+
+**Design principles:**
+- No defensive coding - trust selfeval to catch problems
+- Single concern per lib - report builds, freetext renders, whoami orchestrates
+- Structure is fixed - four levels, same everywhere, no overrides
 
 ### Key Files
 
-- `glossary/dsl.json` - restructured with category system
-- `projects/11-app-architecture/reqs/dsl_glossary_v2.0.0.md` - DSL glossary requirements
-- `glossary/STEPPING_STONES_GLOSSARY.md` - added meandering, updated dsl glossary entry
+- `projects/11-app-architecture/working/container_libs_design.md` - design doc
+- `spl/container/_lib/report.js` - builds four-level structure
+- `spl/container/_lib/freetext.js` - renders to natural language
+- `spl/container/whoami/_lib/whoami.js` - orchestration
+- `_lib/module.js` - updated lib overlay (lines 242-267)
 
-### Next Steps
+### Working Output
 
-- **Add missing DSL glossary terms** - more terms to add as we encounter them
-- Implement remaining whoami facets: reqs, lib, methods, selfevals, tests
-- --levels flag for type chain traversal
-- Update selfeval to use gradedOutput pattern
-- Container methods: `select`, `create`
+```
+./spl spl/container/whoami --silent
+spl/container - API (7 methods)
+  identity - 3 apiFacets
+  handler - base container type
+  schemas - input.avsc, metaoutput.avsc
+  lib - report.js, freetext.js
+  reqs - empty
+
+./spl spl/container/whoami --verbose
+spl/container - API (7 methods)
+  identity - 3 apiFacets
+    Base container type - structural unit for all containers
+    introspection: whoami, typeof, selfeval
+    crud: create, read, delete
+    xpath: select
+  handler - base container type
+  schemas - input.avsc, metaoutput.avsc
+    Universal handler flags and output structure
+  lib - report.js, freetext.js
+    Container core libs - report building and freetext rendering
+  reqs - empty
+    Container requirements and contracts
+```
+
+### Pending
+
+- **Split identity facet** - identity (name, type, extends, instantiates, purpose) + api (apiFacets, methodCount). Removes special case in freetext renderer.
+- Create spl/container/_lib/selfeval.js (validates four-level structure against reqs)
+- Refactor selfeval method to use container lib
+- Update design doc with final implementation
+- Enriched level (deferred - DSL lookups)
 
 ### Work Items
 
@@ -65,13 +106,13 @@ This session:
 **Starting a new session?**
 
 1. Read this file for current context
-2. Key spec: `projects/11-app-architecture/reqs/dsl_glossary_v2.0.0.md`
-3. DSL glossary: `glossary/dsl.json`
+2. Read `projects/11-app-architecture/working/container_libs_design.md` - the design doc
+3. Test: `./spl spl/container/whoami --verbose`
 
-**Reference:**
-- DSL glossary uses category (native/foreign/dialect) not type
-- Descriptions are horizontal meanings for AI
-- ~40 req files created in `projects/11-app-architecture/reqs/`
+**Key concepts:**
+- Flat facts (index.json) → report.js → four-level structure → freetext.js → natural language
+- whoami orchestrates, container libs do per-facet work
+- .js suffix in lib require path = direct lib file
 
 ---
 

@@ -1,158 +1,196 @@
-// whoami.js - Container introspection implementation
+// whoami.js - Orchestrate report building and freetext rendering
 //
-// Returns structured information about a container at configurable depth.
-//
-// Flags:
-//   --facet=<name>  filter to specific facet (schemas, reqs, lib, methods, etc.)
-//   --levels=<n>    type chain traversal depth (0=this only, full=all)
-//   --silent        topline output
-//   --verbose       detail output
-//   --debug         debug output (includes DSL glossary)
-//   --report[=lvl]  include data output at level
+// Uses container libs (report.js, freetext.js) for per-facet work.
+// Handles: component selection, accumulation, level combination, output shaping.
 //
 // Exports:
-//   getContainerPath()     - resolve parent container from method path
-//   loadSchemasFacet()     - load _schemas folder info
-//   outputSchemasFacet()   - output schemas at graded levels
+//   getContainerPath()   - resolve parent container from method path
+//   buildReport()        - build structured report array
+//   renderFreetext()     - render report to natural language at level
 
 export function create(module) {
   let _fs = null
-  let _dslGlossary = null
+  let _path = null
+  let _report = null
+  let _freetext = null
 
   const getFs = async () => {
     if (!_fs) _fs = await module.require('fs')
     return _fs
   }
 
-  const getDslGlossary = async () => {
-    if (!_dslGlossary) {
-      const fs = await getFs()
-      const path = await module.require('path')
-      const nodeRoot = module.getNodeRoot()
-      const glossaryPath = path.join(nodeRoot, '..', 'glossary', 'dsl.json')
-      try {
-        _dslGlossary = JSON.parse(fs.readFileSync(glossaryPath, 'utf8'))
-      } catch (e) {
-        _dslGlossary = { terms: {} }
-      }
-    }
-    return _dslGlossary
+  const getPath = async () => {
+    if (!_path) _path = await module.require('path')
+    return _path
   }
 
-  const lookupDsl = async (term) => {
-    const glossary = await getDslGlossary()
-    const entry = glossary.terms[term]
-    if (entry) {
-      return `${entry.type}: ${entry.description}`
+  const getReport = async () => {
+    if (!_report) _report = await module.require('lib/spl/container/report.js')
+    return _report
+  }
+
+  const getFreetext = async () => {
+    if (!_freetext) _freetext = await module.require('lib/spl/container/freetext.js')
+    return _freetext
+  }
+
+  // Get parent container path from method path
+  const getContainerPath = () => {
+    const methodPath = module.getMethod()
+    return methodPath.split('/').slice(0, -1).join('/')
+  }
+
+  // Get filesystem path for container using module.resolve
+  const getContainerFsPath = async (containerPath) => {
+    const path = await getPath()
+    const indexJsonPath = module.resolve(containerPath, 'index.json')
+    if (indexJsonPath) {
+      return path.dirname(indexJsonPath)
+    }
+    const indexJsPath = module.resolve(containerPath, 'index.js')
+    if (indexJsPath) {
+      return path.dirname(indexJsPath)
     }
     return null
   }
 
-  const input = module.input()
+  // Read JSON file, return null if not found
+  const readJson = async (filePath) => {
+    const fs = await getFs()
+    try {
+      return JSON.parse(fs.readFileSync(filePath, 'utf8'))
+    } catch (e) {
+      return null
+    }
+  }
+
+  // Read file content, return null if not found
+  const readFile = async (filePath) => {
+    const fs = await getFs()
+    try {
+      return fs.readFileSync(filePath, 'utf8')
+    } catch (e) {
+      return null
+    }
+  }
 
   return {
-    // Get parent container path from method path
-    getContainerPath() {
-      const methodPath = module.getMethod()
-      return methodPath.split('/').slice(0, -1).join('/')
-    },
+    getContainerPath,
 
-    // Load schemas facet data
-    async loadSchemasFacet(containerPath) {
-      const fs = await getFs()
-      const schemasJsonPath = module.resolve(containerPath, '_schemas/schemas.json')
+    // Build structured report as array of facets
+    async buildReport() {
+      const path = await getPath()
+      const report = await getReport()
 
-      if (!schemasJsonPath) {
-        return { exists: false }
+      const containerPath = getContainerPath()
+      const containerFsPath = await getContainerFsPath(containerPath)
+
+      // Read container identity
+      const identity = await readJson(path.join(containerFsPath, 'index.json'))
+      if (!identity) return []
+
+      // Build facet reports
+      const facets = []
+
+      // Identity facet (includes container-level info)
+      const identityReport = report.buildIdentity(identity)
+      facets.push(identityReport)
+
+      // Handler facet
+      const handlerContent = await readFile(path.join(containerFsPath, 'index.js'))
+      if (handlerContent) {
+        const handlerReport = report.buildHandler(handlerContent)
+        facets.push(handlerReport)
       }
 
-      try {
-        const manifest = JSON.parse(fs.readFileSync(schemasJsonPath, 'utf8'))
-        const entries = manifest.entries || []
+      // Schemas facet
+      const schemasManifest = await readJson(path.join(containerFsPath, '_schemas', 'index.json'))
+      if (schemasManifest) {
+        const schemasReport = report.buildSchemas(schemasManifest)
+        facets.push(schemasReport)
+      }
 
-        // Load field details for each schema if needed
-        const requiredLevel = module.requiredLevel()
-        const needFields = ['detail', 'debug'].includes(requiredLevel)
+      // Lib facet
+      const libManifest = await readJson(path.join(containerFsPath, '_lib', 'index.json'))
+      if (libManifest) {
+        const libReport = report.buildLib(libManifest)
+        facets.push(libReport)
+      }
 
-        if (needFields) {
-          for (const entry of entries) {
-            const schemaPath = module.resolve(containerPath, `_schemas/${entry.name}`)
-            if (schemaPath) {
-              try {
-                const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'))
-                entry.fields = schema.fields || []
-              } catch (e) {
-                entry.fields = []
-                entry.parseError = e.message
+      // Reqs facet
+      const reqsManifest = await readJson(path.join(containerFsPath, '_reqs', 'index.json'))
+      if (reqsManifest) {
+        const reqsReport = report.buildReqs(reqsManifest)
+        facets.push(reqsReport)
+      }
+
+      // Return as array (single entry for now, multi-container later)
+      return [{ facets }]
+    },
+
+    // Render freetext from report at level
+    async renderFreetext(reportArray, level = 'topline') {
+      const freetext = await getFreetext()
+      const levelNum = { topline: 1, summary: 2, detail: 3, enriched: 4 }[level] || 1
+
+      const lines = []
+
+      for (const entry of reportArray) {
+        for (const facet of entry.facets) {
+          // Identity is special - has container line + facet line
+          if (facet.name === 'identity') {
+            const result = freetext.renderIdentityTopline(facet)
+            lines.push(result.containerLine)
+            lines.push('  ' + result.facetLine)
+
+            if (levelNum >= 2) {
+              const summary = freetext.renderIdentitySummary(facet)
+              if (summary) lines.push('    ' + summary)
+            }
+            if (levelNum >= 3) {
+              const detail = freetext.renderIdentityDetail(facet)
+              if (detail) {
+                for (const line of detail.split('\n')) {
+                  if (line) lines.push('    ' + line)
+                }
+              }
+            }
+          } else {
+            // Other facets: just facet line
+            const toplineRenderer = `render${capitalize(facet.name)}Topline`
+            if (freetext[toplineRenderer]) {
+              lines.push('  ' + freetext[toplineRenderer](facet))
+            }
+
+            if (levelNum >= 2) {
+              const summaryRenderer = `render${capitalize(facet.name)}Summary`
+              if (freetext[summaryRenderer]) {
+                const summary = freetext[summaryRenderer](facet)
+                if (summary) lines.push('    ' + summary)
+              }
+            }
+
+            if (levelNum >= 3) {
+              const detailRenderer = `render${capitalize(facet.name)}Detail`
+              if (freetext[detailRenderer]) {
+                const detail = freetext[detailRenderer](facet)
+                if (detail) {
+                  for (const line of detail.split('\n')) {
+                    if (line) lines.push('    ' + line)
+                  }
+                }
               }
             }
           }
         }
-
-        return {
-          exists: true,
-          description: manifest.description,
-          entries
-        }
-      } catch (err) {
-        return { exists: false, error: err.message }
-      }
-    },
-
-    // Output schemas facet at graded levels
-    async outputSchemasFacet(data) {
-      if (!data.exists) {
-        module.gradedOutput({
-          topline: 'schemas - not found',
-          summary: 'schemas - not found',
-          detail: 'schemas - not found',
-          debug: 'schemas - not found'
-        })
-        return
       }
 
-      const entries = data.entries || []
-      const names = entries.map(e => e.name).join(', ')
-
-      // Topline: facet + filenames
-      const topline = `schemas - ${names || 'empty'}`
-
-      // Summary: entries with descriptions
-      let summary = 'schemas:'
-      for (const entry of entries) {
-        summary += `\n  ${entry.name} - ${entry.description || '(no description)'}`
-      }
-
-      // Detail: + field details
-      let detail = 'schemas:'
-      for (const entry of entries) {
-        detail += `\n  ${entry.name} - ${entry.description || '(no description)'}`
-        if (entry.fields && entry.fields.length > 0) {
-          for (const field of entry.fields) {
-            const typeStr = typeof field.type === 'object' ? JSON.stringify(field.type) : field.type
-            detail += `\n    ${field.name} (${typeStr})${field.doc ? ' - ' + field.doc : ''}`
-          }
-        }
-      }
-
-      // Debug: + DSL glossary
-      let debug = 'schemas:'
-      for (const entry of entries) {
-        debug += `\n  ${entry.name} - ${entry.description || '(no description)'}`
-        if (entry.fields && entry.fields.length > 0) {
-          for (const field of entry.fields) {
-            const typeStr = typeof field.type === 'object' ? JSON.stringify(field.type) : field.type
-            debug += `\n    ${field.name} (${typeStr})`
-            if (field.doc) debug += `\n      Doc: ${field.doc}`
-            const dsl = await lookupDsl(field.name)
-            if (dsl) {
-              debug += `\n      DSL: ${dsl}`
-            }
-          }
-        }
-      }
-
-      module.gradedOutput({ topline, summary, detail, debug })
+      return lines.join('\n')
     }
   }
+}
+
+// Helper: capitalize first letter
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1)
 }

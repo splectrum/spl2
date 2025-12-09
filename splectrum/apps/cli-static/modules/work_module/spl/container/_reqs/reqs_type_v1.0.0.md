@@ -5,39 +5,52 @@
 
 ## Spec
 
-The `_reqs` folder is an internal container folder holding requirements for a container.
+The reqs facet holds requirements for a container. Location: `_reqs/` folder with `index.json` manifest.
 
 **Structure:**
-- Folder name: `_reqs` (underscore prefix = internal)
-- Task entrypoint: `reqs.json`
-- No README.md/README.json (internal folder)
+```
+_reqs/
+  ├── index.json                  ← manifest (flat facts)
+  ├── identity_type_v1.0.0.md     ← type req
+  ├── identity_instance_v1.0.0.md ← instance req
+  └── ...
+```
 
-**Req file structure:**
-- Each req is a separate markdown file
-- Naming: `<name>_v<semver>.md` (e.g., `container_type_v1.0.0.md`)
-- Type reqs define structural contracts
-- Instance reqs define content constraints
+**index.json structure:**
+```json
+{
+  "name": "reqs",
+  "purpose": "Container requirements and contracts",
+  "files": ["identity_type_v1.0.0.md", "identity_instance_v1.0.0.md"]
+}
+```
 
-**Type vs instance reqs:**
-- Type reqs: `<name>_type_v<semver>.md` - what something IS (structural)
-- Instance reqs: `<name>_instance_v<semver>.md` - what something CONTAINS (content)
+**Fields:**
+- `name` - always "reqs"
+- `purpose` - brief description
+- `files` - list of req files present
 
-**reqs.json entrypoint:**
-- Lists available reqs (type and instance)
-- Provides entry for req validation tasks
+**Req file naming:**
+- Pattern: `<facet>_<type>_v<semver>.md`
+- Type reqs: `<facet>_type_v<semver>.md` - what something IS (structural)
+- Instance reqs: `<facet>_instance_v<semver>.md` - what something CONTAINS (content)
+
+**Flat facts pattern:**
+- `index.json` holds raw facts (file list, purpose)
+- whoami builds four-level structure
+- freetext renderer produces natural language
 
 ## Self-eval
 
 - [ ] Folder named `_reqs` with underscore prefix
-- [ ] Contains `reqs.json` task entrypoint
-- [ ] No README.md or README.json present
-- [ ] Req files follow naming convention `<name>_v<semver>.md`
+- [ ] Contains `index.json` manifest
+- [ ] index.json has `name`, `purpose`, `files` fields
+- [ ] Req files follow naming convention `<facet>_<type>_v<semver>.md`
 - [ ] Type reqs use `_type_` suffix
 - [ ] Instance reqs use `_instance_` suffix
-- [ ] reqs.json lists available reqs
 
 ## Comments
 
-Internal folders use underscore prefix to distinguish from visible (navigable) folders. The task entrypoint (`reqs.json`) enables direct execution without spidering through README.
+Internal folders use underscore prefix. The `index.json` manifest enables whoami to discover and report on req contents.
 
-The type/instance suffix pattern separates structural contracts from content constraints. Both may exist for the same subject (e.g., `schemas_type_v1.0.0.md` and `schemas_instance_v1.0.0.md`).
+The type/instance suffix pattern separates structural contracts from content constraints.

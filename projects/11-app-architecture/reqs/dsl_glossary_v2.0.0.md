@@ -39,6 +39,16 @@ Like a dictionary marking foreign origin.
 - **description**: compact horizontal meaning (required)
 - **req**: path to detailed specification (optional)
 
+### Inclusion Criterion
+
+**Minimal and complete.** A term belongs in the DSL glossary only if:
+
+- Meaning is NOT self-evident from common English usage
+- Splectrum-specific interpretation exists
+- Ambiguity would arise without explicit definition
+
+**Exclude:** Common verbs/nouns where English meaning = expected behavior (e.g., create, install, run, status). If you can judge naming vs implementation consistency from the word itself, it doesn't need a DSL entry.
+
 ### Horizontal Meaning
 
 Descriptions must provide general, context-independent meaning - not implementation-specific details.
@@ -68,6 +78,7 @@ Example: verbose (foreign) maps to detail (native).
 
 ## Self-eval
 
+- [ ] Term passes inclusion criterion (not self-evident)
 - [ ] Entry has category field (native/foreign/dialect)
 - [ ] Description provides horizontal meaning, not implementation detail
 - [ ] Type embedded in description

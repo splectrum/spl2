@@ -5,64 +5,55 @@
 
 ## Spec
 
-The `_schemas` folder is an internal container folder holding AVRO schemas for a container.
+The schemas facet holds AVRO schemas for a container. Location: `_schemas/` folder with `index.json` manifest.
 
 **Structure:**
-- Folder name: `_schemas` (underscore prefix = internal)
-- Task entrypoint: `schemas.json`
-- No README.md/README.json (internal folder)
+```
+_schemas/
+  ├── index.json        ← manifest (flat facts)
+  ├── input.avsc        ← input value schema
+  ├── metainput.avsc    ← input headers schema
+  ├── output.avsc       ← output value schema
+  ├── metaoutput.avsc   ← output headers schema
+  ├── state.avsc        ← state value schema
+  └── metastate.avsc    ← state headers schema
+```
 
-**Schema file structure:**
-- Each schema is a separate AVRO file
-- Extension: `.avsc`
-- 6 standard schema files in 3 pairs (Kafka record pattern: value + headers)
+**index.json structure:**
+```json
+{
+  "name": "schemas",
+  "purpose": "Container schemas for input, output, and state",
+  "files": ["input.avsc", "metaoutput.avsc"]
+}
+```
 
-**Schema pairs:**
+**Fields:**
+- `name` - always "schemas"
+- `purpose` - brief description
+- `files` - list of schema files present
+
+**Schema pairs (Kafka record pattern):**
 
 | Pair | Value schema | Headers schema | Purpose |
 |------|--------------|----------------|---------|
-| Input | `input.avsc` | `metainput.avsc` | Method input as Kafka record |
-| Output | `output.avsc` | `metaoutput.avsc` | Method output as Kafka record |
-| State | `state.avsc` | `metastate.avsc` | Main record (private value, public headers) |
+| Input | `input.avsc` | `metainput.avsc` | Method input |
+| Output | `output.avsc` | `metaoutput.avsc` | Method output |
+| State | `state.avsc` | `metastate.avsc` | Container state |
 
-**Value schemas (data):**
-- `input.avsc` - actual input data structure
-- `output.avsc` - actual output data structure
-- `state.avsc` - private state (internal, instance read/write only)
-
-**Headers schemas (metadata + narrative):**
-- `metainput.avsc` - input descriptions, examples, defaults (feeds PAC help)
-- `metaoutput.avsc` - output descriptions, examples (feeds PAC help)
-- `metastate.avsc` - public state (readable by all, writable by implemented types)
-
-**Kafka record nesting:**
-- Input and output are Kafka records nested in main record headers
-- State/metastate are the main record's value/headers
-- Meta schemas carry narrative for integrated help (PAC pattern)
-
-**schemas.json entrypoint:**
-- Lists available schemas
-- Provides entry for schema validation tasks
+**Flat facts pattern:**
+- `index.json` holds raw facts (file list, purpose)
+- whoami builds four-level structure from schema contents
+- freetext renderer produces natural language
 
 ## Self-eval
 
 - [ ] Folder named `_schemas` with underscore prefix
-- [ ] Contains `schemas.json` task entrypoint
-- [ ] No README.md or README.json present
+- [ ] Contains `index.json` manifest
+- [ ] index.json has `name`, `purpose`, `files` fields
 - [ ] Schema files use `.avsc` extension
 - [ ] Schema files follow AVRO specification
-- [ ] schemas.json lists available schemas
-- [ ] Value/headers pairs present for input, output, state
 
 ## Comments
 
-Internal folders use underscore prefix to distinguish from visible (navigable) folders. The task entrypoint (`schemas.json`) enables direct execution without spidering through README.
-
-**Visibility model for state:**
-- `state.avsc` (value) - private, only the instance reads/writes
-- `metastate.avsc` (headers) - public, readable by all, writable only for types the instance implements
-
-**PAC pattern integration:**
-- Meta schemas carry the narrative (descriptions, examples, help text)
-- This narrative feeds into integrated help displayed during confirmation
-- Documentation travels with the schema, not separate
+Internal folders use underscore prefix. The `index.json` manifest enables whoami to discover and report on schema contents.

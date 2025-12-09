@@ -1,8 +1,0 @@
-{
-  "api": {
-    "introspection": ["whoami", "typeof", "selfeval"],
-    "crud": ["create", "read", "delete"],
-    "xpath": ["select"]
-  },
-  "purpose": "Container type definition - base structural unit for all containers"
-}

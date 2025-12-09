@@ -239,13 +239,26 @@ export function create(record) {
       return platformModules[uri]
     }
 
-    // 2. Splectrum libs: lib/spl/container/selfeval -> spl/container/selfeval/_lib/selfeval.js
+    // 2. Splectrum libs:
+    //    lib/spl/container/selfeval    -> spl/container/selfeval/_lib/selfeval.js (container's main lib)
+    //    lib/spl/container/report.js   -> spl/container/_lib/report.js (direct lib file)
     if (uri.startsWith('lib/')) {
       const libPath = uri.replace('lib/', '')
-      const parts = libPath.split('/')
-      const libName = parts[parts.length - 1]
-      // Resolve lib through overlay
-      const libFilePath = internalResolve(libPath, `_lib/${libName}.js`)
+      let libFilePath
+
+      if (libPath.endsWith('.js')) {
+        // Direct lib file: lib/spl/container/report.js -> spl/container/_lib/report.js
+        const parts = libPath.split('/')
+        const libFile = parts.pop() // e.g. "report.js"
+        const containerPath = parts.join('/') // e.g. "spl/container"
+        libFilePath = internalResolve(containerPath, `_lib/${libFile}`)
+      } else {
+        // Container's main lib: lib/spl/container/selfeval -> spl/container/selfeval/_lib/selfeval.js
+        const parts = libPath.split('/')
+        const libName = parts[parts.length - 1]
+        libFilePath = internalResolve(libPath, `_lib/${libName}.js`)
+      }
+
       if (!libFilePath) {
         throw new Error(`Lib not found in any layer: ${uri}`)
       }
@@ -348,23 +361,23 @@ export function create(record) {
      * Returns the max of text level and report level.
      * Methods use this to know what depth of content to produce.
      *
-     * @returns {string} - 'topline', 'summary', 'detail', or 'debug'
+     * @returns {string} - 'topline', 'summary', 'detail', or 'enriched'
      */
     requiredLevel() {
       const input = record.headers.spl.request.input || {}
-      const levelOrder = ['topline', 'summary', 'detail', 'debug']
+      const levelOrder = ['topline', 'summary', 'detail', 'enriched']
 
-      // Text level
+      // Text level (--debug maps to enriched)
       let textLevel = 'summary'
       if (input.silent) textLevel = 'topline'
       if (input.verbose) textLevel = 'detail'
-      if (input.debug) textLevel = 'debug'
+      if (input.debug) textLevel = 'enriched'
 
       // Data level
       let dataLevel = null
       if (input.report) {
         dataLevel = (input.report === true) ? 'summary' :
-                    ['topline', 'summary', 'detail', 'debug'].includes(input.report) ? input.report : 'summary'
+                    ['topline', 'summary', 'detail', 'enriched'].includes(input.report) ? input.report : 'summary'
       }
 
       // Return max
@@ -380,26 +393,26 @@ export function create(record) {
      *   --silent  → topline
      *   (default) → summary
      *   --verbose → detail
-     *   --debug   → debug
+     *   --debug   → enriched
      *   Most verbose wins if multiple present.
      *
      * Data flags (output):
-     *   (not set)       → none
-     *   --report        → summary
-     *   --report=detail → detail
-     *   --report=debug  → debug
+     *   (not set)         → none
+     *   --report          → summary
+     *   --report=detail   → detail
+     *   --report=enriched → enriched
      *
-     * @param {Object} chunk - { topline, summary, detail, debug }
+     * @param {Object} chunk - { topline, summary, detail, enriched }
      */
-    gradedOutput({ topline, summary, detail, debug }) {
+    gradedOutput({ topline, summary, detail, enriched }) {
       const input = record.headers.spl.request.input || {}
-      const levels = { topline, summary, detail, debug }
+      const levels = { topline, summary, detail, enriched }
 
-      // Text level - most verbose wins
+      // Text level - most verbose wins (--debug maps to enriched)
       let textLevel = 'summary'
       if (input.silent) textLevel = 'topline'
       if (input.verbose) textLevel = 'detail'
-      if (input.debug) textLevel = 'debug'
+      if (input.debug) textLevel = 'enriched'
 
       // Append to metaoutput
       if (levels[textLevel]) {
@@ -412,7 +425,7 @@ export function create(record) {
       // Data level - based on --report value
       if (input.report) {
         const dataLevel = (input.report === true) ? 'summary' :
-                          ['topline', 'summary', 'detail', 'debug'].includes(input.report) ? input.report : 'summary'
+                          ['topline', 'summary', 'detail', 'enriched'].includes(input.report) ? input.report : 'summary'
 
         if (levels[dataLevel]) {
           const existing = record.headers.spl.request.output || []

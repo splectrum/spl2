@@ -1,0 +1,12 @@
+{
+  "name": "spl/container",
+  "type": "API",
+  "purpose": "Base container type - structural unit for all containers",
+  "extends": null,
+  "instantiates": null,
+  "api": {
+    "introspection": ["whoami", "typeof", "selfeval"],
+    "crud": ["create", "read", "delete"],
+    "xpath": ["select"]
+  }
+}
