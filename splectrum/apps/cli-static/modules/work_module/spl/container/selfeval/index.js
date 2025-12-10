@@ -1,86 +1,79 @@
 // spl/container/selfeval - Validate container against requirements
-// Instantiates: spl/container
+// Instantiates: spl/method
 //
 // Runs selfeval runners to check container implementation.
-// Flags: --runner, --dry-run, --fail-fast, --report, --verbose
+// Flags: --meta, --report, --runner, --dry-run, --fail-fast, --levels
 
 export default async function(module) {
   const input = module.input()
+  const selfeval = await module.require('lib/spl/container/selfeval.js')
+  const freetext = await module.require('lib/spl/container/freetext.js')
+
+  // 1. Process flags
+  const metaLevel = module.getMetaLevel()
+  const reportLevel = module.getReportLevel()
+  const levels = input.levels || '1'  // Reserved for chain traversal
+
+  // Get container path
+  const containerPath = module.getMethod().split('/').slice(0, -1).join('/')
   const fs = await module.require('fs')
   const path = await module.require('path')
-
-  // Get container path and fs path
-  const containerPath = module.getMethod().split('/').slice(0, -1).join('/')
   const indexJsonPath = module.resolve(containerPath, 'index.json')
   if (!indexJsonPath) {
     return module.output(`No container found: ${containerPath}`)
   }
   const containerFsPath = path.dirname(indexJsonPath)
 
-  // Load libs
-  const reportLib = await module.require('lib/spl/container/report.js')
-  const selfeval = await module.require('lib/spl/container/selfeval.js')
-
-  // Load registry
+  // 2. Load registry
   const registry = await selfeval.loadRegistry(containerFsPath)
-  if (!registry.runners || Object.keys(registry.runners).length === 0) {
+  const runnerKeys = Object.keys(registry.runners || {})
+  if (runnerKeys.length === 0) {
     return module.output(`No selfeval runners for: ${containerPath}`)
   }
 
-  // Select runners (--runner flag or all)
+  // 3. Filter runners based on --runner flag
   const selectedRunnerNames = input.runner
-    ? [input.runner]
-    : Object.keys(registry.runners)
+    ? input.runner.split(',').map(r => r.trim())
+    : runnerKeys
 
   // Load selected runners
   const runners = []
   for (const name of selectedRunnerNames) {
-    const runner = await selfeval.loadRunner(containerFsPath, name, registry)
-    if (runner) runners.push(runner)
+    const meta = registry.runners[name]
+    if (meta) {
+      const fn = await selfeval.loadRunner(meta, containerFsPath)
+      if (fn) runners.push({ meta, fn })
+    }
   }
 
   if (runners.length === 0) {
     return module.output(`No runners loaded for: ${containerPath}`)
   }
 
-  // dryRun: show what would run without executing
+  // 4. Dry run: show what would run
   if (input.dryRun) {
-    const dryRunReport = {
-      container: containerPath,
-      runners: runners.map(r => ({ name: r.name, description: r.description }))
+    const dryRunResult = {
+      topline: `${containerPath} | dry-run`,
+      summary: `${runners.length} runners: ${runners.map(r => r.meta.name).join(', ')}`,
+      runners: runners.map(r => ({
+        topline: r.meta.name,
+        summary: r.meta.description
+      }))
     }
-    module.gradedOutput({
-      topline: `selfeval: ${runners.length} runners`,
-      summary: `Would run: ${runners.map(r => r.name).join(', ')}`,
-      detail: runners.map(r => `${r.name}: ${r.description}`).join('\n')
-    })
-    return dryRunReport
+    const dryFreetext = metaLevel === 'report'
+      ? JSON.stringify(dryRunResult, null, 2)
+      : freetext.render(dryRunResult, metaLevel)
+    return module.output(dryFreetext, reportLevel ? dryRunResult : null)
   }
 
-  // Build container report (need lib facet with detail level)
-  const identity = JSON.parse(fs.readFileSync(path.join(containerFsPath, 'index.json'), 'utf8'))
-  const containerReport = reportLib.buildContainer(identity)
+  // 5. Run selfeval
+  const results = await selfeval.runAll(containerFsPath, containerPath, runners, { failFast: input.failFast })
 
-  // Build lib facet with file contents for detail level
-  const libManifest = JSON.parse(fs.readFileSync(path.join(containerFsPath, '_lib', 'index.json'), 'utf8'))
-  const libFileContents = {}
-  for (const fileName of Object.keys(libManifest.files || {})) {
-    try {
-      libFileContents[fileName] = fs.readFileSync(path.join(containerFsPath, '_lib', fileName), 'utf8')
-    } catch (e) {}
-  }
-  containerReport.facets.push(reportLib.buildLib(libManifest, libFileContents))
+  // 6. Render freetext
+  const output = metaLevel === 'report'
+    ? JSON.stringify(results, null, 2)
+    : freetext.render(results, metaLevel)
 
-  // Run selfeval (with failFast option)
-  const results = await selfeval.runAll(containerReport, runners, { failFast: input.failFast })
-
-  // Build graded freetext output
-  module.gradedOutput({
-    topline: results.pass ? 'PASS' : 'FAIL',
-    summary: selfeval.renderFreetext(results, containerPath, 'summary'),
-    detail: selfeval.renderFreetext(results, containerPath, 'detail')
-  })
-
-  // Return report as data output (shown with --report flag)
-  return results
+  // 7. Output
+  module.output(output, reportLevel ? results : null)
 }

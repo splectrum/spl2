@@ -40,33 +40,56 @@ The `selfeval` method validates container implementation against declared constr
 
 ### Output Structure
 
-Hierarchical like whoami: selfeval envelope wraps runner results.
+Hierarchical: envelope wraps runners, runners wrap checks.
 
 ```
 selfeval (envelope)
-  topline: "spl/container | PASS"
-  summary: "3 runners, all passed"
-  runners[] (facets)
+  runners[]
     runner (e.g. lib)
-      topline: "lib | PASS"
-      summary: "validates exports match manifest"
-      detail: test suite results
-      enriched: individual test cases
+      checks[]
+        check (e.g. file)
 ```
 
-**topline**: Identity + pass/fail
-- Envelope: `spl/container | PASS`
-- Runner: `lib | PASS`
+**Freetext levels** - each level adds incremental information:
 
-**summary**: Description
-- Envelope: runner count, overall status
-- Runner: what it validates
+| Level | Envelope | Runner | Check |
+|-------|----------|--------|-------|
+| topline | `spl/container \| PASS` | `lib \| PASS` | - |
+| summary | `1/1 runners` | `4/4 files` | `report.js \| PASS` |
+| detail | - | - | `6/6 exports, missing(0), extra(0)` |
+| enriched | - | - | `expected: [...], actual: [...]` |
 
-**detail**: Test suite results
-- Runner: per-file or per-check results
+**Example at detail level:**
+```
+spl/container | PASS
+1/1 runners
+  lib | PASS
+  4/4 files
+    report.js | PASS
+    6/6 exports, missing(0), extra(0)
+    freetext.js | PASS
+    1/1 exports, missing(0), extra(0)
+```
 
-**enriched**: Individual test cases
-- Runner: each assertion with expected/actual
+**Example failure at detail:**
+```
+spl/container | FAIL
+0/1 runners
+  lib | FAIL
+  1/4 files
+    report.js | PASS
+    6/6 exports, missing(0), extra(0)
+    freetext.js | FAIL
+    1/18 exports, missing(17), extra(1)
+```
+
+**Enriched shows lists:**
+```
+    freetext.js | FAIL
+    1/18 exports, missing(17), extra(1)
+    missing: renderContainerTopline, renderContainerSummary, ...
+    extra: render
+```
 
 ### Expected Flow
 

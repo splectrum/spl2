@@ -1,5 +1,24 @@
 {
   "name": "reqs",
   "purpose": "Container requirements and contracts",
-  "files": []
+  "files": [
+    "freetext_v1.0.0.md",
+    "handler_instance_v1.0.0.md",
+    "handler_type_v1.0.0.md",
+    "identity_instance_v1.0.0.md",
+    "identity_type_v1.0.0.md",
+    "lib_instance_v1.0.0.md",
+    "lib_type_v1.0.0.md",
+    "report_v1.0.0.md",
+    "reqs_instance_v1.0.0.md",
+    "reqs_type_v1.0.0.md",
+    "schemas_instance_v1.0.0.md",
+    "schemas_type_v1.0.0.md",
+    "selfevals_instance_v1.0.0.md",
+    "selfevals_type_v1.0.0.md",
+    "spl_container_instance_v1.0.0.md",
+    "spl_container_type_v1.0.0.md",
+    "tests_instance_v1.0.0.md",
+    "tests_type_v1.0.0.md"
+  ]
 }

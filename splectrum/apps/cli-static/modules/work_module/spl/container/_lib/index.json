@@ -6,17 +6,15 @@
       "exports": ["buildContainer", "buildApi", "buildHandler", "buildSchemas", "buildLib", "buildReqs"]
     },
     "freetext.js": {
-      "exports": [
-        "renderContainerTopline", "renderContainerSummary", "renderContainerDetail",
-        "renderApiTopline", "renderApiSummary", "renderApiDetail",
-        "renderHandlerTopline", "renderHandlerSummary", "renderHandlerDetail",
-        "renderSchemasTopline", "renderSchemasSummary", "renderSchemasDetail",
-        "renderLibTopline", "renderLibSummary", "renderLibDetail",
-        "renderReqsTopline", "renderReqsSummary", "renderReqsDetail"
-      ]
+      "exports": ["render"]
     },
     "selfeval.js": {
-      "exports": ["loadRegistry", "loadRunner", "runAll", "renderFreetext"]
-    }
+      "exports": ["loadRegistry", "loadRunner", "runAll"]
+    },
+    "selfeval_lib.js": {},
+    "selfeval_api.js": {},
+    "selfeval_schemas.js": {},
+    "selfeval_handler.js": {},
+    "selfeval_reqs.js": {}
   }
 }

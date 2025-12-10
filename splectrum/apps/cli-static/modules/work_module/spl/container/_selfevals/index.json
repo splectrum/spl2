@@ -1,10 +1,31 @@
 {
   "name": "selfevals",
-  "purpose": "Container self-evaluation runners",
+  "purpose": "Container self-evaluation registry",
   "runners": {
     "lib": {
-      "file": "lib_runner.js",
-      "description": "Check lib exports match manifest"
+      "name": "lib",
+      "description": "Check lib exports match manifest",
+      "file": "selfeval_lib.js"
+    },
+    "api": {
+      "name": "api",
+      "description": "Check api methods match folders",
+      "file": "selfeval_api.js"
+    },
+    "schemas": {
+      "name": "schemas",
+      "description": "Check schema files match manifest",
+      "file": "selfeval_schemas.js"
+    },
+    "handler": {
+      "name": "handler",
+      "description": "Check handler index.js exists",
+      "file": "selfeval_handler.js"
+    },
+    "reqs": {
+      "name": "reqs",
+      "description": "Check req files match manifest",
+      "file": "selfeval_reqs.js"
     }
   }
 }
