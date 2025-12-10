@@ -341,97 +341,59 @@ export function create(record) {
 
     /**
      * Set output pair on record
-     * Respects flags: --silent skips metaoutput, --dry-run skips data output
-     * @param {*} meta - Metaoutput (narrative/help)
-     * @param {*} data - Data output (payload, or null if none)
+     * @param {string} freetext - Freetext output (narrative)
+     * @param {*} structured - Structured output (data for parsing/chaining)
      */
-    output(meta, data) {
-      const input = record.headers.spl.request.input || {}
-      if (!input.silent) {
-        record.headers.spl.request.metaoutput = meta
-      }
-      if (!input.dryRun) {
-        record.headers.spl.request.output = data
-      }
+    output(freetext, structured) {
+      record.headers.spl.request.metaoutput = freetext
+      record.headers.spl.request.output = structured
     },
 
     /**
-     * Get required output level based on text and report flags
-     *
-     * Returns the max of text level and report level.
-     * Methods use this to know what depth of content to produce.
-     *
-     * @returns {string} - 'topline', 'summary', 'detail', or 'enriched'
+     * Get meta level from --meta flag
+     * @returns {string} - 'topline'|'summary'|'detail'|'enriched'|'report'
      */
-    requiredLevel() {
+    getMetaLevel() {
       const input = record.headers.spl.request.input || {}
+      const meta = input.meta
+
+      if (meta === undefined || meta === true) return 'summary'
+      if (['topline', 'summary', 'detail', 'enriched', 'report'].includes(meta)) return meta
+      return 'summary'
+    },
+
+    /**
+     * Get report level from --report flag
+     * @returns {string|null} - null|'topline'|'summary'|'detail'|'enriched'
+     */
+    getReportLevel() {
+      const input = record.headers.spl.request.input || {}
+      const report = input.report
+
+      if (report === undefined) return null
+      if (report === true) return 'summary'
+      if (['topline', 'summary', 'detail', 'enriched'].includes(report)) return report
+      return 'summary'
+    },
+
+    /**
+     * Get detail level - max of meta and report levels
+     * Methods use this to know what depth of content to build.
+     * @returns {string} - 'topline'|'summary'|'detail'|'enriched'
+     */
+    getDetailLevel() {
       const levelOrder = ['topline', 'summary', 'detail', 'enriched']
 
-      // Text level (--debug maps to enriched)
-      let textLevel = 'summary'
-      if (input.silent) textLevel = 'topline'
-      if (input.verbose) textLevel = 'detail'
-      if (input.debug) textLevel = 'enriched'
+      const metaLevel = this.getMetaLevel()
+      const reportLevel = this.getReportLevel()
 
-      // Data level
-      let dataLevel = null
-      if (input.report) {
-        dataLevel = (input.report === true) ? 'summary' :
-                    ['topline', 'summary', 'detail', 'enriched'].includes(input.report) ? input.report : 'summary'
-      }
+      // meta=report means echo structured, so use reportLevel for depth
+      const effectiveMetaLevel = metaLevel === 'report' ? (reportLevel || 'summary') : metaLevel
 
-      // Return max
-      const textIdx = levelOrder.indexOf(textLevel)
-      const dataIdx = dataLevel ? levelOrder.indexOf(dataLevel) : -1
-      return levelOrder[Math.max(textIdx, dataIdx)]
-    },
+      const metaIdx = levelOrder.indexOf(effectiveMetaLevel)
+      const reportIdx = reportLevel ? levelOrder.indexOf(reportLevel) : -1
 
-    /**
-     * Graded output - append chunk at selected disclosure level
-     *
-     * Text flags (metaoutput):
-     *   --silent  → topline
-     *   (default) → summary
-     *   --verbose → detail
-     *   --debug   → enriched
-     *   Most verbose wins if multiple present.
-     *
-     * Data flags (output):
-     *   (not set)         → none
-     *   --report          → summary
-     *   --report=detail   → detail
-     *   --report=enriched → enriched
-     *
-     * @param {Object} chunk - { topline, summary, detail, enriched }
-     */
-    gradedOutput({ topline, summary, detail, enriched }) {
-      const input = record.headers.spl.request.input || {}
-      const levels = { topline, summary, detail, enriched }
-
-      // Text level - most verbose wins (--debug maps to enriched)
-      let textLevel = 'summary'
-      if (input.silent) textLevel = 'topline'
-      if (input.verbose) textLevel = 'detail'
-      if (input.debug) textLevel = 'enriched'
-
-      // Append to metaoutput
-      if (levels[textLevel]) {
-        const existing = record.headers.spl.request.metaoutput || ''
-        const chunk = levels[textLevel]
-        const separator = existing ? '\n' : ''
-        record.headers.spl.request.metaoutput = existing + separator + chunk
-      }
-
-      // Data level - based on --report value
-      if (input.report) {
-        const dataLevel = (input.report === true) ? 'summary' :
-                          ['topline', 'summary', 'detail', 'enriched'].includes(input.report) ? input.report : 'summary'
-
-        if (levels[dataLevel]) {
-          const existing = record.headers.spl.request.output || []
-          record.headers.spl.request.output = [...existing, levels[dataLevel]]
-        }
-      }
+      return levelOrder[Math.max(metaIdx, reportIdx)]
     },
 
     /**

@@ -9,93 +9,80 @@
 **Project 11: App Architecture**
 
 - Type: Exploration Project
-- Status: **In Progress - selfeval framework complete**
+- Status: **In Progress - whoami refactored, selfeval next**
 - Location: `projects/11-app-architecture/`
 
 ### Current Focus
 
-**Selfeval framework** - validation system comparing manifest (index.json) vs implementation (lib files).
+**Output flag refactoring** - unified `--meta` and `--report` flag scheme across methods.
 
 This session completed:
-- Split identity facet → identity moved into container, api is now a facet
-- Hierarchical report structure: container wraps facets as children
-- Lib facet now reports: summary (from index.json), detail (extracted from source)
-- Created selfeval framework with runner pattern
-- Created lib_runner.js - compares expected exports vs actual
-- Consistent flag system: --silent/default/--verbose for freetext levels
+- Refactored whoami method with new flag scheme
+- New flags: `--meta`, `--report`, `--facet`, `--levels`
+- Generic freetext renderer in `spl/container/_lib/freetext.js`
+- Incremental report structure (topline/summary/detail/enriched per level)
+- Updated module.js with `getMetaLevel()`, `getReportLevel()`, `getDetailLevel()`
+- Removed `gradedOutput()` - superseded by `module.output(freetext, structured)`
 
 ### Key Design Decisions
 
-**Report hierarchy:**
-```
-container (name, type, extends, instantiates, purpose)
-  └── facets[]
-        ├── api (apiFacets, methodCount)
-        ├── handler (exists, title)
-        ├── schemas (files, purpose)
-        ├── lib (files, expected exports, actual exports)
-        └── reqs (files, purpose)
-```
+**Flag scheme (applies to all methods):**
+- `--meta=topline|summary|detail|enriched|report` - freetext level (default: summary)
+- `--report=topline|summary|detail|enriched` - structured output level (default: none)
+- `--meta=report` echoes structured as JSON to freetext
 
-**Four-level mapping for lib facet:**
-- topline: file list
-- summary: from index.json (manifest declares)
-- detail: from source (extracted functions)
-- enriched: (future - function code)
+**Report structure:**
+- Each level contains only INCREMENTAL information
+- topline: identity/existence
+- summary: purpose/description
+- detail: full breakdown
+- enriched: source code
 
-**Selfeval flow:**
-- req (requirements) → index.json (manifest) → lib.js (implementation)
-- selfeval compares summary vs detail to validate implementation matches manifest
+**Generic freetext renderer:**
+- Walks any JSON with topline/summary/detail/enriched keys
+- No domain knowledge - fully generic
+- Lives in `spl/container/_lib/freetext.js`
+- Usage: `freetext.render(json, level)`
 
-**Output pattern (same for whoami and selfeval):**
-- --silent → topline
-- (default) → summary
-- --verbose → detail
-- --report → adds JSON output
+**Facet filtering:**
+- `--facet=api,lib` - comma-delimited
+- Container always present as envelope
+- If container not in facet list, shows topline only
 
 ### Key Files
 
 Work module: `splectrum/apps/cli-static/modules/work_module/`
 
-- `spl/container/_lib/report.js` - builds hierarchical four-level structure
-- `spl/container/_lib/freetext.js` - renders to natural language
-- `spl/container/_lib/selfeval.js` - selfeval framework (load runners, execute)
-- `spl/container/_selfevals/index.json` - runner registry
-- `spl/container/_selfevals/lib_runner.js` - lib facet validation
-- `spl/container/whoami/_lib/whoami.js` - whoami orchestration
-- `spl/container/selfeval/index.js` - selfeval method
+- `_lib/module.js` - getMetaLevel(), getReportLevel(), getDetailLevel(), output()
+- `_reqs/module_instance_v1.0.0.md` - updated with new flag scheme
+- `spl/container/_lib/freetext.js` - generic freetext renderer
+- `spl/container/_lib/report.js` - incremental report builder
+- `spl/container/whoami/index.js` - refactored method
+- `spl/container/whoami/_reqs/spl_container_whoami_v2.0.0.md` - updated req
+- `spl/container/selfeval/_reqs/selfeval_method_v1.0.0.md` - updated req
 
-### Working Output
+### Working Commands
 
-```
-./spl spl/container/whoami --silent
-spl/container - API
-  api - 3 facets, 7 methods
-  handler - base container type
-  schemas - input.avsc, metaoutput.avsc
-  lib - report.js, freetext.js, selfeval.js
-  reqs - empty
-
-./spl spl/container/selfeval
-Selfeval: spl/container
-
-[lib] PASS
-  + report.js: 6/6 exports
-  + freetext.js: 18/18 exports
-  + selfeval.js: 4/4 exports
-
-Summary: PASS
-
-./spl spl/container/selfeval --silent
-PASS
+```bash
+./spl spl/container/whoami                    # summary freetext (default)
+./spl spl/container/whoami --meta=topline     # minimal
+./spl spl/container/whoami --meta=detail      # full breakdown
+./spl spl/container/whoami --meta=report      # JSON output
+./spl spl/container/whoami --report           # freetext + JSON
+./spl spl/container/whoami --facet=lib        # lib facet only
+./spl spl/container/whoami --facet=api,lib    # multiple facets
 ```
 
-### Pending
+### Next Steps
 
-- More selfeval runners (schemas, api, handler)
-- req → index.json validation (does manifest match req?)
-- Enriched level (function code extraction)
-- Update design doc with final implementation
+1. **Implement selfeval method** - same pattern as whoami
+   - Update index.js with new flow
+   - Use module.output(), getMetaLevel(), etc.
+   - Reuse whoami lib for container report building
+
+2. **Update lib_runner.js** - return hierarchical structure with levels
+
+3. **More selfeval runners** - schemas, api, handler
 
 ### Work Items
 
@@ -114,14 +101,14 @@ PASS
 **Starting a new session?**
 
 1. Read this file for current context
-2. Test: `./spl spl/container/whoami --verbose`
-3. Test: `./spl spl/container/selfeval`
+2. Test: `./spl spl/container/whoami --meta=detail`
+3. Next: Implement selfeval method (see `spl/container/selfeval/index.js`)
 
-**Key concepts:**
-- Hierarchical report: container wraps facets
-- Four levels: topline/summary/detail/enriched
-- req → index.json → implementation (selfeval validates the chain)
-- Runners in _selfevals/ validate specific facets
+**Key patterns:**
+- Methods use `module.output(freetext, structured)` not return
+- `module.getMetaLevel()`, `module.getReportLevel()`, `module.getDetailLevel()`
+- Report structure: incremental data per level (topline/summary/detail/enriched)
+- Generic freetext renderer: `freetext.render(json, level)`
 
 ---
 

@@ -5,57 +5,92 @@
 
 ## Spec
 
-The `selfeval` method is an introspection method on container that validates structural conformance against declared constraints.
+The `selfeval` method validates container implementation against declared constraints.
 
-**Invocation:**
-- `spl <container>/selfeval` - run all facets
-- `spl <container>/selfeval --facet=<name>` - run specific facet
-- `spl <container>/selfeval --dry-run` - list facets without executing
+### Flags
 
-**Data source:**
-- Reads target container's `_selfevals/selfevals.json` manifest
-- Loads `selfeval_<facet>.json` for each facet to run
-- Passes parsed JSON data to runner functions
+| Dimension | Flag | Values | Default |
+|-----------|------|--------|---------|
+| Meta level | `--meta` | topline, summary, detail, enriched, report | summary |
+| Report level | `--report` | topline, summary, detail, enriched | (none) |
+| Runner filter | `--runner` | comma-delimited runner names | all |
+| Dry run | `--dry-run` | boolean | false |
+| Fail fast | `--fail-fast` | boolean | false |
 
-**Runner functions:**
-- Generic functions in `_lib/selfeval.js`
-- Data-driven: same logic, different data per container
-- Each facet has a corresponding runner function
+**--meta**: Controls freetext output
+- `--meta=topline` → PASS/FAIL only
+- `--meta=summary` or (default) → runner results
+- `--meta=detail` → includes missing/extra details
+- `--meta=enriched` → includes source excerpts
+- `--meta=report` → echoes structured as JSON
 
-**Initial facets:**
-- `structure` - validates file/folder presence against requirements
+**--report**: Controls structured output
+- (not set) → no structured output
+- `--report` → summary level results
+- `--report=detail` → detailed results
 
-**Output modes:**
+**--runner**: Filter to specific runners
+- `--runner=lib` → run lib runner only
+- `--runner=lib,schemas` → run lib and schemas runners
+- (not set) → all runners
 
-| Flag | Output | Use case |
-|------|--------|----------|
-| (default) | Freetext summary | Quick interactive check |
-| `--report` | Structured JSON only | CI, parsing, scripts |
-| `--verbose` | Both freetext + JSON | Debugging, full picture |
+**--dry-run**: List runners without executing
 
-Structured format: `{ results: [{ facet, checks: [{ name, pass, message }] }], pass: boolean }`
+**--fail-fast**: Stop on first failure
 
-**Flags:**
-- `--dry-run` - list facets that would run, don't execute
-- `--facet=<name>` - run only specified facet (default: all)
-- `--fail-fast` - quiet mode, stop on first failure
-- `--report` - output structured JSON only (no freetext)
-- `--verbose` - output both freetext and structured JSON
+### Output Structure
+
+Hierarchical like whoami: selfeval envelope wraps runner results.
+
+```
+selfeval (envelope)
+  topline: "spl/container | PASS"
+  summary: "3 runners, all passed"
+  runners[] (facets)
+    runner (e.g. lib)
+      topline: "lib | PASS"
+      summary: "validates exports match manifest"
+      detail: test suite results
+      enriched: individual test cases
+```
+
+**topline**: Identity + pass/fail
+- Envelope: `spl/container | PASS`
+- Runner: `lib | PASS`
+
+**summary**: Description
+- Envelope: runner count, overall status
+- Runner: what it validates
+
+**detail**: Test suite results
+- Runner: per-file or per-check results
+
+**enriched**: Individual test cases
+- Runner: each assertion with expected/actual
+
+### Expected Flow
+
+1. Process flags (meta, report, runner, dry-run, fail-fast)
+2. Load runner registry from _selfevals/index.json
+3. Filter runners based on --runner flag
+4. If --dry-run, output runner list and exit
+5. Build container report (reuse whoami lib)
+6. Run selected runners against report
+7. Render freetext at meta level
+8. Output freetext and structured (if report requested)
 
 ## Self-eval
 
-- [ ] Method container has standard structure (README.md, README.json, index.js)
-- [ ] Runner functions in `_lib/selfeval.js`
-- [ ] Reads manifest from target's `_selfevals/selfevals.json`
-- [ ] Supports `--facet` argument for selective execution
-- [ ] Supports `--dry-run` for facet listing
-- [ ] Default output is freetext summary only
-- [ ] `--fail-fast` stops on first failure, quiet output
-- [ ] `--report` outputs structured JSON only
-- [ ] `--verbose` outputs both freetext and JSON
+- [ ] Supports --meta flag (topline, summary, detail, enriched, report)
+- [ ] Supports --report flag (topline, summary, detail, enriched)
+- [ ] Supports --runner flag for filtering
+- [ ] Supports --dry-run for runner listing
+- [ ] Supports --fail-fast for early exit
+- [ ] Method flow visible in index.js
+- [ ] Output is hierarchical: envelope wraps runners
+- [ ] Each level (topline/summary/detail/enriched) has incremental info
+- [ ] Uses generic freetext renderer
 
 ## Comments
 
-Part of the introspection API facet alongside `whoami` and `typeof`. The natural language selfevals live in req files (Self-eval section); this method executes the machine-readable implementations.
-
-Chicken-and-egg: selfeval needs selfevals to validate itself. Bootstrap with minimal constraints, expand as implementation stabilizes.
+Part of the introspection API facet alongside `whoami` and `typeof`. Validates that implementation matches manifest declarations.

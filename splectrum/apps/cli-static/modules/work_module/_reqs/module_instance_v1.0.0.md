@@ -13,77 +13,63 @@ The work module - logical parent of all packages. Provides the universal module 
 - Universal module interface (bound to record, passed to all execution contexts)
 - Foundation lib that methods, libs, and scripts receive as single arg: `module`
 
-### Graded Output
+### Output
 
-Methods produce output in chunks with graduated disclosure levels. Each chunk contains content at four levels.
+Methods produce two types of output:
+- **freetext** (metaoutput) - human/AI readable narrative
+- **structured** (output) - data for parsing/chaining
 
 **Signature:**
 
 ```js
-module.gradedOutput({ topline, summary, detail, debug })
+module.output(freetext, structured)
 ```
 
-Called per chunk. Same content used for both metaoutput (freetext) and output (data/report), selected by different flags.
+- `freetext` - string, goes to metaoutput (printed to terminal)
+- `structured` - object, goes to output (printed as JSON when --report)
 
-**Levels:**
+### Output Levels
+
+Both freetext and structured support four levels:
 
 | Level | Purpose |
 |-------|---------|
 | topline | Minimal, one-liner |
 | summary | Key information, scannable |
 | detail | Full breakdown |
-| debug | Maximum verbosity |
+| enriched | Maximum depth, includes source code |
 
-**Text flags (metaoutput):**
+### Output Flags
 
-| Flag | Level selected |
-|------|----------------|
-| --silent | topline |
-| (default) | summary |
-| --verbose | detail |
-| --debug | debug |
+**--meta**: Controls freetext output level
+- `--meta=topline` → topline
+- `--meta=summary` or `--meta` or (default) → summary
+- `--meta=detail` → detail
+- `--meta=enriched` → enriched
+- `--meta=report` → echoes structured as JSON
 
-Most verbose wins if multiple present.
+**--report**: Controls structured output level
+- (not set) → no structured output
+- `--report=topline` → topline level
+- `--report=summary` or `--report` → summary level
+- `--report=detail` → detail level
+- `--report=enriched` → enriched level
 
-**Data flags (output):**
-
-| Flag | Level selected |
-|------|----------------|
-| (not set) | none (no data output) |
-| --report | summary |
-| --report=detail | detail |
-| --report=debug | debug |
-
-**Behavior:**
-- Reads flags from input (record state)
-- Appends selected text level to metaoutput
-- Appends selected data level to output (if --report set)
-- Two orthogonal axes: text level and data inclusion
-
-### requiredLevel Helper
-
-Methods need to know what depth of content to produce before building chunks.
-
-**Signature:**
+### Flag Helpers
 
 ```js
-module.requiredLevel()  // returns 'topline', 'summary', 'detail', or 'debug'
+module.getMetaLevel()    // returns 'topline'|'summary'|'detail'|'enriched'|'report'
+module.getReportLevel()  // returns null|'topline'|'summary'|'detail'|'enriched'
+module.getDetailLevel()  // returns max of meta and report levels
 ```
 
-Returns the MAX of text level and data level. Methods use this to avoid producing content they don't need, or to ensure they produce enough for both outputs.
+`getDetailLevel()` tells method how deep to build content. Avoids building enriched when only topline needed.
 
-| Text flag | Report flag | requiredLevel() |
-|-----------|-------------|-----------------|
-| --silent (topline) | --report (summary) | summary |
-| --debug | --report (summary) | debug |
-| (default) summary | --report=debug | debug |
-
-**Input sources (future merge):**
-- API defaults
-- Previous output (chaining)
-- Method explicit input
-
-Later layers override earlier. Method sees unified input.
+| Meta flag | Report flag | getDetailLevel() |
+|-----------|-------------|------------------|
+| --meta=topline | --report (summary) | summary |
+| --meta=enriched | --report (summary) | enriched |
+| (default) summary | --report=enriched | enriched |
 
 ### Flag Categories
 
@@ -94,25 +80,24 @@ Later layers override earlier. Method sees unified input.
 These are woven into each method's specific logic. Each lib handles them internally.
 
 **Output flags (module-level):**
-- `--silent` - suppress text output
-- `--verbose` - detail text level
-- `--debug` - debug text level
-- `--report[=level]` - include data output
+- `--meta[=level]` - freetext output level
+- `--report[=level]` - structured output level
 
-These affect result presentation. Module handles them uniformly via `gradedOutput`.
+These affect result presentation. Method calls `module.output(freetext, structured)` directly.
 
 ## Self-eval
 
-- [ ] gradedOutput accepts { topline, summary, detail, debug }
-- [ ] Text level selected by --silent/--verbose/--debug flags
-- [ ] Data level selected by --report flag value
+- [ ] module.output(freetext, structured) sets metaoutput and output
+- [ ] module.getMetaLevel() returns correct level from --meta flag
+- [ ] module.getReportLevel() returns correct level from --report flag
+- [ ] module.getDetailLevel() returns max of meta and report levels
+- [ ] --meta=report echoes structured as JSON to freetext
 - [ ] Flags read from input (record state)
-- [ ] Chunks append to output (not replace)
 
 ## Comments
 
-The graded output pattern enables:
-- Consistent flag behavior across all methods
-- Progressive disclosure for different use cases
-- Single input structure for both text and data output
-- Highly reusable, very versatile
+The output pattern enables:
+- Separate freetext (narrative) and structured (data) outputs
+- Independent level control via --meta and --report flags
+- Progressive disclosure at four levels: topline, summary, detail, enriched
+- requiredLevel() optimization - build only what's needed

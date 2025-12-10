@@ -11,67 +11,79 @@ Comprehensive container introspection. Returns structured information about a co
 
 ### Flags
 
-**Three orthogonal dimensions:**
+**Four orthogonal dimensions:**
 
 | Dimension | Flag | Values | Default |
 |-----------|------|--------|---------|
-| Chain depth | `--levels` | 0, 1, 2, ... n, full | 0 (this container only) |
-| Facet filter | `--facet` | reqs, lib, methods, selfevals, schemas, tests | all |
-| Detail level | graded output | --silent, (default), --verbose, --debug | summary |
+| Meta level | `--meta` | topline, summary, detail, enriched, report | summary |
+| Report level | `--report` | topline, summary, detail, enriched | (none) |
+| Facet filter | `--facet` | container, api, handler, schemas, lib, reqs | all |
+| Depth level | `--levels` | 0, 1, 2, ... n, full | 0 (this container only) |
 
-Plus standard output flags: `--report[=level]`
+**--meta**: Controls freetext output (metaoutput)
+- `--meta=topline` → topline
+- `--meta=summary` or `--meta` or (default) → summary
+- `--meta=detail` → detail
+- `--meta=enriched` → enriched
+- `--meta=report` → echoes structured as JSON
 
-### Graded Output Levels
+**--report**: Controls structured output (output)
+- (not set) → no structured output
+- `--report=topline` → topline level
+- `--report=summary` or `--report` → summary level
+- `--report=detail` → detail level
+- `--report=enriched` → enriched level
 
-**topline**: Facet list with status
-```
-reqs - 5 type definitions
-lib - no lib files
-methods - 2 introspection, 1 crud
-selfevals - 2 facets
-tests - not implemented
-```
+### Output Levels
 
-**summary**: Facet contents (names)
-```
-reqs:
-  spl_container_type, spl_container_instance, lib_type, ...
-methods:
-  introspection: whoami, selfeval
-  crud: create
-```
+Output is hierarchical: container wraps facets.
 
-**detail**: Descriptions from folder entrypoints
+**topline**: Container identity + facet one-liners
 ```
-reqs:
-  spl_container_type - What a container is
-  lib_type - Lib folder pattern
-methods:
-  whoami - Returns container identity and structure
-  selfeval - Validates container against constraints
+spl/container - API
+  api - 3 facets, 7 methods
+  handler - base container type
+  schemas - input.avsc, metaoutput.avsc
+  lib - report.js, freetext.js, selfeval.js
+  reqs - empty
 ```
 
-**debug**: Full content + DSL glossary meanings
+**summary**: Container purpose + facet contents
 ```
-reqs:
-  spl_container_type:
-    Spec: Container is a folder with README.json...
-    Self-eval: [checklist]
-    Comments: Base type for all containers
-methods:
-  whoami:
-    Purpose: Comprehensive container introspection
-    Behavior: Reads README.json, traverses internal folders...
-    Flags: --levels, --facet, --silent, --verbose, --debug, --report
-schemas:
-  input.avsc - Universal handler flags
-    dryRun (boolean)
-      DSL: Preview mode, no side effects
-    silent (boolean)
-      DSL: Minimal output (topline level)
+spl/container - API
+  Base container type - structural unit for all containers
+  api - 3 facets, 7 methods
+    introspection: whoami, typeof, selfeval
+    crud: create, read, delete
+    xpath: select
+  handler - base container type
+  schemas - input.avsc, metaoutput.avsc
+    Universal handler flags and output structure
+  lib - report.js, freetext.js, selfeval.js
+    Container core libs
+  reqs - empty
 ```
 
-DSL glossary integration at debug level provides horizontal language consistency - same terms mean the same thing across the platform.
+**detail**: Full breakdown per facet
+```
+spl/container - API
+  Base container type - structural unit for all containers
+  api - 3 facets, 7 methods
+    introspection: whoami, typeof, selfeval
+    crud: create, read, delete
+    xpath: select
+  handler - base container type
+  schemas - input.avsc, metaoutput.avsc
+    Universal handler flags and output structure
+  lib - report.js, freetext.js, selfeval.js
+    Container core libs
+    report.js: buildContainer, buildApi, buildHandler, buildSchemas, buildLib, buildReqs
+    freetext.js: renderContainerTopline, renderContainerSummary, ...
+    selfeval.js: loadRegistry, loadRunner, runAll, renderFreetext
+  reqs - empty
+```
+
+**enriched**: Detail + source code (function bodies)
 
 ### Levels Flag
 
@@ -94,38 +106,28 @@ Each level shows whoami output for that container.
 
 ### Facet Flag
 
-Filters to specific internal folder type:
+Filters to specific facets (comma-delimited):
 
-- `--facet=reqs`: _reqs folder
-- `--facet=lib`: _lib folder
-- `--facet=methods`: child method containers
-- `--facet=selfevals`: _selfevals folder
-- `--facet=schemas`: _schemas folder (implemented)
-- `--facet=tests`: _tests folder
+- `container` - Container identity and purpose
+- `api` - API facets and methods
+- `handler` - Handler type info
+- `schemas` - _schemas folder
+- `lib` - _lib folder
+- `reqs` - _reqs folder
 
-Without flag: all facets shown.
+Examples:
+- `--facet=lib` - lib at requested level, container as topline wrapper
+- `--facet=container,lib` - container + lib at requested level
+- `--facet` or (not set) - all facets at requested level
 
-### Facet Grading: schemas
+Container is always present as the envelope. If `container` is in the facet list, it returns at the requested detail level. If not, it returns at topline level (wrapper only).
 
-| Level | Output |
-|-------|--------|
-| topline | `schemas - input.avsc, metaoutput.avsc` |
-| summary | entries with descriptions from schemas.json |
-| detail | + field details from .avsc files |
-| debug | + DSL glossary meanings for field names |
-
-### Child Container Handling
-
-When showing child containers (methods, etc.), show **external** view only:
-- Purpose, spec, behavior, flags
-- NOT internal folders (_lib, _reqs, etc.)
-
-For internals, run whoami directly on that container.
+Use facet filtering to limit output size, especially with `--meta=enriched` or `--report=enriched`.
 
 ### Levels + Facets Interaction
 
-`--levels=full --facet=methods`:
-- Shows methods facet for each level in chain
+`--levels=full --facet=api`:
+- Shows api facet for each level in chain
 - Includes inherited API facets with provenance
 - Shows which methods come from which level
 
@@ -137,55 +139,74 @@ spl/api (type):
   crud: create, read, delete
 ```
 
-### Behavior
+### Expected Flow
 
-1. Resolve parent container from method path
-2. Read README.json for identity
-3. Traverse internal folders for facet info
-4. If --levels > 0, recursively introspect type chain
-5. Output via gradedOutput at requested detail level
+1. Process flags (meta, report, facet, levels)
+2. Build container with facets at required detail level
+3. If depth > 0, traverse type chain
+4. Render freetext at meta level
+5. Output freetext and structured (if report requested)
 
 ### Use Cases
 
 **Quick check:**
 ```
 spl spl/container/whoami
-→ topline facet list
+→ summary freetext (default)
 ```
 
-**Understand methods:**
+**Minimal output:**
 ```
-spl spl/container/whoami --facet=methods --verbose
-→ all methods with descriptions
-```
-
-**Full introspection for AI:**
-```
-spl spl/container/whoami --levels=full --debug
-→ complete structural understanding, replaces file scanning
+spl spl/container/whoami --meta=topline
+→ one-liner per facet
 ```
 
-**Trace inheritance:**
+**Full detail:**
 ```
-spl spl/container/whoami --levels=full --facet=reqs --debug
-→ see how reqs flow through type chain
+spl spl/container/whoami --meta=detail
+→ full breakdown with function names
+```
+
+**Get structured data:**
+```
+spl spl/container/whoami --report
+→ freetext + JSON structured output
+```
+
+**JSON only (for AI parsing):**
+```
+spl spl/container/whoami --meta=report
+→ structured output as JSON freetext
+```
+
+**Filter to specific facet:**
+```
+spl spl/container/whoami --facet=lib --meta=detail
+→ lib facet only, full detail
+```
+
+**Full chain:**
+```
+spl spl/container/whoami --levels=full --report=detail
+→ complete structural understanding with type chain
 ```
 
 ## Self-eval
 
 - [ ] Conforms to spl_method_type structural requirements
-- [ ] Supports --levels flag for chain traversal
+- [ ] Supports --meta flag (topline, summary, detail, enriched, report)
+- [ ] Supports --report flag (topline, summary, detail, enriched)
 - [ ] Supports --facet flag for filtering
-- [ ] Uses gradedOutput for all output
-- [ ] topline shows facets with status
-- [ ] summary shows facet contents (names)
-- [ ] detail shows descriptions from entrypoints
-- [ ] debug shows full content (specs, behavior)
-- [ ] Child containers show external view only
+- [ ] Supports --levels flag for chain traversal
+- [ ] Method flow visible in index.js, details in lib
+- [ ] topline shows container + facet one-liners
+- [ ] summary shows container purpose + facet contents
+- [ ] detail shows full breakdown with function names
+- [ ] enriched shows detail + source code
 - [ ] Handles missing folders gracefully
 
 ## Comments
 
-whoami is the primary introspection tool. At debug level with full chain, it provides complete structural understanding of a container in one call - replacing ad-hoc file scanning.
+whoami is the primary introspection tool. With --report=enriched and full chain, it provides complete structural understanding of a container in one call - replacing ad-hoc file scanning.
 
-The three orthogonal dimensions (levels, facet, detail) compose cleanly for targeted queries.
+The four orthogonal dimensions (meta, report, facet, levels) compose cleanly for targeted queries.

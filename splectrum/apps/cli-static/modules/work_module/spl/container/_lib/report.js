@@ -1,168 +1,170 @@
 // report.js - Build four-level structure from flat facts
 //
-// Transforms index.json (flat facts) into four-level structure
-// (topline/summary/detail).
-//
-// Hierarchical: container wraps facets as children.
+// Each level contains only INCREMENTAL information:
+// - topline: identity/existence
+// - summary: purpose/description
+// - detail: full breakdown
+// - enriched: source code
 //
 // Exports:
-//   buildContainer(indexJson)  - container (name, type, extends, instantiates, purpose)
-//   buildApi(indexJson)        - api facet (apiFacets, methodCount)
-//   buildHandler(content)      - handler facet from index.js content
-//   buildSchemas(indexJson)    - schemas facet from _schemas/index.json
-//   buildLib(indexJson)        - lib facet from _lib/index.json
-//   buildReqs(indexJson)       - reqs facet from _reqs/index.json
+//   buildContainer(indexJson)  - container envelope
+//   buildApi(indexJson)        - api facet
+//   buildHandler(content)      - handler facet
+//   buildSchemas(indexJson)    - schemas facet
+//   buildLib(indexJson)        - lib facet
+//   buildReqs(indexJson)       - reqs facet
 
 export function create(module) {
 
   return {
-    // Build container (facets added by orchestrator)
-    buildContainer(identity) {
-      return {
+    // Build container envelope
+    // detailLevel caps what gets included
+    buildContainer(identity, detailLevel = 'enriched') {
+      const levels = ['topline', 'summary', 'detail', 'enriched']
+      const maxIdx = levels.indexOf(detailLevel)
+
+      const result = {
         name: 'container',
-        topline: {
-          containerName: identity.name,
-          type: identity.type || 'container',
-          extends: identity.extends,
-          instantiates: identity.instantiates
-        },
-        summary: {
-          containerName: identity.name,
-          type: identity.type || 'container',
-          extends: identity.extends,
-          instantiates: identity.instantiates,
-          purpose: identity.purpose
-        },
-        detail: {
-          containerName: identity.name,
-          type: identity.type || 'container',
-          extends: identity.extends,
-          instantiates: identity.instantiates,
-          purpose: identity.purpose
-        },
-        facets: []  // populated by orchestrator
+        topline: `${identity.name} | ${identity.type || 'container'}`,
+        facets: []
       }
+
+      // Summary: add purpose (if level allows)
+      if (maxIdx >= 1 && identity.purpose) {
+        result.summary = identity.purpose
+      }
+
+      // Detail: add extends/instantiates if present (if level allows)
+      if (maxIdx >= 2) {
+        const lineage = []
+        if (identity.extends) lineage.push(`extends: ${identity.extends}`)
+        if (identity.instantiates) lineage.push(`instantiates: ${identity.instantiates}`)
+        if (lineage.length > 0) {
+          result.detail = lineage.join(' | ')
+        }
+      }
+
+      return result
     },
 
-    // Build api facet - what this container can do
+    // Build api facet
     buildApi(identity) {
       const apiFacets = identity.api ? Object.keys(identity.api) : []
       const methodCount = countMethods(identity)
 
-      return {
+      const result = {
         name: 'api',
-        topline: {
-          apiFacets,
-          methodCount
-        },
-        summary: {
-          apiFacets,
-          methodCount
-        },
-        detail: {
-          api: identity.api
+        topline: `api | ${apiFacets.length} facets, ${methodCount} methods`
+      }
+
+      // Detail: method breakdown
+      if (identity.api) {
+        const lines = []
+        for (const [facetName, methods] of Object.entries(identity.api)) {
+          if (Array.isArray(methods) && methods.length > 0) {
+            lines.push(`${facetName}: ${methods.join(', ')}`)
+          }
+        }
+        if (lines.length > 0) {
+          result.detail = lines.join('\n')
         }
       }
+
+      return result
     },
 
-    // Build handler facet from index.js content
+    // Build handler facet
     buildHandler(content) {
-      // Extract comment after container name: "// spl/container - description"
+      // Extract comment after container name
       const match = content.match(/\/\/\s*\S+\s*-\s*(.+)/)
-      const title = match ? match[1].trim() : null
+      const title = match ? match[1].trim() : 'implemented'
 
-      return {
+      const result = {
         name: 'handler',
-        topline: {
-          exists: true,
-          title
-        },
-        summary: {
-          exists: true,
-          title
-        },
-        detail: {
-          exists: true,
-          title,
-          content
-        }
+        topline: `handler | ${title}`
       }
+
+      // Enriched: source code
+      if (content) {
+        result.enriched = content
+      }
+
+      return result
     },
 
-    // Build schemas facet from _schemas/index.json
+    // Build schemas facet
     buildSchemas(manifest) {
-      return {
+      const files = manifest.files || []
+
+      const result = {
         name: 'schemas',
-        topline: {
-          files: manifest.files || []
-        },
-        summary: {
-          purpose: manifest.purpose,
-          files: manifest.files || []
-        },
-        detail: {
-          purpose: manifest.purpose,
-          files: manifest.files || []
-        }
+        topline: `schemas | ${files.join(', ') || 'empty'}`
       }
+
+      if (manifest.purpose) {
+        result.summary = manifest.purpose
+      }
+
+      return result
     },
 
-    // Build lib facet from _lib/index.json and file contents
-    // manifest.files is object: { "file.js": { req, exports } }
-    // fileContents is object: { "file.js": "source code..." }
+    // Build lib facet
     buildLib(manifest, fileContents = {}) {
       const manifestFiles = manifest.files || {}
       const fileNames = Object.keys(manifestFiles)
 
-      // Summary: from manifest (index.json)
-      const summaryFiles = {}
-      for (const [fileName, meta] of Object.entries(manifestFiles)) {
-        summaryFiles[fileName] = { exports: meta.exports || [] }
-      }
-
-      // Detail: from source (extracted)
-      const detailFiles = {}
-      for (const [fileName, content] of Object.entries(fileContents)) {
-        detailFiles[fileName] = { exports: extractExports(content) }
-      }
-
-      return {
+      const result = {
         name: 'lib',
-        topline: {
-          files: fileNames
-        },
-        summary: {
-          purpose: manifest.purpose,
-          files: summaryFiles
-        },
-        detail: {
-          purpose: manifest.purpose,
-          files: detailFiles
+        topline: `lib | ${fileNames.join(', ') || 'empty'}`
+      }
+
+      if (manifest.purpose) {
+        result.summary = manifest.purpose
+      }
+
+      // Detail: exports per file
+      const detailLines = []
+      for (const [fileName, content] of Object.entries(fileContents)) {
+        const exports = extractExports(content)
+        if (exports.length > 0) {
+          detailLines.push(`${fileName}: ${exports.join(', ')}`)
         }
       }
+      if (detailLines.length > 0) {
+        result.detail = detailLines.join('\n')
+      }
+
+      // Enriched: full source code
+      const enrichedParts = []
+      for (const [fileName, content] of Object.entries(fileContents)) {
+        enrichedParts.push(`=== ${fileName} ===\n${content}`)
+      }
+      if (enrichedParts.length > 0) {
+        result.enriched = enrichedParts.join('\n\n')
+      }
+
+      return result
     },
 
-    // Build reqs facet from _reqs/index.json
+    // Build reqs facet
     buildReqs(manifest) {
-      return {
+      const files = manifest.files || []
+
+      const result = {
         name: 'reqs',
-        topline: {
-          files: manifest.files || []
-        },
-        summary: {
-          purpose: manifest.purpose,
-          files: manifest.files || []
-        },
-        detail: {
-          purpose: manifest.purpose,
-          files: manifest.files || []
-        }
+        topline: `reqs | ${files.join(', ') || 'empty'}`
       }
+
+      if (manifest.purpose) {
+        result.summary = manifest.purpose
+      }
+
+      return result
     }
   }
 }
 
-// Count total methods from apiFacets
+// Count total methods
 function countMethods(identity) {
   if (!identity.api) return 0
   let count = 0
@@ -172,26 +174,15 @@ function countMethods(identity) {
   return count
 }
 
-// Extract exported function names from source code
-// Handles: return { foo() {}, bar: function() {} } pattern in create() factory
+// Extract exported function names from source
 function extractExports(content) {
   const exports = []
-
-  // Find method definitions in the returned object
-  // Pattern 1: methodName(args) { - method shorthand
-  // Pattern 2: methodName: function - traditional
-  // Pattern 3: methodName: async function
-  // Pattern 4: async methodName(args) { - async shorthand
-
-  // Method shorthand: name( or async name(
   const shorthandMatches = content.matchAll(/^\s+(?:async\s+)?(\w+)\s*\([^)]*\)\s*\{/gm)
   for (const match of shorthandMatches) {
     const name = match[1]
-    // Skip create function itself and common non-export names
     if (!['create', 'if', 'for', 'while', 'switch', 'catch', 'function'].includes(name)) {
       exports.push(name)
     }
   }
-
-  return [...new Set(exports)] // dedupe
+  return [...new Set(exports)]
 }

@@ -1,12 +1,12 @@
-// whoami.js - Orchestrate report building and freetext rendering
-//
-// Uses container libs (report.js, freetext.js) for per-facet work.
-// Handles: component selection, accumulation, level combination, output shaping.
+// whoami.js - Container introspection lib
 //
 // Exports:
-//   getContainerPath()   - resolve parent container from method path
-//   buildReport()        - build structured report array
-//   renderFreetext()     - render report to natural language at level
+//   parseFacets(input)                    - parse --facet flag
+//   buildContainer(detailLevel, facets)  - build container with facets
+//   buildChain(depthLevel, detailLevel, facets) - traverse type chain
+//   renderFreetext(container, level)     - render to natural language
+
+const ALL_FACETS = ['container', 'api', 'handler', 'schemas', 'lib', 'reqs']
 
 export function create(module) {
   let _fs = null
@@ -40,7 +40,7 @@ export function create(module) {
     return methodPath.split('/').slice(0, -1).join('/')
   }
 
-  // Get filesystem path for container using module.resolve
+  // Get filesystem path for container
   const getContainerFsPath = async (containerPath) => {
     const path = await getPath()
     const indexJsonPath = module.resolve(containerPath, 'index.json')
@@ -74,11 +74,25 @@ export function create(module) {
     }
   }
 
-  return {
-    getContainerPath,
+  // Check if facet is requested
+  const hasFacet = (facets, name) => {
+    if (!facets) return true  // null = all facets
+    return facets.includes(name)
+  }
 
-    // Build structured report - container with nested facets
-    async buildReport() {
+  return {
+    // Parse --facet flag into array
+    parseFacets(facetInput) {
+      if (!facetInput || facetInput === true) return null  // all facets
+      if (typeof facetInput === 'string') {
+        const facets = facetInput.split(',').map(f => f.trim()).filter(f => ALL_FACETS.includes(f))
+        return facets.length > 0 ? facets : null
+      }
+      return null
+    },
+
+    // Build container with facets at detail level
+    async buildContainer(detailLevel, facets) {
       const path = await getPath()
       const report = await getReport()
 
@@ -89,97 +103,66 @@ export function create(module) {
       const identity = await readJson(path.join(containerFsPath, 'index.json'))
       if (!identity) return null
 
-      // Build container with nested facets
-      const container = report.buildContainer(identity)
+      // Container detail level: full if 'container' in facets, topline otherwise
+      const containerDetailLevel = hasFacet(facets, 'container') ? detailLevel : 'topline'
+      const container = report.buildContainer(identity, containerDetailLevel)
 
-      // Api facet (what this container can do)
-      container.facets.push(report.buildApi(identity))
+      // Api facet
+      if (hasFacet(facets, 'api')) {
+        container.facets.push(report.buildApi(identity, detailLevel))
+      }
 
       // Handler facet
-      const handlerContent = await readFile(path.join(containerFsPath, 'index.js'))
-      if (handlerContent) {
-        container.facets.push(report.buildHandler(handlerContent))
+      if (hasFacet(facets, 'handler')) {
+        const handlerContent = await readFile(path.join(containerFsPath, 'index.js'))
+        if (handlerContent) {
+          container.facets.push(report.buildHandler(handlerContent, detailLevel))
+        }
       }
 
       // Schemas facet
-      const schemasManifest = await readJson(path.join(containerFsPath, '_schemas', 'index.json'))
-      if (schemasManifest) {
-        container.facets.push(report.buildSchemas(schemasManifest))
+      if (hasFacet(facets, 'schemas')) {
+        const schemasManifest = await readJson(path.join(containerFsPath, '_schemas', 'index.json'))
+        if (schemasManifest) {
+          container.facets.push(report.buildSchemas(schemasManifest, detailLevel))
+        }
       }
 
       // Lib facet
-      const libManifest = await readJson(path.join(containerFsPath, '_lib', 'index.json'))
-      if (libManifest) {
-        // Read lib file contents for export extraction
-        const libFileContents = {}
-        const libFiles = libManifest.files || {}
-        for (const fileName of Object.keys(libFiles)) {
-          const content = await readFile(path.join(containerFsPath, '_lib', fileName))
-          if (content) libFileContents[fileName] = content
+      if (hasFacet(facets, 'lib')) {
+        const libManifest = await readJson(path.join(containerFsPath, '_lib', 'index.json'))
+        if (libManifest) {
+          const libFileContents = {}
+          const libFiles = libManifest.files || {}
+          for (const fileName of Object.keys(libFiles)) {
+            const content = await readFile(path.join(containerFsPath, '_lib', fileName))
+            if (content) libFileContents[fileName] = content
+          }
+          container.facets.push(report.buildLib(libManifest, libFileContents, detailLevel))
         }
-        container.facets.push(report.buildLib(libManifest, libFileContents))
       }
 
       // Reqs facet
-      const reqsManifest = await readJson(path.join(containerFsPath, '_reqs', 'index.json'))
-      if (reqsManifest) {
-        container.facets.push(report.buildReqs(reqsManifest))
+      if (hasFacet(facets, 'reqs')) {
+        const reqsManifest = await readJson(path.join(containerFsPath, '_reqs', 'index.json'))
+        if (reqsManifest) {
+          container.facets.push(report.buildReqs(reqsManifest, detailLevel))
+        }
       }
 
       return container
     },
 
-    // Render freetext from container report at level
-    async renderFreetext(container, level = 'topline') {
+    // Build type chain (--levels)
+    async buildChain(depthLevel, detailLevel, facets) {
+      // TODO: implement type chain traversal
+      return []
+    },
+
+    // Render freetext from structured report
+    async renderFreetext(report, level = 'summary') {
       const freetext = await getFreetext()
-      const levelNum = { topline: 1, summary: 2, detail: 3, enriched: 4 }[level] || 1
-
-      if (!container) return ''
-
-      const lines = []
-
-      // Container headline
-      lines.push(freetext.renderContainerTopline(container))
-
-      if (levelNum >= 2) {
-        const summary = freetext.renderContainerSummary(container)
-        if (summary) lines.push('  ' + summary)
-      }
-
-      // Facets (children of container)
-      for (const facet of container.facets) {
-        const toplineRenderer = `render${capitalize(facet.name)}Topline`
-        if (freetext[toplineRenderer]) {
-          lines.push('  ' + freetext[toplineRenderer](facet))
-        }
-
-        if (levelNum >= 2) {
-          const summaryRenderer = `render${capitalize(facet.name)}Summary`
-          if (freetext[summaryRenderer]) {
-            const summary = freetext[summaryRenderer](facet)
-            if (summary) lines.push('    ' + summary)
-          }
-        }
-
-        if (levelNum >= 3) {
-          const detailRenderer = `render${capitalize(facet.name)}Detail`
-          if (freetext[detailRenderer]) {
-            const detail = freetext[detailRenderer](facet)
-            if (detail) {
-              for (const line of detail.split('\n')) {
-                if (line) lines.push('    ' + line)
-              }
-            }
-          }
-        }
-      }
-
-      return lines.join('\n')
+      return freetext.render(report, level)
     }
   }
-}
-
-// Helper: capitalize first letter
-function capitalize(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1)
 }
