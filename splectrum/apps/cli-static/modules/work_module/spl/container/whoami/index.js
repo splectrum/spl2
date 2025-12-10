@@ -10,21 +10,62 @@ export default async function(module) {
   const reportLevel = module.getReportLevel()
   const detailLevel = module.getDetailLevel()
   const facets = lib.parseFacets(input.facet)
-  const depthLevel = input.levels || 0
+  const levelsArg = input.levels
 
-  // 2. Build container with facets
-  const container = await lib.buildContainer(detailLevel, facets)
+  // 2. Build type stack
+  const stack = await lib.buildTypeStack()
+  const containerPath = stack[stack.length - 1]
+  const levelsInfo = `${containerPath} [levels: ${stack.map((t, i) => `${i + 1} ${t}`).join(', ')}]`
 
-  // 3. Handle depth level (--levels)
-  if (depthLevel > 0 || depthLevel === 'full') {
-    container.chain = await lib.buildChain(depthLevel, detailLevel, facets)
+  // 3. Handle --levels flag alone (show available levels only)
+  if (levelsArg === true || levelsArg === '') {
+    return module.output(levelsInfo)
   }
 
-  // 4. Render freetext
-  const freetext = metaLevel === 'report'
-    ? JSON.stringify(container, null, 2)
-    : await lib.renderFreetext(container, metaLevel)
+  // 4. Determine which levels to show
+  let selectedLevels
 
-  // 5. Output
-  module.output(freetext, reportLevel ? container : null)
+  if (!levelsArg) {
+    // No --levels flag: just show current container (top of stack)
+    selectedLevels = [stack[stack.length - 1]]
+  } else if (levelsArg === 'all') {
+    // --levels=all: show all levels
+    selectedLevels = stack
+  } else {
+    // --levels=spl/container,spl/api: show specific levels
+    const requested = levelsArg.split(',').map(l => l.trim())
+    selectedLevels = stack.filter(l => requested.includes(l))
+  }
+
+  // 5. Build containers for selected levels
+  const levelResults = []
+  for (let i = 0; i < selectedLevels.length; i++) {
+    const levelName = selectedLevels[i]
+    const levelIdx = stack.indexOf(levelName) + 1
+    const container = await lib.buildContainerAtLevel(levelName, detailLevel, facets)
+    if (container) {
+      // Always add level info to topline
+      container.topline = `${container.topline} [${levelIdx}/${stack.length}]`
+      levelResults.push(container)
+    }
+  }
+
+  // 6. Render output
+  if (levelResults.length === 0) {
+    return module.output('No levels found')
+  }
+
+  // Wrap in container with levels
+  const report = {
+    topline: levelsInfo,
+    levels: levelResults
+  }
+
+  if (metaLevel === 'report') {
+    return module.output(JSON.stringify(report, null, 2), reportLevel ? report : null)
+  }
+
+  // Render freetext - freetext renderer will handle the levels array
+  const output = await lib.renderFreetext(report, metaLevel)
+  module.output(output, reportLevel ? report : null)
 }

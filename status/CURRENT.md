@@ -9,93 +9,98 @@
 **Project 11: App Architecture**
 
 - Type: Exploration Project
-- Status: **In Progress - selfeval implemented, runner pattern refactoring**
+- Status: **In Progress - levels support for whoami/selfeval**
 - Location: `projects/11-app-architecture/`
 
 ### Current Focus
 
-**Selfeval method and runners** - validation framework for containers.
+**Type inheritance levels** - whoami and selfeval support for type stack traversal.
 
 This session completed:
-- Selfeval method refactored to new flag scheme (`--meta`, `--report`, `--runner`, `--dry-run`, `--fail-fast`, `--levels`)
-- 5 selfeval runners: lib, api, schemas, handler, reqs
-- Bidirectional checking: manifest→reality AND reality→manifest (catches unregistered files)
-- Runner registry in `_selfevals/index.json` with explicit file/name/description
-- Selfeval req updated with output structure spec
+- All 5 selfeval runners converted to `create()` pattern
+- Lib manifest updated with name, description, exports per file
+- Reqs manifest restructured to `requirements` array with name/description/file
+- Created req files for all 8 lib files
+- Renamed identity_type/instance to container_type/instance
+- Simplified API to 4 methods: whoami, selfeval, create, delete
+- Created create/delete method stubs
+- spl/container selfeval now passes 5/5 runners
+- **whoami --levels** implemented with type stack
 
 ### In Progress
 
-**Lib pattern standardization** - all libs should use `create()` pattern:
-- Runners currently use `export default` - need to revert to `create()` returning `{ run }`
-- Lib runner should dynamically inspect exports instead of relying on manifest declarations
-- Manifest should just list files, not exports
+**Selfeval levels support** - same pattern as whoami:
+- Build type stack (instance chain first, then type chain, deduped)
+- Each level runs runners from that type's _selfevals/
+- Runners test against current container's structure
 
 ### Key Design Decisions
 
-**Selfeval structure:**
-- `_selfevals/index.json` - registry with runner metadata (name, description, file)
-- `_lib/selfeval_*.js` - runner code
-- `_tests/` - test data (future)
-- Runners receive `containerFsPath` and read what they need
+**Type stack (levels):**
+- Instance chain first (instantiates), then type chain (extends), deduped
+- spl/modules: 1 spl/container, 2 spl/modules
+- `--levels` alone shows available levels
+- `--levels=all` runs all levels
+- `--levels=spl/container` runs specific level
 
-**Runner registry format:**
-```json
-{
-  "runners": {
-    "lib": { "name": "lib", "description": "...", "file": "selfeval_lib.js" }
-  }
-}
-```
+**Final resources (cannot overlap across type chain):**
+- _reqs/*.md
+- _lib/*.js
+- _tests/*.js
 
-**Lib pattern (to be enforced):**
-- All libs use `export function create(module)` returning object with exports
-- No `export default` for libs
-- Manifest lists files only, exports discovered at runtime
+**Non-final (each level has its own):**
+- index.json
+- _schemas/*.avsc
+- _selfevals/
+
+**Selfeval inheritance:**
+- Each level has own _selfevals/index.json
+- Runner code in that level's _lib/ (final, so available via overlay)
+- Runners validate current container's structure against that level's rules
 
 ### Key Files
 
 Work module: `splectrum/apps/cli-static/modules/work_module/`
 
-- `spl/container/selfeval/index.js` - selfeval method
-- `spl/container/selfeval/_reqs/selfeval_method_v1.0.0.md` - output spec
-- `spl/container/_lib/selfeval.js` - framework (loadRegistry, loadRunner, runAll)
-- `spl/container/_lib/selfeval_lib.js` - lib runner
-- `spl/container/_lib/selfeval_api.js` - api runner
-- `spl/container/_lib/selfeval_schemas.js` - schemas runner
-- `spl/container/_lib/selfeval_handler.js` - handler runner
-- `spl/container/_lib/selfeval_reqs.js` - reqs runner
-- `spl/container/_selfevals/index.json` - runner registry
-- `spl/container/_reqs/index.json` - registered req files
+- `spl/container/whoami/index.js` - whoami with --levels support
+- `spl/container/whoami/_lib/whoami.js` - buildTypeStack, buildContainerAtLevel
+- `spl/container/_lib/selfeval.js` - framework with buildTypeStack, loadRegistryFromType
+- `spl/container/index.json` - extends: null, instantiates: spl/api
+- `spl/modules/index.json` - extends: spl/container, instantiates: spl/api
+- `spl/modules/_reqs/spl_modules_type_v1.0.0.md` - hierarchy.json spec
 
 ### Working Commands
 
 ```bash
-./spl spl/container/selfeval                    # summary (default)
-./spl spl/container/selfeval --meta=topline     # minimal
-./spl spl/container/selfeval --meta=detail      # full breakdown
-./spl spl/container/selfeval --meta=report      # JSON output
-./spl spl/container/selfeval --report           # freetext + JSON
-./spl spl/container/selfeval --runner=lib       # specific runner
-./spl spl/container/selfeval --dry-run          # list runners
+./spl spl/modules/whoami                      # current level only
+./spl spl/modules/whoami --levels             # show available levels
+./spl spl/modules/whoami --levels=all         # all levels
+./spl spl/modules/whoami --levels=spl/container  # specific level
+
+./spl spl/container/selfeval                  # all runners pass
+./spl spl/container/selfeval --meta=detail    # full breakdown
 ```
 
-### Current selfeval output
+### Current whoami output
 
 ```
-spl/container | FAIL
-4/5 runners passed
-  lib | PASS (8/8 files)
-  api | FAIL (2/7 methods - 5 not implemented)
-  schemas | PASS (2/2 files)
-  handler | PASS (1/1 checks)
-  reqs | PASS (18/18 files)
+spl/modules [levels: 1 spl/container, 2 spl/modules]
+  spl/modules | Type [2/2]
+  Modules spot type - collection of module instances
+    api | 0 facets, 0 methods
+    handler | Modules spot type container
+    reqs | empty
+    Requirements for spl/modules container
 ```
 
 ### Next Steps
 
-1. **Revert runners to create() pattern** - uniform lib pattern
-2. **Update lib runner** - dynamically inspect exports instead of manifest
-3. **Remove exports from manifest** - just list files
+1. **Add levels support to selfeval** - same pattern as whoami
+2. **Create generic schema runner** - validates JSON against expected structure
+3. **Create generic children runner** - validates child types
+4. **Create generic final-files runner** - validates no overlap in final resources
+5. **Add _selfevals and _lib to spl/modules** - hierarchy runner
+6. **Upgrade spl/module, spl/package, spl/method** - new structure
 
 ### Work Items
 
@@ -114,14 +119,15 @@ spl/container | FAIL
 **Starting a new session?**
 
 1. Read this file for current context
-2. Test: `./spl spl/container/selfeval --meta=detail`
-3. Next: Revert runners to `create()` pattern, update lib runner to inspect exports
+2. Test: `./spl spl/modules/whoami --levels=all`
+3. Next: Add levels to selfeval method
 
 **Key patterns:**
 - Methods use `module.output(freetext, structured)` not return
 - Libs use `create(module)` returning object with exports
 - Runners are libs with a `run(containerFsPath)` export
-- Freetext renderer: `freetext.render(json, level)`
+- Type stack: instance chain first, then type chain, deduped
+- Final resources: _reqs, _lib, _tests (no overlap)
 
 ---
 

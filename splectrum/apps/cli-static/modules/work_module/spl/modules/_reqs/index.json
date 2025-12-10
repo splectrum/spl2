@@ -1,0 +1,11 @@
+{
+  "name": "reqs",
+  "purpose": "Requirements for spl/modules container",
+  "requirements": [
+    {
+      "name": "spl_modules_type",
+      "description": "Modules spot type definition",
+      "file": "spl_modules_type_v1.0.0.md"
+    }
+  ]
+}

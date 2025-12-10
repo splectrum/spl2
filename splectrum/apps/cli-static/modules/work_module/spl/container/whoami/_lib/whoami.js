@@ -153,6 +153,144 @@ export function create(module) {
       return container
     },
 
+    // Build type stack: instance chain first, then type chain, deduped
+    // Returns array of type names from bottom (most base) to top (current)
+    async buildTypeStack() {
+      const path = await getPath()
+      const containerPath = getContainerPath()
+      const containerFsPath = await getContainerFsPath(containerPath)
+      const identity = await readJson(path.join(containerFsPath, 'index.json'))
+      if (!identity) return [containerPath]
+
+      const visited = new Set()
+      const instanceChain = []
+      const typeChain = []
+
+      // Follow instantiates chain first
+      const buildInstanceChain = async (typeName) => {
+        if (!typeName || visited.has(typeName)) return
+        visited.add(typeName)
+
+        const typeFsPath = await getContainerFsPath(typeName)
+        if (!typeFsPath) return
+
+        const typeIdentity = await readJson(path.join(typeFsPath, 'index.json'))
+        if (!typeIdentity) return
+
+        // Recurse to base first
+        if (typeIdentity.instantiates) {
+          await buildInstanceChain(typeIdentity.instantiates)
+        }
+        instanceChain.push(typeName)
+      }
+
+      // Follow extends chain
+      const buildTypeChain = async (typeName) => {
+        if (!typeName || visited.has(typeName)) return
+        visited.add(typeName)
+
+        const typeFsPath = await getContainerFsPath(typeName)
+        if (!typeFsPath) return
+
+        const typeIdentity = await readJson(path.join(typeFsPath, 'index.json'))
+        if (!typeIdentity) return
+
+        // Recurse to base first
+        if (typeIdentity.extends) {
+          await buildTypeChain(typeIdentity.extends)
+        }
+        typeChain.push(typeName)
+      }
+
+      // Build instance chain from instantiates
+      if (identity.instantiates) {
+        await buildInstanceChain(identity.instantiates)
+      }
+
+      // Build type chain from extends (will skip already visited)
+      if (identity.extends) {
+        await buildTypeChain(identity.extends)
+      }
+
+      // Add current container at the end
+      if (!visited.has(containerPath)) {
+        typeChain.push(containerPath)
+      }
+
+      // Combine: instance chain first, then type chain
+      return [...instanceChain, ...typeChain]
+    },
+
+    // Get levels info string
+    async getLevelsInfo() {
+      const stack = await this.buildTypeStack()
+      const containerPath = getContainerPath()
+      const parts = stack.map((t, i) => `${i + 1} ${t}`)
+      return `${containerPath} levels: ${parts.join(', ')}`
+    },
+
+    // Build container at specific level
+    async buildContainerAtLevel(levelName, detailLevel, facets) {
+      const path = await getPath()
+      const report = await getReport()
+
+      const containerFsPath = await getContainerFsPath(levelName)
+      if (!containerFsPath) return null
+
+      // Read container identity
+      const identity = await readJson(path.join(containerFsPath, 'index.json'))
+      if (!identity) return null
+
+      // Container detail level: full if 'container' in facets, topline otherwise
+      const containerDetailLevel = hasFacet(facets, 'container') ? detailLevel : 'topline'
+      const container = report.buildContainer(identity, containerDetailLevel)
+
+      // Api facet
+      if (hasFacet(facets, 'api')) {
+        container.facets.push(report.buildApi(identity, detailLevel))
+      }
+
+      // Handler facet
+      if (hasFacet(facets, 'handler')) {
+        const handlerContent = await readFile(path.join(containerFsPath, 'index.js'))
+        if (handlerContent) {
+          container.facets.push(report.buildHandler(handlerContent, detailLevel))
+        }
+      }
+
+      // Schemas facet
+      if (hasFacet(facets, 'schemas')) {
+        const schemasManifest = await readJson(path.join(containerFsPath, '_schemas', 'index.json'))
+        if (schemasManifest) {
+          container.facets.push(report.buildSchemas(schemasManifest, detailLevel))
+        }
+      }
+
+      // Lib facet
+      if (hasFacet(facets, 'lib')) {
+        const libManifest = await readJson(path.join(containerFsPath, '_lib', 'index.json'))
+        if (libManifest) {
+          const libFileContents = {}
+          const libFiles = libManifest.files || {}
+          for (const fileName of Object.keys(libFiles)) {
+            const content = await readFile(path.join(containerFsPath, '_lib', fileName))
+            if (content) libFileContents[fileName] = content
+          }
+          container.facets.push(report.buildLib(libManifest, libFileContents, detailLevel))
+        }
+      }
+
+      // Reqs facet
+      if (hasFacet(facets, 'reqs')) {
+        const reqsManifest = await readJson(path.join(containerFsPath, '_reqs', 'index.json'))
+        if (reqsManifest) {
+          container.facets.push(report.buildReqs(reqsManifest, detailLevel))
+        }
+      }
+
+      return container
+    },
+
     // Build type chain (--levels)
     async buildChain(depthLevel, detailLevel, facets) {
       // TODO: implement type chain traversal

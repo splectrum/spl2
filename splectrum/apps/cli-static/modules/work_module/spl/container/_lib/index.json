@@ -1,20 +1,46 @@
 {
   "name": "lib",
-  "purpose": "Container core libs - report building, freetext rendering, selfeval framework",
+  "purpose": "Container core libs - report building, freetext rendering, selfeval framework and runners",
   "files": {
     "report.js": {
+      "name": "report",
+      "description": "Build four-level structures from flat facts for whoami output",
       "exports": ["buildContainer", "buildApi", "buildHandler", "buildSchemas", "buildLib", "buildReqs"]
     },
     "freetext.js": {
+      "name": "freetext",
+      "description": "Generic freetext renderer for four-level structured JSON",
       "exports": ["render"]
     },
     "selfeval.js": {
+      "name": "selfeval",
+      "description": "Selfeval framework - load registry, instantiate runners, execute validation",
       "exports": ["loadRegistry", "loadRunner", "runAll"]
     },
-    "selfeval_lib.js": {},
-    "selfeval_api.js": {},
-    "selfeval_schemas.js": {},
-    "selfeval_handler.js": {},
-    "selfeval_reqs.js": {}
+    "selfeval_lib.js": {
+      "name": "selfeval_lib",
+      "description": "Selfeval runner for lib facet - validates files and exports",
+      "exports": ["run"]
+    },
+    "selfeval_api.js": {
+      "name": "selfeval_api",
+      "description": "Selfeval runner for api facet - validates method folders",
+      "exports": ["run"]
+    },
+    "selfeval_schemas.js": {
+      "name": "selfeval_schemas",
+      "description": "Selfeval runner for schemas facet - validates schema files",
+      "exports": ["run"]
+    },
+    "selfeval_handler.js": {
+      "name": "selfeval_handler",
+      "description": "Selfeval runner for handler facet - validates index.js exports function",
+      "exports": ["run"]
+    },
+    "selfeval_reqs.js": {
+      "name": "selfeval_reqs",
+      "description": "Selfeval runner for reqs facet - validates req files",
+      "exports": ["run"]
+    }
   }
 }
