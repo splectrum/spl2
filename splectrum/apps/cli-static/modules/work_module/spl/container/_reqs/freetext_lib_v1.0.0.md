@@ -16,6 +16,7 @@ Generic freetext renderer for four-level structured JSON.
 | Function | Signature | Description |
 |----------|-----------|-------------|
 | `render` | `(json, level?)` | Render JSON to freetext at specified level |
+| `renderWithLevels` | `(report, level?)` | Render selfeval results with levels structure |
 
 **Levels:** `topline`, `summary`, `detail`, `enriched`
 
@@ -29,7 +30,7 @@ Generic freetext renderer for four-level structured JSON.
 
 - [ ] File exists at `_lib/freetext.js`
 - [ ] Exports `create(module)` function
-- [ ] Created object exports `render` function
+- [ ] Created object exports `render`, `renderWithLevels` functions
 
 ## Comments
 

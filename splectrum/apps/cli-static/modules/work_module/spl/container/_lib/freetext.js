@@ -25,6 +25,45 @@ export function create(module) {
       const lines = []
       renderNode(json, 0, include, lines)
       return lines.join('\n')
+    },
+
+    /**
+     * Render selfeval results with levels structure
+     * @param {Object} report - { topline, summary, levels: [...] }
+     * @param {string} level - Max level: 'topline'|'summary'|'detail'|'enriched'
+     * @returns {string} - Freetext rendering
+     */
+    renderWithLevels(report, level = 'summary') {
+      if (!report) return ''
+
+      const levelIdx = LEVEL_KEYS.indexOf(level)
+      const include = levelIdx >= 0 ? LEVEL_KEYS.slice(0, levelIdx + 1) : ['summary']
+
+      const lines = []
+
+      // Report topline and summary
+      if (report.topline) lines.push(report.topline)
+      if (include.includes('summary') && report.summary) lines.push(`  ${report.summary}`)
+
+      // Each level
+      if (report.levels) {
+        for (const levelResult of report.levels) {
+          if (levelResult.topline) lines.push(`  ${levelResult.topline}`)
+          if (include.includes('summary') && levelResult.summary) {
+            lines.push(`    ${levelResult.summary}`)
+          }
+
+          // Runners within each level (detail level and above)
+          if (include.includes('detail') && levelResult.runners) {
+            for (const runner of levelResult.runners) {
+              if (runner.topline) lines.push(`      ${runner.topline}`)
+              if (runner.summary) lines.push(`        ${runner.summary}`)
+            }
+          }
+        }
+      }
+
+      return lines.join('\n')
     }
   }
 }

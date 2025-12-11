@@ -25,7 +25,7 @@ export function create(module) {
       if (!identity.api) {
         return {
           pass: true,
-          topline: 'api | SKIP',
+          topline: 'api | EMPTY',
           summary: 'No api declared',
           methods: []
         }

@@ -100,59 +100,102 @@ function checkPath(nodePath, subPath, nodeRoot, appAPI, enableAppOverlay, module
 }
 
 /**
- * Read README.json from a container path
+ * Read index.json from a container path
  */
-function readContainerReadme(containerPath, nodeRoot, appAPI, enableAppOverlay, modulesDir) {
-  const readmePath = checkPath(containerPath, 'README.json', nodeRoot, appAPI, enableAppOverlay, modulesDir)
-  if (!readmePath) return null
+function readContainerIndex(containerPath, nodeRoot, appAPI, enableAppOverlay, modulesDir) {
+  const indexPath = checkPath(containerPath, 'index.json', nodeRoot, appAPI, enableAppOverlay, modulesDir)
+  if (!indexPath) return null
   try {
-    return JSON.parse(fs.readFileSync(readmePath, 'utf8'))
+    return JSON.parse(fs.readFileSync(indexPath, 'utf8'))
   } catch {
     return null
   }
 }
 
 /**
- * Resolve a file through overlay layers, following instantiates then extends chain
+ * Build type stack for a container.
+ *
+ * Stack structure:
+ * 1. Type layer first: container → extends chain
+ * 2. Instance layer second: instantiates → extends chain (deduped)
+ *
+ * Returns { stack: [...], instanceLevel: N } where instanceLevel is the
+ * 1-based index where instance layer begins (for instanceRunners).
+ *
+ * Examples:
+ * - spl (instance): { stack: [spl, spl/package, spl/container], instanceLevel: 2 }
+ * - spl/package (type): { stack: [spl/package, spl/container, spl/api], instanceLevel: 3 }
+ */
+function buildTypeStack(containerPath, nodeRoot, appAPI, enableAppOverlay, modulesDir) {
+  const index = readContainerIndex(containerPath, nodeRoot, appAPI, enableAppOverlay, modulesDir)
+  if (!index) return { stack: [containerPath], instanceLevel: 1 }
+
+  const stack = [containerPath]
+  const visited = new Set([containerPath])
+
+  // 1. Follow extends chain first (type layer)
+  let current = index.extends
+  while (current && !visited.has(current)) {
+    visited.add(current)
+    stack.push(current)
+    const typeIndex = readContainerIndex(current, nodeRoot, appAPI, enableAppOverlay, modulesDir)
+    if (!typeIndex) break
+    current = typeIndex.extends
+  }
+
+  // 2. Determine instance level
+  // If instantiates points to something already in stack, use that position
+  // Otherwise, instance layer begins after type layer
+  let instanceLevel
+  if (index.instantiates && visited.has(index.instantiates)) {
+    // Bootstrap case: instantiates points to self or ancestor
+    instanceLevel = stack.indexOf(index.instantiates) + 1
+  } else {
+    instanceLevel = stack.length + 1
+  }
+
+  // 3. Follow instantiates chain (instance layer), then extends from there
+  current = index.instantiates
+  while (current && !visited.has(current)) {
+    visited.add(current)
+    stack.push(current)
+    const typeIndex = readContainerIndex(current, nodeRoot, appAPI, enableAppOverlay, modulesDir)
+    if (!typeIndex) break
+    current = typeIndex.extends
+  }
+
+  return { stack, instanceLevel }
+}
+
+/**
+ * Resolve a file through overlay layers, following type stack.
+ * For method paths (spl/whoami): split into container + method, search type stack
+ * For file paths (spl/container/_lib/x.js): search type stack directly
  */
 function resolveOverlay(nodePath, subPath, nodeRoot, appAPI, enableAppOverlay, modulesDir) {
   // Direct check first
   const direct = checkPath(nodePath, subPath, nodeRoot, appAPI, enableAppOverlay, modulesDir)
   if (direct) return direct
 
-  // If looking for a method (path has 3+ segments like spl/api/whoami), follow inheritance
+  // Check if this is a method path (container/method with subPath=index.js)
+  // or a file path (container with subPath=_lib/x.js etc)
   const segments = nodePath.split('/')
-  if (segments.length >= 3) {
+  if (segments.length >= 2 && subPath === 'index.js') {
+    // Method resolution: last segment is method name, rest is container
     const methodName = segments[segments.length - 1]
-    let containerPath = segments.slice(0, -1).join('/')
-    const visited = new Set()
+    const containerPath = segments.slice(0, -1).join('/')
 
-    while (containerPath && !visited.has(containerPath)) {
-      visited.add(containerPath)
-      const readme = readContainerReadme(containerPath, nodeRoot, appAPI, enableAppOverlay, modulesDir)
-      if (!readme) break
-
-      // Check instantiates first (instance -> type)
-      if (readme.instantiates) {
-        const typeMethodPath = `${readme.instantiates}/${methodName}`
-        const found = checkPath(typeMethodPath, subPath, nodeRoot, appAPI, enableAppOverlay, modulesDir)
-        if (found) return found
-        // Continue from the type
-        containerPath = readme.instantiates
-        continue
-      }
-
-      // Then check extends (type -> parent type)
-      if (readme.extends) {
-        const parentMethodPath = `${readme.extends}/${methodName}`
-        const found = checkPath(parentMethodPath, subPath, nodeRoot, appAPI, enableAppOverlay, modulesDir)
-        if (found) return found
-        // Continue up the chain
-        containerPath = readme.extends
-        continue
-      }
-
-      break
+    const { stack } = buildTypeStack(containerPath, nodeRoot, appAPI, enableAppOverlay, modulesDir)
+    for (const typeName of stack) {
+      const found = checkPath(`${typeName}/${methodName}`, subPath, nodeRoot, appAPI, enableAppOverlay, modulesDir)
+      if (found) return found
+    }
+  } else {
+    // File resolution: search type stack for the file
+    const { stack } = buildTypeStack(nodePath, nodeRoot, appAPI, enableAppOverlay, modulesDir)
+    for (const typeName of stack) {
+      const found = checkPath(typeName, subPath, nodeRoot, appAPI, enableAppOverlay, modulesDir)
+      if (found) return found
     }
   }
 
@@ -450,6 +493,17 @@ export function create(record) {
      */
     resolve(nodePath, filename) {
       return internalResolve(nodePath, filename)
+    },
+
+    /**
+     * Build type stack for a container
+     * @param {string} containerPath - Container path (e.g., 'spl/container')
+     * @returns {{ stack: string[], instanceLevel: number }} - Type stack and instance level
+     */
+    buildTypeStack(containerPath) {
+      const modulesDir = getModulesDir()
+      if (!modulesDir) return { stack: [containerPath], instanceLevel: 1 }
+      return buildTypeStack(containerPath, getNodeRoot(), getAppAPI(), getEnableAppOverlay(), modulesDir)
     },
 
     // ========================================================================

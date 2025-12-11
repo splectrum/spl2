@@ -19,7 +19,7 @@ export function create(module) {
       } catch (e) {
         return {
           pass: true,
-          topline: 'lib | SKIP',
+          topline: 'lib | EMPTY',
           summary: 'No _lib/index.json',
           files: []
         }
@@ -117,16 +117,58 @@ export function create(module) {
   }
 }
 
-// Extract exported function names from source
+// Extract exports from source - either ES6 exports or methods in create() return object
 function extractExports(content) {
   const exports = []
 
-  // Check for named exports in create() return object
-  const shorthandMatches = content.matchAll(/^\s+(?:async\s+)?(\w+)\s*\([^)]*\)\s*\{/gm)
-  for (const match of shorthandMatches) {
-    const name = match[1]
-    if (!['create', 'if', 'for', 'while', 'switch', 'catch', 'function'].includes(name)) {
-      exports.push(name)
+  // Check if this is a create() pattern lib
+  const hasCreatePattern = /^export\s+function\s+create\s*\(/m.test(content)
+
+  if (hasCreatePattern) {
+    // Libs with `export function create(module)` pattern - extract instance methods from return block
+    // Find the FINAL return { ... } at function end (indented by 2 spaces)
+    const returnMatch = content.match(/^  return \{([\s\S]*?)^  \}/m)
+    if (returnMatch) {
+      const returnBlock = returnMatch[1]
+      // Method shorthand: name() { or async name() { - must start with proper indent (4+ spaces)
+      // Exclude JS keywords that look like method calls
+      const jsKeywords = ['if', 'for', 'while', 'switch', 'catch', 'with']
+      const methodMatches = returnBlock.matchAll(/^\s{4,}(?:async\s+)?(\w+)\s*\([^)]*\)\s*\{/gm)
+      for (const match of methodMatches) {
+        if (!jsKeywords.includes(match[1])) {
+          exports.push(match[1])
+        }
+      }
+    }
+    // If no methods found, it's a single-method lib - export is 'create'
+    if (exports.length === 0) {
+      exports.push('create')
+    }
+  } else {
+    // Standard ES6 exports
+
+    // export function name
+    const funcMatches = content.matchAll(/^export\s+(?:async\s+)?function\s+(\w+)/gm)
+    for (const match of funcMatches) {
+      exports.push(match[1])
+    }
+
+    // export const name
+    const constMatches = content.matchAll(/^export\s+const\s+(\w+)/gm)
+    for (const match of constMatches) {
+      exports.push(match[1])
+    }
+
+    // export { name1, name2 }
+    const namedMatches = content.matchAll(/^export\s*\{([^}]+)\}/gm)
+    for (const match of namedMatches) {
+      const names = match[1].split(',').map(n => n.trim().split(/\s+as\s+/)[0].trim())
+      exports.push(...names)
+    }
+
+    // export default - track as 'default'
+    if (/^export\s+default/m.test(content)) {
+      exports.push('default')
     }
   }
 

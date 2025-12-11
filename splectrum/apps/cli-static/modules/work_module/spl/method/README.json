@@ -1,6 +1,0 @@
-{
-  "method": {},
-  "instantiates": "spl/api",
-  "extends": "spl/container",
-  "purpose": "Method type definition - what all methods must be"
-}

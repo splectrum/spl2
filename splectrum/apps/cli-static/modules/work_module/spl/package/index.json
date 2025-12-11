@@ -1,0 +1,9 @@
+{
+  "name": "spl/package",
+  "type": "Type",
+  "purpose": "Package type - groups related APIs within a module",
+  "extends": "spl/container",
+  "instantiates": "spl/api",
+  "instanceChildren": "spl/api",
+  "api": {}
+}

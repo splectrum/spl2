@@ -1007,4 +1007,162 @@ spl spl/container/whoami --facet=schemas --report  # with data
 
 ---
 
+## 2025-12-11
+
+### Selfeval Levels Support Complete
+
+Continued from previous session - selfevals now support `--levels` flag same as whoami.
+
+**Completed:**
+- Selfeval method with levels support (type stack traversal)
+- Dual runner categories: `runners` (all levels) and `instanceRunners` (level 1 only)
+- Children runner (`selfeval_children.js`) - validates child container types
+- Final runner (`selfeval_final.js`) - detects overlap in final resources
+- spl/module type setup with _lib/module.js
+- Fixed extractExports in selfeval_lib.js (keyword exclusion, factory pattern fallback)
+
+**Current state:**
+```bash
+./spl spl/container/selfeval          # PASS - 6/6 runners
+./spl spl/module/selfeval --levels=all  # PASS - 3/3 levels
+```
+
+### module.js Pattern Discussion
+
+Identified inconsistency: module.js uses forward reference pattern (`let moduleRef = null; getModuleRef()`) while other libs use direct `return { }`.
+
+**Reason:** Inner functions (`internalRequire`, `createScriptExecutable`) need to pass `module` to loaded libs/methods before the module object exists.
+
+**Solution identified:** Use `this` in method shorthand - binds to containing object at call time:
+```javascript
+return {
+  async require(uri) {
+    return lib.create(this)  // 'this' is the module
+  }
+}
+```
+
+**Decision:** Document and schedule for later. Current solution works, selfevals pass.
+
+See: `notes/module_js_this_refactor.md`
+
+### spl/module type complete
+
+- work_module/index.json created (instance identity)
+- selfeval_module.js runner validates 20 instance methods
+- Lib manifest `exports` documents instance API, not module exports
+- All selfevals pass
+
+### spl/package type started
+
+- index.json created (extends spl/container, instantiates spl/api)
+- _reqs/index.json with type/instance requirements
+- _selfevals/index.json with instanceRunners for children (spl/api)
+
+### README.json → index.json migration (IN PROGRESS)
+
+Phasing out README.json - index.json is the source of truth for container identity.
+
+**Done:**
+- module.js updated: `readContainerReadme` → `readContainerIdentity` (reads index.json)
+- Removed README.json from: spl/module, spl/modules, spl, spl/container/selfeval, spl/container/whoami, spl/method, spl/api, spl/package
+
+**Still needed:**
+- spl/container needs index.json (currently missing - breaks inheritance chain)
+- Test spl/package/selfeval resolves via inheritance
+- Verify all existing selfevals still pass
+
+### Vibe Engineering comparison
+
+Added `elevator-pitch/VIBE_ENGINEERING_COMPARISON.md` - positions HAICC against mainstream "vibe engineering" trend. Key USPs:
+1. Dynamic autonomy (emerges from formalization)
+2. Embedded tooling (types carry tools)
+3. Mycelium context (containers as semantic chunks, not RAG fragments)
+4. Bi-directional growth (shift-left creative, shift-right formal)
+5. Freestyle ↔ Formal as feature
+
+---
+
+## 2025-12-12
+
+### Type Stack and Selfeval Architecture Complete
+
+Major session recovering from Windows reboot. Completed type stack algorithm and selfeval infrastructure.
+
+**Type stack algorithm fixed:**
+
+1. **Extends chain first (type layer)**, then **instantiates chain (instance layer)**
+2. Dynamic `instanceLevel` - not hardcoded to level 2
+3. Bootstrap case handled: when `instantiates` points to self or ancestor, instanceLevel points to existing position
+
+**Stack examples after fix:**
+- `spl`: `[spl, spl/package, spl/container]`, instanceLevel: 2
+- `spl/package`: `[spl/package, spl/container, spl/api]`, instanceLevel: 3
+- `spl/container`: `[spl/container, spl/api]`, instanceLevel: 2
+- `spl/api`: `[spl/api, spl/container]`, instanceLevel: 1 (bootstrap - instantiates itself)
+- `spl/method`: `[spl/method, spl/container, spl/api]`, instanceLevel: 3
+
+**Instance vs Type distinction clarified:**
+- `instantiates` = structural relationship (what container shape)
+- `type` field = content classification (what it defines)
+- Example: `spl/api` is an instance of `spl/api` (structurally) that defines what `spl/api` means (type: "Type")
+
+**Runner placement fixed:**
+- Type runners on `spl/container`: lib, schemas, handler, reqs, final
+- Instance runners on specific types:
+  - `spl/api`: api runner (validates methods match api declaration)
+  - `spl/package`: children runner (validates children match instanceChildren)
+
+**selfeval_children.js fixed:**
+- Now checks `instantiates` (structural type), not `extends`
+
+**selfeval_handler.js fixed:**
+- Now uses `module.resolve()` for overlay inheritance (finds parent type's handler)
+
+**SKIP → EMPTY naming:**
+- Changed throughout - "nothing to validate" not "skipped"
+
+**Empty manifests pattern:**
+- Explicit `index.json` with empty arrays/objects rather than absent folders
+- Created for `spl/_lib`, `spl/_reqs`, `spl/_schemas`
+
+**Type hierarchy fixes:**
+- `spl/api`: added `extends: spl/container`
+- `spl/method`: added `extends: spl/container`
+- `spl/api`, `spl/method`: added `instantiates: spl/api`
+- Moved `api` runner from `spl/container` to `spl/api/_selfevals` as instanceRunner
+
+**Working document created:**
+- `notes/type_stack_and_selfeval_architecture.md` - captures all design decisions
+
+**All selfevals passing:**
+```bash
+./spl spl/selfeval --levels=all          # PASS 3/3 levels
+./spl spl/container/selfeval --levels=all # PASS 2/2 levels
+./spl spl/package/selfeval --levels=all   # PASS 3/3 levels
+./spl spl/api/selfeval --levels=all       # PASS 2/2 levels
+./spl spl/method/selfeval --levels=all    # PASS 3/3 levels
+```
+
+### Next Steps (consolidated)
+
+**Foundation work:**
+1. Add empty manifest folders to remaining types (`spl/api`, `spl/method`)
+2. Test method instances (e.g., `spl/container/whoami/selfeval`)
+
+**Type completion:**
+3. `spl/api` - add _selfevals for instances (method children validation?)
+4. `spl/method` - add instanceRunner if needed
+
+**New container creation:**
+5. Methods - create new method instances
+6. APIs - create new API containers
+7. Packages - create package instances
+8. Modules - create module instances
+
+**Documentation:**
+9. Update relevant _reqs with design decisions from working document
+
+---
+
 *Log entries added as work progresses.*

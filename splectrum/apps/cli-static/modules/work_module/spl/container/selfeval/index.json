@@ -1,0 +1,6 @@
+{
+  "name": "spl/container/selfeval",
+  "type": "Method",
+  "purpose": "Validate container against requirements using runners",
+  "instantiates": "spl/method"
+}

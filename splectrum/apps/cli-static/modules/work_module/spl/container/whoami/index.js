@@ -13,9 +13,9 @@ export default async function(module) {
   const levelsArg = input.levels
 
   // 2. Build type stack
-  const stack = await lib.buildTypeStack()
-  const containerPath = stack[stack.length - 1]
-  const levelsInfo = `${containerPath} [levels: ${stack.map((t, i) => `${i + 1} ${t}`).join(', ')}]`
+  const { stack, instanceLevel } = lib.buildTypeStack()
+  const containerPath = stack[0]  // First element is the container itself
+  const levelsInfo = `${containerPath} [levels: ${stack.map((t, i) => `${i + 1} ${t}`).join(', ')}, instanceLevel: ${instanceLevel}]`
 
   // 3. Handle --levels flag alone (show available levels only)
   if (levelsArg === true || levelsArg === '') {
@@ -26,8 +26,8 @@ export default async function(module) {
   let selectedLevels
 
   if (!levelsArg) {
-    // No --levels flag: just show current container (top of stack)
-    selectedLevels = [stack[stack.length - 1]]
+    // No --levels flag: just show current container (first in stack)
+    selectedLevels = [stack[0]]
   } else if (levelsArg === 'all') {
     // --levels=all: show all levels
     selectedLevels = stack

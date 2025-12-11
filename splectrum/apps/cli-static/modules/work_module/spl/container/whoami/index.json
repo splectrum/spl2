@@ -1,0 +1,6 @@
+{
+  "name": "spl/container/whoami",
+  "type": "Method",
+  "purpose": "Container introspection - shows identity, api, handler, reqs, lib, schemas",
+  "instantiates": "spl/method"
+}

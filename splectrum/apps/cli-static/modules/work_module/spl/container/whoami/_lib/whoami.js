@@ -153,77 +153,15 @@ export function create(module) {
       return container
     },
 
-    // Build type stack: instance chain first, then type chain, deduped
-    // Returns array of type names from bottom (most base) to top (current)
-    async buildTypeStack() {
-      const path = await getPath()
+    // Build type stack: delegates to module.buildTypeStack
+    buildTypeStack() {
       const containerPath = getContainerPath()
-      const containerFsPath = await getContainerFsPath(containerPath)
-      const identity = await readJson(path.join(containerFsPath, 'index.json'))
-      if (!identity) return [containerPath]
-
-      const visited = new Set()
-      const instanceChain = []
-      const typeChain = []
-
-      // Follow instantiates chain first
-      const buildInstanceChain = async (typeName) => {
-        if (!typeName || visited.has(typeName)) return
-        visited.add(typeName)
-
-        const typeFsPath = await getContainerFsPath(typeName)
-        if (!typeFsPath) return
-
-        const typeIdentity = await readJson(path.join(typeFsPath, 'index.json'))
-        if (!typeIdentity) return
-
-        // Recurse to base first
-        if (typeIdentity.instantiates) {
-          await buildInstanceChain(typeIdentity.instantiates)
-        }
-        instanceChain.push(typeName)
-      }
-
-      // Follow extends chain
-      const buildTypeChain = async (typeName) => {
-        if (!typeName || visited.has(typeName)) return
-        visited.add(typeName)
-
-        const typeFsPath = await getContainerFsPath(typeName)
-        if (!typeFsPath) return
-
-        const typeIdentity = await readJson(path.join(typeFsPath, 'index.json'))
-        if (!typeIdentity) return
-
-        // Recurse to base first
-        if (typeIdentity.extends) {
-          await buildTypeChain(typeIdentity.extends)
-        }
-        typeChain.push(typeName)
-      }
-
-      // Build instance chain from instantiates
-      if (identity.instantiates) {
-        await buildInstanceChain(identity.instantiates)
-      }
-
-      // Build type chain from extends (will skip already visited)
-      if (identity.extends) {
-        await buildTypeChain(identity.extends)
-      }
-
-      // Add current container at the end
-      if (!visited.has(containerPath)) {
-        typeChain.push(containerPath)
-      }
-
-      // Combine: instance chain first, then type chain
-      return [...instanceChain, ...typeChain]
+      return module.buildTypeStack(containerPath)
     },
 
     // Get levels info string
-    async getLevelsInfo() {
-      const stack = await this.buildTypeStack()
+    getLevelsInfo() {
+      const stack = this.buildTypeStack()
       const containerPath = getContainerPath()
       const parts = stack.map((t, i) => `${i + 1} ${t}`)
       return `${containerPath} levels: ${parts.join(', ')}`

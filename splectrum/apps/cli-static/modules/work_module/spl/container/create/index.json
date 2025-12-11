@@ -1,0 +1,6 @@
+{
+  "name": "spl/container/create",
+  "type": "Method",
+  "purpose": "Create new container - scaffold structure from type",
+  "instantiates": "spl/method"
+}

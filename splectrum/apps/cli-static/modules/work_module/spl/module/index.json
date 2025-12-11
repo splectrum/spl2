@@ -1,8 +1,9 @@
 {
   "name": "spl/module",
   "type": "Type",
-  "purpose": "Module type - a named unit containing packages",
+  "purpose": "Module type - root container of a module, contains packages",
   "extends": "spl/container",
-  "instantiates": null,
+  "instantiates": "spl/api",
+  "instanceChildren": "spl/package",
   "api": {}
 }

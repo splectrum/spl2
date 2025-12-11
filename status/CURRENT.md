@@ -1,6 +1,6 @@
 # Current Status
 
-**Last Updated:** 2025-12-10
+**Last Updated:** 2025-12-12
 
 ---
 
@@ -9,98 +9,84 @@
 **Project 11: App Architecture**
 
 - Type: Exploration Project
-- Status: **In Progress - levels support for whoami/selfeval**
+- Status: **In Progress - Ready for container creation**
 - Location: `projects/11-app-architecture/`
 
 ### Current Focus
 
-**Type inheritance levels** - whoami and selfeval support for type stack traversal.
+**Type system complete.** All 7 types and method instances pass selfeval. Ready for:
+1. module.js `this` refactor (cleanup)
+2. `spl/container/create` method (the biggy)
 
-This session completed:
-- All 5 selfeval runners converted to `create()` pattern
-- Lib manifest updated with name, description, exports per file
-- Reqs manifest restructured to `requirements` array with name/description/file
-- Created req files for all 8 lib files
-- Renamed identity_type/instance to container_type/instance
-- Simplified API to 4 methods: whoami, selfeval, create, delete
-- Created create/delete method stubs
-- spl/container selfeval now passes 5/5 runners
-- **whoami --levels** implemented with type stack
+### Completed This Session (2025-12-12)
 
-### In Progress
+**Type stack architecture:**
+1. Algorithm fixed - extends chain first (type layer), then instantiates chain (instance layer)
+2. Dynamic `instanceLevel` - not hardcoded, handles bootstrap case
+3. Instance vs Type distinction - instantiates=structural, type field=content
 
-**Selfeval levels support** - same pattern as whoami:
-- Build type stack (instance chain first, then type chain, deduped)
-- Each level runs runners from that type's _selfevals/
-- Runners test against current container's structure
+**Runner infrastructure:**
+4. Type runners on `spl/container`: lib, schemas, handler, reqs, final
+5. Instance runners: `api` on spl/api, `children` on spl/api and spl/package
+6. `selfeval_children.js` checks `instantiates` (structural type)
+7. `selfeval_handler.js` uses overlay for inheritance
+
+**Type fixes:**
+8. `spl/api` and `spl/method` now extend `spl/container`
+9. `spl/api` bootstrap - instantiates itself, instanceLevel=1
+10. Empty manifests for `spl/_lib`, `spl/_reqs`, `spl/_schemas`, `spl/api/*`, `spl/method/*`
+11. Added `index.json` to `spl/container/create` and `spl/container/delete` methods
+
+### All Selfevals Passing
+
+```bash
+./spl spl/selfeval --levels=all             # PASS 3/3 levels
+./spl spl/container/selfeval --levels=all   # PASS 2/2 levels
+./spl spl/api/selfeval --levels=all         # PASS 2/2 levels
+./spl spl/method/selfeval --levels=all      # PASS 3/3 levels
+./spl spl/package/selfeval --levels=all     # PASS 3/3 levels
+./spl spl/module/selfeval --levels=all      # PASS 3/3 levels
+./spl spl/modules/selfeval --levels=all     # PASS 3/3 levels
+./spl spl/container/whoami/selfeval --levels=all  # PASS 3/3 levels
+```
+
+### Next Steps
+
+1. **module.js `this` refactor** - cleanup forward reference pattern (see `notes/module_js_this_refactor.md`)
+2. **`spl/container/create` method** - scaffold new containers from type
+
+**For project closure:**
+- Update _reqs with design decisions from `notes/type_stack_and_selfeval_architecture.md`
 
 ### Key Design Decisions
 
-**Type stack (levels):**
-- Instance chain first (instantiates), then type chain (extends), deduped
-- spl/modules: 1 spl/container, 2 spl/modules
-- `--levels` alone shows available levels
-- `--levels=all` runs all levels
-- `--levels=spl/container` runs specific level
+**Type stack structure:**
+- Type layer first: container → extends chain
+- Instance layer second: instantiates → extends chain (deduped)
+- `instanceLevel` marks where instance layer begins
 
-**Final resources (cannot overlap across type chain):**
-- _reqs/*.md
-- _lib/*.js
-- _tests/*.js
+**Stack examples:**
+- `spl`: `[spl, spl/package, spl/container]`, instanceLevel: 2
+- `spl/package`: `[spl/package, spl/container, spl/api]`, instanceLevel: 3
+- `spl/api`: `[spl/api, spl/container]`, instanceLevel: 1 (bootstrap)
 
-**Non-final (each level has its own):**
-- index.json
-- _schemas/*.avsc
-- _selfevals/
+**Runner categories:**
+- `runners` - run at every level (type validation)
+- `instanceRunners` - run only at instanceLevel (instance validation)
 
-**Selfeval inheritance:**
-- Each level has own _selfevals/index.json
-- Runner code in that level's _lib/ (final, so available via overlay)
-- Runners validate current container's structure against that level's rules
+**Final resources (no overlap):** `_reqs/*.md`, `_lib/*.js`, `_tests/*.js`
+**Non-final (inherit via overlay):** `index.js`, `_schemas/*.avsc`
 
 ### Key Files
 
 Work module: `splectrum/apps/cli-static/modules/work_module/`
 
-- `spl/container/whoami/index.js` - whoami with --levels support
-- `spl/container/whoami/_lib/whoami.js` - buildTypeStack, buildContainerAtLevel
-- `spl/container/_lib/selfeval.js` - framework with buildTypeStack, loadRegistryFromType
-- `spl/container/index.json` - extends: null, instantiates: spl/api
-- `spl/modules/index.json` - extends: spl/container, instantiates: spl/api
-- `spl/modules/_reqs/spl_modules_type_v1.0.0.md` - hierarchy.json spec
-
-### Working Commands
-
-```bash
-./spl spl/modules/whoami                      # current level only
-./spl spl/modules/whoami --levels             # show available levels
-./spl spl/modules/whoami --levels=all         # all levels
-./spl spl/modules/whoami --levels=spl/container  # specific level
-
-./spl spl/container/selfeval                  # all runners pass
-./spl spl/container/selfeval --meta=detail    # full breakdown
-```
-
-### Current whoami output
-
-```
-spl/modules [levels: 1 spl/container, 2 spl/modules]
-  spl/modules | Type [2/2]
-  Modules spot type - collection of module instances
-    api | 0 facets, 0 methods
-    handler | Modules spot type container
-    reqs | empty
-    Requirements for spl/modules container
-```
-
-### Next Steps
-
-1. **Add levels support to selfeval** - same pattern as whoami
-2. **Create generic schema runner** - validates JSON against expected structure
-3. **Create generic children runner** - validates child types
-4. **Create generic final-files runner** - validates no overlap in final resources
-5. **Add _selfevals and _lib to spl/modules** - hierarchy runner
-6. **Upgrade spl/module, spl/package, spl/method** - new structure
+- `_lib/module.js` - buildTypeStack, resolveOverlay
+- `spl/container/_lib/selfeval.js` - selfeval framework
+- `spl/container/_selfevals/index.json` - type runners
+- `spl/api/_selfevals/index.json` - api instanceRunner
+- `spl/package/_selfevals/index.json` - children instanceRunner
+- `notes/type_stack_and_selfeval_architecture.md` - design document
 
 ### Work Items
 
@@ -119,15 +105,15 @@ spl/modules [levels: 1 spl/container, 2 spl/modules]
 **Starting a new session?**
 
 1. Read this file for current context
-2. Test: `./spl spl/modules/whoami --levels=all`
-3. Next: Add levels to selfeval method
+2. Test: `./spl spl/selfeval --levels=all`
+3. Read: `projects/11-app-architecture/notes/type_stack_and_selfeval_architecture.md`
 
 **Key patterns:**
 - Methods use `module.output(freetext, structured)` not return
 - Libs use `create(module)` returning object with exports
 - Runners are libs with a `run(containerFsPath)` export
-- Type stack: instance chain first, then type chain, deduped
-- Final resources: _reqs, _lib, _tests (no overlap)
+- Type stack: extends chain first, then instantiates chain, deduped
+- instanceLevel: dynamic, where instanceRunners execute
 
 ---
 

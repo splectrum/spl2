@@ -18,7 +18,7 @@ export function create(module) {
       } catch (e) {
         return {
           pass: true,
-          topline: 'reqs | SKIP',
+          topline: 'reqs | EMPTY',
           summary: 'No _reqs/index.json',
           files: []
         }

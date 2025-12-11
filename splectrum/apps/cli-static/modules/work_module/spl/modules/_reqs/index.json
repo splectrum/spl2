@@ -6,6 +6,11 @@
       "name": "spl_modules_type",
       "description": "Modules spot type definition",
       "file": "spl_modules_type_v1.0.0.md"
+    },
+    {
+      "name": "selfeval_hierarchy_runner",
+      "description": "Selfeval runner for hierarchy.json validation",
+      "file": "selfeval_hierarchy_runner_v1.0.0.md"
     }
   ]
 }

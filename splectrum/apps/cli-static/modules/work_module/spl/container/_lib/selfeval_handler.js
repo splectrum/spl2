@@ -1,6 +1,6 @@
 // selfeval_handler.js - Selfeval runner for handler facet
 //
-// Checks index.js exists and exports a function.
+// Checks index.js exists (via overlay) and exports a function.
 
 export function create(module) {
   return {
@@ -8,10 +8,24 @@ export function create(module) {
       const fs = await module.require('fs')
       const path = await module.require('path')
 
-      const handlerPath = path.join(containerFsPath, 'index.js')
+      // Get container path from filesystem path
+      const indexJson = JSON.parse(fs.readFileSync(path.join(containerFsPath, 'index.json'), 'utf8'))
+      const containerPath = indexJson.name
+
+      // Resolve index.js through overlay (inherits from parent types)
+      const handlerPath = module.resolve(containerPath, 'index.js')
 
       // Check file exists
       let content
+      if (!handlerPath) {
+        return {
+          pass: false,
+          topline: 'handler | FAIL',
+          summary: 'No index.js',
+          checks: []
+        }
+      }
+
       try {
         content = fs.readFileSync(handlerPath, 'utf8')
       } catch (e) {

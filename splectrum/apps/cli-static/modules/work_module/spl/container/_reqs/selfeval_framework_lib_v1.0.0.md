@@ -18,6 +18,9 @@ Selfeval framework lib for loading and executing validation runners.
 | `loadRegistry` | `(containerFsPath)` | Load `_selfevals/index.json` registry |
 | `loadRunner` | `(runnerMeta, containerFsPath)` | Load and instantiate a runner from `_lib/` |
 | `runAll` | `(containerFsPath, containerName, runners, options?)` | Execute runners and aggregate results |
+| `buildTypeStack` | `(containerPath)` | Build type stack: instance chain first, then type chain, deduped |
+| `loadRegistryFromType` | `(typePath)` | Load `_selfevals/index.json` from a specific type |
+| `loadRunnerFromType` | `(runnerMeta, typePath)` | Load and instantiate a runner from a specific type's `_lib/` |
 
 **Options for runAll:**
 - `failFast` - stop on first failure (default: false)
@@ -36,7 +39,7 @@ Selfeval framework lib for loading and executing validation runners.
 
 - [ ] File exists at `_lib/selfeval.js`
 - [ ] Exports `create(module)` function
-- [ ] Created object exports `loadRegistry`, `loadRunner`, `runAll`
+- [ ] Created object exports `loadRegistry`, `loadRunner`, `runAll`, `buildTypeStack`, `loadRegistryFromType`, `loadRunnerFromType`
 
 ## Comments
 

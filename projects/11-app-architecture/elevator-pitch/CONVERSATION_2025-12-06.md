@@ -245,3 +245,5 @@ Splectrum is a **toolbox** - focus on integration and management of solutions.
 ---
 
 *Prepared for coffee conversation, 2025-12-06*
+
+**See also:** `VIBE_ENGINEERING_COMPARISON.md` - positioning against mainstream "vibe engineering" trend

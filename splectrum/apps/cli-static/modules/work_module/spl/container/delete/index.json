@@ -1,0 +1,6 @@
+{
+  "name": "spl/container/delete",
+  "type": "Method",
+  "purpose": "Delete container - remove structure with confirmation",
+  "instantiates": "spl/method"
+}

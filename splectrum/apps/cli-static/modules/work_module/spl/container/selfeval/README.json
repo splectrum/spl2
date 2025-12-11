@@ -1,5 +1,0 @@
-{
-  "method": ["selfeval"],
-  "instantiates": "spl/container",
-  "purpose": "Run structural validation checks against container constraints"
-}

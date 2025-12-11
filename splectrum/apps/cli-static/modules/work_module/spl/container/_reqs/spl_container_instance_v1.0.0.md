@@ -7,42 +7,42 @@
 
 The spl/container API - methods available on all containers.
 
-**API facets:**
+**API:**
 
-| Facet | Purpose | Candidate methods |
-|-------|---------|-------------------|
-| crud | Create, read, delete containers | create, read, delete |
-| types | Type introspection | whoami, typeof |
-| xpath | Structural queries | select |
+| Facet | Methods | Purpose |
+|-------|---------|---------|
+| introspection | whoami, selfeval | Container identity and validation |
+| lifecycle | create, delete | Container CRUD operations |
 
-**Batch handling:**
-- API-level invocation can include `batch` argument
-- Batch executes multiple method calls in sequence
-- Implemented in spl/container index.js
+**Methods:**
 
-**Method dispatch:**
-- Methods organized by API facet (organizational only)
-- All methods callable directly on container
-- API facets are for documentation/discovery, not enforcement
+- `whoami` - Container introspection, shows identity, api, handler, reqs, lib, schemas
+- `selfeval` - Validate container against requirements using runners
+- `create` - Create new container (stub)
+- `delete` - Delete container (stub)
 
-**Content constraints:** None.
+**Flags (common to all methods):**
+- `--meta=topline|summary|detail|enriched|report` - output verbosity
+- `--report` - include structured JSON in output
+- `--levels` - show available type inheritance levels
+- `--levels=all` - run on all levels
+- `--levels=<type>` - run on specific level
+
+**Type inheritance:**
+- Methods inherit down the type chain
+- Each level can define its own _selfevals/ runners
+- `--levels` traverses type stack: instance chain first, then type chain
 
 ## Self-eval
 
 - [ ] Conforms to spl_container_type structural requirements
-- [ ] API facets documented in README.json
-- [ ] Batch handling implemented (when index.js exists)
+- [ ] API facets documented in index.json
+- [ ] Methods whoami, selfeval, create, delete present
 
 ## Comments
 
-This is the base API - all container types (package, api, method) inherit these methods.
+This is the base API - all container types inherit these methods.
 
-**Method status:**
-- Candidate methods listed above are initial set
-- Actual methods defined when implemented (each in own container)
-- No `update` method - Write/Edit + selfevals handles modifications
-
-**API facet naming:**
-- crud, types, xpath are organizational API facets
-- Listed in README.json `apiFacets` for discovery
-- Methods live in their own containers (e.g., spl/container/whoami/)
+Methods use `module.output(freetext, structured)` pattern for output.
+Libs use `create(module)` pattern returning object with exports.
+Runners are libs with a `run(containerFsPath)` export.

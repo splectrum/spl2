@@ -1,0 +1,16 @@
+{
+  "name": "lib",
+  "purpose": "Module runtime lib - provides module API for methods and libs",
+  "files": {
+    "module.js": {
+      "name": "module",
+      "description": "Module runtime - input/output, require, resolve, faf, record access",
+      "exports": ["create"]
+    },
+    "selfeval_module.js": {
+      "name": "selfeval_module",
+      "description": "Selfeval runner for module.js implementation",
+      "exports": ["run"]
+    }
+  }
+}

@@ -12,68 +12,130 @@ export default async function(module) {
   // 1. Process flags
   const metaLevel = module.getMetaLevel()
   const reportLevel = module.getReportLevel()
-  const levels = input.levels || '1'  // Reserved for chain traversal
+  const levelsArg = input.levels
+  const path = await module.require('path')
 
   // Get container path
   const containerPath = module.getMethod().split('/').slice(0, -1).join('/')
-  const fs = await module.require('fs')
-  const path = await module.require('path')
   const indexJsonPath = module.resolve(containerPath, 'index.json')
   if (!indexJsonPath) {
     return module.output(`No container found: ${containerPath}`)
   }
   const containerFsPath = path.dirname(indexJsonPath)
 
-  // 2. Load registry
-  const registry = await selfeval.loadRegistry(containerFsPath)
-  const runnerKeys = Object.keys(registry.runners || {})
-  if (runnerKeys.length === 0) {
-    return module.output(`No selfeval runners for: ${containerPath}`)
+  // 2. Build type stack for levels support
+  const { stack, instanceLevel } = selfeval.buildTypeStack(containerPath)
+  const levelsInfo = `${containerPath} [levels: ${stack.map((t, i) => `${i + 1} ${t}`).join(', ')}, instanceLevel: ${instanceLevel}]`
+
+  // 3. Handle --levels flag alone (show available levels only)
+  if (levelsArg === true || levelsArg === '') {
+    return module.output(levelsInfo)
   }
 
-  // 3. Filter runners based on --runner flag
-  const selectedRunnerNames = input.runner
-    ? input.runner.split(',').map(r => r.trim())
-    : runnerKeys
+  // 4. Determine which levels to run
+  let selectedLevels
+  if (!levelsArg) {
+    // No --levels flag: just run current container (first in stack)
+    selectedLevels = [stack[0]]
+  } else if (levelsArg === 'all') {
+    // --levels=all: run all levels
+    selectedLevels = stack
+  } else {
+    // --levels=spl/container: run specific level(s)
+    const requested = levelsArg.split(',').map(l => l.trim())
+    selectedLevels = stack.filter(l => requested.includes(l))
+  }
 
-  // Load selected runners
-  const runners = []
-  for (const name of selectedRunnerNames) {
-    const meta = registry.runners[name]
-    if (meta) {
-      const fn = await selfeval.loadRunner(meta, containerFsPath)
-      if (fn) runners.push({ meta, fn })
+  // 5. Run selfeval for each selected level
+  const levelResults = []
+  let allPass = true
+
+  for (let i = 0; i < selectedLevels.length; i++) {
+    const levelName = selectedLevels[i]
+    const levelIdx = stack.indexOf(levelName) + 1
+    const isInstanceLevel = (levelIdx === instanceLevel)
+
+    // Load registry from this level's _selfevals/index.json
+    const registry = await selfeval.loadRegistryFromType(levelName)
+
+    // Get runners: type runners always, plus instanceRunners at instance level (direct type)
+    const runnerKeys = Object.keys(registry.runners || {})
+    const instanceRunnerKeys = isInstanceLevel ? Object.keys(registry.instanceRunners || {}) : []
+    const allRunnerKeys = [...runnerKeys, ...instanceRunnerKeys]
+
+    if (allRunnerKeys.length === 0) {
+      // No runners at this level - skip with info
+      levelResults.push({
+        pass: true,
+        topline: `${levelName} | EMPTY [${levelIdx}/${stack.length}]`,
+        summary: 'No selfeval runners defined',
+        runners: []
+      })
+      continue
     }
-  }
 
-  if (runners.length === 0) {
-    return module.output(`No runners loaded for: ${containerPath}`)
-  }
+    // Filter runners based on --runner flag (applies within each level)
+    const selectedRunnerNames = input.runner
+      ? input.runner.split(',').map(r => r.trim())
+      : allRunnerKeys
 
-  // 4. Dry run: show what would run
-  if (input.dryRun) {
-    const dryRunResult = {
-      topline: `${containerPath} | dry-run`,
-      summary: `${runners.length} runners: ${runners.map(r => r.meta.name).join(', ')}`,
-      runners: runners.map(r => ({
-        topline: r.meta.name,
-        summary: r.meta.description
-      }))
+    // Load runners from this level's _lib
+    const runners = []
+    for (const name of selectedRunnerNames) {
+      // Check both runners and instanceRunners
+      const meta = registry.runners?.[name] || (isInstanceLevel ? registry.instanceRunners?.[name] : null)
+      if (meta) {
+        const fn = await selfeval.loadRunnerFromType(meta, levelName)
+        if (fn) runners.push({ meta, fn })
+      }
     }
-    const dryFreetext = metaLevel === 'report'
-      ? JSON.stringify(dryRunResult, null, 2)
-      : freetext.render(dryRunResult, metaLevel)
-    return module.output(dryFreetext, reportLevel ? dryRunResult : null)
+
+    if (runners.length === 0) {
+      levelResults.push({
+        pass: true,
+        topline: `${levelName} | EMPTY [${levelIdx}/${stack.length}]`,
+        summary: 'No runners loaded',
+        runners: []
+      })
+      continue
+    }
+
+    // Dry run: show what would run
+    if (input.dryRun) {
+      levelResults.push({
+        topline: `${levelName} | dry-run [${levelIdx}/${stack.length}]`,
+        summary: `${runners.length} runners: ${runners.map(r => r.meta.name).join(', ')}`,
+        runners: runners.map(r => ({
+          topline: r.meta.name,
+          summary: r.meta.description
+        }))
+      })
+      continue
+    }
+
+    // Run selfeval for this level - test current container against this level's rules
+    const results = await selfeval.runAll(containerFsPath, containerPath, runners, { failFast: input.failFast })
+    results.topline = `${levelName} | ${results.pass ? 'PASS' : 'FAIL'} [${levelIdx}/${stack.length}]`
+    levelResults.push(results)
+
+    if (!results.pass) allPass = false
+    if (input.failFast && !results.pass) break
   }
 
-  // 5. Run selfeval
-  const results = await selfeval.runAll(containerFsPath, containerPath, runners, { failFast: input.failFast })
+  // 6. Build combined report
+  const passCount = levelResults.filter(r => r.pass).length
+  const report = {
+    pass: allPass,
+    topline: `${containerPath} | ${allPass ? 'PASS' : 'FAIL'}`,
+    summary: `${passCount}/${levelResults.length} levels passed`,
+    levels: levelResults
+  }
 
-  // 6. Render freetext
+  // 7. Render freetext
   const output = metaLevel === 'report'
-    ? JSON.stringify(results, null, 2)
-    : freetext.render(results, metaLevel)
+    ? JSON.stringify(report, null, 2)
+    : freetext.renderWithLevels(report, metaLevel)
 
-  // 7. Output
-  module.output(output, reportLevel ? results : null)
+  // 8. Output
+  module.output(output, reportLevel ? report : null)
 }

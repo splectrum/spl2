@@ -7,11 +7,6 @@
       "description": "Check lib exports match manifest",
       "file": "selfeval_lib.js"
     },
-    "api": {
-      "name": "api",
-      "description": "Check api methods match folders",
-      "file": "selfeval_api.js"
-    },
     "schemas": {
       "name": "schemas",
       "description": "Check schema files match manifest",
@@ -26,6 +21,11 @@
       "name": "reqs",
       "description": "Check req files match manifest",
       "file": "selfeval_reqs.js"
+    },
+    "final": {
+      "name": "final",
+      "description": "Check final resources don't overlap across type chain",
+      "file": "selfeval_final.js"
     }
   }
 }

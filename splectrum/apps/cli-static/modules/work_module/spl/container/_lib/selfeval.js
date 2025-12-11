@@ -78,7 +78,7 @@ export function create(module) {
       const runnerResults = []
 
       for (const { meta, fn } of runners) {
-        const result = await fn(containerFsPath)
+        const result = await fn(containerFsPath, meta)
         runnerResults.push(result)
 
         // Stop on first failure if failFast
@@ -96,73 +96,9 @@ export function create(module) {
       }
     },
 
-    // Build type stack: instance chain first, then type chain, deduped
-    // Returns array of type names from bottom (most base) to top (current)
-    async buildTypeStack(containerPath) {
-      const path = await getPath()
-      const containerFsPath = await getContainerFsPath(containerPath)
-      if (!containerFsPath) return [containerPath]
-
-      const identity = await readJson(path.join(containerFsPath, 'index.json'))
-      if (!identity) return [containerPath]
-
-      const visited = new Set()
-      const instanceChain = []
-      const typeChain = []
-
-      // Follow instantiates chain first
-      const buildInstanceChain = async (typeName) => {
-        if (!typeName || visited.has(typeName)) return
-        visited.add(typeName)
-
-        const typeFsPath = await getContainerFsPath(typeName)
-        if (!typeFsPath) return
-
-        const typeIdentity = await readJson(path.join(typeFsPath, 'index.json'))
-        if (!typeIdentity) return
-
-        // Recurse to base first
-        if (typeIdentity.instantiates) {
-          await buildInstanceChain(typeIdentity.instantiates)
-        }
-        instanceChain.push(typeName)
-      }
-
-      // Follow extends chain
-      const buildTypeChain = async (typeName) => {
-        if (!typeName || visited.has(typeName)) return
-        visited.add(typeName)
-
-        const typeFsPath = await getContainerFsPath(typeName)
-        if (!typeFsPath) return
-
-        const typeIdentity = await readJson(path.join(typeFsPath, 'index.json'))
-        if (!typeIdentity) return
-
-        // Recurse to base first
-        if (typeIdentity.extends) {
-          await buildTypeChain(typeIdentity.extends)
-        }
-        typeChain.push(typeName)
-      }
-
-      // Build instance chain from instantiates
-      if (identity.instantiates) {
-        await buildInstanceChain(identity.instantiates)
-      }
-
-      // Build type chain from extends (will skip already visited)
-      if (identity.extends) {
-        await buildTypeChain(identity.extends)
-      }
-
-      // Add current container at the end
-      if (!visited.has(containerPath)) {
-        typeChain.push(containerPath)
-      }
-
-      // Combine: instance chain first, then type chain
-      return [...instanceChain, ...typeChain]
+    // Build type stack: delegates to module.buildTypeStack
+    buildTypeStack(containerPath) {
+      return module.buildTypeStack(containerPath)
     },
 
     // Load registry from a type's _selfevals/index.json
@@ -175,13 +111,12 @@ export function create(module) {
       return registry || { runners: {} }
     },
 
-    // Load a runner from a specific type's _lib
+    // Load a runner from a type's _lib (uses overlay resolution for inheritance)
     async loadRunnerFromType(runnerMeta, typePath) {
-      const path = await getPath()
-      const typeFsPath = await getContainerFsPath(typePath)
-      if (!typeFsPath) return null
+      // Resolve through overlay - _lib files are final so inherited from parent types
+      const runnerPath = module.resolve(typePath, `_lib/${runnerMeta.file}`)
+      if (!runnerPath) return null
 
-      const runnerPath = path.join(typeFsPath, '_lib', runnerMeta.file)
       try {
         const runnerModule = await import(runnerPath)
         // Runners use create() pattern - instantiate with module

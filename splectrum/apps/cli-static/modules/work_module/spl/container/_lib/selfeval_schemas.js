@@ -18,7 +18,7 @@ export function create(module) {
       } catch (e) {
         return {
           pass: true,
-          topline: 'schemas | SKIP',
+          topline: 'schemas | EMPTY',
           summary: 'No _schemas/index.json',
           files: []
         }

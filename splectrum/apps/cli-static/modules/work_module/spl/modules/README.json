@@ -1,6 +1,0 @@
-{
-  "modules": {},
-  "instantiates": "spl/api",
-  "extends": "spl/container",
-  "purpose": "Modules spot type definition - the root container for modules"
-}

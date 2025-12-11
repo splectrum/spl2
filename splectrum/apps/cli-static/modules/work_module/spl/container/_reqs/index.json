@@ -131,6 +131,16 @@
       "name": "selfeval_reqs_runner",
       "description": "Selfeval runner for reqs facet",
       "file": "selfeval_reqs_runner_v1.0.0.md"
+    },
+    {
+      "name": "selfeval_children_runner",
+      "description": "Selfeval runner for child type validation",
+      "file": "selfeval_children_runner_v1.0.0.md"
+    },
+    {
+      "name": "selfeval_final_runner",
+      "description": "Selfeval runner for final resources overlap detection",
+      "file": "selfeval_final_runner_v1.0.0.md"
     }
   ]
 }
