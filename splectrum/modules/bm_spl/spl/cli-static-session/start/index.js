@@ -4,8 +4,6 @@
 // Short-TTL mode: watchers self-destruct after processing one request.
 // Returns immediately - watchers run in background.
 
-import { loadModule } from '../../../../../lib/moduleBootstrap.js'
-
 export default async function(module) {
   const fs = await module.require('fs')
   const path = await module.require('path')
@@ -29,13 +27,6 @@ export default async function(module) {
   fs.mkdirSync(inboxDir, { recursive: true })
   fs.mkdirSync(processingDir, { recursive: true })
   fs.mkdirSync(outboxDir, { recursive: true })
-
-  // Get app name for module loading
-  const appAPI = module.getAppAPI()
-  const appName = appAPI?.replace('spl/', '')
-
-  // Load moduleLib once for request processing
-  const moduleLib = await loadModule(appName)
 
   // Inbox → Processing watcher (one-shot)
   const inboxWatcher = fs.watch(inboxDir, (event, filename) => {
@@ -63,8 +54,8 @@ export default async function(module) {
     const content = fs.readFileSync(sourcePath, 'utf-8')
     const requestRecord = JSON.parse(content)
 
-    // Create module instance for this request
-    const requestModule = moduleLib.create(requestRecord)
+    // Create module instance for this request using parent module's factory
+    const requestModule = await module.createForRecord(requestRecord)
 
     try {
       // Execute the method

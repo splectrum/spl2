@@ -6,6 +6,6 @@
   "instantiates": "spl/api",
   "api": {
     "introspection": ["whoami", "selfeval"],
-    "lifecycle": ["create", "delete"]
+    "lifecycle": ["create", "lift", "delete"]
   }
 }

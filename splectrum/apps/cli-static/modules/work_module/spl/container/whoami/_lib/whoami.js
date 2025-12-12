@@ -146,7 +146,15 @@ export function create(module) {
       if (hasFacet(facets, 'reqs')) {
         const reqsManifest = await readJson(path.join(containerFsPath, '_reqs', 'index.json'))
         if (reqsManifest) {
-          container.facets.push(report.buildReqs(reqsManifest, detailLevel))
+          const reqsFileContents = {}
+          const requirements = reqsManifest.requirements || []
+          for (const req of requirements) {
+            if (req.file) {
+              const content = await readFile(path.join(containerFsPath, '_reqs', req.file))
+              if (content) reqsFileContents[req.file] = content
+            }
+          }
+          container.facets.push(report.buildReqs(reqsManifest, reqsFileContents, detailLevel))
         }
       }
 
@@ -222,7 +230,15 @@ export function create(module) {
       if (hasFacet(facets, 'reqs')) {
         const reqsManifest = await readJson(path.join(containerFsPath, '_reqs', 'index.json'))
         if (reqsManifest) {
-          container.facets.push(report.buildReqs(reqsManifest, detailLevel))
+          const reqsFileContents = {}
+          const requirements = reqsManifest.requirements || []
+          for (const req of requirements) {
+            if (req.file) {
+              const content = await readFile(path.join(containerFsPath, '_reqs', req.file))
+              if (content) reqsFileContents[req.file] = content
+            }
+          }
+          container.facets.push(report.buildReqs(reqsManifest, reqsFileContents, detailLevel))
         }
       }
 

@@ -147,16 +147,34 @@ export function create(module) {
     },
 
     // Build reqs facet
-    buildReqs(manifest) {
-      const files = manifest.files || []
+    buildReqs(manifest, fileContents = {}, detailLevel = 'enriched') {
+      const levels = ['topline', 'summary', 'detail', 'enriched']
+      const maxIdx = levels.indexOf(detailLevel)
+
+      const requirements = manifest.requirements || []
+      const fileNames = requirements.map(r => r.name || r.file)
 
       const result = {
         name: 'reqs',
-        topline: `reqs | ${files.join(', ') || 'empty'}`
+        topline: `reqs | ${fileNames.join(', ') || 'empty'}`
       }
 
-      if (manifest.purpose) {
+      // Summary: purpose from manifest
+      if (maxIdx >= 1 && manifest.purpose) {
         result.summary = manifest.purpose
+      }
+
+      // Detail: requirements list with descriptions
+      if (maxIdx >= 2 && requirements.length > 0) {
+        result.detail = requirements.map(r => `${r.name}: ${r.description}`).join('\n')
+      }
+
+      // Enriched: actual file contents
+      if (maxIdx >= 3 && Object.keys(fileContents).length > 0) {
+        const contents = Object.entries(fileContents)
+          .map(([file, content]) => `--- ${file} ---\n${content}`)
+          .join('\n\n')
+        result.enriched = contents
       }
 
       return result

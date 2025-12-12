@@ -39,11 +39,14 @@ const record = {
 }
 
 // ============================================================================
-// Load module lib (no app context yet - splectrum only)
+// Load module (returns instantiated module, not lib)
 // ============================================================================
 
-const moduleLib = await loadModule('cli-static')
-const module = moduleLib.create(record)
+const module = await loadModule('cli-static')
+
+// Initialize platform modules (fs, path) and bind record
+await module.init()
+module.bindRecord(record)
 
 // ============================================================================
 // Process CLI state

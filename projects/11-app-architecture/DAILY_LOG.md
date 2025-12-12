@@ -1165,4 +1165,103 @@ Major session recovering from Windows reboot. Completed type stack algorithm and
 
 ---
 
+## 2025-12-12
+
+### module.js Bootstrap Refactor
+
+Completed refactor of module.js to use standard lib signature `create(module)` instead of special-case `create(record)`.
+
+**Changes:**
+- moduleBootstrap.js creates minimal bootstrap module (nodeRoot, modulesDir, platform require)
+- module.js receives bootstrap via standard `create(module)` pattern
+- New methods: `init()`, `bindRecord()`, `createForRecord()`
+- Platform modules via direct `import()` (package.json handles Node/Bare mapping)
+- Updated cli-static-session/start to use `createForRecord()`
+
+All selfevals pass.
+
+### Container Lifecycle Design
+
+Designed the full container lifecycle: create, lift, delete.
+
+**create** - establish identity only:
+- Creates folder + index.json in work_module
+- Overlay provides everything else (handler, libs, schemas inherit from type)
+
+**lift** - materialize resources from overlay:
+- `--resource=index.js` - single resource for editing
+- `--all` - standalone container (all resources, portable)
+- Uses overlay to find correct resource instance
+- Enables editing via standard Write/Edit tools
+
+**delete** - remove + overlay directive:
+- Removes from work_module
+- Acts as overlay stop marker
+
+Key insight: lift exists because overlay encapsulates complexity of finding the right resource through layers and type chains.
+
+### Terminology: Resource vs File
+
+Decision to use "resource" instead of "file" throughout:
+- Abstract - doesn't imply filesystem
+- Future-proof - works for Kafka topics, databases, etc.
+- Consistent with how we talk about `_lib/`, `_reqs/`, `_schemas/` as resource categories
+
+**TODO:** Update existing documentation to use "resource" instead of "file" where appropriate.
+
+### Container Lifecycle Implementation
+
+Implemented all three container lifecycle methods:
+
+**spl/container/create:**
+- Validates child expected by parent (in api field)
+- Resolves type via parent's instanceType → instanceChildren
+- Creates folder + index.json in work_module
+- Flags: `--dryRun`, `--purpose`
+
+**spl/container/lift:**
+- Resolves resource through overlay (type stack)
+- Copies to work_module for editing
+- Flags: `--resource`, `--dryRun`, `--all` (future)
+
+**spl/container/delete:**
+- Removes all files except `_reqs/` (immutables preserved)
+- Removes folder if empty
+- Flags: `--dryRun`
+
+All tested and working.
+
+### Requirements Documentation
+
+Added missing _reqs:
+- `spl/_reqs/spl_package_v1.0.0.md` - SPL package contents
+- `spl/container/create/_reqs/Create_v1.0.0.md`
+- `spl/container/delete/_reqs/Delete_v1.0.0.md`
+- `spl/container/lift/_reqs/index.json` (was missing)
+
+Fixed _reqs/index.json format - requires objects with `name`, `description`, `file` fields, not just filename strings.
+
+Removed `spl/newType` test container and cleaned up spl/index.json api reference.
+
+### whoami Reqs Enhancement
+
+Fixed `buildReqs` in report.js:
+- Was looking for `manifest.files`, now uses `manifest.requirements`
+- Added detail levels: summary (purpose), detail (req list), enriched (file contents)
+
+Updated whoami lib to read req file contents at enriched level.
+
+`--meta=enriched` now shows actual req file contents alongside handler code.
+
+### Project Ready for Closure
+
+All work items complete:
+1. Backlog and CIP Consolidation ✓
+2. Splectrum node cleanup ✓
+3. App-based design and implementation experience ✓
+4. Elevator pitch for Pear/Bare ✓
+5. Splectrum node install (carry forward)
+
+---
+
 *Log entries added as work progresses.*

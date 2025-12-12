@@ -3,8 +3,12 @@
 // The foundation lib that all execution contexts receive.
 // Contains all utilities needed for basic operation plus overlay resolution.
 //
-// Bootstrap creates this bound to record, passes to all contexts.
-// Methods receive: module (single arg)
+// Bootstrap:
+//   1. moduleBootstrap.js creates minimal bootstrap module
+//   2. module.js receives bootstrap via create(module) - same signature as all libs
+//   3. spl.mjs calls bindRecord(record) to bind the request record
+//
+// After binding, methods receive: module (single arg)
 // Libs receive: module (single arg)
 // Scripts receive: module (injected)
 //
@@ -12,21 +16,7 @@
 // See package.json "imports" field for mappings (fs -> bare-fs, etc.)
 
 // ============================================================================
-// Platform Modules (via import maps - package.json handles Node/Bare switching)
-// ============================================================================
-
-const fs = await import('fs').then(m => m.default ?? m)
-const path = await import('path').then(m => m.default ?? m)
-const url = await import('url').then(m => m.default ?? m)
-
-// Platform modules cache - loaded on demand
-const platformModules = { fs, path, url }
-
-// Known platform modules (can be loaded via module.require)
-const knownPlatformModules = ['fs', 'path', 'os', 'url', 'crypto', 'events']
-
-// ============================================================================
-// Overlay Resolution (brought into library from bootstrap)
+// Overlay Resolution
 // ============================================================================
 
 // Cached hierarchies
@@ -36,7 +26,7 @@ const appHierarchies = new Map()
 /**
  * Load splectrum hierarchy.json (lazy, cached)
  */
-function loadSplectrumHierarchy(modulesDir) {
+function loadSplectrumHierarchy(modulesDir, fs, path) {
   if (splectrumHierarchy) return splectrumHierarchy
 
   const hierarchyPath = path.join(modulesDir, 'hierarchy.json')
@@ -51,7 +41,7 @@ function loadSplectrumHierarchy(modulesDir) {
 /**
  * Load app hierarchy.json (lazy, cached)
  */
-function loadAppHierarchy(appModulesDir) {
+function loadAppHierarchy(appModulesDir, fs, path) {
   if (appHierarchies.has(appModulesDir)) {
     return appHierarchies.get(appModulesDir)
   }
@@ -70,12 +60,12 @@ function loadAppHierarchy(appModulesDir) {
 /**
  * Check a single path in app modules and splectrum modules
  */
-function checkPath(nodePath, subPath, nodeRoot, appAPI, enableAppOverlay, modulesDir) {
+function checkPath(nodePath, subPath, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path) {
   // 1. Check app modules first (if app overlay is enabled)
   if (enableAppOverlay && nodeRoot && appAPI) {
     const appName = appAPI.replace('spl/', '')
     const appModulesDir = path.join(nodeRoot, 'apps', appName, 'modules')
-    const appHierarchy = loadAppHierarchy(appModulesDir)
+    const appHierarchy = loadAppHierarchy(appModulesDir, fs, path)
 
     if (appHierarchy) {
       for (const layer of appHierarchy.layers) {
@@ -88,7 +78,7 @@ function checkPath(nodePath, subPath, nodeRoot, appAPI, enableAppOverlay, module
   }
 
   // 2. Fall back to splectrum modules
-  const h = loadSplectrumHierarchy(modulesDir)
+  const h = loadSplectrumHierarchy(modulesDir, fs, path)
   for (const layer of h.layers) {
     const filePath = path.join(modulesDir, layer.name, nodePath, subPath)
     if (fs.existsSync(filePath)) {
@@ -102,8 +92,8 @@ function checkPath(nodePath, subPath, nodeRoot, appAPI, enableAppOverlay, module
 /**
  * Read index.json from a container path
  */
-function readContainerIndex(containerPath, nodeRoot, appAPI, enableAppOverlay, modulesDir) {
-  const indexPath = checkPath(containerPath, 'index.json', nodeRoot, appAPI, enableAppOverlay, modulesDir)
+function readContainerIndex(containerPath, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path) {
+  const indexPath = checkPath(containerPath, 'index.json', nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path)
   if (!indexPath) return null
   try {
     return JSON.parse(fs.readFileSync(indexPath, 'utf8'))
@@ -126,8 +116,8 @@ function readContainerIndex(containerPath, nodeRoot, appAPI, enableAppOverlay, m
  * - spl (instance): { stack: [spl, spl/package, spl/container], instanceLevel: 2 }
  * - spl/package (type): { stack: [spl/package, spl/container, spl/api], instanceLevel: 3 }
  */
-function buildTypeStack(containerPath, nodeRoot, appAPI, enableAppOverlay, modulesDir) {
-  const index = readContainerIndex(containerPath, nodeRoot, appAPI, enableAppOverlay, modulesDir)
+function buildTypeStackInternal(containerPath, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path) {
+  const index = readContainerIndex(containerPath, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path)
   if (!index) return { stack: [containerPath], instanceLevel: 1 }
 
   const stack = [containerPath]
@@ -138,7 +128,7 @@ function buildTypeStack(containerPath, nodeRoot, appAPI, enableAppOverlay, modul
   while (current && !visited.has(current)) {
     visited.add(current)
     stack.push(current)
-    const typeIndex = readContainerIndex(current, nodeRoot, appAPI, enableAppOverlay, modulesDir)
+    const typeIndex = readContainerIndex(current, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path)
     if (!typeIndex) break
     current = typeIndex.extends
   }
@@ -159,7 +149,7 @@ function buildTypeStack(containerPath, nodeRoot, appAPI, enableAppOverlay, modul
   while (current && !visited.has(current)) {
     visited.add(current)
     stack.push(current)
-    const typeIndex = readContainerIndex(current, nodeRoot, appAPI, enableAppOverlay, modulesDir)
+    const typeIndex = readContainerIndex(current, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path)
     if (!typeIndex) break
     current = typeIndex.extends
   }
@@ -171,30 +161,49 @@ function buildTypeStack(containerPath, nodeRoot, appAPI, enableAppOverlay, modul
  * Resolve a file through overlay layers, following type stack.
  * For method paths (spl/whoami): split into container + method, search type stack
  * For file paths (spl/container/_lib/x.js): search type stack directly
+ *
+ * Virtual container support: if container doesn't exist (no index.json),
+ * use spl/container stack. Virtual containers only get base container functionality.
  */
-function resolveOverlay(nodePath, subPath, nodeRoot, appAPI, enableAppOverlay, modulesDir) {
+function resolveOverlay(nodePath, subPath, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path) {
   // Direct check first
-  const direct = checkPath(nodePath, subPath, nodeRoot, appAPI, enableAppOverlay, modulesDir)
+  const direct = checkPath(nodePath, subPath, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path)
   if (direct) return direct
 
-  // Check if this is a method path (container/method with subPath=index.js)
-  // or a file path (container with subPath=_lib/x.js etc)
+  // Determine if this is a method path or a container/file path
+  // Method path: nodePath is container/method, looking for method's index.js
+  // Container path: nodePath is a container, looking for its own file (index.js, _lib/x.js, etc.)
+  //
+  // Heuristic: if nodePath has an index.json, it's a container. Otherwise treat as method.
   const segments = nodePath.split('/')
-  if (segments.length >= 2 && subPath === 'index.js') {
-    // Method resolution: last segment is method name, rest is container
+  const nodeIndex = readContainerIndex(nodePath, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path)
+
+  if (!nodeIndex && segments.length >= 2 && subPath === 'index.js') {
+    // Method resolution: nodePath doesn't exist as container, treat last segment as method name
     const methodName = segments[segments.length - 1]
     const containerPath = segments.slice(0, -1).join('/')
 
-    const { stack } = buildTypeStack(containerPath, nodeRoot, appAPI, enableAppOverlay, modulesDir)
+    // Check if container exists (has index.json)
+    const containerIndex = readContainerIndex(containerPath, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path)
+
+    let stack
+    if (containerIndex) {
+      // Container exists - use its type stack
+      stack = buildTypeStackInternal(containerPath, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path).stack
+    } else {
+      // Virtual container - only spl/container functionality available
+      stack = buildTypeStackInternal('spl/container', nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path).stack
+    }
+
     for (const typeName of stack) {
-      const found = checkPath(`${typeName}/${methodName}`, subPath, nodeRoot, appAPI, enableAppOverlay, modulesDir)
+      const found = checkPath(`${typeName}/${methodName}`, subPath, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path)
       if (found) return found
     }
   } else {
-    // File resolution: search type stack for the file
-    const { stack } = buildTypeStack(nodePath, nodeRoot, appAPI, enableAppOverlay, modulesDir)
+    // File resolution: nodePath is a container, search type stack for the file
+    const { stack } = buildTypeStackInternal(nodePath, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path)
     for (const typeName of stack) {
-      const found = checkPath(typeName, subPath, nodeRoot, appAPI, enableAppOverlay, modulesDir)
+      const found = checkPath(typeName, subPath, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path)
       if (found) return found
     }
   }
@@ -209,7 +218,7 @@ function resolveOverlay(nodePath, subPath, nodeRoot, appAPI, enableAppOverlay, m
 /**
  * Find unique filename using dedupe algorithm
  */
-function findUniqueFilename(folder, filename, dedupe) {
+function findUniqueFilename(folder, filename, dedupe, fs, path) {
   const ext = path.extname(filename)
   const base = path.basename(filename, ext)
 
@@ -245,115 +254,216 @@ function findUniqueFilename(folder, filename, dedupe) {
 // ============================================================================
 
 /**
- * Create module interface bound to record
+ * Create module interface from bootstrap module.
  *
- * @param {Object} record - The request record
- * @returns {Object} - Bound module interface
+ * Same signature as all libs: create(module)
+ * The bootstrap module provides minimal functionality for initialization.
+ * Call bindRecord() to bind a request record for full functionality.
+ *
+ * @param {Object} bootstrapModule - Bootstrap module from moduleBootstrap.js
+ * @returns {Object} - Module interface
  */
-export function create(record) {
-  // Dynamic getters - read from record each time (record may be mutated after module creation)
-  const getNodeRoot = () => record.headers.spl.runtime.nodeRoot
-  const getAppAPI = () => record.headers.spl.runtime.appAPI
+export function create(bootstrapModule) {
+  // Platform modules - loaded via bootstrap, cached here
+  let _fs = null
+  let _path = null
+
+  const getFs = async () => {
+    if (!_fs) _fs = await bootstrapModule.require('fs')
+    return _fs
+  }
+
+  const getPath = async () => {
+    if (!_path) _path = await bootstrapModule.require('path')
+    return _path
+  }
+
+  // Record binding - starts null, set via bindRecord()
+  let record = null
+
+  // Context getters - delegate to bootstrap until record is bound
+  const getNodeRoot = () => {
+    if (record?.headers?.spl?.runtime?.nodeRoot) {
+      return record.headers.spl.runtime.nodeRoot
+    }
+    return bootstrapModule.getNodeRoot()
+  }
+
+  const getAppAPI = () => {
+    if (record?.headers?.spl?.runtime?.appAPI) {
+      return record.headers.spl.runtime.appAPI
+    }
+    return bootstrapModule.getAppAPI()
+  }
+
   const getAppName = () => getAppAPI()?.replace('spl/', '')
+
   const getEnableAppOverlay = () => {
-    const appName = getAppName()
-    return appName ? record.headers.spl?.[appName]?.enableAppOverlay : false
+    if (record) {
+      const appName = getAppName()
+      return appName ? record.headers.spl?.[appName]?.enableAppOverlay : false
+    }
+    return bootstrapModule.getEnableAppOverlay()
   }
+
   const getModulesDir = () => {
-    const nodeRoot = getNodeRoot()
-    return nodeRoot ? path.join(nodeRoot, 'modules') : null
-  }
-
-  // Internal resolve function
-  const internalResolve = (nodePath, filename) => {
-    const modulesDir = getModulesDir()
-    if (!modulesDir) return null
-    return resolveOverlay(nodePath, filename, getNodeRoot(), getAppAPI(), getEnableAppOverlay(), modulesDir)
-  }
-
-  // Internal require function
-  const internalRequire = async (uri) => {
-    // 1. Platform modules (no slashes, known module name)
-    if (!uri.includes('/') && knownPlatformModules.includes(uri)) {
-      // Check cache first
-      if (!(uri in platformModules)) {
-        platformModules[uri] = await import(uri).then(m => m.default ?? m)
-      }
-      return platformModules[uri]
+    if (record?.headers?.spl?.runtime?.nodeRoot) {
+      return _path ? _path.join(record.headers.spl.runtime.nodeRoot, 'modules') : null
     }
-
-    // 2. Splectrum libs:
-    //    lib/spl/container/selfeval    -> spl/container/selfeval/_lib/selfeval.js (container's main lib)
-    //    lib/spl/container/report.js   -> spl/container/_lib/report.js (direct lib file)
-    if (uri.startsWith('lib/')) {
-      const libPath = uri.replace('lib/', '')
-      let libFilePath
-
-      if (libPath.endsWith('.js')) {
-        // Direct lib file: lib/spl/container/report.js -> spl/container/_lib/report.js
-        const parts = libPath.split('/')
-        const libFile = parts.pop() // e.g. "report.js"
-        const containerPath = parts.join('/') // e.g. "spl/container"
-        libFilePath = internalResolve(containerPath, `_lib/${libFile}`)
-      } else {
-        // Container's main lib: lib/spl/container/selfeval -> spl/container/selfeval/_lib/selfeval.js
-        const parts = libPath.split('/')
-        const libName = parts[parts.length - 1]
-        libFilePath = internalResolve(libPath, `_lib/${libName}.js`)
-      }
-
-      if (!libFilePath) {
-        throw new Error(`Lib not found in any layer: ${uri}`)
-      }
-      const mod = await import(libFilePath)
-      return mod.create(module)
-    }
-
-    // 3. Inline script
-    if (uri === 'spl/script/inline') {
-      const scriptContent = record.headers.spl.request.script
-      return createScriptExecutable(scriptContent)
-    }
-
-    // 4. Script file (absolute path)
-    if (uri.startsWith('/')) {
-      const scriptContent = fs.readFileSync(uri, 'utf-8')
-      return createScriptExecutable(scriptContent)
-    }
-
-    // 5. Commands (pkg/api/method) - resolve via overlay
-    const modulePath = internalResolve(uri, 'index.js')
-    if (!modulePath) {
-      throw new Error(`Module not found in any layer: ${uri}`)
-    }
-    const mod = await import(modulePath)
-
-    // Methods export default function
-    if (typeof mod.default === 'function') {
-      return {
-        async invoke() {
-          await mod.default(module)
-        }
-      }
-    }
-
-    // Fallback for create() pattern (libs)
-    return mod.create(module)
-  }
-
-  // Script executable factory
-  const createScriptExecutable = (scriptContent) => {
-    const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor
-    const fn = new AsyncFunction('module', scriptContent)
-    return {
-      async invoke() {
-        await fn(module)
-      }
-    }
+    return bootstrapModule.getModulesDir()
   }
 
   // The module interface
-  const module = {
+  return {
+    // ========================================================================
+    // Initialization
+    // ========================================================================
+
+    /**
+     * Initialize platform modules (fs, path).
+     * Must be called before using resolve, faf, consumeLatest, etc.
+     * Typically called right after loadModule() returns.
+     */
+    async init() {
+      await getFs()
+      await getPath()
+    },
+
+    /**
+     * Bind a request record to this module.
+     * After binding, record-dependent methods become functional.
+     * @param {Object} requestRecord - The request record
+     */
+    bindRecord(requestRecord) {
+      record = requestRecord
+    },
+
+    /**
+     * Create a new module instance bound to a different record.
+     * Reuses the same bootstrap module and platform modules.
+     * Useful for processing multiple requests with separate state.
+     * @param {Object} requestRecord - The request record for the new instance
+     * @returns {Promise<Object>} - New module instance
+     */
+    async createForRecord(requestRecord) {
+      // Create new instance from same bootstrap
+      const newModule = create(bootstrapModule)
+      await newModule.init()
+      newModule.bindRecord(requestRecord)
+      return newModule
+    },
+
+    // ========================================================================
+    // Module Resolution
+    // ========================================================================
+
+    /**
+     * Require a module - handles three types:
+     * 1. Platform modules: 'fs', 'path' - direct import (package.json handles mapping)
+     * 2. Splectrum libs: 'lib/spl' - returns bound lib instance
+     * 3. Commands: 'spl/container/whoami' - returns { invoke() }
+     *
+     * Also handles scripts:
+     * - 'spl/script/inline' - inline script from record
+     * - '/absolute/path' - script file
+     *
+     * @param {string} uri - Module URI
+     * @returns {Promise<Object>} - Loaded module, lib instance, or executable
+     */
+    async require(uri) {
+      const fs = await getFs()
+      const path = await getPath()
+
+      // 1. Platform modules (no slashes) - direct import, package.json handles mapping
+      if (!uri.includes('/')) {
+        return import(uri).then(m => m.default ?? m)
+      }
+
+      // 2. Splectrum libs:
+      //    lib/spl/container/selfeval    -> spl/container/selfeval/_lib/selfeval.js (container's main lib)
+      //    lib/spl/container/report.js   -> spl/container/_lib/report.js (direct lib file)
+      if (uri.startsWith('lib/')) {
+        const libPath = uri.replace('lib/', '')
+        let libFilePath
+
+        if (libPath.endsWith('.js')) {
+          // Direct lib file: lib/spl/container/report.js -> spl/container/_lib/report.js
+          const parts = libPath.split('/')
+          const libFile = parts.pop() // e.g. "report.js"
+          const containerPath = parts.join('/') // e.g. "spl/container"
+          libFilePath = this.resolve(containerPath, `_lib/${libFile}`)
+        } else {
+          // Container's main lib: lib/spl/container/selfeval -> spl/container/selfeval/_lib/selfeval.js
+          const parts = libPath.split('/')
+          const libName = parts[parts.length - 1]
+          libFilePath = this.resolve(libPath, `_lib/${libName}.js`)
+        }
+
+        if (!libFilePath) {
+          throw new Error(`Lib not found in any layer: ${uri}`)
+        }
+        const mod = await import(libFilePath)
+        return mod.create(this)
+      }
+
+      // 3. Inline script
+      if (uri === 'spl/script/inline') {
+        const scriptContent = record.headers.spl.request.script
+        return this._createScriptExecutable(scriptContent)
+      }
+
+      // 4. Script file (absolute path)
+      if (uri.startsWith('/')) {
+        const scriptContent = fs.readFileSync(uri, 'utf-8')
+        return this._createScriptExecutable(scriptContent)
+      }
+
+      // 5. Commands (pkg/api/method) - resolve via overlay
+      const modulePath = this.resolve(uri, 'index.js')
+      if (!modulePath) {
+        throw new Error(`Module not found in any layer: ${uri}`)
+      }
+      const mod = await import(modulePath)
+
+      // Methods export default function
+      if (typeof mod.default === 'function') {
+        const self = this
+        return {
+          async invoke() {
+            await mod.default(self)
+          }
+        }
+      }
+
+      // Fallback for create() pattern (libs)
+      return mod.create(this)
+    },
+
+    /**
+     * Resolve a path through overlay (without instantiation)
+     * @param {string} nodePath - Container path (e.g., 'spl/container')
+     * @param {string} filename - File to resolve (e.g., 'README.json')
+     * @returns {string|null} - Absolute path or null if not found
+     */
+    resolve(nodePath, filename) {
+      if (!_fs || !_path) return null
+      const modulesDir = getModulesDir()
+      if (!modulesDir) return null
+      return resolveOverlay(nodePath, filename, getNodeRoot(), getAppAPI(), getEnableAppOverlay(), modulesDir, _fs, _path)
+    },
+
+    /**
+     * Build type stack for a container
+     * @param {string} containerPath - Container path (e.g., 'spl/container')
+     * @returns {{ stack: string[], instanceLevel: number }} - Type stack and instance level
+     */
+    buildTypeStack(containerPath) {
+      if (!_fs || !_path) return { stack: [containerPath], instanceLevel: 1 }
+      const modulesDir = getModulesDir()
+      if (!modulesDir) return { stack: [containerPath], instanceLevel: 1 }
+      return buildTypeStackInternal(containerPath, getNodeRoot(), getAppAPI(), getEnableAppOverlay(), modulesDir, _fs, _path)
+    },
+
     // ========================================================================
     // Input/Output
     // ========================================================================
@@ -363,7 +473,7 @@ export function create(record) {
      * @returns {Object}
      */
     input() {
-      return record.headers.spl.request.input || {}
+      return record?.headers?.spl?.request?.input || {}
     },
 
     /**
@@ -397,7 +507,7 @@ export function create(record) {
      * @returns {string} - 'topline'|'summary'|'detail'|'enriched'|'report'
      */
     getMetaLevel() {
-      const input = record.headers.spl.request.input || {}
+      const input = record?.headers?.spl?.request?.input || {}
       const meta = input.meta
 
       if (meta === undefined || meta === true) return 'summary'
@@ -410,7 +520,7 @@ export function create(record) {
      * @returns {string|null} - null|'topline'|'summary'|'detail'|'enriched'
      */
     getReportLevel() {
-      const input = record.headers.spl.request.input || {}
+      const input = record?.headers?.spl?.request?.input || {}
       const report = input.report
 
       if (report === undefined) return null
@@ -465,48 +575,6 @@ export function create(record) {
     },
 
     // ========================================================================
-    // Module Resolution
-    // ========================================================================
-
-    /**
-     * Require a module - handles three types:
-     * 1. Platform modules: 'fs', 'path' - returns platform module directly
-     * 2. Splectrum libs: 'lib/spl' - returns bound lib instance
-     * 3. Commands: 'spl/container/whoami' - returns { invoke() }
-     *
-     * Also handles scripts:
-     * - 'spl/script/inline' - inline script from record
-     * - '/absolute/path' - script file
-     *
-     * @param {string} uri - Module URI
-     * @returns {Promise<Object>} - Loaded module, lib instance, or executable
-     */
-    async require(uri) {
-      return internalRequire(uri)
-    },
-
-    /**
-     * Resolve a path through overlay (without instantiation)
-     * @param {string} nodePath - Container path (e.g., 'spl/container')
-     * @param {string} filename - File to resolve (e.g., 'README.json')
-     * @returns {string|null} - Absolute path or null if not found
-     */
-    resolve(nodePath, filename) {
-      return internalResolve(nodePath, filename)
-    },
-
-    /**
-     * Build type stack for a container
-     * @param {string} containerPath - Container path (e.g., 'spl/container')
-     * @returns {{ stack: string[], instanceLevel: number }} - Type stack and instance level
-     */
-    buildTypeStack(containerPath) {
-      const modulesDir = getModulesDir()
-      if (!modulesDir) return { stack: [containerPath], instanceLevel: 1 }
-      return buildTypeStack(containerPath, getNodeRoot(), getAppAPI(), getEnableAppOverlay(), modulesDir)
-    },
-
-    // ========================================================================
     // Fire and Forget / State Management
     // ========================================================================
 
@@ -522,7 +590,7 @@ export function create(record) {
      */
     faf(destination, options = {}) {
       const nodeRoot = getNodeRoot()
-      if (!nodeRoot) return null
+      if (!nodeRoot || !_fs || !_path) return null
 
       // Clone immediately - record may mutate before async write completes
       const recordClone = JSON.parse(JSON.stringify(record))
@@ -532,24 +600,24 @@ export function create(record) {
       const filename = options.filename || `${timestamp}.json`
 
       // Resolve destination relative to node root
-      const destPath = path.isAbsolute(destination)
+      const destPath = _path.isAbsolute(destination)
         ? destination
-        : path.join(nodeRoot, destination)
+        : _path.join(nodeRoot, destination)
 
       // Ensure directory exists
-      fs.mkdirSync(destPath, { recursive: true })
+      _fs.mkdirSync(destPath, { recursive: true })
 
       // Find unique filename
-      const finalFilename = findUniqueFilename(destPath, filename, options.dedupe)
+      const finalFilename = findUniqueFilename(destPath, filename, options.dedupe, _fs, _path)
 
-      const filePath = path.join(destPath, finalFilename)
+      const filePath = _path.join(destPath, finalFilename)
       const recordJson = JSON.stringify(recordClone, null, 2)
 
       if (options.sync) {
-        fs.writeFileSync(filePath, recordJson, 'utf-8')
+        _fs.writeFileSync(filePath, recordJson, 'utf-8')
       } else {
-        fs.writeFile(filePath, recordJson, 'utf-8', (err) => {
-          if (err) module.raiseAsyncError(err, { operation: 'faf', destination, filePath })
+        _fs.writeFile(filePath, recordJson, 'utf-8', (err) => {
+          if (err) this.raiseAsyncError(err, { operation: 'faf', destination, filePath })
         })
       }
 
@@ -564,23 +632,23 @@ export function create(record) {
      */
     consumeLatest(topic) {
       const nodeRoot = getNodeRoot()
-      if (!nodeRoot) return null
+      if (!nodeRoot || !_fs || !_path) return null
 
-      const topicPath = path.isAbsolute(topic)
+      const topicPath = _path.isAbsolute(topic)
         ? topic
-        : path.join(nodeRoot, topic)
+        : _path.join(nodeRoot, topic)
 
-      if (!fs.existsSync(topicPath)) return null
+      if (!_fs.existsSync(topicPath)) return null
 
-      const files = fs.readdirSync(topicPath)
+      const files = _fs.readdirSync(topicPath)
         .filter(f => f.endsWith('.json'))
         .sort()
         .reverse()
 
       if (files.length === 0) return null
 
-      const latestPath = path.join(topicPath, files[0])
-      const content = fs.readFileSync(latestPath, 'utf-8')
+      const latestPath = _path.join(topicPath, files[0])
+      const content = _fs.readFileSync(latestPath, 'utf-8')
       return JSON.parse(content)
     },
 
@@ -589,17 +657,23 @@ export function create(record) {
     // ========================================================================
 
     /**
-     * Get node root from record
+     * Get node root from record (or bootstrap)
      * @returns {string|null}
      */
     getNodeRoot,
+
+    /**
+     * Get the modules directory
+     * @returns {string|null}
+     */
+    getModulesDir,
 
     /**
      * Get the record's unique identifier
      * @returns {string}
      */
     getRecordId() {
-      return String(record.headers.spl.request.timeReceived)
+      return String(record?.headers?.spl?.request?.timeReceived || '')
     },
 
     /**
@@ -609,11 +683,17 @@ export function create(record) {
     getAppAPI,
 
     /**
+     * Get current app name
+     * @returns {string|null}
+     */
+    getAppName,
+
+    /**
      * Get the request method path
      * @returns {string}
      */
     getMethod() {
-      return record.headers.spl.request.method
+      return record?.headers?.spl?.request?.method
     },
 
     // ========================================================================
@@ -636,7 +716,7 @@ export function create(record) {
      */
     raiseAsyncError(error, context = {}) {
       const nodeRoot = getNodeRoot()
-      if (!nodeRoot) return
+      if (!nodeRoot || !_fs || !_path) return
 
       const errorRecord = JSON.parse(JSON.stringify(record))
       errorRecord.headers.spl.error = {
@@ -648,14 +728,14 @@ export function create(record) {
         async: true
       }
 
-      const errorPath = path.join(nodeRoot, 'runtime/error')
-      fs.mkdirSync(errorPath, { recursive: true })
+      const errorPath = _path.join(nodeRoot, 'runtime/error')
+      _fs.mkdirSync(errorPath, { recursive: true })
 
       const filename = `${Date.now()}.json`
-      const finalFilename = findUniqueFilename(errorPath, filename, 'numeric-digit')
+      const finalFilename = findUniqueFilename(errorPath, filename, 'numeric-digit', _fs, _path)
 
-      fs.writeFile(
-        path.join(errorPath, finalFilename),
+      _fs.writeFile(
+        _path.join(errorPath, finalFilename),
         JSON.stringify(errorRecord, null, 2),
         'utf-8',
         () => {}
@@ -667,8 +747,26 @@ export function create(record) {
      */
     completeRequest() {
       record.headers.spl.request.completed = true
+    },
+
+    // ========================================================================
+    // Internal Helpers
+    // ========================================================================
+
+    /**
+     * Create script executable (internal)
+     * @param {string} scriptContent - Script source code
+     * @returns {Object} - Executable with invoke() method
+     */
+    _createScriptExecutable(scriptContent) {
+      const self = this
+      const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor
+      const fn = new AsyncFunction('module', scriptContent)
+      return {
+        async invoke() {
+          await fn(self)
+        }
+      }
     }
   }
-
-  return module
 }

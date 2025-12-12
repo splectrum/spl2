@@ -1,0 +1,11 @@
+{
+  "name": "reqs",
+  "purpose": "Delete method requirements",
+  "requirements": [
+    {
+      "name": "delete",
+      "description": "Delete method specification",
+      "file": "Delete_v1.0.0.md"
+    }
+  ]
+}
