@@ -155,12 +155,21 @@ Entry point recognizes spot namespaces:
 4. Inheritance from container types works
 5. Consistent patterns across spot apps
 
+## Design Principle: Logical Detached from Physical
+
+URI addressing with DNS-style name resolution:
+- `spl spl://glossary.core.spl/dsl/addItem` - absolute URI form
+- Names map to containers (many-to-one possible)
+- Logical addressing independent of physical storage
+- Enables: federation, migration, multiple views over same containers
+
 ## Open Questions
 
 - How to register known spots for routing?
 - Data type schema format (AVRO? JSON Schema?)
 - Relationship between data types and container types
 - Migration path for existing spot data
+- Name resolution mechanism (local config, registry, P2P DHT)
 
 ## Related
 
