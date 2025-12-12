@@ -8,6 +8,7 @@
 // 5. Return result to client
 
 import * as readline from 'readline'
+import process from 'process'
 
 export default async function(module) {
   const fs = await module.require('fs')

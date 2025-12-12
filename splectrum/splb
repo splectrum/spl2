@@ -1,0 +1,5 @@
+#!/bin/sh
+# splb - Splectrum CLI entry point (Bare runtime)
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+exec bare "${SCRIPT_DIR}/spl.mjs" "$@"

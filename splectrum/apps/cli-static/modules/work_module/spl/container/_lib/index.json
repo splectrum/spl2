@@ -51,6 +51,11 @@
       "name": "selfeval_final",
       "description": "Selfeval runner for final resources overlap detection",
       "exports": ["run"]
+    },
+    "avsc.js": {
+      "name": "avsc",
+      "description": "Avro schema parsing and validation",
+      "exports": ["parseSchema", "validate"]
     }
   }
 }

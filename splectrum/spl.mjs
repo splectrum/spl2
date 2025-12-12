@@ -9,6 +9,7 @@
 //   4. Library:  spl status
 
 import { loadModule } from './lib/moduleBootstrap.js'
+import process from 'process'
 
 // ============================================================================
 // Create record first thing - all input captured
@@ -24,7 +25,7 @@ const record = {
       runtime: {
         nodeRoot: null,
         invokedFrom: process.cwd(),
-        platform: { type: 'node' }
+        platform: { type: 'node' }  // TODO: detect from process
       }
     }
   },

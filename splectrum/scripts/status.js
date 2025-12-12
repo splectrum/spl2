@@ -1,20 +1,17 @@
 /*
  * scripts/status.js - Show node status
  * Usage: spl status [--verbose]
- * Available: record, spl, requireSpl, requireNonSpl
  */
-const fs = requireNonSpl('fs')
-const path = requireNonSpl('path')
-const input = spl.input()
+const fs = await module.require('fs')
+const path = await module.require('path')
+const input = module.input()
 
-const nodeRoot = record.headers.spl.runtime.nodeRoot
-const splectrumDir = nodeRoot  // nodeRoot IS the splectrum dir
-const invokedFrom = record.headers.spl.runtime.invokedFrom
+const nodeRoot = module.getNodeRoot()
+const splectrumDir = nodeRoot
 
 console.log('=== Splectrum Node Status ===')
 console.log('')
 console.log(`Node root:     ${nodeRoot}`)
-console.log(`Invoked from:  ${invokedFrom}`)
 console.log('')
 
 // Directories inside splectrum/ (the node)
@@ -83,7 +80,6 @@ if (input.verbose) {
         if (entry.isDirectory() && !entry.name.startsWith('_') && entry.name !== 'versions') {
           walkMethods(path.join(dir, entry.name), prefix + entry.name + '/')
         } else if (entry.name === 'index.js' && prefix.split('/').length > 3) {
-          // package/api/method/index.js pattern
           console.log(`  ${prefix.slice(0, -1)}`)
         }
       }
@@ -97,4 +93,4 @@ if (input.verbose) {
   }
 }
 
-spl.output({ status: 'ok' })
+module.output({ status: 'ok' })

@@ -9,11 +9,76 @@
   "installedAt": "2025-11-26T14:29:54.556Z",
   "rolledBackFrom": "bm_spl-1764167374419",
   "imports": {
-    "fs": { "bare": "bare-fs", "default": "fs" },
-    "fs/*": { "bare": "bare-fs/*", "default": "fs/*" },
-    "path": { "bare": "bare-path", "default": "path" },
-    "path/*": { "bare": "bare-path/*", "default": "path/*" },
-    "os": { "bare": "bare-os", "default": "os" },
-    "url": { "bare": "bare-url", "default": "url" }
+    "fs": {
+      "bare": "bare-fs",
+      "default": "fs"
+    },
+    "fs/*": {
+      "bare": "bare-fs/*",
+      "default": "fs/*"
+    },
+    "path": {
+      "bare": "bare-path",
+      "default": "path"
+    },
+    "path/*": {
+      "bare": "bare-path/*",
+      "default": "path/*"
+    },
+    "os": {
+      "bare": "bare-os",
+      "default": "os"
+    },
+    "url": {
+      "bare": "bare-node-url",
+      "default": "url"
+    },
+    "readline": {
+      "bare": "bare-node-readline",
+      "default": "readline"
+    },
+    "process": {
+      "bare": "bare-node-process",
+      "default": "process"
+    },
+    "util": {
+      "bare": "bare-node-util",
+      "default": "util"
+    },
+    "stream": {
+      "bare": "bare-node-stream",
+      "default": "stream"
+    },
+    "zlib": {
+      "bare": "bare-node-zlib",
+      "default": "zlib"
+    },
+    "crypto": {
+      "bare": "bare-node-crypto",
+      "default": "crypto"
+    },
+    "events": {
+      "bare": "bare-node-events",
+      "default": "events"
+    },
+    "buffer": {
+      "bare": "bare-node-buffer",
+      "default": "buffer"
+    }
+  },
+  "dependencies": {
+    "avsc": "^5.7.9",
+    "bare-node-buffer": "^1.0.0",
+    "bare-node-crypto": "^1.0.0",
+    "bare-node-events": "^1.0.1",
+    "bare-node-process": "^1.0.1",
+    "bare-node-readline": "^1.0.1",
+    "bare-node-runtime": "^1.1.4",
+    "bare-node-stream": "^1.0.0",
+    "bare-node-url": "^1.0.1",
+    "bare-node-util": "^1.0.0",
+    "bare-node-zlib": "^1.0.0",
+    "bare-process": "^4.2.2",
+    "bare-tty": "^5.0.3"
   }
 }

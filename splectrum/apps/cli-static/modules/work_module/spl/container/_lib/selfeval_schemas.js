@@ -1,13 +1,16 @@
 // selfeval_schemas.js - Selfeval runner for schemas facet
 //
-// Checks files declared in _schemas/index.json exist,
-// and schema files are declared in manifest.
+// Checks:
+// 1. Files declared in _schemas/index.json exist
+// 2. Schema files are declared in manifest
+// 3. .avsc files are valid Avro schemas
 
 export function create(module) {
   return {
     async run(containerFsPath) {
       const fs = await module.require('fs')
       const path = await module.require('path')
+      const avsc = await module.require('lib/spl/container/avsc.js')
 
       const schemasPath = path.join(containerFsPath, '_schemas')
 
@@ -27,20 +30,51 @@ export function create(module) {
       const declaredFiles = new Set(manifest.files || [])
       const results = []
 
-      // Check manifest → reality (declared files exist)
+      // Check manifest → reality (declared files exist and validate .avsc)
       for (const fileName of declaredFiles) {
+        const filePath = path.join(schemasPath, fileName)
         let exists = false
         try {
-          fs.statSync(path.join(schemasPath, fileName))
+          fs.statSync(filePath)
           exists = true
         } catch (e) {}
 
-        results.push({
-          name: fileName,
-          pass: exists,
-          topline: `${fileName} | ${exists ? 'PASS' : 'FAIL'}`,
-          detail: exists ? 'file exists' : 'file missing'
-        })
+        if (!exists) {
+          results.push({
+            name: fileName,
+            pass: false,
+            topline: `${fileName} | FAIL`,
+            detail: 'file missing'
+          })
+          continue
+        }
+
+        // Validate .avsc files as valid Avro
+        if (fileName.endsWith('.avsc')) {
+          const parseResult = await avsc.parseSchema(filePath)
+          if (parseResult.ok) {
+            results.push({
+              name: fileName,
+              pass: true,
+              topline: `${fileName} | PASS`,
+              detail: `valid Avro: ${parseResult.type.name || 'anonymous'}`
+            })
+          } else {
+            results.push({
+              name: fileName,
+              pass: false,
+              topline: `${fileName} | FAIL`,
+              detail: `invalid Avro: ${parseResult.error}`
+            })
+          }
+        } else {
+          results.push({
+            name: fileName,
+            pass: true,
+            topline: `${fileName} | PASS`,
+            detail: 'file exists'
+          })
+        }
       }
 
       // Check reality → manifest (actual files are declared)

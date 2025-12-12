@@ -4,13 +4,12 @@
  * Examples:
  *   spl help              - Show general help
  *   spl help spl/dev/cycle - Show help for specific method
- * Available: record, spl, requireSpl, requireNonSpl
  */
-const fs = requireNonSpl('fs')
-const path = requireNonSpl('path')
-const input = spl.input()
+const fs = await module.require('fs')
+const path = await module.require('path')
+const input = module.input()
 
-const nodeRoot = record.headers.spl.runtime.nodeRoot
+const nodeRoot = module.getNodeRoot()
 const methodPath = input["0"]  // first positional arg
 
 if (!methodPath) {
@@ -33,55 +32,52 @@ if (!methodPath) {
   console.log('  spl "/* */ spl.output({ hello: true })"')
   console.log('')
   console.log(`Current node: ${nodeRoot}`)
-  spl.output({ status: 'ok' })
+  module.output({ status: 'ok' })
 } else {
   // Method-specific help
   const parts = methodPath.split('/')
   if (parts.length < 3) {
     console.log('Method path must be in format: package/api/method')
     console.log(`Got: ${methodPath}`)
-    spl.output({ status: 'error', message: 'invalid method path' })
-    return
-  }
+    module.output({ status: 'error', message: 'invalid method path' })
+  } else {
+    // Look in modules/ for the method
+    const modulesDir = path.join(nodeRoot, 'modules')
+    const activeModule = fs.readdirSync(modulesDir).find(m => !m.startsWith('.') && m !== 'versions')
 
-  // Look in modules/ for the method
-  const modulesDir = path.join(nodeRoot, 'modules')
-  const activeModule = fs.readdirSync(modulesDir).find(m => !m.startsWith('.') && m !== 'versions')
+    if (!activeModule) {
+      console.log('No active module found')
+      module.output({ status: 'error', message: 'no active module' })
+    } else {
+      const methodDir = path.join(modulesDir, activeModule, ...parts)
 
-  if (!activeModule) {
-    console.log('No active module found')
-    spl.output({ status: 'error', message: 'no active module' })
-    return
-  }
+      if (!fs.existsSync(methodDir)) {
+        console.log(`Method not found: ${methodPath}`)
+        console.log(`Looked in: ${methodDir}`)
+        module.output({ status: 'error', message: 'method not found' })
+      } else {
+        console.log(`=== ${methodPath} ===`)
+        console.log('')
 
-  const methodDir = path.join(modulesDir, activeModule, ...parts)
+        // Check for README.json
+        const readmePath = path.join(methodDir, 'README.json')
+        if (fs.existsSync(readmePath)) {
+          const readme = JSON.parse(fs.readFileSync(readmePath, 'utf-8'))
+          if (readme.description) {
+            console.log(`Description: ${readme.description}`)
+            console.log('')
+          }
+        }
 
-  if (!fs.existsSync(methodDir)) {
-    console.log(`Method not found: ${methodPath}`)
-    console.log(`Looked in: ${methodDir}`)
-    spl.output({ status: 'error', message: 'method not found' })
-    return
-  }
+        // Check what files exist
+        console.log('Files:')
+        const files = fs.readdirSync(methodDir).filter(f => !f.startsWith('.'))
+        for (const file of files) {
+          console.log(`  ${file}`)
+        }
 
-  console.log(`=== ${methodPath} ===`)
-  console.log('')
-
-  // Check for README.json
-  const readmePath = path.join(methodDir, 'README.json')
-  if (fs.existsSync(readmePath)) {
-    const readme = JSON.parse(fs.readFileSync(readmePath, 'utf-8'))
-    if (readme.description) {
-      console.log(`Description: ${readme.description}`)
-      console.log('')
+        module.output({ status: 'ok', method: methodPath })
+      }
     }
   }
-
-  // Check what files exist
-  console.log('Files:')
-  const files = fs.readdirSync(methodDir).filter(f => !f.startsWith('.'))
-  for (const file of files) {
-    console.log(`  ${file}`)
-  }
-
-  spl.output({ status: 'ok', method: methodPath })
 }

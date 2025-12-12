@@ -374,8 +374,15 @@ export function create(bootstrapModule) {
       const fs = await getFs()
       const path = await getPath()
 
-      // 1. Platform modules (no slashes) - direct import, package.json handles mapping
+      // 1. Platform modules and npm packages (no slashes)
+      //    - Platform modules: package.json import maps handle Node/Bare switching
+      //    - npm packages: need import attributes on Bare for Node.js compatibility
       if (!uri.includes('/')) {
+        const isBare = typeof Bare !== 'undefined'
+        if (isBare) {
+          // On Bare, use import attributes for npm packages to get Node.js builtins mapped
+          return import(uri, { with: { imports: 'bare-node-runtime/imports' } }).then(m => m.default ?? m)
+        }
         return import(uri).then(m => m.default ?? m)
       }
 

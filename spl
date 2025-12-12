@@ -1,6 +1,0 @@
-#!/bin/sh
-# spl - Splectrum CLI entry point
-# Hands off to splectrum/spl.mjs for ES module support
-
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-exec node "${SCRIPT_DIR}/splectrum/spl.mjs" "$@"
