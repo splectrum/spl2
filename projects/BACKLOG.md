@@ -32,6 +32,7 @@ Phased approach to get implementation infrastructure working.
 
 | Backlog Item | Priority | Dependencies | Addons | Comments |
 |--------------|----------|--------------|--------|----------|
+| [Spot Apps / Data Resources](backlog/spot-apps-data-resources.md) | High | Project 11 | | Apps that manage data areas. Data resources vs functional resources. CRUD on typed items (projects, glossary terms). `../` prefix distinguishes functional calls. |
 | App Architecture | High | Project 11 | | Original Project 11 scope. App as stateful component, app-session handover, namespaced headers, execute=load+handle pattern. Design docs in projects/11-app-architecture/notes/. |
 | PAC Handler Design | Medium | App Architecture | | Prompt And Confirm at handler level. Methods implement --dry-run/--silent, handler orchestrates --pac. Pluggable handlers (CLI, browser, AI agent). Design doc: pac_handler_design_2025-12-07.md. |
 | [Wrapper APIs](backlog/wrapper-apis.md) | High | | Session/Context Tools | spl/git, spl/file, spl/search - reuse existing tools within splectrum context. Creates records/audit trails. Foundation for session tracking, replay, context recovery. |
