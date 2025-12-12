@@ -4,87 +4,57 @@
 
 ---
 
-## Active Project
+## Active: Project 11 Closure
 
-**Project 11: App Architecture**
+**Project:** 11-app-architecture (Exploration Project)
+**Phase:** Closure - collaborative tasks remaining
 
-- Type: Exploration Project
-- Status: **Ready for Closure**
-- Location: `projects/11-app-architecture/`
+### Completed (Autonomous)
+- ✓ Container lifecycle methods (create, lift, delete)
+- ✓ All _reqs for new methods
+- ✓ whoami reqs enhancement
+- ✓ LESSONS_LEARNED.md
+- ✓ PARTNERSHIP_REFLECTION.md
+- ✓ Committed and pushed (be0ca86)
 
-### Completed
+### Remaining (Collaborative)
 
-**Container lifecycle methods complete:**
-1. `spl/container/create` - establish container identity in work_module
-2. `spl/container/lift` - materialize resources from overlay for editing
-3. `spl/container/delete` - remove container from work_module
+**1. Design doc review → _reqs updates**
 
-**All _reqs documentation complete:**
-- `spl/_reqs/spl_package_v1.0.0.md` - SPL package contents
-- `spl/container/create/_reqs/Create_v1.0.0.md`
-- `spl/container/delete/_reqs/Delete_v1.0.0.md`
-- `spl/container/lift/_reqs/Lift_v1.0.0.md`
+Review each design doc in `projects/11-app-architecture/notes/` and check if decisions need to propagate to _reqs:
 
-**whoami enhanced:**
-- Reqs facet now shows requirement names (was showing "empty")
-- `--meta=enriched` shows actual req file contents
+| Doc | Key Decisions |
+|-----|---------------|
+| `type_stack_and_selfeval_architecture.md` | Type stack algorithm, runner types, final vs non-final |
+| `container_create_design_2025-12-12.md` | Create/lift/delete lifecycle |
+| `module_js_this_refactor.md` | Bootstrap pattern, create(module) signature |
+| `selfeval_design_2025-12-08.md` | Selfeval framework |
 
-### All Selfevals Passing
+TODOs from type_stack doc:
+- Update _reqs with type stack design decisions
+- Verify spl/method extends spl/container
+- Empty manifest folders question
 
-```bash
-spl spl/selfeval --levels=all             # PASS 3/3 levels
-spl spl/container/selfeval --levels=all   # PASS 2/2 levels
-spl spl/api/selfeval --levels=all         # PASS 2/2 levels
-spl spl/method/selfeval --levels=all      # PASS 3/3 levels
-spl spl/package/selfeval --levels=all     # PASS 3/3 levels
-spl spl/module/selfeval --levels=all      # PASS 3/3 levels
-spl spl/modules/selfeval --levels=all     # PASS 3/3 levels
-```
+**2. Partnership review**
 
-### Work Items
+**3. Foundation/glossary updates**
 
-| # | Item | Status |
-|---|------|--------|
-| 1 | Backlog and CIP Consolidation | Done |
-| 2 | Splectrum node cleanup | Done |
-| 3 | App-based design and implementation experience | Done |
-| 4 | Elevator pitch for Pear/Bare | Ready (`elevator-pitch/`) |
-| 5 | Splectrum node install | Pending (carry forward) |
+**4. INDEX.md and BACKLOG.md updates**
 
-### Key Deliverables
+**5. Next project planning**
 
-**Type system:**
-- 7 container types with selfeval validation
-- Type stack algorithm (extends first, then instantiates)
-- Dual runner categories (runners + instanceRunners)
+**6. Final commit and push**
 
-**Container lifecycle:**
-- create/lift/delete methods on spl/container
-- Overlay-based resource resolution
-- Virtual container support
+### Key Files
 
-**Introspection:**
-- whoami with levels support
-- selfeval with type stack traversal
-- Detail levels: topline/summary/detail/enriched
+- Design docs: `projects/11-app-architecture/notes/`
+- Container _reqs: `splectrum/apps/cli-static/modules/work_module/spl/container/_reqs/`
+- Closure artifacts: `projects/11-app-architecture/LESSONS_LEARNED.md`, `PARTNERSHIP_REFLECTION.md`
 
 ---
 
-## Session Entry Points
+## Session Entry
 
-**Starting a new session?**
-
-1. Read this file for current context
-2. Test: `spl spl/selfeval --levels=all`
-3. For project closure: `projects/11-app-architecture/`
-
-**Key patterns:**
-- Methods use `module.output(freetext, structured)` not return
-- Libs use `create(module)` returning object with exports
-- Container lifecycle: create → lift → edit → selfeval
-
----
-
-## Notes
-
-This file provides session context. Update when project status changes significantly.
+1. Read this file
+2. Continue with design doc review (collaborative)
+3. `./spl spl/selfeval --levels=all` to verify system health
