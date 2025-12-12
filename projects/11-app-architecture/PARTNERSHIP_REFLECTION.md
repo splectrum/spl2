@@ -117,4 +117,59 @@ Strong project despite (or because of) significant pivot. The container infrastr
 
 ---
 
-*This reflection captures AI perspective. Partnership Review to follow collaboratively.*
+## Partnership Review (Collaborative)
+
+**Date:** 2025-12-12
+
+### User Perspective
+
+**On the pivot:** Seen as dealing with a prerequisite. Container methods as local state was the right foundation. Groundwork done for design and implementation experience. Remarkably little friction despite chicken-and-egg problems. whoami and selfeval play important roles. Free flow between design and implementation (creative-formal dualism) working well.
+
+**On friction:** No major frustration or misalignment, no sharp turns needed. Design effort and lengthy discussions are paying off.
+
+**On course:** No change needed - just identify most useful step forward. Work item tracking is difficult when design evolves fast.
+
+### AI Perspective on Context Comfort
+
+**What enables implementation speed:**
+- Type stack is clear - understand extends/instantiates combination
+- Overlay pattern internalized - can predict resolution
+- _reqs as anchors - documented specs to reference
+- selfeval as safety net - verify nothing broken
+- whoami for orientation - quick state checks
+- Consistent patterns (create(module), handler structure, _lib layout)
+- Low ceremony - direct changes, selfeval catches issues
+
+**What slows down:**
+- Unfamiliar domains (app architecture, session handling)
+- Missing _reqs (have to infer, less confident)
+- New patterns without examples
+
+### Key Learning: Friction Response
+
+**User observation:** In unfamiliar domains, AI tends to get stressed and switch to "blinkered auto-mode."
+
+**Agreed response pattern:** Friction should trigger strict collab mode. When feeling uncertain or stressed → slow down, make it collaborative, sort it out together. Don't push through blindly.
+
+### --like Candidates
+
+For the model implementation pattern, strong candidates identified:
+
+**Methods:**
+- `spl/container/whoami` - Primary recommendation. Clean introspection, good _reqs, freetext rendering. Not too simple, not too complex.
+- `spl/container/create` - Lifecycle method with validation, dryRun support.
+
+**Libs:**
+- `spl/container/_lib/selfeval.js` - Framework lib, clear exports, create(module) pattern
+- `spl/container/_lib/report.js` - Data transformation lib
+
+**Runners:**
+- `spl/container/_lib/selfeval_lib.js` - Type runner pattern, structured result
+
+### Partnership Health (Final)
+
+**Friction level:** Low
+**Trust:** High
+**Communication:** Clear, corrections immediate and constructive
+**Productivity:** Good, meaningful deliverables
+**Creative-formal balance:** Working well

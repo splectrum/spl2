@@ -2,7 +2,7 @@
 
 # Project Backlog
 
-**Last Updated:** 2025-11-30
+**Last Updated:** 2025-12-12
 
 Backlog of identified projects for SPL2 development. Projects analyzed for priority and dependencies during Project 02 (Dependency & Priority Analysis).
 
@@ -32,6 +32,11 @@ Phased approach to get implementation infrastructure working.
 
 | Backlog Item | Priority | Dependencies | Addons | Comments |
 |--------------|----------|--------------|--------|----------|
+| App Architecture | High | Project 11 | | Original Project 11 scope. App as stateful component, app-session handover, namespaced headers, execute=load+handle pattern. Design docs in projects/11-app-architecture/notes/. |
+| PAC Handler Design | Medium | App Architecture | | Prompt And Confirm at handler level. Methods implement --dry-run/--silent, handler orchestrates --pac. Pluggable handlers (CLI, browser, AI agent). Design doc: pac_handler_design_2025-12-07.md. |
+| Session/Context Tools | Medium | App Architecture | Wrapper APIs | Context recovery tools. MVP: spl/session/summary derives state from git/CURRENT.md. Full: save/resume sessions. Design doc: session_tool_idea_2025-12-12.md. |
+| Wrapper APIs | Medium | | Session/Context Tools | spl/git, spl/file, spl/search wrappers. Enable audit trails, session tracking, replay/undo. Prerequisite for rich session tools. |
+| Scripting Layer | Low | App Architecture | | Client-agnostic scripting syntax. Context management (set/with), multi-command, fluent layer over formal syntax. Design docs: cli_namespacing_and_context, natural_language_bridge. |
 | [AVRO Wrapper API](backlog/avro-wrapper-api.md) | High | | | SPL2 wrapper for AVRO schema operations. Schema loading/caching, validation helpers, Bare compatibility. Foundation for all APIs - every API uses AVRO schemas. |
 | [Bare Runtime Compatibility](backlog/bare-runtime-compatibility.md) | High | | | Deep dive: Node.js → Bare workflow, tooling compatibility (Vite, Vitest), SPL2 patterns on Bare. Prerequisite for Pear platform work. |
 | [Browser Platform Exploration](backlog/browser-platform-exploration.md) | High | Bare Runtime Compatibility | | Validate browser as third pillar platform for SPL2 runtime. File system abstraction (IndexedDB/OPFS), browser lifecycle, basic P2P validation (WebRTC/WebTransport). Completes three-pillar portability (Node/Bare/Browser). |

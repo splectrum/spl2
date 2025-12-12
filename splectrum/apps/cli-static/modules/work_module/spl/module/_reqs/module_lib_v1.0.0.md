@@ -15,9 +15,29 @@ Module runtime lib - provides the module API for methods and libs.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `create` | `(record)` | Create module instance bound to a record |
+| `create` | `(bootstrapModule)` | Create module instance from bootstrap module |
 
-**Module instance methods:**
+### Initialization Pattern
+
+```javascript
+const module = create(bootstrapModule)
+await module.init()           // Load platform modules (fs, path)
+module.bindRecord(record)     // Bind request record
+```
+
+The bootstrap module provides minimal interface: `getNodeRoot()`, `getModulesDir()`, `require(uri)` for platform modules.
+
+### Module Instance Methods
+
+**Lifecycle:**
+
+| Method | Description |
+|--------|-------------|
+| `init()` | Load platform modules (fs, path). Must be called before other methods |
+| `bindRecord(record)` | Bind a request record after initialization |
+| `createForRecord(record)` | Factory: create new module instance with different record |
+
+**Input/Output:**
 
 | Method | Description |
 |--------|-------------|
@@ -28,14 +48,34 @@ Module runtime lib - provides the module API for methods and libs.
 | `getReportLevel()` | Get --report flag value |
 | `getDetailLevel()` | Get detail level from meta |
 | `extractOutput(sourceRecord)` | Extract output from a record |
+
+**Record Management:**
+
+| Method | Description |
+|--------|-------------|
 | `snapshotRecord()` | Create record snapshot |
 | `restoreRecord(snapshot)` | Restore from snapshot |
-| `require(uri)` | Load platform module, lib, or method |
-| `resolve(nodePath, filename)` | Resolve path through overlay |
-| `faf(destination, options)` | Fire and forget to destination |
-| `consumeLatest(topic)` | Consume latest message from topic |
 | `getRecordId()` | Get current record ID |
 | `getMethod()` | Get current method path |
+
+**Dependencies:**
+
+| Method | Description |
+|--------|-------------|
+| `require(uri)` | Load platform module, lib, or method |
+| `resolve(nodePath, filename)` | Resolve path through overlay |
+
+**Messaging:**
+
+| Method | Description |
+|--------|-------------|
+| `faf(destination, options)` | Fire and forget to destination |
+| `consumeLatest(topic)` | Consume latest message from topic |
+
+**Errors:**
+
+| Method | Description |
+|--------|-------------|
 | `raiseError(message)` | Raise synchronous error |
 | `raiseAsyncError(error, context)` | Raise async error |
 | `completeRequest()` | Mark request complete |
@@ -48,9 +88,10 @@ Module runtime lib - provides the module API for methods and libs.
 ## Self-eval
 
 - [ ] File exists at `_lib/module.js`
-- [ ] Exports `create(record)` function
+- [ ] Exports `create(bootstrapModule)` function
+- [ ] Created instance has `init()`, `bindRecord()`, `createForRecord()`
 - [ ] Created instance has all documented methods
 
 ## Comments
 
-This is the core runtime lib. Every module instance inherits it through the type chain (instantiates: spl/module).
+This is the core runtime lib. Every module instance inherits it through the type chain (instantiates: spl/module). Uses standard `create(module)` signature like all other libs.

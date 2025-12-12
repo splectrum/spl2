@@ -4,7 +4,7 @@
 
 | Code | Name | Status | Started |
 |------|------|--------|---------|
-| 11-app-architecture | App Architecture | In Progress | 2025-11-30 |
+| - | - | - | - |
 
 ## Completed Projects
 
@@ -20,6 +20,7 @@
 | 08-dev-environment-api | Dev Environment API | 2025-11-20 | 4-level module structure, executable selfeval pattern, test runner, AVRO schemas (API + 7 methods), native vs wrapper API convention, delegation stepping stone, work package pattern |
 | 09-console-v5-stream-native | Console v5 Stream Native | 2025-11-26 | v0 dev env template, type hierarchy design, lib resolution pattern, selfeval inheritance, event record structure (pivoted from Console migration to dev env foundation) |
 | 10-dev-env-v0-bundle-continued | Dev Env v0 Bundle Continued | 2025-11-30 | Self-hosting dev cycle, spl/dev + spl/ops APIs, CLI pipeline (record-first, session, apps), unified scripting, splectrum node at repo level |
+| 11-app-architecture | App Architecture | 2025-12-12 | Container type hierarchy, whoami/selfeval introspection, container lifecycle (create/lift/delete), type stack architecture, final/non-final resources |
 
 ## Planned Projects
 
@@ -393,6 +394,45 @@
 - Project 10 Design Docs Integration (addon to API Design Documentation)
 
 **See:** `projects/10-dev-env-v0-bundle-continued/LESSONS_LEARNED.md` for full details
+
+### 11-app-architecture
+**Objective:** Establish app architecture patterns and infrastructure
+
+**Project Type:** Explorative Project
+
+**Products Delivered:**
+1. Container type hierarchy (spl/container, spl/api, spl/package, spl/method, spl/module, spl/modules) ✅
+2. whoami method with --levels support and type stack traversal ✅
+3. selfeval method with type/instance runners and structured output ✅
+4. Container lifecycle methods (create, lift, delete) ✅
+5. Type stack architecture (_reqs documented) ✅
+6. 13 design documents capturing architectural decisions ✅
+
+**Status:** Complete - Pivoted from app architecture to container architecture (prerequisite)
+
+**Key Outcomes:**
+- **Type stack architecture:** Two-layer model (extends chain + instantiates chain) with instanceLevel
+- **Final vs non-final resources:** _reqs, _lib, _tests are final; index.js, _schemas inherit via overlay
+- **Type runners vs instance runners:** Type runners run at every level, instance runners at instanceLevel only
+- **Introspection foundation:** whoami and selfeval provide self-awareness for containers
+- **Lifecycle methods:** create (establish identity), lift (materialize from overlay), delete (remove from work_module)
+- **Report pattern:** Hierarchical report structure (topline/summary/detail/enriched) reusable across methods
+- **Creative-formal dualism:** Free flow between design notes and _reqs working well
+
+**Key Learnings:**
+- Pivot was dealing with prerequisite - container infrastructure before app infrastructure
+- whoami and selfeval reduce friction significantly
+- Work item tracking difficult when design evolves fast
+- Friction should trigger collab mode, not auto-mode
+- Comfortable context enables implementation speed
+
+**Design Documents:**
+- type_stack_and_selfeval_architecture.md (captured in _reqs)
+- container_create_design_2025-12-12.md (captured in _reqs)
+- module_js_this_refactor.md (captured in _reqs)
+- Plus 10 future-oriented design docs (app design, scripting layer, PAC handlers)
+
+**See:** `projects/11-app-architecture/LESSONS_LEARNED.md` for full details
 
 ---
 
