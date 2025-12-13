@@ -2,4 +2,4 @@
 # spl - Splectrum CLI entry point (Node runtime)
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-exec node "${SCRIPT_DIR}/spl.mjs" "$@"
+exec node "${SCRIPT_DIR}/../entrypoints/spl.mjs" "$@"

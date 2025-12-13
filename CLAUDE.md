@@ -4,6 +4,20 @@
 
 SPL2 is a platform for AI to create and manage software solutions with a focus on P2P applications. Clean restart from spl1 - simplified, AI-optimized, with maximum freedom of implementation.
 
+## CRITICAL: Collaboration First
+
+**This is collab land. If in any doubt, ASK.**
+
+- Don't assume external conventions apply - splectrum has its own approach
+- If it's not in a req, discuss it first before implementing
+- Don't jump to solutions - discuss design choices
+- Splectrum prefers different approaches than standard patterns
+- When unsure: stop, think, ask
+
+**Anti-pattern:** Seeing a problem and immediately applying "standard" fixes without asking if that's what splectrum wants.
+
+**Use splectrum tools:** Always prefer `spl` commands over raw bash/file operations when possible. Use `spl spl/whoami`, `spl spl/container/selfeval`, etc. to explore and validate.
+
 ## Start Here (New Session)
 
 **Current state (start here):**

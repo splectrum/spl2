@@ -14,78 +14,61 @@ Wrap existing tools (git, file, search) within splectrum context. Platform-agnos
 
 ### Current Phase
 
-**Execution phase.** Implementing spl/container/_lib/avsc.
+**Execution phase.** Designing spl/http API - reqs complete, ready to create container.
 
 ### Products
 
-1. **spl/container/_lib/avsc** - schema parsing and validation lib
-2. **spl/git** - git wrapper (design → implementation)
-3. **spl/container/select** - xpath-style queries (research → vision → syntax → MVP)
-4. **Additional Wrapper APIs** - research and potential implementation
+1. **spl/container/_lib/avsc** - schema parsing and validation lib ✓
+2. **spl/http** - HTTP client API (in progress)
+3. **spl/tools/git** - git wrapper (planned)
+4. **spl/tools/7zip** - archive wrapper (planned)
 
-### Completed: Bare Test ✓
+### Completed: Entry Point Reorganization ✓
 
-Dual entry points working:
-- `splectrum/spl` - Node runtime entry point
-- `splectrum/splb` - Bare runtime entry point
+**New structure:**
+```
+splectrum/
+  bin/                    # Shell entry points
+    spl                   # Node runtime
+    splb                  # Bare runtime
+    _reqs/                # Setup documentation
+  entrypoints/            # JS bootstrap code
+    spl.mjs               # Main entrypoint
+    _reqs/                # Entrypoint documentation
+```
 
-**Platform compatibility via import maps (package.json):**
-- `readline` → `bare-node-readline`
-- `process` → `bare-node-process`
-- `url` → `bare-node-url`
-- `util`, `stream`, `zlib`, `crypto`, `events`, `buffer` → bare-node-* equivalents
+**PATH setup:** Add to `/etc/environment`:
+```
+PATH="/home/herma/splectrum/spl2/splectrum/bin:..."
+```
 
-No custom abstraction code - import maps handle all switching.
+See `bin/_reqs/bin_setup_v1.0.0.md` for full setup instructions.
 
 ### Completed: avsc Integration ✓
 
-**avsc dependencies:** Zero npm packages, all Node builtins have Bare equivalents.
+- `spl/container/_lib/avsc.js` - parseSchema, validate functions
+- selfeval_schemas runner validates .avsc files as valid Avro
+- Works on both Node and Bare runtimes
 
-**Solution:** `module.require()` uses import attributes on Bare:
-```javascript
-import(uri, { with: { imports: 'bare-node-runtime/imports' } })
-```
+### In Progress: spl/http API
 
-Updated in `apps/cli-static/modules/work_module/_lib/module.js` line 381-384.
+**Reqs written:**
+- `spl/http/_reqs/spl_http_v1.0.0.md` - API specification
+- `spl/http/get/_reqs/` - GET method req + schemas
+- `spl/http/post/_reqs/` - POST method req + schemas
 
-**Verified working:**
-```bash
-module.require('avsc')  # Works on both Node and Bare
-```
+**Registered in spl:**
+- `spl/index.json` updated with `api.instance: ["http"]`
+- `spl/_reqs/spl_instance_v1.0.0.md` updated
 
-### Completed: spl/container/_lib/avsc ✓
-
-**Decision:** Start with avsc as a lib in `spl/container/_lib/`, not API methods. Methods can come later.
-
-**Lib functions:**
-- `parseSchema(schemaPath)` - load and validate Avro schema file
-- `validate(type, value)` - check value against parsed schema
-
-**Enables two selfevals:**
-1. Schema files in `_schemas/` are valid Avro
-2. Test/selfeval data conforms to declared schemas
-
-**Files:**
-- `spl/container/_reqs/avsc_lib_v1.0.0.md` - requirements
-- `spl/container/_lib/avsc.js` - implementation
-
-**Verified:** Works on both Node and Bare runtimes.
-
-**Integrated:** selfeval_schemas runner now validates .avsc files as valid Avro schemas.
-
-### Also Completed This Session
-
-- Fixed CRLF line endings in spl/splb shell scripts
-- Upgraded legacy scripts (status.js, help.js) to new module interface
-- Removed obsolete test scripts
-- Installed bare-node-runtime and all required compatibility packages
+**Next:** Create spl/http container and implement methods.
 
 ---
 
 ## Session Entry
 
 1. Read this file
-2. Test: `spl spl/whoami` and `splb spl/whoami`
-3. Test: `spl spl/container/selfeval` (validates .avsc schemas)
-4. Test script available: `spl test-avsc`
-5. Next: Consider spl/git wrapper or other Project 12 products
+2. Test: `spl spl/whoami` (should show `instance: http`)
+3. Test: `spl spl/container/selfeval` (should pass)
+4. Continue: Create spl/http container using `spl spl/container/create`
+5. Then: Implement spl/http/get and spl/http/post methods

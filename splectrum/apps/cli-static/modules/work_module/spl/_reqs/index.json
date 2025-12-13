@@ -1,11 +1,11 @@
 {
   "name": "reqs",
-  "purpose": "SPL package requirements",
+  "purpose": "SPL instance requirements",
   "requirements": [
     {
-      "name": "spl_package",
-      "description": "SPL package contents and structure",
-      "file": "spl_package_v1.0.0.md"
+      "name": "spl_instance",
+      "description": "SPL instance contents and structure",
+      "file": "spl_instance_v1.0.0.md"
     }
   ]
 }

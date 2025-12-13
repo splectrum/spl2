@@ -1,4 +1,4 @@
-# SPL Package Requirement
+# spl_instance
 
 **Version:** 1.0.0
 **Container:** spl
@@ -20,6 +20,12 @@ SPL core package containing base container types and introspection APIs.
 | `package` | Package type - distributable container collections |
 | `module` | Module type - runtime interface provider |
 | `modules` | Modules type - module layer collections |
+
+### Instance APIs (api.instance)
+
+| API | Purpose |
+|-----|---------|
+| `http` | HTTP client - GET, POST requests |
 
 ### Resource Folders
 

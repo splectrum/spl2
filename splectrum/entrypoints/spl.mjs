@@ -8,7 +8,7 @@
 //   3. File:     spl ./workflow.js --env=prod
 //   4. Library:  spl status
 
-import { loadModule } from './lib/moduleBootstrap.js'
+import { loadModule } from '../lib/moduleBootstrap.js'
 import process from 'process'
 
 // ============================================================================
@@ -54,7 +54,7 @@ module.bindRecord(record)
 // ============================================================================
 
 // CLI lib is entrypoint infrastructure - receives module + raw record
-const { create: createCli } = await import('./modules/bm_spl/spl/cli/_lib/cli.js')
+const { create: createCli } = await import('../modules/bm_spl/spl/cli/_lib/cli.js')
 const cli = await createCli(module, record)
 
 cli.resolveNode()
