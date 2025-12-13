@@ -26,6 +26,11 @@
       "name": "final",
       "description": "Check final resources don't overlap across type chain",
       "file": "selfeval_final.js"
+    },
+    "schemas_inheritance": {
+      "name": "schemas_inheritance",
+      "description": "Check schema files include inherited parent fields",
+      "file": "selfeval_schemas_inheritance.js"
     }
   }
 }

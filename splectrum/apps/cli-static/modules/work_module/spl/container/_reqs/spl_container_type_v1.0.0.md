@@ -32,6 +32,11 @@ A container consists of:
 - `instanceChildren` - type of child containers for instances of this type
 - Type stack built from: instance chain first, then type chain, deduped
 
+**Global flags:**
+- `--help` / `-h` - available on all containers
+- Entry point rewrites `<container> --help` to `<container>/whoami --usage`
+- Shows input schema as usage information
+
 **Type definition requirements:**
 - A type should define `instanceChildren` in index.json
 - A type should configure the generic children selfeval instance runner to validate children

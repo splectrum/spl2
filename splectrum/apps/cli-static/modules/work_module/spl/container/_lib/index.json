@@ -54,8 +54,13 @@
     },
     "avsc.js": {
       "name": "avsc",
-      "description": "Avro schema parsing and validation",
-      "exports": ["parseSchema", "validate"]
+      "description": "Avro schema parsing, validation, and comparison",
+      "exports": ["parseSchema", "validate", "compareSchemas"]
+    },
+    "selfeval_schemas_inheritance.js": {
+      "name": "selfeval_schemas_inheritance",
+      "description": "Selfeval runner for schema inheritance validation",
+      "exports": ["run"]
     }
   }
 }

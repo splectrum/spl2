@@ -144,8 +144,13 @@
     },
     {
       "name": "avsc_lib",
-      "description": "Avro schema parsing and validation lib",
-      "file": "avsc_lib_v1.0.0.md"
+      "description": "Avro schema parsing, validation, and comparison lib",
+      "file": "avsc_lib_v1.1.0.md"
+    },
+    {
+      "name": "selfeval_schemas_inheritance_runner",
+      "description": "Selfeval runner for schema inheritance validation",
+      "file": "selfeval_schemas_inheritance_runner_v1.0.0.md"
     }
   ]
 }

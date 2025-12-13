@@ -8,6 +8,17 @@
 
 const ALL_FACETS = ['container', 'api', 'handler', 'schemas', 'lib', 'reqs']
 
+// Extract base facet name from path (schemas/input -> schemas)
+function getBaseFacet(facetPath) {
+  return facetPath.split('/')[0]
+}
+
+// Extract file filter from path (schemas/input -> input, schemas -> null)
+function getFileFilter(facetPath) {
+  const parts = facetPath.split('/')
+  return parts.length > 1 ? parts[1] : null
+}
+
 export function create(module) {
   let _fs = null
   let _path = null
@@ -74,18 +85,25 @@ export function create(module) {
     }
   }
 
-  // Check if facet is requested
+  // Check if facet is requested (handles paths like schemas/input)
   const hasFacet = (facets, name) => {
     if (!facets) return true  // null = all facets
-    return facets.includes(name)
+    return facets.some(f => getBaseFacet(f) === name)
+  }
+
+  // Get suffix for a facet (schemas/input -> input, schemas -> null)
+  const getFacetSuffix = (facets, name) => {
+    if (!facets) return null
+    const match = facets.find(f => getBaseFacet(f) === name)
+    return match ? getFileFilter(match) : null
   }
 
   return {
-    // Parse --facet flag into array
+    // Parse --facet flag into array (supports paths like schemas/input)
     parseFacets(facetInput) {
       if (!facetInput || facetInput === true) return null  // all facets
       if (typeof facetInput === 'string') {
-        const facets = facetInput.split(',').map(f => f.trim()).filter(f => ALL_FACETS.includes(f))
+        const facets = facetInput.split(',').map(f => f.trim()).filter(f => ALL_FACETS.includes(getBaseFacet(f)))
         return facets.length > 0 ? facets : null
       }
       return null
@@ -107,8 +125,8 @@ export function create(module) {
       const containerDetailLevel = hasFacet(facets, 'container') ? detailLevel : 'topline'
       const container = report.buildContainer(identity, containerDetailLevel)
 
-      // Api facet
-      if (hasFacet(facets, 'api')) {
+      // Api facet (only if container has API methods)
+      if (hasFacet(facets, 'api') && identity.api && Object.keys(identity.api).length > 0) {
         container.facets.push(report.buildApi(identity, detailLevel))
       }
 
@@ -124,7 +142,14 @@ export function create(module) {
       if (hasFacet(facets, 'schemas')) {
         const schemasManifest = await readJson(path.join(containerFsPath, '_schemas', 'index.json'))
         if (schemasManifest) {
-          container.facets.push(report.buildSchemas(schemasManifest, detailLevel))
+          this.applyFacetFilter(facets, 'schemas', schemasManifest, 'files', '.avsc')
+          const schemaContents = {}
+          const files = schemasManifest.files || []
+          for (const fileName of files) {
+            const content = await readJson(path.join(containerFsPath, '_schemas', fileName))
+            if (content) schemaContents[fileName] = content
+          }
+          container.facets.push(report.buildSchemas(schemasManifest, schemaContents, detailLevel))
         }
       }
 
@@ -161,6 +186,14 @@ export function create(module) {
       return container
     },
 
+    // Apply suffix filter to facet files (mutates manifest)
+    applyFacetFilter(facets, facetName, manifest, fileField = 'files', extension = '') {
+      const suffix = getFacetSuffix(facets, facetName)
+      if (suffix && manifest[fileField]) {
+        manifest[fileField] = manifest[fileField].filter(f => f.replace(extension, '') === suffix)
+      }
+    },
+
     // Build type stack: delegates to module.buildTypeStack
     buildTypeStack() {
       const containerPath = getContainerPath()
@@ -191,8 +224,8 @@ export function create(module) {
       const containerDetailLevel = hasFacet(facets, 'container') ? detailLevel : 'topline'
       const container = report.buildContainer(identity, containerDetailLevel)
 
-      // Api facet
-      if (hasFacet(facets, 'api')) {
+      // Api facet (only if container has API methods)
+      if (hasFacet(facets, 'api') && identity.api && Object.keys(identity.api).length > 0) {
         container.facets.push(report.buildApi(identity, detailLevel))
       }
 
@@ -208,7 +241,14 @@ export function create(module) {
       if (hasFacet(facets, 'schemas')) {
         const schemasManifest = await readJson(path.join(containerFsPath, '_schemas', 'index.json'))
         if (schemasManifest) {
-          container.facets.push(report.buildSchemas(schemasManifest, detailLevel))
+          this.applyFacetFilter(facets, 'schemas', schemasManifest, 'files', '.avsc')
+          const schemaContents = {}
+          const files = schemasManifest.files || []
+          for (const fileName of files) {
+            const content = await readJson(path.join(containerFsPath, '_schemas', fileName))
+            if (content) schemaContents[fileName] = content
+          }
+          container.facets.push(report.buildSchemas(schemasManifest, schemaContents, detailLevel))
         }
       }
 

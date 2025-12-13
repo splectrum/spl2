@@ -93,7 +93,9 @@ export function create(module) {
     },
 
     // Build schemas facet
-    buildSchemas(manifest) {
+    buildSchemas(manifest, schemaContents = {}, detailLevel = 'enriched') {
+      const levels = ['topline', 'summary', 'detail', 'enriched']
+      const maxIdx = levels.indexOf(detailLevel)
       const files = manifest.files || []
 
       const result = {
@@ -101,8 +103,33 @@ export function create(module) {
         topline: `schemas | ${files.join(', ') || 'empty'}`
       }
 
-      if (manifest.purpose) {
+      if (maxIdx >= 1 && manifest.purpose) {
         result.summary = manifest.purpose
+      }
+
+      // Detail: show schema fields
+      if (maxIdx >= 2) {
+        const schemaDetails = []
+        for (const fileName of files) {
+          const schema = schemaContents[fileName]
+          if (schema && schema.fields) {
+            const fieldLines = schema.fields.map(f => {
+              const typeStr = typeof f.type === 'string' ? f.type : formatAvroType(f.type)
+              const defaultStr = f.default !== undefined ? ` (default: ${f.default})` : ''
+              const docStr = f.doc ? ` - ${f.doc}` : ''
+              return `  --${f.name}: ${typeStr}${defaultStr}${docStr}`
+            })
+            schemaDetails.push(fieldLines.join('\n'))
+          }
+        }
+        if (schemaDetails.length > 0) {
+          result.detail = schemaDetails.join('\n')
+        }
+      }
+
+      // Enriched: full schema JSON
+      if (maxIdx >= 3 && Object.keys(schemaContents).length > 0) {
+        result.enriched = JSON.stringify(schemaContents, null, 2)
       }
 
       return result
@@ -203,4 +230,23 @@ function extractExports(content) {
     }
   }
   return [...new Set(exports)]
+}
+
+// Format Avro type for display
+function formatAvroType(type) {
+  if (Array.isArray(type)) {
+    // Union type like ["null", "string"] or ["null", { type: "enum", ... }]
+    const types = type.map(t => {
+      if (t === 'null') return null
+      if (typeof t === 'string') return t
+      if (t.type === 'enum') return t.symbols ? t.symbols.join('|') : 'enum'
+      return JSON.stringify(t)
+    }).filter(Boolean)
+    return types.join('|')
+  }
+  if (typeof type === 'object') {
+    if (type.type === 'enum') return type.symbols ? type.symbols.join('|') : 'enum'
+    return JSON.stringify(type)
+  }
+  return String(type)
 }

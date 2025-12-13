@@ -60,6 +60,7 @@ const cli = await createCli(module, record)
 cli.resolveNode()
 cli.detectMode()
 cli.parseArgs()
+cli.rewriteHelp()
 if (cli.isExternalScriptFile()) cli.loadExternalScriptFile()
 
 if (!cli.validate()) {

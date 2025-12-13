@@ -5,6 +5,12 @@ export default async function(module) {
   const lib = await module.require('lib/spl/container/whoami')
   const input = module.input()
 
+  // Handle --usage: rewrite to schemas/input facet
+  if (input.usage) {
+    input.facet = 'schemas/input'
+    input.meta = input.meta || 'detail'
+  }
+
   // 1. Process flags
   const metaLevel = module.getMetaLevel()
   const reportLevel = module.getReportLevel()

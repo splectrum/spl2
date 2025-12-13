@@ -181,6 +181,30 @@ export async function create(module, record) {
     },
 
     /**
+     * Rewrite --help/-h to whoami --usage
+     * Reads: record.value.argv, record.value.method, record.headers.spl.request.input
+     * Writes: record.value.method, record.headers.spl.request.input
+     */
+    rewriteHelp() {
+      const argv = record.value.argv
+      const input = record.headers.spl.request.input
+
+      // Check for --help (in input) or -h (in argv, not parsed as flag)
+      const hasHelp = input.help === true || argv.includes('-h')
+
+      if (!hasHelp) return
+
+      // Rewrite method: append /whoami
+      if (record.value.method) {
+        record.value.method = record.value.method + '/whoami'
+      }
+
+      // Add usage flag, remove help
+      input.usage = true
+      delete input.help
+    },
+
+    /**
      * Check if mode is external script file
      * Reads: record.value.mode
      * Returns: true if mode is 'file'
