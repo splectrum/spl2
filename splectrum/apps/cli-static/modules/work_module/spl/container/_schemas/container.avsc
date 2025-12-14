@@ -1,0 +1,35 @@
+{
+  "type": "record",
+  "name": "spl.container.container",
+  "doc": "Container facet - index.json structure",
+  "fields": [
+    {
+      "name": "name",
+      "type": "string",
+      "doc": "Container path (e.g., spl/container/whoami)"
+    },
+    {
+      "name": "instantiates",
+      "type": "string",
+      "doc": "Type this container is an instance of"
+    },
+    {
+      "name": "extends",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Parent type path for inheritance chain, or null"
+    },
+    {
+      "name": "api",
+      "type": ["null", {
+        "type": "map",
+        "values": {
+          "type": "array",
+          "items": "string"
+        }
+      }],
+      "default": null,
+      "doc": "API facets with method names (optional, for API containers)"
+    }
+  ]
+}

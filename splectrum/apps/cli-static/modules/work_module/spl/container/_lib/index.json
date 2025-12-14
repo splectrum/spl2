@@ -42,9 +42,9 @@
       "description": "Selfeval runner for reqs facet - validates req files",
       "exports": ["run"]
     },
-    "selfeval_children.js": {
-      "name": "selfeval_children",
-      "description": "Selfeval runner for child type validation",
+    "selfeval_container.js": {
+      "name": "selfeval_container",
+      "description": "Selfeval runner for container facet validation",
       "exports": ["run"]
     },
     "selfeval_final.js": {
@@ -60,6 +60,11 @@
     "selfeval_schemas_inheritance.js": {
       "name": "selfeval_schemas_inheritance",
       "description": "Selfeval runner for schema inheritance validation",
+      "exports": ["run"]
+    },
+    "selfeval_schemas_data.js": {
+      "name": "selfeval_schemas_data",
+      "description": "Selfeval runner for schema data validation",
       "exports": ["run"]
     }
   }

@@ -10,7 +10,6 @@
 //
 // Flags:
 //   --dryRun    Show what would be created without doing it
-//   --purpose   Purpose description for the container
 
 export default async function(module) {
   const fs = await module.require('fs')
@@ -18,7 +17,6 @@ export default async function(module) {
 
   const input = module.input()
   const dryRun = input.dryRun || false
-  const purposeOverride = input.purpose
 
   // Get the method path - this tells us what container to create
   // e.g., "spl/container/test/create" → create "spl/container/test"
@@ -85,16 +83,6 @@ export default async function(module) {
     return
   }
 
-  // Resolve child instance type to get its type name (for the "type" field)
-  const childTypeIndexPath = module.resolve(childInstanceType, 'index.json')
-  if (!childTypeIndexPath) {
-    module.output(`Child type not found: ${childInstanceType}`, { error: 'child_type_not_found', childInstanceType })
-    return
-  }
-
-  const childTypeIndex = JSON.parse(fs.readFileSync(childTypeIndexPath, 'utf8'))
-  const typeName = childTypeIndex.type || childInstanceType.split('/').pop()
-
   // Determine work_module path for target
   const nodeRoot = module.getNodeRoot()
   const appAPI = module.getAppAPI()
@@ -119,12 +107,10 @@ export default async function(module) {
   }
 
   // Build the index.json content
-  const purpose = purposeOverride || `${typeName} container - purpose to be defined`
   const indexContent = {
     name: targetPath,
-    type: typeName,
-    purpose: purpose,
-    instantiates: childInstanceType
+    instantiates: childInstanceType,
+    extends: null
   }
 
   // dryRun mode - show what would be created

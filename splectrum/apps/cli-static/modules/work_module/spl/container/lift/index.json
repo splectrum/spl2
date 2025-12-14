@@ -1,6 +1,6 @@
 {
   "name": "spl/container/lift",
-  "type": "Type",
-  "purpose": "Lift resources from overlay into work_module for editing",
-  "instantiates": "spl/method"
+  "instantiates": "spl/method",
+  "extends": null,
+  "api": null
 }

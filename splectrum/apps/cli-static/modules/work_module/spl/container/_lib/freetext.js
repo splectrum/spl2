@@ -14,13 +14,20 @@ export function create(module) {
      * Render structured JSON to freetext
      * @param {Object} json - Structured data with level keys
      * @param {string} level - Max level: 'topline'|'summary'|'detail'|'enriched'
+     * @param {Object} options - { hide: 'topline,summary' } to exclude levels
      * @returns {string} - Freetext rendering
      */
-    render(json, level = 'summary') {
+    render(json, level = 'summary', options = {}) {
       if (!json) return ''
 
       const levelIdx = LEVEL_KEYS.indexOf(level)
-      const include = levelIdx >= 0 ? LEVEL_KEYS.slice(0, levelIdx + 1) : ['summary']
+      let include = levelIdx >= 0 ? LEVEL_KEYS.slice(0, levelIdx + 1) : ['summary']
+
+      // Apply hide filter
+      if (options.hide) {
+        const hideSet = new Set(options.hide.split(',').map(s => s.trim()))
+        include = include.filter(l => !hideSet.has(l))
+      }
 
       const lines = []
       renderNode(json, 0, include, lines)

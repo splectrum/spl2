@@ -53,7 +53,9 @@ export function create(module) {
           continue
         }
 
-        const files = manifest.files || []
+        // Handle both array (legacy) and map (current) formats
+        const filesField = manifest.files || {}
+        const files = Array.isArray(filesField) ? filesField : Object.keys(filesField)
         schemasByLevel[i] = {}
 
         for (const fileName of files) {

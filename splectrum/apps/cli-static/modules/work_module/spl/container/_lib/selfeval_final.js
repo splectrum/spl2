@@ -75,12 +75,19 @@ export function create(module) {
 
       const allPass = overlaps.length === 0
 
+      // Build summary with overlap details
+      let summary
+      if (allPass) {
+        summary = `${fileOwners.size} files, no overlaps`
+      } else {
+        const overlapFiles = overlaps.map(o => o.file).join(', ')
+        summary = `${overlaps.length} overlaps: ${overlapFiles}`
+      }
+
       return {
         pass: allPass,
         topline: `final | ${allPass ? 'PASS' : 'FAIL'}`,
-        summary: allPass
-          ? `${fileOwners.size} files, no overlaps`
-          : `${overlaps.length} overlaps detected`,
+        summary,
         overlaps
       }
     }

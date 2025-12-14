@@ -85,6 +85,25 @@ export function create(module) {
     }
   }
 
+  // Resolve facet file through overlay (walks type chain)
+  const resolveFacetFile = (containerPath, relativePath) => {
+    return module.resolve(containerPath, relativePath)
+  }
+
+  // Read JSON through overlay resolution
+  const readJsonOverlay = async (containerPath, relativePath) => {
+    const resolved = resolveFacetFile(containerPath, relativePath)
+    if (!resolved) return null
+    return readJson(resolved)
+  }
+
+  // Read file through overlay resolution
+  const readFileOverlay = async (containerPath, relativePath) => {
+    const resolved = resolveFacetFile(containerPath, relativePath)
+    if (!resolved) return null
+    return readFile(resolved)
+  }
+
   // Check if facet is requested (handles paths like schemas/input)
   const hasFacet = (facets, name) => {
     if (!facets) return true  // null = all facets
@@ -111,14 +130,12 @@ export function create(module) {
 
     // Build container with facets at detail level
     async buildContainer(detailLevel, facets) {
-      const path = await getPath()
       const report = await getReport()
 
       const containerPath = getContainerPath()
-      const containerFsPath = await getContainerFsPath(containerPath)
 
-      // Read container identity
-      const identity = await readJson(path.join(containerFsPath, 'index.json'))
+      // Read container identity (through overlay)
+      const identity = await readJsonOverlay(containerPath, 'index.json')
       if (!identity) return null
 
       // Container detail level: full if 'container' in facets, topline otherwise
@@ -132,50 +149,51 @@ export function create(module) {
 
       // Handler facet
       if (hasFacet(facets, 'handler')) {
-        const handlerContent = await readFile(path.join(containerFsPath, 'index.js'))
+        const handlerContent = await readFileOverlay(containerPath, 'index.js')
         if (handlerContent) {
           container.facets.push(report.buildHandler(handlerContent, detailLevel))
         }
       }
 
-      // Schemas facet
+      // Schemas facet (through overlay - inherits from parent types)
       if (hasFacet(facets, 'schemas')) {
-        const schemasManifest = await readJson(path.join(containerFsPath, '_schemas', 'index.json'))
+        const schemasManifest = await readJsonOverlay(containerPath, '_schemas/index.json')
         if (schemasManifest) {
           this.applyFacetFilter(facets, 'schemas', schemasManifest, 'files', '.avsc')
           const schemaContents = {}
-          const files = schemasManifest.files || []
+          const filesField = schemasManifest.files || {}
+          const files = Array.isArray(filesField) ? filesField : Object.keys(filesField)
           for (const fileName of files) {
-            const content = await readJson(path.join(containerFsPath, '_schemas', fileName))
+            const content = await readJsonOverlay(containerPath, `_schemas/${fileName}`)
             if (content) schemaContents[fileName] = content
           }
           container.facets.push(report.buildSchemas(schemasManifest, schemaContents, detailLevel))
         }
       }
 
-      // Lib facet
+      // Lib facet (through overlay)
       if (hasFacet(facets, 'lib')) {
-        const libManifest = await readJson(path.join(containerFsPath, '_lib', 'index.json'))
+        const libManifest = await readJsonOverlay(containerPath, '_lib/index.json')
         if (libManifest) {
           const libFileContents = {}
           const libFiles = libManifest.files || {}
           for (const fileName of Object.keys(libFiles)) {
-            const content = await readFile(path.join(containerFsPath, '_lib', fileName))
+            const content = await readFileOverlay(containerPath, `_lib/${fileName}`)
             if (content) libFileContents[fileName] = content
           }
           container.facets.push(report.buildLib(libManifest, libFileContents, detailLevel))
         }
       }
 
-      // Reqs facet
+      // Reqs facet (through overlay)
       if (hasFacet(facets, 'reqs')) {
-        const reqsManifest = await readJson(path.join(containerFsPath, '_reqs', 'index.json'))
+        const reqsManifest = await readJsonOverlay(containerPath, '_reqs/index.json')
         if (reqsManifest) {
           const reqsFileContents = {}
           const requirements = reqsManifest.requirements || []
           for (const req of requirements) {
             if (req.file) {
-              const content = await readFile(path.join(containerFsPath, '_reqs', req.file))
+              const content = await readFileOverlay(containerPath, `_reqs/${req.file}`)
               if (content) reqsFileContents[req.file] = content
             }
           }
@@ -190,7 +208,17 @@ export function create(module) {
     applyFacetFilter(facets, facetName, manifest, fileField = 'files', extension = '') {
       const suffix = getFacetSuffix(facets, facetName)
       if (suffix && manifest[fileField]) {
-        manifest[fileField] = manifest[fileField].filter(f => f.replace(extension, '') === suffix)
+        const files = manifest[fileField]
+        if (Array.isArray(files)) {
+          manifest[fileField] = files.filter(f => f.replace(extension, '') === suffix)
+        } else {
+          // Map format - filter keys
+          const filtered = {}
+          for (const [k, v] of Object.entries(files)) {
+            if (k.replace(extension, '') === suffix) filtered[k] = v
+          }
+          manifest[fileField] = filtered
+        }
       }
     },
 
@@ -208,16 +236,15 @@ export function create(module) {
       return `${containerPath} levels: ${parts.join(', ')}`
     },
 
-    // Build container at specific level
+    // Build container at specific level (uses overlay resolution)
     async buildContainerAtLevel(levelName, detailLevel, facets) {
-      const path = await getPath()
       const report = await getReport()
 
-      const containerFsPath = await getContainerFsPath(levelName)
-      if (!containerFsPath) return null
+      // levelName is the container path (e.g., spl/container)
+      const containerPath = levelName
 
-      // Read container identity
-      const identity = await readJson(path.join(containerFsPath, 'index.json'))
+      // Read container identity (through overlay)
+      const identity = await readJsonOverlay(containerPath, 'index.json')
       if (!identity) return null
 
       // Container detail level: full if 'container' in facets, topline otherwise
@@ -231,50 +258,51 @@ export function create(module) {
 
       // Handler facet
       if (hasFacet(facets, 'handler')) {
-        const handlerContent = await readFile(path.join(containerFsPath, 'index.js'))
+        const handlerContent = await readFileOverlay(containerPath, 'index.js')
         if (handlerContent) {
           container.facets.push(report.buildHandler(handlerContent, detailLevel))
         }
       }
 
-      // Schemas facet
+      // Schemas facet (through overlay)
       if (hasFacet(facets, 'schemas')) {
-        const schemasManifest = await readJson(path.join(containerFsPath, '_schemas', 'index.json'))
+        const schemasManifest = await readJsonOverlay(containerPath, '_schemas/index.json')
         if (schemasManifest) {
           this.applyFacetFilter(facets, 'schemas', schemasManifest, 'files', '.avsc')
           const schemaContents = {}
-          const files = schemasManifest.files || []
+          const filesField = schemasManifest.files || {}
+          const files = Array.isArray(filesField) ? filesField : Object.keys(filesField)
           for (const fileName of files) {
-            const content = await readJson(path.join(containerFsPath, '_schemas', fileName))
+            const content = await readJsonOverlay(containerPath, `_schemas/${fileName}`)
             if (content) schemaContents[fileName] = content
           }
           container.facets.push(report.buildSchemas(schemasManifest, schemaContents, detailLevel))
         }
       }
 
-      // Lib facet
+      // Lib facet (through overlay)
       if (hasFacet(facets, 'lib')) {
-        const libManifest = await readJson(path.join(containerFsPath, '_lib', 'index.json'))
+        const libManifest = await readJsonOverlay(containerPath, '_lib/index.json')
         if (libManifest) {
           const libFileContents = {}
           const libFiles = libManifest.files || {}
           for (const fileName of Object.keys(libFiles)) {
-            const content = await readFile(path.join(containerFsPath, '_lib', fileName))
+            const content = await readFileOverlay(containerPath, `_lib/${fileName}`)
             if (content) libFileContents[fileName] = content
           }
           container.facets.push(report.buildLib(libManifest, libFileContents, detailLevel))
         }
       }
 
-      // Reqs facet
+      // Reqs facet (through overlay)
       if (hasFacet(facets, 'reqs')) {
-        const reqsManifest = await readJson(path.join(containerFsPath, '_reqs', 'index.json'))
+        const reqsManifest = await readJsonOverlay(containerPath, '_reqs/index.json')
         if (reqsManifest) {
           const reqsFileContents = {}
           const requirements = reqsManifest.requirements || []
           for (const req of requirements) {
             if (req.file) {
-              const content = await readFile(path.join(containerFsPath, '_reqs', req.file))
+              const content = await readFileOverlay(containerPath, `_reqs/${req.file}`)
               if (content) reqsFileContents[req.file] = content
             }
           }
@@ -292,9 +320,9 @@ export function create(module) {
     },
 
     // Render freetext from structured report
-    async renderFreetext(report, level = 'summary') {
+    async renderFreetext(report, level = 'summary', options = {}) {
       const freetext = await getFreetext()
-      return freetext.render(report, level)
+      return freetext.render(report, level, options)
     }
   }
 }

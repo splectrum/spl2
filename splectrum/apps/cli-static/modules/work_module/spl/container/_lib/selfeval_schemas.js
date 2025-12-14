@@ -27,7 +27,11 @@ export function create(module) {
         }
       }
 
-      const declaredFiles = new Set(manifest.files || [])
+      // Handle both array (legacy) and map (current) formats
+      const filesField = manifest.files || {}
+      const declaredFiles = new Set(
+        Array.isArray(filesField) ? filesField : Object.keys(filesField)
+      )
       const results = []
 
       // Check manifest → reality (declared files exist and validate .avsc)

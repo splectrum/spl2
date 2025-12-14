@@ -10,12 +10,12 @@
     {
       "name": "spl_container_instance",
       "description": "Container instance constraints for spl/container",
-      "file": "spl_container_instance_v1.0.0.md"
+      "file": "spl_container_instance_v1.1.0.md"
     },
     {
       "name": "container_type",
       "description": "Container index.json structure",
-      "file": "container_type_v1.0.0.md"
+      "file": "container_type_v1.1.0.md"
     },
     {
       "name": "container_instance",
@@ -133,9 +133,9 @@
       "file": "selfeval_reqs_runner_v1.0.0.md"
     },
     {
-      "name": "selfeval_children_runner",
-      "description": "Selfeval runner for child type validation",
-      "file": "selfeval_children_runner_v1.0.0.md"
+      "name": "selfeval_container_runner",
+      "description": "Selfeval runner for container facet validation",
+      "file": "selfeval_container_runner_v1.0.0.md"
     },
     {
       "name": "selfeval_final_runner",

@@ -1,5 +1,5 @@
 {
-  "name": "spl/container/whoami",
+  "name": "spl/container/update",
   "instantiates": "spl/method",
   "extends": null,
   "api": null

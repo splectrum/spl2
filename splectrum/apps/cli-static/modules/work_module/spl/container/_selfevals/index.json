@@ -31,6 +31,16 @@
       "name": "schemas_inheritance",
       "description": "Check schema files include inherited parent fields",
       "file": "selfeval_schemas_inheritance.js"
+    },
+    "container": {
+      "name": "container",
+      "description": "Check container facet (required fields, no extras, valid instantiates)",
+      "file": "selfeval_container.js"
+    },
+    "schemas_data": {
+      "name": "schemas_data",
+      "description": "Validate facet data files against their .avsc schemas",
+      "file": "selfeval_schemas_data.js"
     }
   }
 }

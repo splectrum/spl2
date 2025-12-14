@@ -1,11 +1,17 @@
 {
   "name": "spl/container",
-  "type": "API",
-  "purpose": "Base container type - structural unit for all containers",
-  "extends": null,
   "instantiates": "spl/api",
+  "extends": null,
   "api": {
-    "introspection": ["whoami", "selfeval"],
-    "lifecycle": ["create", "lift", "delete"]
+    "introspection": [
+      "whoami",
+      "selfeval"
+    ],
+    "lifecycle": [
+      "create",
+      "lift",
+      "update",
+      "delete"
+    ]
   }
 }

@@ -5,10 +5,42 @@ export default async function(module) {
   const lib = await module.require('lib/spl/container/whoami')
   const input = module.input()
 
-  // Handle --usage: rewrite to schemas/input facet
+  // Handle --usage: build all levels, filter to one with input.avsc, render with hide
   if (input.usage) {
-    input.facet = 'schemas/input'
-    input.meta = input.meta || 'detail'
+    const { stack, instanceLevel } = lib.buildTypeStack()
+    const containerPath = stack[0]
+
+    // Build all levels with schemas/input facet
+    const levelResults = []
+    for (let i = 0; i < stack.length; i++) {
+      const level = stack[i]
+      const container = await lib.buildContainerAtLevel(level, 'detail', ['schemas/input'])
+      if (container) {
+        container.topline = `${container.topline} [${i + 1}/${stack.length}]`
+        levelResults.push(container)
+      }
+    }
+
+    // Find first level with input.avsc
+    const levelWithSchema = levelResults.find(c => {
+      const schemasFacet = c.facets?.find(f => f.name === 'schemas')
+      return schemasFacet?.topline?.includes('input.avsc')
+    })
+
+    if (!levelWithSchema) {
+      return module.output('No input schema found')
+    }
+
+    // Build report with just that level
+    const report = {
+      topline: `${containerPath} [levels: ${stack.map((t, i) => `${i + 1} ${t}`).join(', ')}, instanceLevel: ${instanceLevel}]`,
+      levels: [levelWithSchema]
+    }
+
+    // Render with hide
+    const options = { hide: input.hide || 'topline,summary' }
+    const output = await lib.renderFreetext(report, 'detail', options)
+    return module.output(output)
   }
 
   // 1. Process flags
@@ -72,6 +104,7 @@ export default async function(module) {
   }
 
   // Render freetext - freetext renderer will handle the levels array
-  const output = await lib.renderFreetext(report, metaLevel)
+  const options = input.hide ? { hide: input.hide } : {}
+  const output = await lib.renderFreetext(report, metaLevel, options)
   module.output(output, reportLevel ? report : null)
 }

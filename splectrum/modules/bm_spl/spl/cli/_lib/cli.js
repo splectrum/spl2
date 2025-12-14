@@ -199,8 +199,9 @@ export async function create(module, record) {
         record.value.method = record.value.method + '/whoami'
       }
 
-      // Add usage flag, remove help
+      // Add usage flag, hide topline/summary, remove help
       input.usage = true
+      input.hide = 'topline,summary'
       delete input.help
     },
 

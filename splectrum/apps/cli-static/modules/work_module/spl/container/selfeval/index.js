@@ -34,11 +34,8 @@ export default async function(module) {
 
   // 4. Determine which levels to run
   let selectedLevels
-  if (!levelsArg) {
-    // No --levels flag: just run current container (first in stack)
-    selectedLevels = [stack[0]]
-  } else if (levelsArg === 'all') {
-    // --levels=all: run all levels
+  if (!levelsArg || levelsArg === 'all') {
+    // Default: run all levels (comprehensive validation)
     selectedLevels = stack
   } else {
     // --levels=spl/container: run specific level(s)
@@ -67,7 +64,7 @@ export default async function(module) {
       // No runners at this level - skip with info
       levelResults.push({
         pass: true,
-        topline: `${levelName} | EMPTY [${levelIdx}/${stack.length}]`,
+        topline: `${levelName} | EMPTY`,
         summary: 'No selfeval runners defined',
         runners: []
       })
@@ -93,7 +90,7 @@ export default async function(module) {
     if (runners.length === 0) {
       levelResults.push({
         pass: true,
-        topline: `${levelName} | EMPTY [${levelIdx}/${stack.length}]`,
+        topline: `${levelName} | EMPTY`,
         summary: 'No runners loaded',
         runners: []
       })
@@ -103,7 +100,7 @@ export default async function(module) {
     // Dry run: show what would run
     if (input.dryRun) {
       levelResults.push({
-        topline: `${levelName} | dry-run [${levelIdx}/${stack.length}]`,
+        topline: `${levelName} | dry-run`,
         summary: `${runners.length} runners: ${runners.map(r => r.meta.name).join(', ')}`,
         runners: runners.map(r => ({
           topline: r.meta.name,
@@ -115,7 +112,7 @@ export default async function(module) {
 
     // Run selfeval for this level - test current container against this level's rules
     const results = await selfeval.runAll(containerFsPath, containerPath, runners, { failFast: input.failFast })
-    results.topline = `${levelName} | ${results.pass ? 'PASS' : 'FAIL'} [${levelIdx}/${stack.length}]`
+    results.topline = `${levelName} | ${results.pass ? 'PASS' : 'FAIL'}`
     levelResults.push(results)
 
     if (!results.pass) allPass = false
@@ -124,10 +121,31 @@ export default async function(module) {
 
   // 6. Build combined report
   const passCount = levelResults.filter(r => r.pass).length
+
+  // Build summary with failed runner/facet names
+  let summary
+  if (allPass) {
+    summary = `${passCount} levels passed`
+  } else {
+    // Collect failed runner names across all levels
+    const failedRunners = []
+    for (const level of levelResults) {
+      if (level.runners) {
+        for (const runner of level.runners) {
+          if (!runner.pass) {
+            failedRunners.push(runner.topline.split(' | ')[0])
+          }
+        }
+      }
+    }
+    const failedNames = failedRunners.join(', ')
+    summary = `failed facets: ${failedNames}`
+  }
+
   const report = {
     pass: allPass,
     topline: `${containerPath} | ${allPass ? 'PASS' : 'FAIL'}`,
-    summary: `${passCount}/${levelResults.length} levels passed`,
+    summary,
     levels: levelResults
   }
 

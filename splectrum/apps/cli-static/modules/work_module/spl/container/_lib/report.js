@@ -96,7 +96,9 @@ export function create(module) {
     buildSchemas(manifest, schemaContents = {}, detailLevel = 'enriched') {
       const levels = ['topline', 'summary', 'detail', 'enriched']
       const maxIdx = levels.indexOf(detailLevel)
-      const files = manifest.files || []
+      // Handle both array (legacy) and map (current) formats
+      const filesField = manifest.files || {}
+      const files = Array.isArray(filesField) ? filesField : Object.keys(filesField)
 
       const result = {
         name: 'schemas',
