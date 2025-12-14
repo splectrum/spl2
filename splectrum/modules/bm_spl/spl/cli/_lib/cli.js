@@ -143,6 +143,35 @@ export async function create(module, record) {
     },
 
     /**
+     * Check if a method path instantiates spl/wrapper (passthrough mode)
+     * @param {string} methodPath - The method path to check
+     * @returns {boolean} - true if wrapper, false otherwise
+     */
+    isWrapper(methodPath) {
+      if (!methodPath) return false
+
+      try {
+        // Get the container path (remove method name if present)
+        const segments = methodPath.split('/')
+        let containerPath = methodPath
+
+        // Try to find index.json - if not found, try parent
+        let resolved = module.resolve(containerPath, 'index.json')
+        if (!resolved && segments.length > 1) {
+          containerPath = segments.slice(0, -1).join('/')
+          resolved = module.resolve(containerPath, 'index.json')
+        }
+        if (!resolved) return false
+
+        // Check instantiates chain for spl/wrapper
+        const { stack } = module.buildTypeStack(containerPath, 'instantiates')
+        return stack.includes('spl/wrapper')
+      } catch (e) {
+        return false
+      }
+    },
+
+    /**
      * Parse CLI arguments
      * Reads: record.value.argv, record.value.mode
      * Writes: record.headers.spl.request.input, record.value.method
@@ -155,12 +184,20 @@ export async function create(module, record) {
       // For other modes, first arg is script/file, rest are input
       const startIndex = 1
 
+      // For command mode, first arg is the method
+      if (mode === 'command' && argv[0]) {
+        record.value.method = argv[0]
+      }
+
+      // Check if this is a wrapper - if so, all args are positional
+      const isWrapperMode = mode === 'command' && this.isWrapper(record.value.method)
+
       const input = {}
       let positionalIndex = 0
 
       for (let i = startIndex; i < argv.length; i++) {
         const arg = argv[i]
-        if (arg.startsWith('--')) {
+        if (!isWrapperMode && arg.startsWith('--')) {
           const [rawKey, ...valueParts] = arg.slice(2).split('=')
           const key = kebabToCamel(rawKey)
           input[key] = valueParts.length > 0 ? valueParts.join('=') : true
@@ -173,11 +210,6 @@ export async function create(module, record) {
 
       // Input is metadata - goes to headers
       record.headers.spl.request.input = input
-
-      // For command mode, first arg is the method
-      if (mode === 'command' && argv[0]) {
-        record.value.method = argv[0]
-      }
     },
 
     /**

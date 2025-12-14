@@ -1,0 +1,10 @@
+{
+  "name": "spl/wrapper/_reqs",
+  "reqs": [
+    {
+      "name": "spl_wrapper_type",
+      "description": "Wrapper API type for external tools",
+      "file": "spl_wrapper_type_v1.0.0.md"
+    }
+  ]
+}

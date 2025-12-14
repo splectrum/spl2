@@ -1,14 +1,13 @@
 {
-  "name": "spl/introspection",
+  "name": "spl/http",
   "instantiates": "spl/api",
-  "extends": null,
+  "extends": "spl/wrapper",
   "instance": {
     "children": {
       "type": "spl/method",
       "list": [
-        "whoami",
-        "selfeval",
-        "info"
+        "get",
+        "post"
       ]
     }
   }

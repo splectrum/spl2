@@ -47,9 +47,10 @@ export default async function(module) {
   const expectedChildren = parentIndex.instance?.children?.list || []
 
   if (!expectedChildren.includes(childName)) {
+    const setCommand = `spl ${parentPath}/set container.instance.children.list+="${childName}"`
     module.output(
-      `Child "${childName}" not expected by parent "${parentPath}". Expected: ${expectedChildren.join(', ') || '(none)'}`,
-      { error: 'child_not_expected', childName, parentPath, expectedChildren }
+      `Child "${childName}" not expected by parent "${parentPath}". Expected: ${expectedChildren.join(', ') || '(none)'}\n\nRun: ${setCommand}`,
+      { error: 'child_not_expected', childName, parentPath, expectedChildren, fix: setCommand }
     )
     return
   }

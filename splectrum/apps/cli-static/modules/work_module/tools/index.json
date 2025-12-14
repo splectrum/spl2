@@ -1,0 +1,14 @@
+{
+  "name": "tools",
+  "instantiates": "spl/package",
+  "extends": null,
+  "instance": {
+    "children": {
+      "type": "spl/wrapper",
+      "list": [
+        "7zip",
+        "git"
+      ]
+    }
+  }
+}

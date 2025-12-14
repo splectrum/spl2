@@ -1,5 +1,9 @@
 # CLAUDE.md - SPL2 Project Navigation
 
+## Quick Start
+
+**Run `spl get-started` for command reference** - introspection, CRUD, property mutation, inline scripts.
+
 ## Project Purpose
 
 SPL2 is a platform for AI to create and manage software solutions with a focus on P2P applications. Clean restart from spl1 - simplified, AI-optimized, with maximum freedom of implementation.
@@ -73,7 +77,3 @@ The glossaries are the index to everything. Scanning projects or grepping the re
 **Completed projects:** `projects/NN-*/` folders
 **Lessons learned:** `projects/NN-*/LESSONS_LEARNED.md`
 **Partnership reflections:** `projects/NN-*/PARTNERSHIP_REFLECTION*.md`
-
-## SPL Commands
-
-Run `spl get-started` for quick reference of common commands.

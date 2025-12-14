@@ -14,41 +14,59 @@ Wrap existing tools (git, file, search) within splectrum context. Platform-agnos
 
 ### Current Phase
 
-**Method resolution FIXED. spl/script API created.**
+**Wrapper infrastructure complete. CLI passthrough WIP.**
 
 ### Completed This Session (2025-12-15)
 
-**Method resolution fix in `module.js buildTypeStackInternal`:**
-- Virtual method resolution for instantiates mode
-- Instantiates mode continues past duplicates instead of stopping
-- `--help` now works on all inherited methods
-
-**spl/script API created:**
-- New API for scripting/exploration
-- `ai.js` helper lib with utilities: `stack()`, `methods()`, `readJson()`, `physicalMethod()`, `table()`, etc.
-- Design reqs for future REPL mode
-- See `spl/script/_reqs/` for roadmap
-
-**selfeval input.avsc added:**
-- Pattern for documenting method-specific args
-- `--help` now shows all selfeval flags
-
-**get-started.js updated:**
-- Added inline script syntax documentation
-
-### Key Commands
-
+**spl/crud/set - Property mutation with dot-path syntax:**
 ```bash
-# Introspection
-spl spl/container/whoami --help    # Shows all input args - NOW WORKS!
-spl spl/container/selfeval --help  # Shows selfeval-specific args
-
-# Inline scripts with ai helper
-spl '/* explore */
-const ai = await module.require("lib/spl/script/ai.js")
-module.output(ai.table(await ai.methods("spl/container")))
-'
+spl spl/foo/set container.extends="spl/bar"
+spl spl/foo/set container.instance.children.list+="new"  # append
+spl spl/foo/set container.instance.children.list-="old"  # remove
 ```
+
+**spl/introspection/info - Quick query tool:**
+```bash
+spl spl/container/info --stack              # Type stack
+spl spl/container/info --stack=instantiates # Instance chain
+spl spl/container/info --methods            # Available methods
+spl spl/container/info --children           # Allowed children
+```
+
+**spl/http API - HTTP client:**
+```bash
+spl spl/http/get --url=https://example.com
+spl spl/http/post --url=https://api.example.com --body='{"key":"value"}'
+```
+
+**spl/wrapper type - External tool wrapper pattern:**
+- String input schema (passthrough args)
+- Philosophy documented in `spl/wrapper/_reqs/spl_wrapper_type_v1.0.0.md`
+- Handlers implement own --help/--dryRun from positional args
+- Structured output for errors
+
+**tools package - External tool wrappers:**
+```bash
+spl tools/7zip a archive.7z ./src           # Create archive
+spl tools/7zip l archive.7z                 # List contents
+spl tools/git status                        # Git status
+spl tools/git log -5                        # Recent commits
+```
+
+**CLI wrapper detection (WIP):**
+- Added `isWrapper()` check to cli.js
+- Intent: all args positional for wrappers (no flag parsing)
+- Current: detection works but flags like `--oneline` still captured
+- Next: debug why wrapper mode not fully working
+
+### Key Files Changed
+
+- `splectrum/modules/bm_spl/spl/cli/_lib/cli.js` - wrapper detection
+- `spl/wrapper/` - type definition and reqs
+- `spl/http/` - HTTP client API
+- `spl/crud/set/` - property mutation
+- `spl/introspection/info/` - quick queries
+- `tools/7zip/`, `tools/git/` - wrappers
 
 ### Bug List
 
@@ -56,28 +74,14 @@ See `status/BUGLIST.md`
 
 ### Next Steps
 
-1. **Create spl/introspection/info** - quick query tool (simpler than whoami)
-   - `--stack` / `--stack=instantiates` - show type stack
-   - `--methods` - list available methods and where defined
-   - `--schemas` - list schemas
-   - Rewrites to whoami under the hood
-   - **Design rationale:** Keep whoami clean for full introspection, info for quick queries
-   - **Pattern:** Like `--help` rewrites to `whoami --usage`, info flags rewrite to whoami calls
-   - **Reference:** ai.js already has `stack()` and `methods()` - info is the CLI equivalent
-2. Continue with spl/http API (Project 12 objective)
-3. Consider REPL mode (see `spl/script/_reqs/repl_design.md`)
+1. **Fix CLI wrapper passthrough** - `--flags` should pass to tool, not splectrum
+2. **spl/file API** - wrap file operations
+3. **bm_spl migration** - bring legacy modules into work_module
 
 ---
 
 ## Session Entry
 
 1. Read this file
-2. Run `spl get-started` for quick reference
-3. Use inline scripts with ai.js to explore:
-   ```bash
-   spl '/* test */
-   const ai = await module.require("lib/spl/script/ai.js")
-   module.output(ai.json(ai.stack("spl/container")))
-   '
-   ```
-4. Method resolution complete - can proceed with wrapper APIs
+2. Run `spl get-started` for command reference
+3. Check wrapper passthrough issue in `cli.js` - `isWrapper()` detects correctly but flag parsing still happens

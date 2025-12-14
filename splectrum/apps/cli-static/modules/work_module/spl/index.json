@@ -2,6 +2,20 @@
   "name": "spl",
   "instantiates": "spl/package",
   "instance": {
-    "children": { "type": "spl/api", "list": ["introspection", "crud", "container", "api", "method", "package", "module", "modules", "http"] }
+    "children": {
+      "type": "spl/api",
+      "list": [
+        "introspection",
+        "crud",
+        "container",
+        "api",
+        "method",
+        "package",
+        "module",
+        "modules",
+        "http",
+        "wrapper"
+      ]
+    }
   }
 }
