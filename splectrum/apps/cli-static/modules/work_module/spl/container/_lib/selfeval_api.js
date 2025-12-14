@@ -34,11 +34,20 @@ export function create(module) {
       const results = []
 
       // Collect all declared methods
+      // Handles both flat array ["method1"] and nested { facet: [methods] }
       const declaredMethods = new Set()
-      for (const [facetName, methods] of Object.entries(identity.api)) {
-        if (Array.isArray(methods)) {
-          for (const method of methods) {
-            declaredMethods.add(method)
+      if (Array.isArray(identity.api)) {
+        // Flat array format
+        for (const method of identity.api) {
+          declaredMethods.add(method)
+        }
+      } else {
+        // Nested facet format
+        for (const [facetName, methods] of Object.entries(identity.api)) {
+          if (Array.isArray(methods)) {
+            for (const method of methods) {
+              declaredMethods.add(method)
+            }
           }
         }
       }

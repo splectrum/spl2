@@ -93,21 +93,6 @@
       "file": "freetext_v1.0.0.md"
     },
     {
-      "name": "report_lib",
-      "description": "Report building lib contract",
-      "file": "report_lib_v1.0.0.md"
-    },
-    {
-      "name": "freetext_lib",
-      "description": "Freetext renderer lib contract",
-      "file": "freetext_lib_v1.0.0.md"
-    },
-    {
-      "name": "selfeval_framework_lib",
-      "description": "Selfeval framework lib contract",
-      "file": "selfeval_framework_lib_v1.0.0.md"
-    },
-    {
       "name": "selfeval_lib_runner",
       "description": "Selfeval runner for lib facet",
       "file": "selfeval_lib_runner_v1.0.0.md"
@@ -141,11 +126,6 @@
       "name": "selfeval_final_runner",
       "description": "Selfeval runner for final resources overlap detection",
       "file": "selfeval_final_runner_v1.0.0.md"
-    },
-    {
-      "name": "avsc_lib",
-      "description": "Avro schema parsing, validation, and comparison lib",
-      "file": "avsc_lib_v1.1.0.md"
     },
     {
       "name": "selfeval_schemas_inheritance_runner",

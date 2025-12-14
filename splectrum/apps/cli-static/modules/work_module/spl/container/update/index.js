@@ -149,8 +149,8 @@ async function mergeSchemaInheritance(module, fs, path, targetPath, dryRun) {
     return []
   }
 
-  // Build type stack (same as whoami/selfeval use)
-  const typeStack = module.buildTypeStack(targetPath)
+  // Build type stack (instantiates chain - schema inheritance follows instance type structure)
+  const typeStack = module.buildTypeStack(targetPath, 'instantiates')
   if (!typeStack || typeStack.stack.length <= 1) {
     return [] // No parent types in stack
   }

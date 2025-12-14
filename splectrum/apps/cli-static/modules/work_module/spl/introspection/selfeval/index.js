@@ -1,4 +1,4 @@
-// spl/container/selfeval - Validate container against requirements
+// spl/introspection/selfeval - Validate container against requirements
 // Instantiates: spl/method
 //
 // Runs selfeval runners to check container implementation.
@@ -6,8 +6,8 @@
 
 export default async function(module) {
   const input = module.input()
-  const selfeval = await module.require('lib/spl/container/selfeval.js')
-  const freetext = await module.require('lib/spl/container/freetext.js')
+  const selfeval = await module.require('lib/spl/introspection/selfeval.js')
+  const freetext = await module.require('lib/spl/introspection/freetext.js')
 
   // 1. Process flags
   const metaLevel = module.getMetaLevel()

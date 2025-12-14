@@ -115,19 +115,24 @@ function readContainerIndex(containerPath, nodeRoot, appAPI, enableAppOverlay, m
  * Examples:
  * - spl (instance): { stack: [spl, spl/package, spl/container], instanceLevel: 2 }
  * - spl/package (type): { stack: [spl/package, spl/container, spl/api], instanceLevel: 3 }
+ *
+ * @param {string} stackType - 'full' (default), 'extends', or 'instantiates'
+ *   - full: complete stack (extends + instantiates chains)
+ *   - extends: only the extends chain (type inheritance)
+ *   - instantiates: only the instantiates chain (instance relationship)
  */
-function buildTypeStackInternal(containerPath, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path) {
+function buildTypeStackInternal(containerPath, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path, stackType = 'full') {
   const index = readContainerIndex(containerPath, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path)
   if (!index) return { stack: [containerPath], instanceLevel: 1 }
 
-  const stack = [containerPath]
+  const extendsStack = [containerPath]
   const visited = new Set([containerPath])
 
   // 1. Follow extends chain first (type layer)
   let current = index.extends
   while (current && !visited.has(current)) {
     visited.add(current)
-    stack.push(current)
+    extendsStack.push(current)
     const typeIndex = readContainerIndex(current, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path)
     if (!typeIndex) break
     current = typeIndex.extends
@@ -139,22 +144,34 @@ function buildTypeStackInternal(containerPath, nodeRoot, appAPI, enableAppOverla
   let instanceLevel
   if (index.instantiates && visited.has(index.instantiates)) {
     // Bootstrap case: instantiates points to self or ancestor
-    instanceLevel = stack.indexOf(index.instantiates) + 1
+    instanceLevel = extendsStack.indexOf(index.instantiates) + 1
   } else {
-    instanceLevel = stack.length + 1
+    instanceLevel = extendsStack.length + 1
+  }
+
+  // For extends-only, return just the extends chain
+  if (stackType === 'extends') {
+    return { stack: extendsStack, instanceLevel }
   }
 
   // 3. Follow instantiates chain (instance layer), then extends from there
+  const instantiatesStack = []
   current = index.instantiates
   while (current && !visited.has(current)) {
     visited.add(current)
-    stack.push(current)
+    instantiatesStack.push(current)
     const typeIndex = readContainerIndex(current, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path)
     if (!typeIndex) break
     current = typeIndex.extends
   }
 
-  return { stack, instanceLevel }
+  // For instantiates-only, return container + instantiates chain
+  if (stackType === 'instantiates') {
+    return { stack: [containerPath, ...instantiatesStack], instanceLevel: 1 }
+  }
+
+  // Full stack: extends + instantiates
+  return { stack: [...extendsStack, ...instantiatesStack], instanceLevel }
 }
 
 /**
@@ -462,13 +479,14 @@ export function create(bootstrapModule) {
     /**
      * Build type stack for a container
      * @param {string} containerPath - Container path (e.g., 'spl/container')
+     * @param {string} stackType - 'full' (default), 'extends', or 'instantiates'
      * @returns {{ stack: string[], instanceLevel: number }} - Type stack and instance level
      */
-    buildTypeStack(containerPath) {
+    buildTypeStack(containerPath, stackType = 'full') {
       if (!_fs || !_path) return { stack: [containerPath], instanceLevel: 1 }
       const modulesDir = getModulesDir()
       if (!modulesDir) return { stack: [containerPath], instanceLevel: 1 }
-      return buildTypeStackInternal(containerPath, getNodeRoot(), getAppAPI(), getEnableAppOverlay(), modulesDir, _fs, _path)
+      return buildTypeStackInternal(containerPath, getNodeRoot(), getAppAPI(), getEnableAppOverlay(), modulesDir, _fs, _path, stackType)
     },
 
     // ========================================================================

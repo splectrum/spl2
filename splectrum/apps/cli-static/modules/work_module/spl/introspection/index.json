@@ -1,0 +1,6 @@
+{
+  "name": "spl/introspection",
+  "instantiates": "spl/api",
+  "extends": null,
+  "api": ["whoami", "selfeval"]
+}

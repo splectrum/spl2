@@ -85,6 +85,35 @@ These are woven into each method's specific logic. Each lib handles them interna
 
 These affect result presentation. Method calls `module.output(freetext, structured)` directly.
 
+### Type Stack
+
+```js
+module.buildTypeStack(containerPath, stackType = 'full')
+```
+
+Returns `{ stack: string[], instanceLevel: number }`.
+
+**stackType options:**
+
+| Value | Description |
+|-------|-------------|
+| `'full'` | Complete stack: extends chain + instantiates chain (default) |
+| `'extends'` | Type inheritance chain only (follows `extends` field) |
+| `'instantiates'` | Instance type structure chain only (follows `instantiates` field) |
+
+**Usage:**
+
+- `'full'` - Method/runner dispatch, file overlay resolution
+- `'extends'` - Behavior inheritance (methods, runners)
+- `'instantiates'` - Schema inheritance and merge operations
+
+**Example:**
+
+For spl/container (extends spl/introspection, instantiates spl/api):
+- `'full'`: [spl/container, spl/introspection, spl/api]
+- `'extends'`: [spl/container, spl/introspection]
+- `'instantiates'`: [spl/container, spl/api]
+
 ## Self-eval
 
 - [ ] module.output(freetext, structured) sets metaoutput and output

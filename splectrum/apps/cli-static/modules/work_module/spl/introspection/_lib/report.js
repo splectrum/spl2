@@ -48,8 +48,24 @@ export function create(module) {
     },
 
     // Build api facet
+    // Handles both flat array ["method1", "method2"] and nested { facet: [methods] }
     buildApi(identity) {
-      const apiFacets = identity.api ? Object.keys(identity.api) : []
+      if (!identity.api) {
+        return { name: 'api', topline: 'api | empty' }
+      }
+
+      // Flat array format
+      if (Array.isArray(identity.api)) {
+        const methods = identity.api
+        return {
+          name: 'api',
+          topline: `api | ${methods.length} methods`,
+          detail: methods.join(', ')
+        }
+      }
+
+      // Nested facet format
+      const apiFacets = Object.keys(identity.api)
       const methodCount = countMethods(identity)
 
       const result = {
@@ -58,16 +74,14 @@ export function create(module) {
       }
 
       // Detail: method breakdown
-      if (identity.api) {
-        const lines = []
-        for (const [facetName, methods] of Object.entries(identity.api)) {
-          if (Array.isArray(methods) && methods.length > 0) {
-            lines.push(`${facetName}: ${methods.join(', ')}`)
-          }
+      const lines = []
+      for (const [facetName, methods] of Object.entries(identity.api)) {
+        if (Array.isArray(methods) && methods.length > 0) {
+          lines.push(`${facetName}: ${methods.join(', ')}`)
         }
-        if (lines.length > 0) {
-          result.detail = lines.join('\n')
-        }
+      }
+      if (lines.length > 0) {
+        result.detail = lines.join('\n')
       }
 
       return result

@@ -1,22 +1,7 @@
 {
   "name": "lib",
-  "purpose": "Container core libs - report building, freetext rendering, selfeval framework and runners",
+  "purpose": "Container structural selfeval runners",
   "files": {
-    "report.js": {
-      "name": "report",
-      "description": "Build four-level structures from flat facts for whoami output",
-      "exports": ["buildContainer", "buildApi", "buildHandler", "buildSchemas", "buildLib", "buildReqs"]
-    },
-    "freetext.js": {
-      "name": "freetext",
-      "description": "Generic freetext renderer for four-level structured JSON",
-      "exports": ["render", "renderWithLevels"]
-    },
-    "selfeval.js": {
-      "name": "selfeval",
-      "description": "Selfeval framework - load registry, instantiate runners, execute validation",
-      "exports": ["loadRegistry", "loadRunner", "runAll", "buildTypeStack", "loadRegistryFromType", "loadRunnerFromType"]
-    },
     "selfeval_lib.js": {
       "name": "selfeval_lib",
       "description": "Selfeval runner for lib facet - validates files and exports",
@@ -46,16 +31,6 @@
       "name": "selfeval_container",
       "description": "Selfeval runner for container facet validation",
       "exports": ["run"]
-    },
-    "selfeval_final.js": {
-      "name": "selfeval_final",
-      "description": "Selfeval runner for final resources overlap detection",
-      "exports": ["run"]
-    },
-    "avsc.js": {
-      "name": "avsc",
-      "description": "Avro schema parsing, validation, and comparison",
-      "exports": ["parseSchema", "validate", "compareSchemas"]
     },
     "selfeval_schemas_inheritance.js": {
       "name": "selfeval_schemas_inheritance",

@@ -4,7 +4,7 @@
   "purpose": "SPL core package - base container types and introspection APIs",
   "instantiates": "spl/package",
   "api": {
-    "types": ["container", "api", "method", "package", "module", "modules"],
+    "types": ["introspection", "container", "api", "method", "package", "module", "modules"],
     "instance": ["http"]
   }
 }

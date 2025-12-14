@@ -1,9 +1,7 @@
 {
   "name": "schemas",
-  "purpose": "Universal handler flags, output structure, and facet schemas",
+  "purpose": "Container structural facet schemas",
   "files": {
-    "input.avsc": {},
-    "metaoutput.avsc": {},
     "container.avsc": { "validates": "index.json" },
     "lib.avsc": { "validates": "_lib/index.json" },
     "reqs.avsc": { "validates": "_reqs/index.json" },

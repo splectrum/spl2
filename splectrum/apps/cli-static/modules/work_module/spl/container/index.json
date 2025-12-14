@@ -1,12 +1,8 @@
 {
   "name": "spl/container",
   "instantiates": "spl/api",
-  "extends": null,
+  "extends": "spl/introspection",
   "api": {
-    "introspection": [
-      "whoami",
-      "selfeval"
-    ],
     "lifecycle": [
       "create",
       "lift",

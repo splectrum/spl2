@@ -22,9 +22,9 @@ export function create(module) {
         }
       }
 
-      // Build type stack
+      // Build type stack (instantiates chain - schema inheritance follows instance type structure)
       const containerPath = identity.name
-      const { stack } = module.buildTypeStack(containerPath)
+      const { stack } = module.buildTypeStack(containerPath, 'instantiates')
 
       // No inheritance to check if only one level
       if (stack.length <= 1) {

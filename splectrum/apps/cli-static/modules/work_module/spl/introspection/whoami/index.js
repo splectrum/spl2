@@ -1,8 +1,8 @@
-// spl/container/whoami - Container introspection
+// spl/introspection/whoami - Container introspection
 // Instantiates: spl/method
 
 export default async function(module) {
-  const lib = await module.require('lib/spl/container/whoami')
+  const lib = await module.require('lib/spl/introspection/whoami')
   const input = module.input()
 
   // Handle --usage: build all levels, filter to one with input.avsc, render with hide
