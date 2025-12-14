@@ -61,6 +61,9 @@ See `status/BUGLIST.md`
    - `--methods` - list available methods and where defined
    - `--schemas` - list schemas
    - Rewrites to whoami under the hood
+   - **Design rationale:** Keep whoami clean for full introspection, info for quick queries
+   - **Pattern:** Like `--help` rewrites to `whoami --usage`, info flags rewrite to whoami calls
+   - **Reference:** ai.js already has `stack()` and `methods()` - info is the CLI equivalent
 2. Continue with spl/http API (Project 12 objective)
 3. Consider REPL mode (see `spl/script/_reqs/repl_design.md`)
 
