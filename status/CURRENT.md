@@ -56,8 +56,12 @@ See `status/BUGLIST.md`
 
 ### Next Steps
 
-1. Continue with spl/http API (Project 12 objective)
-2. Implement --methods flag for whoami
+1. **Create spl/introspection/info** - quick query tool (simpler than whoami)
+   - `--stack` / `--stack=instantiates` - show type stack
+   - `--methods` - list available methods and where defined
+   - `--schemas` - list schemas
+   - Rewrites to whoami under the hood
+2. Continue with spl/http API (Project 12 objective)
 3. Consider REPL mode (see `spl/script/_reqs/repl_design.md`)
 
 ---
