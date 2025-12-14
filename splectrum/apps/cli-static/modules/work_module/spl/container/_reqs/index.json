@@ -10,7 +10,7 @@
     {
       "name": "spl_container_instance",
       "description": "Container instance constraints for spl/container",
-      "file": "spl_container_instance_v1.1.0.md"
+      "file": "spl_container_instance_v1.2.0.md"
     },
     {
       "name": "container_type",

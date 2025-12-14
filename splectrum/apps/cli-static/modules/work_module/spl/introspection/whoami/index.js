@@ -5,9 +5,9 @@ export default async function(module) {
   const lib = await module.require('lib/spl/introspection/whoami')
   const input = module.input()
 
-  // Handle --usage: build all levels, filter to one with input.avsc, render with hide
+  // Handle --usage: build instantiates stack to find input.avsc through instance chain
   if (input.usage) {
-    const { stack, instanceLevel } = lib.buildTypeStack()
+    const { stack, instanceLevel } = lib.buildTypeStack('instantiates')
     const containerPath = stack[0]
 
     // Build all levels with schemas/input facet
@@ -16,7 +16,9 @@ export default async function(module) {
       const level = stack[i]
       const container = await lib.buildContainerAtLevel(level, 'detail', ['schemas/input'])
       if (container) {
-        container.topline = `${container.topline} [${i + 1}/${stack.length}]`
+        const parts = container.topline.split(' | ')
+        const rest = parts.slice(1).join(' | ')
+        container.topline = rest ? `${parts[0]} [${i + 1}] | ${rest}` : `${parts[0]} [${i + 1}]`
         levelResults.push(container)
       }
     }
@@ -82,8 +84,10 @@ export default async function(module) {
     const levelIdx = stack.indexOf(levelName) + 1
     const container = await lib.buildContainerAtLevel(levelName, detailLevel, facets)
     if (container) {
-      // Always add level info to topline
-      container.topline = `${container.topline} [${levelIdx}/${stack.length}]`
+      // Insert level after name: "name | lineage" -> "name [level] | lineage"
+      const parts = container.topline.split(' | ')
+      const rest = parts.slice(1).join(' | ')
+      container.topline = rest ? `${parts[0]} [${levelIdx}] | ${rest}` : `${parts[0]} [${levelIdx}]`
       levelResults.push(container)
     }
   }

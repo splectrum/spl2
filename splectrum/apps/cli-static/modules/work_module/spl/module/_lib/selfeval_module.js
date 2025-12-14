@@ -2,12 +2,35 @@
 //
 // Validates that _lib/module.js exists, exports create(), and the
 // created instance has all documented methods per module_lib_v1.0.0.md.
+//
+// Note: This runner validates instances, not the type. If run on spl/module
+// itself (the type definition), it skips since types define contracts, not implementations.
 
 export function create(module) {
   return {
     async run(containerFsPath) {
       const fs = await module.require('fs')
       const path = await module.require('path')
+
+      // Read index.json to get container name
+      const indexPath = path.join(containerFsPath, 'index.json')
+      let containerName = null
+      try {
+        const index = JSON.parse(fs.readFileSync(indexPath, 'utf8'))
+        containerName = index.name
+      } catch (e) {
+        // If can't read, continue with validation
+      }
+
+      // Skip if running on the type itself (spl/module) - types define contracts, not implementations
+      if (containerName === 'spl/module') {
+        return {
+          pass: true,
+          topline: 'module | SKIP',
+          summary: 'Type definition - implementation validated on instances',
+          checks: []
+        }
+      }
 
       const modulePath = path.join(containerFsPath, '_lib/module.js')
 

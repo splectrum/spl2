@@ -3,7 +3,7 @@
 // Validates index.json against container.avsc schema.
 // Required/optional fields derived from schema (fields with defaults are optional).
 // No extra fields allowed.
-// instantiates must match parent's instanceChildren.
+// instantiates must match parent's type.children.type.
 
 export function create(module) {
   return {
@@ -138,7 +138,7 @@ export function create(module) {
                 detail: `parent has no instantiates`
               })
             } else {
-              // Resolve parent's instance type to get instanceChildren
+              // Resolve parent's instance type to get type.children.type
               const instanceTypeIndexPath = module.resolve(parentInstanceType, 'index.json')
               if (!instanceTypeIndexPath) {
                 checks.push({
@@ -149,14 +149,14 @@ export function create(module) {
                 })
               } else {
                 const instanceTypeIndex = JSON.parse(fs.readFileSync(instanceTypeIndexPath, 'utf8'))
-                const expectedInstanceType = instanceTypeIndex.instanceChildren
+                const expectedInstanceType = instanceTypeIndex.type?.children?.type
 
                 if (!expectedInstanceType) {
                   checks.push({
                     name: 'instantiates',
                     pass: false,
                     topline: 'instantiates | FAIL',
-                    detail: `${parentInstanceType} has no instanceChildren`
+                    detail: `${parentInstanceType} has no type.children.type`
                   })
                 } else if (identity.instantiates === expectedInstanceType) {
                   checks.push({

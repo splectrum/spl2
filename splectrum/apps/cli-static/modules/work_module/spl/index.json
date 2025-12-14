@@ -1,10 +1,7 @@
 {
   "name": "spl",
-  "type": "Instance",
-  "purpose": "SPL core package - base container types and introspection APIs",
   "instantiates": "spl/package",
-  "api": {
-    "types": ["introspection", "container", "api", "method", "package", "module", "modules"],
-    "instance": ["http"]
+  "instance": {
+    "children": { "type": "spl/api", "list": ["introspection", "crud", "container", "api", "method", "package", "module", "modules", "http"] }
   }
 }

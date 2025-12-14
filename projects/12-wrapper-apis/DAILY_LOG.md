@@ -100,9 +100,52 @@ spl/api is where data meets behavior - it instantiates itself but extends spl/co
 
 ---
 
+## 2025-12-14 (Session 2)
+
+### Whoami Output Improvements
+
+- Changed `api | 9 methods` to `children | 9 [spl/api]` - shows actual children type
+- Changed level format from `spl [1/5]` to `spl [1] | (instantiates: spl/package)`
+- Renamed `buildApi` to `buildChildren` in report.js
+- Renamed `api` facet to `children` facet
+
+### Code Cleanup
+
+- Removed drifted `module.js` copy from `spl/module/_lib/` (type defines contract, instance provides implementation)
+- Updated `spl/module/index.json` to new type/instance children structure
+- Fixed `selfeval_module.js` to skip when running on type definition
+
+### Design Discovery: Method Resolution and API Association
+
+**Problem:** `spl spl/container/whoami --help` returns "No input schema found"
+
+**Root cause:** `module.resolve` only does method resolution for `index.js`, not for other files like `_schemas/input.avsc`.
+
+**Key insight - Methods are special:**
+
+Methods (spl/method instances) occupy a unique place in splectrum architecture:
+- They're not standalone containers - they're extensions of their API definition
+- `spl/container/whoami` is "whoami applied to spl/container"
+- Resolution must FIRST find the original method definition through parent API's type chain
+- THEN use that method's own instantiates stack
+
+**Two resolution modes:**
+
+1. **Regular containers:** resolve through own type stack
+2. **Method instances:** API association first, then own stack
+
+For `spl/container/whoami/_schemas/input.avsc`:
+- Step 1: Find original - walk spl/container's type chain to find where whoami is defined → spl/introspection/whoami
+- Step 2: Resolve from there using spl/introspection/whoami's stack
+
+**→ See `design/METHOD_RESOLUTION.md` for full writeup**
+
+---
+
 ## For Project Closure
 
 - create_project howto updated to v1.3.0 (removed dev bundle, work module approach)
 - Entry points moved into splectrum node (self-contained)
 - **Design element:** Data/Functional Duality (spl/container vs spl/api) → DESIGN_REGISTER.md
+- **Design element:** Method Resolution and API Association → DESIGN_REGISTER.md
 - select method moves to spl/introspection (from original spl/container/select plan)

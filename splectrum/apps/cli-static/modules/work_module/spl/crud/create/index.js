@@ -1,12 +1,12 @@
-// spl/container/create - Create a new container
+// spl/crud/create - Create a new container
 //
 // Creates a container in work_module by establishing its identity (index.json only).
 // The overlay provides everything else (handler, libs, schemas inherit from type).
 //
 // Invocation: spl spl/container/test/create
 // - Called on the virtual container path (what you want to exist)
-// - Parent must expect this child (in api field)
-// - Type determined via parent's instanceType → instanceChildren
+// - Parent must expect this child (in instance.children.list)
+// - Type determined via parent's type → type.children.type
 //
 // Flags:
 //   --dryRun    Show what would be created without doing it
@@ -43,15 +43,8 @@ export default async function(module) {
 
   const parentIndex = JSON.parse(fs.readFileSync(parentIndexPath, 'utf8'))
 
-  // Validate child is expected by parent (flatten api field)
-  const expectedChildren = []
-  if (parentIndex.api) {
-    for (const facet of Object.values(parentIndex.api)) {
-      if (Array.isArray(facet)) {
-        expectedChildren.push(...facet)
-      }
-    }
-  }
+  // Validate child is expected by parent (from instance.children.list)
+  const expectedChildren = parentIndex.instance?.children?.list || []
 
   if (!expectedChildren.includes(childName)) {
     module.output(
@@ -61,14 +54,14 @@ export default async function(module) {
     return
   }
 
-  // Get parent's instance type to find instanceChildren
+  // Get parent's instance type to find type.children.type
   const parentInstanceType = parentIndex.instantiates
   if (!parentInstanceType) {
     module.output(`Parent "${parentPath}" has no instantiates field`, { error: 'no_instance_type', parentPath })
     return
   }
 
-  // Resolve instance type's index.json to get instanceChildren
+  // Resolve instance type's index.json to get type.children.type
   const instanceTypeIndexPath = module.resolve(parentInstanceType, 'index.json')
   if (!instanceTypeIndexPath) {
     module.output(`Instance type not found: ${parentInstanceType}`, { error: 'instance_type_not_found', parentInstanceType })
@@ -76,10 +69,10 @@ export default async function(module) {
   }
 
   const instanceTypeIndex = JSON.parse(fs.readFileSync(instanceTypeIndexPath, 'utf8'))
-  const childInstanceType = instanceTypeIndex.instanceChildren
+  const childInstanceType = instanceTypeIndex.type?.children?.type
 
   if (!childInstanceType) {
-    module.output(`Instance type "${parentInstanceType}" has no instanceChildren field`, { error: 'no_instance_children', parentInstanceType })
+    module.output(`Instance type "${parentInstanceType}" has no type.children.type field`, { error: 'no_type_children', parentInstanceType })
     return
   }
 

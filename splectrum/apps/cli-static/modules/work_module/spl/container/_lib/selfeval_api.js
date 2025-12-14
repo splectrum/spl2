@@ -1,7 +1,7 @@
 // selfeval_api.js - Selfeval runner for api facet
 //
-// Checks methods declared in index.json exist as folders,
-// and method folders are declared in api.
+// Checks children declared in instance.children.list exist as folders,
+// and child folders are declared in the list.
 
 export function create(module) {
   return {
@@ -22,7 +22,8 @@ export function create(module) {
         }
       }
 
-      if (!identity.api) {
+      const childrenList = identity.instance?.children?.list
+      if (!childrenList || childrenList.length === 0) {
         return {
           pass: true,
           topline: 'api | EMPTY',
@@ -33,24 +34,8 @@ export function create(module) {
 
       const results = []
 
-      // Collect all declared methods
-      // Handles both flat array ["method1"] and nested { facet: [methods] }
-      const declaredMethods = new Set()
-      if (Array.isArray(identity.api)) {
-        // Flat array format
-        for (const method of identity.api) {
-          declaredMethods.add(method)
-        }
-      } else {
-        // Nested facet format
-        for (const [facetName, methods] of Object.entries(identity.api)) {
-          if (Array.isArray(methods)) {
-            for (const method of methods) {
-              declaredMethods.add(method)
-            }
-          }
-        }
-      }
+      // Collect all declared methods from instance.children.list
+      const declaredMethods = new Set(childrenList)
 
       // Check manifest → reality (declared methods exist as folders)
       for (const method of declaredMethods) {

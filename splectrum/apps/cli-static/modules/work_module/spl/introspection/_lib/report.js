@@ -8,7 +8,7 @@
 //
 // Exports:
 //   buildContainer(indexJson)  - container envelope
-//   buildApi(indexJson)        - api facet
+//   buildChildren(indexJson)   - children facet
 //   buildHandler(content)      - handler facet
 //   buildSchemas(indexJson)    - schemas facet
 //   buildLib(indexJson)        - lib facet
@@ -23,9 +23,17 @@ export function create(module) {
       const levels = ['topline', 'summary', 'detail', 'enriched']
       const maxIdx = levels.indexOf(detailLevel)
 
+      // Build lineage info for topline
+      const lineage = []
+      if (identity.extends) lineage.push(`extends: ${identity.extends}`)
+      if (identity.instantiates) lineage.push(`instantiates: ${identity.instantiates}`)
+      const topline = lineage.length > 0
+        ? `${identity.name} | (${lineage.join(', ')})`
+        : identity.name
+
       const result = {
         name: 'container',
-        topline: `${identity.name} | ${identity.type || 'container'}`,
+        topline,
         facets: []
       }
 
@@ -34,54 +42,23 @@ export function create(module) {
         result.summary = identity.purpose
       }
 
-      // Detail: add extends/instantiates if present (if level allows)
-      if (maxIdx >= 2) {
-        const lineage = []
-        if (identity.extends) lineage.push(`extends: ${identity.extends}`)
-        if (identity.instantiates) lineage.push(`instantiates: ${identity.instantiates}`)
-        if (lineage.length > 0) {
-          result.detail = lineage.join(' | ')
-        }
-      }
-
       return result
     },
 
-    // Build api facet
-    // Handles both flat array ["method1", "method2"] and nested { facet: [methods] }
-    buildApi(identity) {
-      if (!identity.api) {
-        return { name: 'api', topline: 'api | empty' }
+    // Build children facet
+    // Reads from instance.children.list and instance.children.type
+    buildChildren(identity) {
+      const children = identity.instance?.children
+      if (!children || !children.list || children.list.length === 0) {
+        return { name: 'children', topline: 'children | empty' }
       }
 
-      // Flat array format
-      if (Array.isArray(identity.api)) {
-        const methods = identity.api
-        return {
-          name: 'api',
-          topline: `api | ${methods.length} methods`,
-          detail: methods.join(', ')
-        }
-      }
-
-      // Nested facet format
-      const apiFacets = Object.keys(identity.api)
-      const methodCount = countMethods(identity)
-
+      const childList = children.list
+      const childType = children.type || 'unknown'
       const result = {
-        name: 'api',
-        topline: `api | ${apiFacets.length} facets, ${methodCount} methods`
-      }
-
-      // Detail: method breakdown
-      const lines = []
-      for (const [facetName, methods] of Object.entries(identity.api)) {
-        if (Array.isArray(methods) && methods.length > 0) {
-          lines.push(`${facetName}: ${methods.join(', ')}`)
-        }
-      }
-      if (lines.length > 0) {
-        result.detail = lines.join('\n')
+        name: 'children',
+        topline: `children | ${childList.length} [${childType}]`,
+        detail: childList.join(', ')
       }
 
       return result
@@ -225,14 +202,9 @@ export function create(module) {
   }
 }
 
-// Count total methods
+// Count total methods (children)
 function countMethods(identity) {
-  if (!identity.api) return 0
-  let count = 0
-  for (const facet of Object.values(identity.api)) {
-    if (Array.isArray(facet)) count += facet.length
-  }
-  return count
+  return identity.instance?.children?.list?.length || 0
 }
 
 // Extract exported function names from source

@@ -6,7 +6,7 @@
 //   buildChain(depthLevel, detailLevel, facets) - traverse type chain
 //   renderFreetext(container, level)     - render to natural language
 
-const ALL_FACETS = ['container', 'api', 'handler', 'schemas', 'lib', 'reqs']
+const ALL_FACETS = ['container', 'children', 'handler', 'schemas', 'lib', 'reqs']
 
 // Extract base facet name from path (schemas/input -> schemas)
 function getBaseFacet(facetPath) {
@@ -142,9 +142,9 @@ export function create(module) {
       const containerDetailLevel = hasFacet(facets, 'container') ? detailLevel : 'topline'
       const container = report.buildContainer(identity, containerDetailLevel)
 
-      // Api facet (only if container has API methods)
-      if (hasFacet(facets, 'api') && identity.api && Object.keys(identity.api).length > 0) {
-        container.facets.push(report.buildApi(identity, detailLevel))
+      // Api facet (only if container has children)
+      if (hasFacet(facets, 'children') && identity.instance?.children?.list?.length > 0) {
+        container.facets.push(report.buildChildren(identity, detailLevel))
       }
 
       // Handler facet
@@ -223,9 +223,10 @@ export function create(module) {
     },
 
     // Build type stack: delegates to module.buildTypeStack
-    buildTypeStack() {
+    // stackType: 'full' (default), 'extends', or 'instantiates'
+    buildTypeStack(stackType = 'full') {
       const containerPath = getContainerPath()
-      return module.buildTypeStack(containerPath)
+      return module.buildTypeStack(containerPath, stackType)
     },
 
     // Get levels info string
@@ -251,9 +252,9 @@ export function create(module) {
       const containerDetailLevel = hasFacet(facets, 'container') ? detailLevel : 'topline'
       const container = report.buildContainer(identity, containerDetailLevel)
 
-      // Api facet (only if container has API methods)
-      if (hasFacet(facets, 'api') && identity.api && Object.keys(identity.api).length > 0) {
-        container.facets.push(report.buildApi(identity, detailLevel))
+      // Api facet (only if container has children)
+      if (hasFacet(facets, 'children') && identity.instance?.children?.list?.length > 0) {
+        container.facets.push(report.buildChildren(identity, detailLevel))
       }
 
       // Handler facet

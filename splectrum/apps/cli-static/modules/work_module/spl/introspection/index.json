@@ -2,5 +2,7 @@
   "name": "spl/introspection",
   "instantiates": "spl/api",
   "extends": null,
-  "api": ["whoami", "selfeval"]
+  "instance": {
+    "children": { "type": "spl/method", "list": ["whoami", "selfeval"] }
+  }
 }

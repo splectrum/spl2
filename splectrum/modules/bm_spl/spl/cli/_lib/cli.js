@@ -194,7 +194,7 @@ export async function create(module, record) {
 
       if (!hasHelp) return
 
-      // Rewrite method: append /whoami
+      // Rewrite method: append /whoami (always - whoami on whoami introspects the method itself)
       if (record.value.method) {
         record.value.method = record.value.method + '/whoami'
       }

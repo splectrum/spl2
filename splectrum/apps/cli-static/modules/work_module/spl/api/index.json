@@ -1,8 +1,8 @@
 {
   "name": "spl/api",
-  "type": "Type",
-  "purpose": "API type - container with method children",
   "instantiates": "spl/api",
   "extends": "spl/container",
-  "instanceChildren": "spl/method"
+  "type": {
+    "children": { "type": "spl/method" }
+  }
 }

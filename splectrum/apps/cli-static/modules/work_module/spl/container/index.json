@@ -1,13 +1,5 @@
 {
   "name": "spl/container",
   "instantiates": "spl/api",
-  "extends": "spl/introspection",
-  "api": {
-    "lifecycle": [
-      "create",
-      "lift",
-      "update",
-      "delete"
-    ]
-  }
+  "extends": "spl/crud"
 }
