@@ -1,7 +1,7 @@
 # Method Resolution and API Association
 
 **Created:** 2025-12-14
-**Status:** Design insight - implementation needed
+**Status:** IMPLEMENTED (2025-12-15)
 
 ## Discovery
 
@@ -11,35 +11,26 @@ During investigation of `spl spl/container/whoami --help` returning "No input sc
 
 `module.resolve('spl/container/whoami', '_schemas/input.avsc')` returns `null`, even though the file exists at `spl/introspection/whoami/_schemas/input.avsc`.
 
-The current `resolveOverlay` function only handles method resolution for `index.js`, not for other files like schemas.
+## Solution
 
-## Two Resolution Modes
+The fix was implemented in `buildTypeStackInternal` in `_lib/module.js`:
 
-There are two distinct resolution strategies needed:
+### 1. Virtual Method Resolution (instantiates mode)
 
-### 1. Regular Containers (types, packages, APIs)
+When `buildTypeStack(path, 'instantiates')` is called for a path without index.json (virtual method):
+- Extract parent path and method name
+- Walk parent's instantiates chain to find which type has the method as a physical child
+- Return that physical method's instantiates stack
 
-Resolve files through their OWN instantiates/extends stack.
+### 2. Instantiates Mode Fix
 
-Example: `spl/container` resolving `_schemas/container.avsc`
-- Walk spl/container's type chain: spl/container → spl/crud → spl/introspection → spl/api
-- Check each level for the file
-- Return first found
+The instantiates mode was stopping at first duplicate. Fixed to skip duplicates but continue following the extends chain.
 
-### 2. Method Instances (instantiate spl/method)
+## The Three Stack Modes
 
-Methods occupy a special place - they need **API association** first.
-
-Example: `spl/container/whoami` resolving `_schemas/input.avsc`
-
-**Step 1: Find original method definition**
-- `spl/container/whoami` is a method instance
-- Walk parent API's (`spl/container`) type chain
-- Find first type that defines `whoami` → `spl/introspection/whoami`
-
-**Step 2: Use original method's stack**
-- Now resolve from `spl/introspection/whoami`'s instantiates chain
-- Find `_schemas/input.avsc` at `spl/introspection/whoami`
+- **full** = container + extends + instantiates (deduped)
+- **extends** = container + extends chain
+- **instantiates** = container + instantiates chain (following type's extends, skipping duplicates but continuing)
 
 ## Why Methods Are Special
 
@@ -51,33 +42,15 @@ Methods are not standalone containers. They are extensions of their API definiti
 
 The method is "attached" to its original API first, then its own inheritance kicks in.
 
-## Architectural Significance
+## Verification
 
-This is a characteristic of the special place the splectrum API occupies:
-- APIs define methods with contracts (schemas, handlers)
-- Method instances inherit from their original API definition
-- This creates a two-phase resolution: API association → then normal type chain
+```bash
+# All now work:
+spl spl/whoami --help
+spl spl/container/whoami --help
+spl spl/crud/whoami --help
 
-## Affected Areas
-
-To investigate:
-- [ ] `--help` / `--usage` on inherited methods
-- [ ] Method handler resolution (index.js) - currently works, but logic is fragmented
-- [ ] Method schema resolution (input.avsc, output.avsc)
-- [ ] Method lib resolution (_lib files)
-- [ ] Selfeval on methods
-- [ ] Any other file resolution on method paths
-
-## Current State
-
-- `resolveOverlay` in `_lib/module.js` has method resolution for `index.js` only (line 198)
-- The index.json existence check is being used as a heuristic to detect method vs container
-- This conflates concerns - resolve should just traverse layers, not determine container type
-
-## Proposed Fix
-
-Modify `resolveOverlay` to:
-1. Detect if path is a method instance (container doesn't exist, parent exists)
-2. If method: find original definition through parent's type chain, then resolve from there
-3. If regular container: resolve through own type chain
-4. No index.json branching - just proper traversal
+# Test with inline script:
+spl '/* test */ module.output(JSON.stringify(module.buildTypeStack("spl/container/whoami", "instantiates"), null, 2))'
+# Returns: ["spl/introspection/whoami", "spl/method", "spl/container", "spl/crud", "spl/introspection"]
+```

@@ -123,7 +123,50 @@ function readContainerIndex(containerPath, nodeRoot, appAPI, enableAppOverlay, m
  */
 function buildTypeStackInternal(containerPath, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path, stackType = 'full') {
   const index = readContainerIndex(containerPath, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path)
-  if (!index) return { stack: [containerPath], instanceLevel: 1 }
+
+  // Virtual method handling: no index.json means we need to find the physical method
+  if (!index) {
+    // Only do method resolution for instantiates mode
+    if (stackType === 'instantiates') {
+      const segments = containerPath.split('/')
+      if (segments.length >= 2) {
+        const methodName = segments[segments.length - 1]
+        const parentPath = segments.slice(0, -1).join('/')
+
+        // Build parent's instantiates chain
+        const { stack: parentStack } = buildTypeStackInternal(parentPath, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path, 'instantiates')
+
+        // Find which type in the chain has this method as a physical child
+        for (const typePath of parentStack) {
+          const methodPath = `${typePath}/${methodName}`
+          const methodIndex = readContainerIndex(methodPath, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path)
+          if (methodIndex) {
+            // Found the physical method - return its instantiates stack
+            return buildTypeStackInternal(methodPath, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path, 'instantiates')
+          }
+        }
+      }
+    }
+    return { stack: [containerPath], instanceLevel: 1 }
+  }
+
+  // For instantiates-only, build container + instantiates chain
+  // Follow instantiates type's extends chain, skipping duplicates but continuing past them
+  if (stackType === 'instantiates') {
+    const instantiatesStack = [containerPath]
+    const visited = new Set([containerPath])
+    let current = index.instantiates
+    while (current) {
+      if (!visited.has(current)) {
+        visited.add(current)
+        instantiatesStack.push(current)
+      }
+      const typeIndex = readContainerIndex(current, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path)
+      if (!typeIndex || !typeIndex.extends) break
+      current = typeIndex.extends
+    }
+    return { stack: instantiatesStack, instanceLevel: 1 }
+  }
 
   const extendsStack = [containerPath]
   const visited = new Set([containerPath])
@@ -163,11 +206,6 @@ function buildTypeStackInternal(containerPath, nodeRoot, appAPI, enableAppOverla
     const typeIndex = readContainerIndex(current, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path)
     if (!typeIndex) break
     current = typeIndex.extends
-  }
-
-  // For instantiates-only, return container + instantiates chain
-  if (stackType === 'instantiates') {
-    return { stack: [containerPath, ...instantiatesStack], instanceLevel: 1 }
   }
 
   // Full stack: extends + instantiates

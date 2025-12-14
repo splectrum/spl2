@@ -1,0 +1,15 @@
+{
+  "name": "spl/script",
+  "instantiates": "spl/api",
+  "type": {
+    "children": {
+      "type": "spl/method"
+    }
+  },
+  "instance": {
+    "children": {
+      "type": "spl/method",
+      "list": []
+    }
+  }
+}

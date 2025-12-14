@@ -19,6 +19,10 @@ Fix drift:
 
 Examples:
   spl spl/whoami                        # Introspect the spl package
-  spl spl/container/whoami/selfeval     # Validate whoami method`)
+  spl spl/container/whoami/selfeval     # Validate whoami method
+
+Inline scripts:
+  spl '/* comment */ module.output("hello")'  # Run inline script
+  spl '/* test */ console.log(module.buildTypeStack("spl/container"))'`)
 
 module.output({ status: 'ok' })
