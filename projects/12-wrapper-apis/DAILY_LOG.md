@@ -61,7 +61,48 @@ rm /home/herma/splectrum/spl2/spl
 
 ---
 
+## 2025-12-14
+
+### Type Hierarchy Refactor
+
+**spl/introspection created:**
+- New base API type for introspection methods
+- spl/container now extends spl/introspection
+- Moved whoami, selfeval, framework libs, base schemas
+- Created type and instance reqs
+- Added select method to roadmap (xpath-style queries)
+
+**stackType parameter for buildTypeStack:**
+- 'full' (default), 'extends', 'instantiates'
+- Schema inheritance now correctly uses 'instantiates' chain
+- Key fix: instantiates chain is for functional contract (schemas), extends chain is for structural inheritance
+
+**Flat api format support:**
+- `["method1", "method2"]` in addition to nested facets `{ facet: [methods] }`
+
+### Design Insight: Data/Functional Duality
+
+**spl/container** - Type cornerstone (data)
+- What a container IS structurally
+- Validation, constraints, structural rules
+
+**spl/api** - Functional cornerstone (behavior)
+- How you interact with containers
+- Methods, execution, I/O
+
+The dual inheritance model:
+- `extends`: data/structural inheritance (what I am)
+- `instantiates`: functional inheritance (how I behave)
+
+spl/api is where data meets behavior - it instantiates itself but extends spl/container. Everything functional flows through spl/api. Schema inheritance follows `instantiates` because it's about functional contract, not structural definition.
+
+**→ Add to DESIGN_REGISTER.md at project closure**
+
+---
+
 ## For Project Closure
 
 - create_project howto updated to v1.3.0 (removed dev bundle, work module approach)
 - Entry points moved into splectrum node (self-contained)
+- **Design element:** Data/Functional Duality (spl/container vs spl/api) → DESIGN_REGISTER.md
+- select method moves to spl/introspection (from original spl/container/select plan)
