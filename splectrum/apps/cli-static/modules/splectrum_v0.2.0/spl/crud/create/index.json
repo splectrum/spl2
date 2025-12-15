@@ -1,0 +1,4 @@
+{
+  "name": "spl/container/create",
+  "instantiates": "spl/method"
+}

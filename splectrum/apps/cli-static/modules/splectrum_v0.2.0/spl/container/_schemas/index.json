@@ -1,0 +1,11 @@
+{
+  "name": "schemas",
+  "purpose": "Container structural facet schemas",
+  "files": {
+    "container.avsc": { "validates": "index.json" },
+    "lib.avsc": { "validates": "_lib/index.json" },
+    "reqs.avsc": { "validates": "_reqs/index.json" },
+    "schemas.avsc": { "validates": "_schemas/index.json" },
+    "selfevals.avsc": { "validates": "_selfevals/index.json" }
+  }
+}

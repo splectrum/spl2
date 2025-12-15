@@ -1,0 +1,24 @@
+{
+  "type": "record",
+  "name": "spl.wrapper.input",
+  "doc": "Wrapper input with passthrough args and splectrum control flags",
+  "fields": [
+    {
+      "name": "args",
+      "type": "string",
+      "doc": "Passthrough arguments for wrapped tool (quoted, ready for shell)"
+    },
+    {
+      "name": "dryRun",
+      "type": "boolean",
+      "default": false,
+      "doc": "Show command without executing"
+    },
+    {
+      "name": "silent",
+      "type": "boolean",
+      "default": false,
+      "doc": "Suppress narrative output"
+    }
+  ]
+}

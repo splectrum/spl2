@@ -1,0 +1,19 @@
+{
+  "name": "selfevals",
+  "purpose": "Selfeval runners for spl/modules type",
+  "runners": {
+    "hierarchy": {
+      "name": "hierarchy",
+      "description": "Validates hierarchy.json exists and has correct structure",
+      "file": "selfeval_hierarchy.js"
+    }
+  },
+  "instanceRunners": {
+    "children": {
+      "name": "children",
+      "description": "Check child containers match instanceChildren constraint",
+      "file": "selfeval_children.js",
+      "instanceChildren": "spl/module"
+    }
+  }
+}

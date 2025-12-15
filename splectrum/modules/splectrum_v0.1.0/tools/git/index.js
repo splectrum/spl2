@@ -49,7 +49,16 @@ export default async function(module) {
     return
   }
 
-  const cmd = `git ${args.join(' ')}`
+  // Quote args containing spaces or special shell characters
+  const quotedArgs = args.map(arg => {
+    if (arg.includes(' ') || arg.includes('"') || arg.includes("'") || arg.includes('$')) {
+      // Escape any existing double quotes and wrap in double quotes
+      return `"${arg.replace(/"/g, '\\"')}"`
+    }
+    return arg
+  })
+
+  const cmd = `git ${quotedArgs.join(' ')}`
 
   // Handle --dryRun
   if (input.dryRun) {

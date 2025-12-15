@@ -1,0 +1,9 @@
+{
+  "requirements": [
+    {
+      "name": "spl_container_whoami",
+      "description": "Comprehensive container introspection",
+      "file": "spl_container_whoami_v2.0.0.md"
+    }
+  ]
+}

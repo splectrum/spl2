@@ -1,0 +1,11 @@
+{
+  "name": "lib",
+  "purpose": "CRUD utilities - work module resolution",
+  "files": {
+    "crud.js": {
+      "name": "crud",
+      "description": "Work module path resolution for CRUD operations",
+      "exports": ["getWorkModulePath"]
+    }
+  }
+}

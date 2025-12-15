@@ -1,0 +1,26 @@
+{
+  "name": "reqs",
+  "purpose": "Script API requirements and design",
+  "requirements": [
+    {
+      "name": "spl_script_type",
+      "description": "Script API type definition",
+      "file": "spl_script_type.md"
+    },
+    {
+      "name": "inline_scripts",
+      "description": "Inline script execution pattern",
+      "file": "inline_scripts.md"
+    },
+    {
+      "name": "repl_design",
+      "description": "REPL interactive session design",
+      "file": "repl_design.md"
+    },
+    {
+      "name": "helper_lib",
+      "description": "AI/exploration helper library",
+      "file": "helper_lib.md"
+    }
+  ]
+}

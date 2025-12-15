@@ -50,6 +50,8 @@ During development, a work module layer is added as the first entry:
 
 Work module (type: `work_module`) captures changes during development. At release, type changes to `release` and module becomes frozen.
 
+**Constraint:** There can only be one work module at any time. Multiple release modules are allowed.
+
 ## Self-eval
 
 - [ ] File exists at splectrum/modules/hierarchy.json
@@ -57,6 +59,7 @@ Work module (type: `work_module`) captures changes during development. At releas
 - [ ] Has layers array
 - [ ] Each layer has name property
 - [ ] Each layer has type property (work_module or release)
+- [ ] At most one layer has type work_module
 - [ ] Named folders exist in modules/
 
 ## Comments

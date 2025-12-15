@@ -1,0 +1,36 @@
+{
+  "type": "record",
+  "name": "spl.http.post.input",
+  "doc": "HTTP POST request input",
+  "fields": [
+    {
+      "name": "url",
+      "type": "string",
+      "doc": "Target URL (required)"
+    },
+    {
+      "name": "headers",
+      "type": ["null", {"type": "map", "values": "string"}],
+      "default": null,
+      "doc": "Request headers as key-value pairs"
+    },
+    {
+      "name": "body",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Request body - string or JSON-serialized object"
+    },
+    {
+      "name": "contentType",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Content-Type header (defaults to application/json)"
+    },
+    {
+      "name": "timeout",
+      "type": "int",
+      "default": 30000,
+      "doc": "Request timeout in milliseconds"
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "name": "spl/runtime",
+  "extends": "spl/container",
+  "instantiates": "spl/api"
+}

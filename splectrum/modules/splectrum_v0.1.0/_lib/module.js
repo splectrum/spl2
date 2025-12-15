@@ -532,6 +532,33 @@ export function create(bootstrapModule) {
     // ========================================================================
 
     /**
+     * Get record data (value)
+     * Returns the actual object - callers can set properties directly
+     * @returns {Object}
+     */
+    getData() {
+      return record.value
+    },
+
+    /**
+     * Set record data (value)
+     * Replaces the entire data object (use null to clear)
+     * @param {Object|null} value - New data value
+     */
+    setData(value) {
+      record.value = value
+    },
+
+    /**
+     * Get record metadata (headers)
+     * Returns the actual object - callers can set properties directly
+     * @returns {Object}
+     */
+    getMetaData() {
+      return record.headers
+    },
+
+    /**
      * Get input from record
      * @returns {Object}
      */

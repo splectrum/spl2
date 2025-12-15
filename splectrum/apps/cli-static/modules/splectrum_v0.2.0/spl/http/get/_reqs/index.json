@@ -1,0 +1,9 @@
+{
+  "requirements": [
+    {
+      "name": "spl_http_get",
+      "description": "HTTP GET method",
+      "file": "spl_http_get_v1.0.0.md"
+    }
+  ]
+}

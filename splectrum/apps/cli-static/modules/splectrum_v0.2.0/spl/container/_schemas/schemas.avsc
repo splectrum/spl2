@@ -1,0 +1,36 @@
+{
+  "type": "record",
+  "name": "spl.container.schemas",
+  "doc": "Schemas facet - _schemas/index.json structure",
+  "fields": [
+    {
+      "name": "name",
+      "type": "string",
+      "doc": "Facet name (e.g., schemas)"
+    },
+    {
+      "name": "purpose",
+      "type": "string",
+      "doc": "Description of what schemas this collection defines"
+    },
+    {
+      "name": "files",
+      "type": {
+        "type": "map",
+        "values": {
+          "type": "record",
+          "name": "SchemaFile",
+          "fields": [
+            {
+              "name": "validates",
+              "type": ["null", "string"],
+              "default": null,
+              "doc": "Path to data file this schema validates (relative to container root)"
+            }
+          ]
+        }
+      },
+      "doc": "Map of schema filename to metadata"
+    }
+  ]
+}

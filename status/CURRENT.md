@@ -1,6 +1,6 @@
 # Current Status
 
-**Last Updated:** 2025-12-15
+**Last Updated:** 2025-12-16
 
 ---
 
@@ -18,7 +18,29 @@
 
 ### Current
 
-Execution phase - starting with tool coverage
+Twin Pair 1 - wrapper and CRUD fixes complete, ready for next tool coverage work
+
+### Done This Session
+
+**Schema-driven wrapper parsing (v0.2.0):**
+- Updated `spl/wrapper/_schemas/input.avsc` to record type with args, dryRun, silent
+- Updated `cli.js parseArgs()` to extract splectrum flags from schema, quote remaining args
+- Updated `cli.js rewriteHelp()` to skip wrappers (--help passes through to tool)
+- Simplified tools/git and tools/7zip handlers (just use `input.args` directly)
+- Removed `lib/spl/wrapper` (no longer needed - cli.js handles all parsing)
+- Updated `spl_wrapper_type_v1.0.0.md` with new design and help behavior
+
+**Help behavior for wrappers:**
+- `spl tools/git --help` → shows git's help (passthrough)
+- `spl tools/git/whoami` → shows splectrum wrapper info
+
+**Work module path fix (v0.2.0):**
+- Created `lib/spl/crud` library with `getWorkModulePath()` for dynamic resolution
+- Updated hierarchy.json req: only one work_module allowed at any time
+- Updated CRUD methods (create, delete, set, lift) to use dynamic path from hierarchy.json
+- Fixed lift/_lib/lift.js to check `layer.type === 'work_module'` not name
+
+**Previous commit:** bf5c486
 
 ---
 

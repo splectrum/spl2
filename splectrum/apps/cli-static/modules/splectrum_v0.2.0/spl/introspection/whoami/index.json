@@ -1,0 +1,4 @@
+{
+  "name": "spl/container/whoami",
+  "instantiates": "spl/method"
+}

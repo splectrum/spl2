@@ -196,15 +196,63 @@ export async function create(module) {
         data.method = argv[0]
       }
 
-      // Check if this is a wrapper - if so, all args are positional
+      // Check if this is a wrapper - schema-driven parsing
       const isWrapperMode = mode === 'command' && this.isWrapper(data.method)
 
+      if (isWrapperMode) {
+        // Load wrapper input schema to get splectrum flag names
+        const schemaPath = module.resolve('spl/wrapper', '_schemas/input.avsc')
+        let schemaFields = new Set(['dryRun', 'silent']) // defaults if schema not found
+
+        if (schemaPath) {
+          try {
+            const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf-8'))
+            if (schema.fields) {
+              schemaFields = new Set(schema.fields.map(f => f.name))
+              schemaFields.delete('args') // args is passthrough, not a flag
+            }
+          } catch (e) {
+            // Use defaults
+          }
+        }
+
+        // Initialize input with schema defaults
+        const input = { args: '', dryRun: false, silent: false }
+        const passthrough = []
+
+        // Extract splectrum flags, collect passthrough args
+        for (let i = startIndex; i < argv.length; i++) {
+          const arg = argv[i]
+          if (arg.startsWith('--')) {
+            const [rawKey] = arg.slice(2).split('=')
+            const flagName = kebabToCamel(rawKey)
+            if (schemaFields.has(flagName)) {
+              input[flagName] = true
+              continue
+            }
+          }
+          passthrough.push(arg)
+        }
+
+        // Quote and join passthrough args for shell
+        input.args = passthrough.map(arg => {
+          if (arg.includes(' ') || arg.includes('"') || arg.includes("'") || arg.includes('$')) {
+            return `"${arg.replace(/"/g, '\\"')}"`
+          }
+          return arg
+        }).join(' ')
+
+        metadata.spl.request.input = input
+        return
+      }
+
+      // Standard (non-wrapper) parsing
       const input = {}
       let positionalIndex = 0
 
       for (let i = startIndex; i < argv.length; i++) {
         const arg = argv[i]
-        if (!isWrapperMode && arg.startsWith('--')) {
+        if (arg.startsWith('--')) {
           const [rawKey, ...valueParts] = arg.slice(2).split('=')
           const key = kebabToCamel(rawKey)
           input[key] = valueParts.length > 0 ? valueParts.join('=') : true
@@ -223,8 +271,14 @@ export async function create(module) {
      * Rewrite --help/-h to whoami --usage
      * Reads: data.argv, data.method, metadata.spl.request.input
      * Writes: data.method, metadata.spl.request.input
+     *
+     * Note: Wrappers skip help rewrite - help passes through to wrapped tool.
+     * Use /whoami for splectrum wrapper help (e.g., spl tools/git/whoami).
      */
     rewriteHelp() {
+      // Wrappers: help passes through to tool, use /whoami for splectrum help
+      if (this.isWrapper(data.method)) return
+
       const argv = data.argv
       const input = metadata.spl.request.input
 

@@ -1,0 +1,64 @@
+// crud.js - CRUD utilities
+//
+// Work module path resolution for CRUD operations.
+// Reads hierarchy.json to find the active work module dynamically.
+
+export function create(module) {
+  // Module cache
+  let _fs, _path
+
+  async function getFs() {
+    if (!_fs) _fs = await module.require('fs')
+    return _fs
+  }
+
+  async function getPath() {
+    if (!_path) _path = await module.require('path')
+    return _path
+  }
+
+  return {
+    /**
+     * Get the path to the active work module
+     * Reads hierarchy.json to find the layer with type: "work_module"
+     * Respects app context (uses app hierarchy.json if in app context)
+     *
+     * @returns {string|null} Full path to work module, or null if none found
+     */
+    async getWorkModulePath() {
+      const fs = await getFs()
+      const path = await getPath()
+
+      const nodeRoot = module.getNodeRoot()
+      const appAPI = module.getAppAPI()
+      const appName = appAPI?.replace('spl/', '')
+
+      // Determine modules directory and hierarchy.json location
+      const modulesDir = appName
+        ? path.join(nodeRoot, 'apps', appName, 'modules')
+        : path.join(nodeRoot, 'modules')
+
+      const hierarchyPath = path.join(modulesDir, 'hierarchy.json')
+
+      // Read hierarchy.json
+      if (!fs.existsSync(hierarchyPath)) {
+        return null
+      }
+
+      let hierarchy
+      try {
+        hierarchy = JSON.parse(fs.readFileSync(hierarchyPath, 'utf-8'))
+      } catch (e) {
+        return null
+      }
+
+      // Find the work_module layer
+      const workLayer = hierarchy.layers?.find(l => l.type === 'work_module')
+      if (!workLayer) {
+        return null
+      }
+
+      return path.join(modulesDir, workLayer.name)
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "name": "schemas",
+  "purpose": "Selfeval method input schema",
+  "files": {
+    "input.avsc": {}
+  }
+}

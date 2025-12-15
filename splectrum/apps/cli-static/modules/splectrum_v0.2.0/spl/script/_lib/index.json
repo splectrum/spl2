@@ -1,0 +1,11 @@
+{
+  "name": "lib",
+  "purpose": "Script API helper libraries",
+  "files": {
+    "ai.js": {
+      "name": "ai",
+      "description": "AI/exploration helper utilities",
+      "exports": ["readFile", "readJson", "stack", "methods", "children", "exists", "isMethod", "physicalMethod", "json", "table"]
+    }
+  }
+}

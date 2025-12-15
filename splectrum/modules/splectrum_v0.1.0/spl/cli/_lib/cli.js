@@ -1,10 +1,9 @@
 // cli.js - CLI entry point utilities
 //
-// Bound pattern: create(module, record) returns object with methods
-// that read/write record internally. Caller doesn't know property paths.
+// Bound pattern: create(module) returns object with methods
+// that read/write record internally via module.getData() and module.getMetaData().
 //
 // Note: This lib is entrypoint infrastructure specific to spl.mjs.
-// It receives raw record because it builds the record structure.
 
 // Script preamble - inline scripts must start with this
 const SCRIPT_PREAMBLE = '/*'
@@ -15,14 +14,17 @@ function kebabToCamel(str) {
 }
 
 /**
- * Create CLI bound to record
- * @param {Object} module - Module interface (for platform requires)
- * @param {Object} record - The CLI record (raw access for setup)
+ * Create CLI bound to module's record
+ * @param {Object} module - Module interface (record access via getData/getMetaData)
  * @returns {Object} - Bound CLI methods
  */
-export async function create(module, record) {
+export async function create(module) {
   const fs = await module.require('fs')
   const path = await module.require('path')
+
+  // Get record data and metadata from module
+  const data = module.getData()
+  const metadata = module.getMetaData()
 
   // Internal: resolve script by name from scripts/ folder
   function resolveScript(scriptName, nodeRoot) {
@@ -48,11 +50,11 @@ export async function create(module, record) {
   return {
     /**
      * Find nearest splectrum/ folder traversing up from invokedFrom
-     * Reads: record.headers.spl.runtime.invokedFrom
-     * Writes: record.headers.spl.runtime.nodeRoot
+     * Reads: metadata.spl.runtime.invokedFrom
+     * Writes: metadata.spl.runtime.nodeRoot
      */
     resolveNode() {
-      let dir = record.headers.spl.runtime.invokedFrom
+      let dir = metadata.spl.runtime.invokedFrom
 
       while (dir !== path.dirname(dir)) {
         const splectrumPath = path.join(dir, 'splectrum')
@@ -63,7 +65,7 @@ export async function create(module, record) {
             try {
               const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'))
               if (pkg.name === 'splectrum') {
-                record.headers.spl.runtime.nodeRoot = splectrumPath
+                metadata.spl.runtime.nodeRoot = splectrumPath
                 return
               }
             } catch (e) {
@@ -80,22 +82,22 @@ export async function create(module, record) {
 
     /**
      * Detect invocation mode from first argument
-     * Reads: record.value.argv[0], record.headers.spl.runtime.invokedFrom, record.headers.spl.runtime.nodeRoot
-     * Writes: record.value.mode, record.value.resolvedPath
+     * Reads: data.argv[0], metadata.spl.runtime.invokedFrom, metadata.spl.runtime.nodeRoot
+     * Writes: data.mode, data.resolvedPath
      */
     detectMode() {
-      const firstArg = record.value.argv[0]
-      const invokedFrom = record.headers.spl.runtime.invokedFrom
-      const nodeRoot = record.headers.spl.runtime.nodeRoot
+      const firstArg = data.argv[0]
+      const invokedFrom = metadata.spl.runtime.invokedFrom
+      const nodeRoot = metadata.spl.runtime.nodeRoot
 
       if (!firstArg) {
-        record.value.mode = 'command'
+        data.mode = 'command'
         return
       }
 
       // 1. Inline script (starts with /*) - check before file paths since /* looks like absolute path
       if (firstArg.startsWith(SCRIPT_PREAMBLE)) {
-        record.value.mode = 'script'
+        data.mode = 'script'
         return
       }
 
@@ -108,18 +110,18 @@ export async function create(module, record) {
         if (fs.existsSync(possiblePath) && fs.statSync(possiblePath).isFile()) {
           // Check if path is inside nodeRoot (internal script)
           if (nodeRoot && possiblePath.startsWith(nodeRoot + path.sep)) {
-            record.value.mode = 'library'
-            record.value.resolvedPath = possiblePath
+            data.mode = 'library'
+            data.resolvedPath = possiblePath
             return
           }
           // External file
-          record.value.mode = 'file'
-          record.value.resolvedPath = possiblePath
+          data.mode = 'file'
+          data.resolvedPath = possiblePath
           return
         } else {
           // Explicit file path but file not found - error
-          record.value.mode = 'file'
-          record.value.error = {
+          data.mode = 'file'
+          data.error = {
             code: 'FILE_NOT_FOUND',
             path: possiblePath,
             exitCode: 1
@@ -132,14 +134,14 @@ export async function create(module, record) {
       if (nodeRoot) {
         const scriptPath = resolveScript(firstArg, nodeRoot)
         if (scriptPath) {
-          record.value.mode = 'library'
-          record.value.resolvedPath = scriptPath
+          data.mode = 'library'
+          data.resolvedPath = scriptPath
           return
         }
       }
 
       // 5. Default: command mode
-      record.value.mode = 'command'
+      data.mode = 'command'
     },
 
     /**
@@ -178,12 +180,12 @@ export async function create(module, record) {
 
     /**
      * Parse CLI arguments
-     * Reads: record.value.argv, record.value.mode
-     * Writes: record.headers.spl.request.input, record.value.method
+     * Reads: data.argv, data.mode
+     * Writes: metadata.spl.request.input, data.method
      */
     parseArgs() {
-      const argv = record.value.argv
-      const mode = record.value.mode
+      const argv = data.argv
+      const mode = data.mode
 
       // For command mode, first arg is method, rest are input
       // For other modes, first arg is script/file, rest are input
@@ -191,11 +193,11 @@ export async function create(module, record) {
 
       // For command mode, first arg is the method
       if (mode === 'command' && argv[0]) {
-        record.value.method = argv[0]
+        data.method = argv[0]
       }
 
       // Check if this is a wrapper - if so, all args are positional
-      const isWrapperMode = mode === 'command' && this.isWrapper(record.value.method)
+      const isWrapperMode = mode === 'command' && this.isWrapper(data.method)
 
       const input = {}
       let positionalIndex = 0
@@ -213,18 +215,18 @@ export async function create(module, record) {
         }
       }
 
-      // Input is metadata - goes to headers
-      record.headers.spl.request.input = input
+      // Input is metadata - goes to metadata
+      metadata.spl.request.input = input
     },
 
     /**
      * Rewrite --help/-h to whoami --usage
-     * Reads: record.value.argv, record.value.method, record.headers.spl.request.input
-     * Writes: record.value.method, record.headers.spl.request.input
+     * Reads: data.argv, data.method, metadata.spl.request.input
+     * Writes: data.method, metadata.spl.request.input
      */
     rewriteHelp() {
-      const argv = record.value.argv
-      const input = record.headers.spl.request.input
+      const argv = data.argv
+      const input = metadata.spl.request.input
 
       // Check for --help (in input) or -h (in argv, not parsed as flag)
       const hasHelp = input.help === true || argv.includes('-h')
@@ -232,8 +234,8 @@ export async function create(module, record) {
       if (!hasHelp) return
 
       // Rewrite method: append /whoami (always - whoami on whoami introspects the method itself)
-      if (record.value.method) {
-        record.value.method = record.value.method + '/whoami'
+      if (data.method) {
+        data.method = data.method + '/whoami'
       }
 
       // Add usage flag, hide topline/summary, remove help
@@ -244,27 +246,27 @@ export async function create(module, record) {
 
     /**
      * Check if mode is external script file
-     * Reads: record.value.mode
+     * Reads: data.mode
      * Returns: true if mode is 'file'
      */
     isExternalScriptFile() {
-      return record.value.mode === 'file'
+      return data.mode === 'file'
     },
 
     /**
      * Load external script file content for inline execution
-     * Reads: record.value.resolvedPath
-     * Writes: record.value.script, record.value.mode (file → script), record.value.error
+     * Reads: data.resolvedPath
+     * Writes: data.script, data.mode (file → script), data.error
      */
     loadExternalScriptFile() {
       try {
-        const content = fs.readFileSync(record.value.resolvedPath, 'utf-8')
-        record.value.script = content
-        record.value.mode = 'script'
+        const content = fs.readFileSync(data.resolvedPath, 'utf-8')
+        data.script = content
+        data.mode = 'script'
       } catch (e) {
-        record.value.error = {
+        data.error = {
           code: 'FILE_READ_ERROR',
-          path: record.value.resolvedPath,
+          path: data.resolvedPath,
           message: e.message,
           exitCode: 1
         }
@@ -273,19 +275,19 @@ export async function create(module, record) {
 
     /**
      * Validate CLI state
-     * Reads: record.value.argv, record.value.error, record.headers.spl.runtime.nodeRoot
-     * Writes: record.value.error (if invalid)
+     * Reads: data.argv, data.error, metadata.spl.runtime.nodeRoot
+     * Writes: data.error (if invalid)
      * Returns: true if valid, false if error
      */
     validate() {
       // Check: error already set (from detectMode, parseArgs, etc.)
-      if (record.value.error) {
+      if (data.error) {
         return false
       }
 
       // Check: no args
-      if (record.value.argv.length === 0) {
-        record.value.error = {
+      if (data.argv.length === 0) {
+        data.error = {
           code: 'NO_ARGS',
           exitCode: 1
         }
@@ -293,10 +295,10 @@ export async function create(module, record) {
       }
 
       // Check: no node found
-      if (!record.headers.spl.runtime.nodeRoot) {
-        record.value.error = {
+      if (!metadata.spl.runtime.nodeRoot) {
+        data.error = {
           code: 'NO_NODE',
-          invokedFrom: record.headers.spl.runtime.invokedFrom,
+          invokedFrom: metadata.spl.runtime.invokedFrom,
           exitCode: 1
         }
         return false
@@ -307,21 +309,21 @@ export async function create(module, record) {
 
     /**
      * Resolve error topic path for this CLI session
-     * Reads: record.headers.spl.runtime.nodeRoot
+     * Reads: metadata.spl.runtime.nodeRoot
      * Returns: absolute path to error topic folder
      */
     resolveErrorTopic() {
-      const nodeRoot = record.headers.spl.runtime.nodeRoot
+      const nodeRoot = metadata.spl.runtime.nodeRoot
       if (!nodeRoot) return null
       return path.join(nodeRoot, 'runtime', 'error', 'cli')
     },
 
     /**
      * Handle error - output console-friendly message and exit
-     * Reads: record.value.error
+     * Reads: data.error
      */
     handleError() {
-      const error = record.value.error
+      const error = data.error
 
       if (error.code === 'NO_ARGS') {
         console.error('Usage:')

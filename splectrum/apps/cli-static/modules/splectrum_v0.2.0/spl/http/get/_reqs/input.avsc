@@ -1,0 +1,24 @@
+{
+  "type": "record",
+  "name": "spl.http.get.input",
+  "doc": "HTTP GET request input",
+  "fields": [
+    {
+      "name": "url",
+      "type": "string",
+      "doc": "Target URL (required)"
+    },
+    {
+      "name": "headers",
+      "type": ["null", {"type": "map", "values": "string"}],
+      "default": null,
+      "doc": "Request headers as key-value pairs"
+    },
+    {
+      "name": "timeout",
+      "type": "int",
+      "default": 30000,
+      "doc": "Request timeout in milliseconds"
+    }
+  ]
+}

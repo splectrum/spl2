@@ -1,0 +1,8 @@
+{
+  "name": "spl/wrapper/_schemas",
+  "files": {
+    "input.avsc": {
+      "doc": "Wrapper input schema with passthrough args and splectrum control flags"
+    }
+  }
+}

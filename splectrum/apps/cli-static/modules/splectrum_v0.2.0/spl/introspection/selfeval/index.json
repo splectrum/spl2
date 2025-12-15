@@ -1,0 +1,7 @@
+{
+  "name": "spl/container/selfeval",
+  "instantiates": "spl/method",
+  "extends": null,
+  "type": null,
+  "instance": null
+}

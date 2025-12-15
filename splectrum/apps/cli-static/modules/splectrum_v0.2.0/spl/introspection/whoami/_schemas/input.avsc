@@ -1,0 +1,95 @@
+{
+  "type": "record",
+  "name": "spl.container.whoami.input",
+  "doc": "Whoami introspection input",
+  "fields": [
+    {
+      "name": "dryRun",
+      "type": "boolean",
+      "default": false,
+      "doc": "Preview only, no action taken"
+    },
+    {
+      "name": "silent",
+      "type": "boolean",
+      "default": false,
+      "doc": "Omit narrative, data only"
+    },
+    {
+      "name": "help",
+      "type": "boolean",
+      "default": false,
+      "doc": "Show usage information"
+    },
+    {
+      "name": "meta",
+      "type": [
+        "null",
+        {
+          "type": "enum",
+          "name": "MetaLevel",
+          "symbols": [
+            "topline",
+            "summary",
+            "detail",
+            "enriched",
+            "report"
+          ]
+        }
+      ],
+      "default": null,
+      "doc": "Freetext output level (default: summary)"
+    },
+    {
+      "name": "report",
+      "type": [
+        "null",
+        {
+          "type": "enum",
+          "name": "ReportLevel",
+          "symbols": [
+            "topline",
+            "summary",
+            "detail",
+            "enriched"
+          ]
+        }
+      ],
+      "default": null,
+      "doc": "Structured output level (default: none)"
+    },
+    {
+      "name": "facet",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Facet filter: container, api, handler, schemas, lib, reqs (comma-delimited, default: all)"
+    },
+    {
+      "name": "levels",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Depth level: 0, 1, 2, ... n, full (default: 0 - this container only)"
+    },
+    {
+      "name": "usage",
+      "type": "boolean",
+      "default": false,
+      "doc": "Show input schema as usage information"
+    },
+    {
+      "name": "hide",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Hide output levels: topline, summary, detail, enriched (comma-delimited)"
+    }
+  ]
+}
