@@ -1,0 +1,6 @@
+{
+  "type": "record",
+  "name": "module_node.output",
+  "doc": "Base output schema for all module_nodes - empty default",
+  "fields": []
+}

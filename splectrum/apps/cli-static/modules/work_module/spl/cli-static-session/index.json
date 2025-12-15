@@ -1,0 +1,4 @@
+{
+  "name": "spl/cli-static-session",
+  "instantiates": "spl/api"
+}

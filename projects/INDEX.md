@@ -4,12 +4,13 @@
 
 | Code | Name | Status | Started |
 |------|------|--------|---------|
-| 12-wrapper-apis | Wrapper APIs | In Progress | 2025-12-12 |
+| - | - | - | - |
 
 ## Completed Projects
 
 | Code | Name | Completed | Key Outcomes |
 |------|------|-----------|--------------|
+| 12-wrapper-apis | Wrapper APIs | 2025-12-15 | First release (v0.1.0), wrapper passthrough, lift --modules, selfeval lib bug fix, releases/ spot |
 | 01-preliminary-to-workplan | Preliminary to Workplan | 2025-11-08 | Validated foundations, established PRINCE2+TDC methodology, bootstrap pattern |
 | 02-initial-workplan | Initial Workplan | 2025-11-10 | Simplified foundations, backlog structure with 9 projects, artifact-to-requirements pattern, minimal+complete practice guidance |
 | 03-runtime-hello-world | Runtime Structure "Hello World" | 2025-11-12 | Core architecture validated, single-parameter method signature, platform abstraction, glossary discovery, MVP+End Vision pattern, Local Rules Apply generality |
@@ -433,6 +434,39 @@
 - Plus 10 future-oriented design docs (app design, scripting layer, PAC handlers)
 
 **See:** `projects/11-app-architecture/LESSONS_LEARNED.md` for full details
+
+### 12-wrapper-apis
+**Objective:** Implement wrapper APIs and complete first release
+
+**Project Type:** Explorative Project
+
+**Products Delivered:**
+1. Wrapper passthrough fixed (early app context in spl.mjs) ✅
+2. lift --modules and --recursive modes ✅
+3. Containers lifted from bm_spl to work_module ✅
+4. bm_spl removed from hierarchy ✅
+5. Selfeval lib runner bug fix (unregistered files detection) ✅
+6. First release: splectrum_v0.1.0 ✅
+7. releases/ spot with archive ✅
+8. Bootstrap req (splectrum/lib/_reqs) ✅
+
+**Status:** Complete - First versioned release achieved
+
+**Key Outcomes:**
+- **First release (v0.1.0):** Module layer registered, work_module deregistered, clean separation
+- **Wrapper passthrough:** --flags now pass through to wrapped tools correctly
+- **lift --modules:** Copy containers from lower module layers with --recursive for full hive
+- **Selfeval bug fix:** lib runner now detects unregistered .js files when no index.json exists
+- **releases/ spot:** Archive folder for versioned module copies
+- **Bootstrap req:** splectrum/lib/_reqs with module_bootstrap_v1.0.0.md
+
+**Key Learnings:**
+- Use spl tools (get-started, set, lift) instead of raw file operations
+- Check selfeval after changes to catch issues early
+- Rushing leads to errors - slow down, verify each step
+- Module hierarchy format matters (objects with name property, not strings)
+
+**See:** `projects/12-wrapper-apis/LESSONS_LEARNED.md` for full details
 
 ---
 

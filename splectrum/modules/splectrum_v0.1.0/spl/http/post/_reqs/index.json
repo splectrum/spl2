@@ -1,0 +1,9 @@
+{
+  "requirements": [
+    {
+      "name": "spl_http_post",
+      "description": "HTTP POST method",
+      "file": "spl_http_post_v1.0.0.md"
+    }
+  ]
+}

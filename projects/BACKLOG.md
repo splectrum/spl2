@@ -2,7 +2,7 @@
 
 # Project Backlog
 
-**Last Updated:** 2025-12-12
+**Last Updated:** 2025-12-15
 
 Backlog of identified projects for SPL2 development. Projects analyzed for priority and dependencies during Project 02 (Dependency & Priority Analysis).
 
@@ -16,6 +16,7 @@ Phased approach to get implementation infrastructure working.
 
 | Backlog Item | Priority | Dependencies | Addons | Comments |
 |--------------|----------|--------------|--------|----------|
+| [spl Tooling and Release Docs](backlog/spl-tooling-and-release-docs.md) | High | Project 12 ✅ | | Full spl tool coverage, faf history tracking, release doc generator. Enables audit processing. |
 | [spl/bug API](backlog/spl-bug-api.md) | High | Project 11 (App Architecture) | | Bug report as API state. Captures failure context for reconstruction. Bug reports from event streams. |
 
 ### Phase 2 - Complete Pipeline

@@ -1,0 +1,11 @@
+{
+  "name": "reqs",
+  "purpose": "Container requirements and contracts",
+  "requirements": [
+    {
+      "name": "spl_request",
+      "description": "Request container type",
+      "file": "spl_request_v1.0.0.md"
+    }
+  ]
+}

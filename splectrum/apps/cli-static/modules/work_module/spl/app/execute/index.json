@@ -1,0 +1,4 @@
+{
+  "name": "spl/app/execute",
+  "instantiates": "spl/method"
+}

@@ -1,0 +1,9 @@
+{
+  "requirements": [
+    {
+      "name": "module_bootstrap",
+      "description": "Bootstrap loader for module.js initialization",
+      "file": "module_bootstrap_v1.0.0.md"
+    }
+  ]
+}

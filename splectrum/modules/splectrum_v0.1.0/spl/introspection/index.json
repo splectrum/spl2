@@ -1,0 +1,15 @@
+{
+  "name": "spl/introspection",
+  "instantiates": "spl/api",
+  "extends": null,
+  "instance": {
+    "children": {
+      "type": "spl/method",
+      "list": [
+        "whoami",
+        "selfeval",
+        "info"
+      ]
+    }
+  }
+}

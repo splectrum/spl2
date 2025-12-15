@@ -1,0 +1,46 @@
+{
+  "name": "lib",
+  "purpose": "Container structural selfeval runners",
+  "files": {
+    "selfeval_lib.js": {
+      "name": "selfeval_lib",
+      "description": "Selfeval runner for lib facet - validates files and exports",
+      "exports": ["run"]
+    },
+    "selfeval_api.js": {
+      "name": "selfeval_api",
+      "description": "Selfeval runner for api facet - validates method folders",
+      "exports": ["run"]
+    },
+    "selfeval_schemas.js": {
+      "name": "selfeval_schemas",
+      "description": "Selfeval runner for schemas facet - validates schema files",
+      "exports": ["run"]
+    },
+    "selfeval_handler.js": {
+      "name": "selfeval_handler",
+      "description": "Selfeval runner for handler facet - validates index.js exports function",
+      "exports": ["run"]
+    },
+    "selfeval_reqs.js": {
+      "name": "selfeval_reqs",
+      "description": "Selfeval runner for reqs facet - validates req files",
+      "exports": ["run"]
+    },
+    "selfeval_container.js": {
+      "name": "selfeval_container",
+      "description": "Selfeval runner for container facet validation",
+      "exports": ["run"]
+    },
+    "selfeval_schemas_inheritance.js": {
+      "name": "selfeval_schemas_inheritance",
+      "description": "Selfeval runner for schema inheritance validation",
+      "exports": ["run"]
+    },
+    "selfeval_schemas_data.js": {
+      "name": "selfeval_schemas_data",
+      "description": "Selfeval runner for schema data validation",
+      "exports": ["run"]
+    }
+  }
+}

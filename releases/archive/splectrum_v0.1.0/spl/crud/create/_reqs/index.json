@@ -1,0 +1,11 @@
+{
+  "name": "reqs",
+  "purpose": "Create method requirements",
+  "requirements": [
+    {
+      "name": "create",
+      "description": "Create method specification",
+      "file": "Create_v1.0.0.md"
+    }
+  ]
+}

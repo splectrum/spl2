@@ -1,0 +1,5 @@
+{
+  "name": "spl/app",
+  "extends": "spl/api",
+  "instantiates": "spl/api"
+}

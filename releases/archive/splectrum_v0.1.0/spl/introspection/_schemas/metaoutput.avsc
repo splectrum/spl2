@@ -1,0 +1,15 @@
+{
+  "type": "record",
+  "name": "spl.container.metaoutput",
+  "fields": [
+    {
+      "name": "freetext",
+      "type": {
+        "type": "array",
+        "items": "string"
+      },
+      "default": [],
+      "doc": "Natural language output"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 {
   "layers": [
-    { "name": "bm_spl", "type": "bundle_module" }
+    { "name": "splectrum_v0.1.0" }
   ]
 }

@@ -1,0 +1,9 @@
+{
+  "requirements": [
+    {
+      "name": "update_method",
+      "description": "Update method for spl/container lifecycle",
+      "file": "update_method_v1.0.0.md"
+    }
+  ]
+}

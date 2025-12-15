@@ -1,0 +1,17 @@
+{
+  "name": "spl/wrapper/_reqs",
+  "reqs": [
+    {
+      "name": "spl_wrapper_type",
+      "description": "Wrapper API type for external tools",
+      "file": "spl_wrapper_type_v1.0.0.md"
+    }
+  ],
+  "requirements": [
+    {
+      "name": "spl_http",
+      "description": "HTTP client API for web requests",
+      "file": "spl_http_v1.0.0.md"
+    }
+  ]
+}

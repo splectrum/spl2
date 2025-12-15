@@ -1,0 +1,4 @@
+{
+  "name": "spl/cli",
+  "instantiates": "spl/api"
+}

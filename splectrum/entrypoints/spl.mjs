@@ -49,6 +49,10 @@ const module = await loadModule('cli-static')
 await module.init()
 module.bindRecord(record)
 
+// Set app context early (enables app overlay for wrapper detection in parseArgs)
+record.headers.spl.runtime.appAPI = 'spl/cli-static'
+record.headers.spl['cli-static'] = { enableAppOverlay: true }
+
 // ============================================================================
 // Process CLI state
 // ============================================================================

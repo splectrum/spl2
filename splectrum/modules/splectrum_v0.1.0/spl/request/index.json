@@ -1,0 +1,5 @@
+{
+  "name": "spl/request",
+  "extends": "spl/container",
+  "instantiates": "spl/api"
+}

@@ -1,0 +1,15 @@
+{
+  "reqs": [
+    {
+      "name": "spl_cli_static_app",
+      "version": "1.0.0"
+    }
+  ],
+  "requirements": [
+    {
+      "name": "spl_cli_static_app",
+      "description": "CLI static bootstrap app",
+      "file": "spl_cli_static_app_v1.0.0.md"
+    }
+  ]
+}

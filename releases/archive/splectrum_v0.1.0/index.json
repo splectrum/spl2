@@ -1,0 +1,12 @@
+{
+  "name": "work_module",
+  "type": "Instance",
+  "purpose": "Development work module - contains spl packages under development",
+  "instantiates": "spl/module",
+  "instance": {
+    "children": {
+      "type": "spl/package",
+      "list": ["spl", "tools"]
+    }
+  }
+}

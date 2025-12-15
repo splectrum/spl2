@@ -1,0 +1,14 @@
+{
+  "name": "spl/http",
+  "instantiates": "spl/api",
+  "extends": "spl/wrapper",
+  "instance": {
+    "children": {
+      "type": "spl/method",
+      "list": [
+        "get",
+        "post"
+      ]
+    }
+  }
+}

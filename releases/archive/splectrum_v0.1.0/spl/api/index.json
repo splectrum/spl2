@@ -1,0 +1,8 @@
+{
+  "name": "spl/api",
+  "instantiates": "spl/api",
+  "extends": "spl/container",
+  "type": {
+    "children": { "type": "spl/method" }
+  }
+}

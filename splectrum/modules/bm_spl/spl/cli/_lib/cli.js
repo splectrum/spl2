@@ -146,6 +146,10 @@ export async function create(module, record) {
      * Check if a method path instantiates spl/wrapper (passthrough mode)
      * @param {string} methodPath - The method path to check
      * @returns {boolean} - true if wrapper, false otherwise
+     *
+     * Note: Requires appAPI and enableAppOverlay to be set on record before
+     * parseArgs() is called, so app modules (work_module) can be resolved.
+     * See spl.mjs for early app context setup.
      */
     isWrapper(methodPath) {
       if (!methodPath) return false
