@@ -1,5 +1,0 @@
-{
-  "name": "tools/git",
-  "instantiates": "spl/wrapper",
-  "extends": null
-}

@@ -1,5 +1,0 @@
-{
-  "name": "tools/7zip",
-  "instantiates": "spl/wrapper",
-  "extends": null
-}

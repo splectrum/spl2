@@ -1,7 +1,0 @@
-{
-  "name": "spl/method",
-  "type": "Type",
-  "purpose": "Method type - executable container",
-  "instantiates": "spl/api",
-  "extends": "spl/container"
-}

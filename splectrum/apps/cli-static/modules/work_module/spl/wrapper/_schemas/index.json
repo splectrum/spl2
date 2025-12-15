@@ -1,8 +1,0 @@
-{
-  "name": "spl/wrapper/_schemas",
-  "files": {
-    "input.avsc": {
-      "doc": "String input - passthrough to wrapped tool"
-    }
-  }
-}

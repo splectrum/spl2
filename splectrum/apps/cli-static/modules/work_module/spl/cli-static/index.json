@@ -1,5 +1,0 @@
-{
-  "name": "spl/cli-static",
-  "extends": "spl/app",
-  "instantiates": "spl/api"
-}

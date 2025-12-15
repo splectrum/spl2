@@ -1,8 +1,0 @@
-{
-  "name": "schemas",
-  "purpose": "Introspection API base schemas - input flags and output structure",
-  "files": {
-    "input.avsc": {},
-    "metaoutput.avsc": {}
-  }
-}

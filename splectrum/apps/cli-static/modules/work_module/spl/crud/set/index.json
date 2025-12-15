@@ -1,5 +1,0 @@
-{
-  "name": "spl/crud/set",
-  "instantiates": "spl/method",
-  "extends": null
-}

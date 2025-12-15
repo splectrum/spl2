@@ -1,8 +1,0 @@
-{
-  "name": "spl/crud",
-  "instantiates": "spl/api",
-  "extends": "spl/introspection",
-  "instance": {
-    "children": { "type": "spl/method", "list": ["create", "lift", "update", "delete", "set"] }
-  }
-}

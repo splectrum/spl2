@@ -1,8 +1,0 @@
-{
-  "name": "spl/module",
-  "extends": "spl/container",
-  "instantiates": "spl/api",
-  "type": {
-    "children": { "type": "spl/package" }
-  }
-}

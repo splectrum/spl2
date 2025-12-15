@@ -1,5 +1,5 @@
 {
   "layers": [
-    { "name": "splectrum_v0.1.0" }
+    { "name": "splectrum_v0.1.0", "type": "release" }
   ]
 }

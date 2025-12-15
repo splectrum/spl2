@@ -1,5 +1,0 @@
-{
-  "name": "spl/http/post",
-  "instantiates": "spl/method",
-  "extends": null
-}

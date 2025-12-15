@@ -1,5 +1,0 @@
-{
-  "required_files": ["README.md", "README.json", "index.js"],
-  "required_folders": ["_reqs", "_lib"],
-  "optional_folders": ["_selfevals", "_schemas", "_tests"]
-}

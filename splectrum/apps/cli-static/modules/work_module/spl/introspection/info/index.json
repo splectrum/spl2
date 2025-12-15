@@ -1,5 +1,0 @@
-{
-  "name": "spl/introspection/info",
-  "instantiates": "spl/method",
-  "extends": null
-}

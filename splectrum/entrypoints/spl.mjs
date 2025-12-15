@@ -57,9 +57,8 @@ record.headers.spl['cli-static'] = { enableAppOverlay: true }
 // Process CLI state
 // ============================================================================
 
-// CLI lib is entrypoint infrastructure - receives module + raw record
-const { create: createCli } = await import('../modules/bm_spl/spl/cli/_lib/cli.js')
-const cli = await createCli(module, record)
+// CLI lib is entrypoint infrastructure - gets record via module.getData()/getHeaders()
+const cli = await module.require('lib/spl/cli')
 
 cli.resolveNode()
 cli.detectMode()

@@ -1,5 +1,0 @@
-{
-  "name": "spl/container",
-  "instantiates": "spl/api",
-  "extends": "spl/crud"
-}

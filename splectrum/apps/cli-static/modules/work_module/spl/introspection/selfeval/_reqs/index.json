@@ -1,9 +1,0 @@
-{
-  "requirements": [
-    {
-      "name": "selfeval_method",
-      "description": "Selfeval method validation specification",
-      "file": "selfeval_method_v1.0.0.md"
-    }
-  ]
-}

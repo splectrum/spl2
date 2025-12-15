@@ -1,9 +1,0 @@
-{
-  "files": {
-    "cli.js": {
-      "exports": [
-        "create"
-      ]
-    }
-  }
-}

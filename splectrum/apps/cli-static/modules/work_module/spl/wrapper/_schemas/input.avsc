@@ -1,5 +1,0 @@
-{
-  "type": "string",
-  "name": "spl.wrapper.input",
-  "doc": "Passthrough arguments for wrapped tool. Global flags (--help, --dryRun, --silent) may be implemented by handler and must come first."
-}

@@ -1,5 +1,0 @@
-{
-  "name": "schemas",
-  "purpose": "Whoami input - meta, report, facet, levels, usage flags",
-  "files": ["input.avsc"]
-}

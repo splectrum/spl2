@@ -1,0 +1,4 @@
+{
+  "type": "lib",
+  "purpose": "CLI entry point utilities - parses args, detects mode, handles errors"
+}

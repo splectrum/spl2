@@ -1,5 +1,0 @@
-{
-  "name": "spl/wrapper",
-  "instantiates": "spl/api",
-  "extends": "spl/api"
-}

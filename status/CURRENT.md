@@ -4,7 +4,25 @@
 
 ---
 
-## Status: Project 12 Complete
+## Status: Project 13 In Progress
+
+**Project 13: spl Tooling and Release Documentation** - In Progress
+
+**Target:** v0.2.0
+
+### Twin Pairs
+
+1. **Tool Coverage** - Replace non-spl tools with spl equivalents live, test/improve existing
+2. **Request/Response Capture** - Formalize faf/event gathering
+3. **Release Doc Generator** - Tool to generate docs from releases
+
+### Current
+
+Execution phase - starting with tool coverage
+
+---
+
+## Previous: Project 12 Complete
 
 **Project 12: Wrapper APIs** - Closed
 
@@ -15,29 +33,6 @@ First versioned release achieved:
 - Registered in `splectrum/modules/hierarchy.json`
 - Archive at `releases/archive/splectrum_v0.1.0`
 - work_module deregistered from app hierarchy
-
-### What's in v0.1.0
-
-**Container Types:**
-- spl/container, spl/api, spl/method, spl/package, spl/module, spl/modules
-
-**Introspection:**
-- whoami with --levels, --facet, --meta
-- selfeval with type stack traversal
-
-**Lifecycle:**
-- create, lift (with --modules, --recursive), delete, update, set
-
-**APIs:**
-- spl/http (get, post)
-- spl/request, spl/runtime
-- spl/app, spl/cli, spl/cli-static, spl/cli-static-session
-
-### Infrastructure Added
-
-- `releases/` spot with `archive/` subfolder
-- `splectrum/lib/_reqs/module_bootstrap_v1.0.0.md`
-- Selfeval lib runner bug fix (unregistered files detection)
 
 ---
 
