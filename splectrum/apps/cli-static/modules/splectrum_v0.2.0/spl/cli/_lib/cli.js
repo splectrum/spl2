@@ -153,25 +153,21 @@ export async function create(module) {
      * overlay modules. This is because wrapper detection runs during cli.parseArgs()
      * before app context is available (appAPI not set yet). Wrappers should be
      * placed in splectrum modules, not work_module.
+     *
+     * NOTE: Only returns true when invoking a wrapper API directly (e.g., tools/git).
+     * Method calls on wrapper APIs (e.g., tools/git/whoami, spl/wrapper/selfeval)
+     * use standard splectrum parsing, not passthrough.
      */
     isWrapper(methodPath) {
       if (!methodPath) return false
 
       try {
-        // Get the container path (remove method name if present)
-        const segments = methodPath.split('/')
-        let containerPath = methodPath
-
-        // Try to find index.json - if not found, try parent
-        let resolved = module.resolve(containerPath, 'index.json')
-        if (!resolved && segments.length > 1) {
-          containerPath = segments.slice(0, -1).join('/')
-          resolved = module.resolve(containerPath, 'index.json')
-        }
+        // Only check exact path - if no index.json here, it's a method call
+        const resolved = module.resolve(methodPath, 'index.json')
         if (!resolved) return false
 
         // Check instantiates chain for spl/wrapper
-        const { stack } = module.buildTypeStack(containerPath, 'instantiates')
+        const { stack } = module.buildTypeStack(methodPath, 'instantiates')
         return stack.includes('spl/wrapper')
       } catch (e) {
         return false

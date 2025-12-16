@@ -229,6 +229,8 @@ Each entry:
 - **API_DESIGN.md** - Comprehensive API architecture and implementation patterns (from Projects 03-07)
 - **DEV_ENVIRONMENT_DESIGN.md** - Dev environment as API, teardown approach, deployment scripts (from Project 07)
 - **SELF_EVAL_DESIGN.md** - Self-evaluation architecture, autonomy enabler, quality control (from Project 07)
+- **INTEGRATION_DESIGN.md** - External services (MCP), P2P network (Pear), inter-node communication (AVRO RPC)
+- **SYNTHESIS_DESIGN.md** - Documentation synthesis, analysis, AI context optimization (vibe engineering)
 - **EXECUTION_DESIGN.md** (future) - Bug fix loop, failure preprocessing, error routing
 
 ---
@@ -318,3 +320,107 @@ Each entry:
 - Evidence-based evolution
 
 **See:** CIP-013 (Design Spot Setup), CIP-014 (Comprehensive API Design Phase)
+
+---
+
+## Design Elements (Integration Architecture)
+
+### Three-Layer Integration Model
+
+**Status:** Draft (exploratory)
+**Location:** INTEGRATION_DESIGN.md § "Architecture Layers"
+**Template For:** Integration decisions - where capabilities belong
+**Description:** Node core (native SPL), P2P network (Pear/Hyperswarm), External (MCP) - clear separation of concerns
+**Related:** Exploratory discussion 2025-12-16
+
+---
+
+### MCP as AI Agent Management
+
+**Status:** Draft (exploratory)
+**Location:** INTEGRATION_DESIGN.md § "Layer 3: External (MCP)"
+**Template For:** External service integration, AI capability governance
+**Description:** MCP for AI invocation not programmatic code - SPL manages config/permissions/lifecycle, AI exercises access. "MCP handles how to talk, SPL handles who's allowed"
+**Related:** Exploratory discussion 2025-12-16
+
+---
+
+### Inter-Node AVRO RPC
+
+**Status:** Draft (exploratory)
+**Location:** INTEGRATION_DESIGN.md § "Inter-Node Communication: AVRO RPC"
+**Template For:** Node-to-node communication protocol
+**Description:** SPL types map to AVRO schemas for typed P2P calls - schema evolution handles version drift, type definitions become inter-node contracts
+**Related:** Exploratory discussion 2025-12-16
+
+---
+
+### Repo Node as Control Plane
+
+**Status:** Draft (exploratory)
+**Location:** INTEGRATION_DESIGN.md § "Dev/Ops Pattern: Repo Node as Control Plane"
+**Template For:** Development workflow for P2P applications
+**Description:** Local repo node manages Pear nodes - build, deploy, run, manage lifecycle from development environment
+**Related:** Exploratory discussion 2025-12-16, tools/pear wrapper
+
+---
+
+### Wrapper-First Integration Strategy
+
+**Status:** Draft (exploratory)
+**Location:** INTEGRATION_DESIGN.md § "Wrapper-First Strategy"
+**Template For:** New technology integration approach
+**Description:** Start with thin wrapper to learn API, discover patterns, inform native integration decisions - avoid premature abstraction
+**Related:** Exploratory discussion 2025-12-16, Pear wrapper, MCP integration
+
+---
+
+## Design Elements (Synthesis and AI Context)
+
+### Distributed Sources, Synthesized View
+
+**Status:** Draft (vision crystallizing)
+**Location:** SYNTHESIS_DESIGN.md § "The Approach"
+**Template For:** Documentation architecture
+**Description:** Keep documentation distributed (where it belongs) but synthesize coherent view on demand. Each container self-describes, synthesis weaves into queryable model
+**Related:** Mycelium patterns, introspection, "local rules apply"
+
+---
+
+### Install Model
+
+**Status:** Draft (vision crystallizing)
+**Location:** SYNTHESIS_DESIGN.md § "Output: The Install Model"
+**Template For:** Synthesis output structure
+**Description:** Structured model of an install - packages, types, methods, reqs, quality state. The model IS the documentation, queryable and complete
+**Related:** whoami four-level output, selfeval aggregation
+
+---
+
+### Analysis Layer
+
+**Status:** Draft (vision crystallizing)
+**Location:** SYNTHESIS_DESIGN.md § "Analysis Layer"
+**Template For:** Quality and consistency checking
+**Description:** Synthesis enables analysis - consistency checks, coverage analysis, roadmap gaps, quality state. Meta-selfeval at system level
+**Related:** selfeval pattern, quality state
+
+---
+
+### AI Context Optimization
+
+**Status:** Draft (vision crystallizing)
+**Location:** SYNTHESIS_DESIGN.md § "AI Context Optimization"
+**Template For:** Vibe engineering implementation
+**Description:** Synthesized model enables RAG-ready architecture. Task-based retrieval, coherent context injection, work with insight not grep
+**Related:** Vibe engineering, HAICC, AI-first design
+
+---
+
+### Synthesis as Introspection Extension
+
+**Status:** Draft (vision crystallizing)
+**Location:** SYNTHESIS_DESIGN.md § "Implementation: Introspection Methods"
+**Template For:** synthesize/analyze/context methods
+**Description:** synthesize (build model), analyze (run checks), context (task-based retrieval). Extends introspection pattern from container to collection scope
+**Related:** spl/introspection type, whoami, selfeval
