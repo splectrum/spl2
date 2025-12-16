@@ -2,21 +2,18 @@
 //
 // Executes a spl command and checks output against expectations.
 // Expects test format:
-//   { runner: "command", command: "/method args" or "full/path", expect: { contains?, notContains?, equals? } }
-// Commands starting with "/" are relative to the container being tested.
+//   { runner: "command", command: "method", expect: { contains?, notContains?, equals? } }
+// Commands are relative to the container being tested (replaces 'selfeval' in method path).
 
 export function create(module) {
   return {
     name: 'command',
 
-    async run(test, containerPath) {
+    async run(test) {
       const { execSync } = await module.require('child_process')
 
-      // If command starts with /, prepend the container path
-      let commandPath = test.command
-      if (commandPath.startsWith('/')) {
-        commandPath = containerPath + commandPath
-      }
+      // Derive command path from method path (spl/container/selfeval + /whoami -> spl/container/whoami)
+      const commandPath = module.getMethod().replace('/selfeval', test.command)
       const command = `spl ${commandPath}`
       let output = ''
       let error = null

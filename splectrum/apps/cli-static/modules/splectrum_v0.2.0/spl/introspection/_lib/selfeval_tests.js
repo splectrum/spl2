@@ -11,15 +11,6 @@ export function create(module) {
 
       const testsPath = path.join(containerFsPath, '_tests')
 
-      // Get container identity to know the path
-      let containerPath
-      try {
-        const identity = JSON.parse(fs.readFileSync(path.join(containerFsPath, 'index.json'), 'utf8'))
-        containerPath = identity.name
-      } catch (e) {
-        containerPath = null
-      }
-
       // Check if _tests folder exists
       let testsManifest
       try {
@@ -92,7 +83,7 @@ export function create(module) {
           }
 
           try {
-            const result = await runner.run(test, containerPath)
+            const result = await runner.run(test)
             if (result.pass) passedTests++
             testResults.push(result)
           } catch (e) {

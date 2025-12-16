@@ -18,6 +18,9 @@ Full Introspection (whoami):
 
 Validation:
   spl spl/container/selfeval            # Validate container (all levels)
+  spl selfeval-all spl/container        # Validate container + all descendants
+  spl selfeval-all spl --detail         # Show selfeval breakdown per container
+  spl selfeval-all spl --failFast       # Stop at first failure
 
 Lifecycle (CRUD):
   spl spl/foo/bar/create                # Create new container

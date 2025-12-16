@@ -31,6 +31,16 @@
       "name": "avsc_lib",
       "description": "Avro schema parsing, validation, and comparison",
       "file": "avsc_lib_v1.1.0.md"
+    },
+    {
+      "name": "selfeval_tests_lib",
+      "description": "Data-driven test runner for _tests/ folder",
+      "file": "selfeval_tests_lib_v1.0.0.md"
+    },
+    {
+      "name": "selfeval_command_test_runner",
+      "description": "Test runner for spl command execution",
+      "file": "selfeval_command_test_runner_v1.0.0.md"
     }
   ]
 }

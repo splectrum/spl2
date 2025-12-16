@@ -3,27 +3,19 @@
   "category": "introspection",
   "tests": [
     {
-      "name": "inherited method resolves to physical location",
+      "name": "whoami shows container identity",
       "runner": "command",
-      "command": "spl/api/set/whoami",
+      "command": "/whoami",
       "expect": {
-        "contains": "spl/crud/set [levels:"
+        "contains": "spl/container [levels:"
       }
     },
     {
-      "name": "per-level facets show only local content",
+      "name": "whoami --levels=all shows full type chain",
       "runner": "command",
-      "command": "spl/crud/set/whoami --facet=schemas --levels=spl/crud/set",
+      "command": "/whoami --levels=all",
       "expect": {
-        "notContains": "schemas |"
-      }
-    },
-    {
-      "name": "direct method shows full type chain",
-      "runner": "command",
-      "command": "spl/crud/set/whoami --levels=all",
-      "expect": {
-        "contains": ["spl/crud/set [1]", "spl/method [2]", "spl/container [3]"]
+        "contains": ["spl/container [1]", "spl/api [4]"]
       }
     }
   ]

@@ -5,7 +5,7 @@
     "report.js": {
       "name": "report",
       "description": "Build four-level structures from flat facts for whoami output",
-      "exports": ["buildContainer", "buildApi", "buildHandler", "buildSchemas", "buildLib", "buildReqs"]
+      "exports": ["buildContainer", "buildChildren", "buildHandler", "buildSchemas", "buildLib", "buildReqs"]
     },
     "freetext.js": {
       "name": "freetext",
