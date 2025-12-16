@@ -1,5 +1,7 @@
 {
   "name": "spl/wrapper",
   "instantiates": "spl/api",
-  "extends": "spl/api"
+  "extends": "spl/api",
+  "type": null,
+  "instance": null
 }

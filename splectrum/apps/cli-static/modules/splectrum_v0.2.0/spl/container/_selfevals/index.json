@@ -41,6 +41,11 @@
       "name": "schemas_data",
       "description": "Validate facet data files against their .avsc schemas",
       "file": "selfeval_schemas_data.js"
+    },
+    "tests": {
+      "name": "tests",
+      "description": "Execute data-driven tests from _tests/ folder",
+      "file": "selfeval_tests.js"
     }
   }
 }

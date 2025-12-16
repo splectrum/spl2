@@ -4,21 +4,27 @@
   "doc": "Wrapper input with passthrough args and splectrum control flags",
   "fields": [
     {
-      "name": "args",
-      "type": "string",
-      "doc": "Passthrough arguments for wrapped tool (quoted, ready for shell)"
-    },
-    {
       "name": "dryRun",
       "type": "boolean",
       "default": false,
-      "doc": "Show command without executing"
+      "doc": "Preview only, no action taken"
     },
     {
       "name": "silent",
       "type": "boolean",
       "default": false,
-      "doc": "Suppress narrative output"
+      "doc": "Omit narrative, data only"
+    },
+    {
+      "name": "help",
+      "type": "boolean",
+      "default": false,
+      "doc": "Show usage information"
+    },
+    {
+      "name": "args",
+      "type": "string",
+      "doc": "Passthrough arguments for wrapped tool (quoted, ready for shell)"
     }
   ]
 }

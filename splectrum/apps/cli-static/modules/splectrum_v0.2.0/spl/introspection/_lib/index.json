@@ -26,6 +26,11 @@
       "name": "avsc",
       "description": "Avro schema parsing, validation, and comparison",
       "exports": ["parseSchema", "validate", "compareSchemas"]
+    },
+    "selfeval_tests.js": {
+      "name": "selfeval_tests",
+      "description": "Selfeval runner for data-driven tests from _tests/ folder",
+      "exports": ["run"]
     }
   }
 }

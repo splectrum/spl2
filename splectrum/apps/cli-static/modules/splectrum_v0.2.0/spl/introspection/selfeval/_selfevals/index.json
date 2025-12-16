@@ -1,0 +1,16 @@
+{
+  "name": "selfevals",
+  "purpose": "Selfeval runners and test runners",
+  "runners": {
+    "tests": {
+      "name": "tests",
+      "description": "Execute data-driven tests from _tests/ folder",
+      "file": "selfeval_tests.js"
+    }
+  },
+  "files": {
+    "selfeval_structure.json": "Selfeval structure constraints",
+    "selfevals.json": "Selfeval facet declaration",
+    "test_runners/command.js": "Command execution test runner"
+  }
+}

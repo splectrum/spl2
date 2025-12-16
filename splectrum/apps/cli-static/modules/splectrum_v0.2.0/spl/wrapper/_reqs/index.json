@@ -1,6 +1,7 @@
 {
-  "name": "spl/wrapper/_reqs",
-  "reqs": [
+  "name": "reqs",
+  "purpose": "Wrapper type requirements",
+  "requirements": [
     {
       "name": "spl_wrapper_type",
       "description": "Wrapper API type for external tools",

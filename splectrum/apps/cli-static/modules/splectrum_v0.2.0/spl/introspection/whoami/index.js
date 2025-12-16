@@ -7,7 +7,7 @@ export default async function(module) {
 
   // Handle --usage: build instantiates stack to find input.avsc through instance chain
   if (input.usage) {
-    const { stack, instanceLevel } = lib.buildTypeStack('instantiates')
+    const { stack, instanceLevel } = await lib.buildTypeStack('instantiates')
     const containerPath = stack[0]
 
     // Build all levels with schemas/input facet
@@ -53,7 +53,7 @@ export default async function(module) {
   const levelsArg = input.levels
 
   // 2. Build type stack
-  const { stack, instanceLevel } = lib.buildTypeStack()
+  const { stack, instanceLevel } = await lib.buildTypeStack()
   const containerPath = stack[0]  // First element is the container itself
   const levelsInfo = `${containerPath} [levels: ${stack.map((t, i) => `${i + 1} ${t}`).join(', ')}, instanceLevel: ${instanceLevel}]`
 

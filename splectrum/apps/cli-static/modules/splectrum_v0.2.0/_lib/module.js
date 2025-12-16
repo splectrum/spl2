@@ -233,7 +233,7 @@ function resolveOverlay(nodePath, subPath, nodeRoot, appAPI, enableAppOverlay, m
   const segments = nodePath.split('/')
   const nodeIndex = readContainerIndex(nodePath, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path)
 
-  if (!nodeIndex && segments.length >= 2 && subPath === 'index.js') {
+  if (!nodeIndex && segments.length >= 2) {
     // Method resolution: nodePath doesn't exist as container, treat last segment as method name
     const methodName = segments[segments.length - 1]
     const containerPath = segments.slice(0, -1).join('/')

@@ -1,0 +1,7 @@
+{
+  "name": "tests",
+  "purpose": "Data-driven test files",
+  "files": [
+    "method_resolution.json"
+  ]
+}
