@@ -1,5 +1,5 @@
 **Requirements:** projects/09-console-v5-stream-native/howto_glossary_v1.1.0.md
-**Status:** Active - procedural guidance for SPL2 work
+**Status:** Active - procedural guidance for Splectrum work
 **Context:** User's land - procedures and actions
 
 **Entry point for goal-oriented action:** "How do I do X?"

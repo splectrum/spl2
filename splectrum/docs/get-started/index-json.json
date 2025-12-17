@@ -1,0 +1,36 @@
+{
+  "title": "index.json",
+  "description": "Universal entry point for spidering. Every folder with resources has one.",
+  "sections": [
+    {
+      "name": "Purpose",
+      "description": "The 'what's here?' file. No pre-knowledge needed - just look for index.json to understand any folder."
+    },
+    {
+      "name": "Spidering",
+      "description": "index.json registers files in folder and links to subfolder index.json files. This enables discovery without prior knowledge of folder structure.",
+      "commands": [
+        { "command": "files", "description": "References to content files in this folder" },
+        { "command": "subfolders with index.json", "description": "Links to child index.json for recursive discovery" }
+      ]
+    },
+    {
+      "name": "Keep Lean",
+      "description": "index.json is for discovery, not data storage. Put content in named files and reference them.",
+      "commands": [
+        { "command": "index.json", "description": "Spider: refs to files and subfolders" },
+        { "command": "container.json", "description": "Content: identity details" },
+        { "command": "manifest.json", "description": "Content: file listings" },
+        { "command": "name_v1.0.0.md", "description": "Content: req/doc files" }
+      ]
+    },
+    {
+      "name": "When Child index.json Needed",
+      "description": "Only if parent doesn't already cover the content",
+      "commands": [
+        { "command": "Parent registers all files", "description": "No child index.json needed" },
+        { "command": "Subfolder has own structure", "description": "Child index.json needed for that subtree" }
+      ]
+    }
+  ]
+}

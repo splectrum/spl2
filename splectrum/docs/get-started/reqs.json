@@ -1,0 +1,49 @@
+{
+  "title": "Requirements (_reqs)",
+  "description": "Desired state documentation. Versioned immutables alongside resources.",
+  "sections": [
+    {
+      "name": "Purpose",
+      "description": "_reqs folders define desired state - not necessarily implemented yet. They provide doc points where resources exist and enable validation against spec."
+    },
+    {
+      "name": "Local Rules",
+      "description": "Reqs live with resources - self-contained, no external dependencies. Each folder owns its reqs. No central registry, no retroactive burden. Resources and their reqs travel together."
+    },
+    {
+      "name": "Structure",
+      "description": "Every resource folder can have _reqs/",
+      "commands": [
+        { "command": "_reqs/index.json", "description": "Lists requirements with name, description, versioned file" },
+        { "command": "_reqs/name_v1.0.0.md", "description": "Versioned immutable req file" }
+      ]
+    },
+    {
+      "name": "Req File Format",
+      "description": "Plain req structure",
+      "commands": [
+        { "command": "**Type:** plain req", "description": "Req type declaration" },
+        { "command": "**Version:** X.Y.Z", "description": "Semver version" },
+        { "command": "## Spec", "description": "What it should do (desired state)" },
+        { "command": "## Self-eval", "description": "Checklist to validate implementation" },
+        { "command": "## Comments", "description": "Optional notes and references" }
+      ]
+    },
+    {
+      "name": "Viewing Reqs",
+      "commands": [
+        { "command": "spl spl/container/whoami --facet=reqs", "description": "Show reqs facet" },
+        { "command": "spl spl/container/whoami --facet=reqs --meta=enriched", "description": "Show full req content" }
+      ]
+    },
+    {
+      "name": "Versioning",
+      "description": "Reqs are immutable - new versions create new files",
+      "commands": [
+        { "command": "name_v1.0.0.md", "description": "Initial version" },
+        { "command": "name_v1.1.0.md", "description": "Minor update (backward compatible)" },
+        { "command": "name_v2.0.0.md", "description": "Major update (breaking change)" }
+      ]
+    }
+  ]
+}

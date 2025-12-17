@@ -1,0 +1,21 @@
+{
+  "name": "reqs",
+  "purpose": "Node script requirements - established fixtures",
+  "requirements": [
+    {
+      "name": "get_started",
+      "description": "AI-first command reference script",
+      "file": "get_started_v1.0.0.md"
+    },
+    {
+      "name": "selfeval_all",
+      "description": "Tree selfeval for container hierarchies",
+      "file": "selfeval_all_v1.0.0.md"
+    },
+    {
+      "name": "status",
+      "description": "Node status and diagnostics",
+      "file": "status_v1.0.0.md"
+    }
+  ]
+}

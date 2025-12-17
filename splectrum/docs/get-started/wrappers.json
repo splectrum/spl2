@@ -1,0 +1,37 @@
+{
+  "title": "Wrappers",
+  "description": "External tool integration. Passthrough to CLI tools with splectrum methods alongside.",
+  "sections": [
+    {
+      "name": "Pattern",
+      "description": "Wrappers expose external CLI tools (git, 7zip, gh) through spl. Arguments pass through to the underlying tool.",
+      "commands": [
+        { "command": "tools/git status", "description": "Passthrough: args go to git CLI" },
+        { "command": "tools/git/whoami", "description": "Method: standard splectrum method call" }
+      ]
+    },
+    {
+      "name": "Wrapper vs Method",
+      "commands": [
+        { "command": "spl tools/git status", "description": "Wrapper passthrough - runs 'git status'" },
+        { "command": "spl tools/git/whoami", "description": "Splectrum method - introspection" },
+        { "command": "spl tools/git/selfeval", "description": "Splectrum method - validation" }
+      ]
+    },
+    {
+      "name": "Available Wrappers",
+      "commands": [
+        { "command": "tools/git", "description": "Git version control" },
+        { "command": "tools/7zip", "description": "7-Zip compression" }
+      ]
+    },
+    {
+      "name": "Type Chain",
+      "description": "Wrappers instantiate spl/wrapper which extends spl/api",
+      "commands": [
+        { "command": "spl/wrapper", "description": "Wrapper type - passthrough handler" },
+        { "command": "spl/api", "description": "API type - methods like whoami, selfeval" }
+      ]
+    }
+  ]
+}

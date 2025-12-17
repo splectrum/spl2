@@ -1,11 +1,15 @@
 {
   "title": "SPL Quick Reference",
-  "description": "Welcome to SPL2. Run spl get-started <topic> for details.",
+  "description": "Welcome to Splectrum. Run spl get-started <topic> for details.",
   "topics": [
+    { "name": "ai-first", "description": "JSON default, --human for rendered - optimize for AI" },
+    { "name": "index-json", "description": "universal entry point, spidering pattern" },
+    { "name": "reqs", "description": "_reqs folders - desired state, local rules, versioned immutables" },
     { "name": "introspection", "description": "whoami, info - what is this container?" },
     { "name": "validation", "description": "selfeval, selfeval-all - is it correct?" },
     { "name": "crud", "description": "create, update, lift, delete, set - lifecycle" },
-    { "name": "scripts", "description": "inline scripts, ai.js helpers" }
+    { "name": "wrappers", "description": "external tool integration - passthrough vs method" },
+    { "name": "scripts", "description": "inline scripts, ai.js, freetext.js helpers" }
   ],
   "examples": [
     { "command": "spl spl/container/whoami", "description": "What is this container?" },

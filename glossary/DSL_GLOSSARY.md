@@ -2,9 +2,9 @@
 
 **Requirements:** chats/immutables/glossary_requirements_v1.0.0.md
 **Status:** Active - manually maintained
-**Context:** SPL2 Domain-Specific Language (runtime, APIs, methods, properties)
+**Context:** Splectrum Domain-Specific Language (runtime, APIs, methods, properties)
 
-This glossary defines the consistent vocabulary for SPL2 development. Each term has one meaning throughout SPL2.
+This glossary defines the consistent vocabulary for Splectrum development. Each term has one meaning throughout Splectrum.
 
 ---
 

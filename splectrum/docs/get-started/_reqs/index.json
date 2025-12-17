@@ -1,0 +1,16 @@
+{
+  "name": "reqs",
+  "purpose": "Get-started documentation structure and topic management",
+  "requirements": [
+    {
+      "name": "get_started_docs",
+      "description": "Folder ownership and purpose",
+      "file": "get_started_docs_v1.0.0.md"
+    },
+    {
+      "name": "topic_structure",
+      "description": "Topic JSON structure and how to add topics",
+      "file": "topic_structure_v1.0.0.md"
+    }
+  ]
+}

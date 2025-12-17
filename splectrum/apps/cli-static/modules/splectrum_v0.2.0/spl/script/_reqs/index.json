@@ -19,8 +19,13 @@
     },
     {
       "name": "helper_lib",
-      "description": "AI/exploration helper library",
+      "description": "AI/exploration helper library (ai.js)",
       "file": "helper_lib.md"
+    },
+    {
+      "name": "freetext_lib",
+      "description": "Generic doc-style JSON renderer (freetext.js)",
+      "file": "freetext_lib_v1.0.0.md"
     }
   ]
 }

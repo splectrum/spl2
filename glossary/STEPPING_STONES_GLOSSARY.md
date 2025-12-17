@@ -2,9 +2,9 @@
 
 **Requirements:** projects/04-bare-runtime-hello-world/Stepping_stones_glossary_requirements_v1.1.0.md
 **Status:** Active - requirements register function established
-**Context:** Foundations - navigational concepts and requirements register for SPL2 work
+**Context:** Foundations - navigational concepts and requirements register for Splectrum work
 
-This glossary defines stepping stones - the navigational concepts used throughout SPL2 foundations and work patterns. Stepping stones are encountered repeatedly on the journey, helping choose paths and make decisions.
+This glossary defines stepping stones - the navigational concepts used throughout Splectrum foundations and work patterns. Stepping stones are encountered repeatedly on the journey, helping choose paths and make decisions.
 
 ---
 

@@ -1,0 +1,36 @@
+{
+  "title": "AI-First Principle",
+  "description": "Optimize for AI consumption. Structured data by default, human rendering on request.",
+  "sections": [
+    {
+      "name": "Pattern",
+      "description": "JSON default, --human for rendered output. AI gets structured data it can traverse. Humans get readable text when needed."
+    },
+    {
+      "name": "Why",
+      "commands": [
+        { "command": "No parsing ambiguity", "description": "JSON structure is explicit, freetext is visual convention" },
+        { "command": "Complete data", "description": "Rendering often omits or abbreviates" },
+        { "command": "Direct field access", "description": "Traverse structure vs scanning text" },
+        { "command": "Known schema", "description": "Consistent shape, know what to look for" }
+      ]
+    },
+    {
+      "name": "Examples",
+      "commands": [
+        { "command": "spl get-started", "description": "Returns JSON (AI default)" },
+        { "command": "spl get-started --human", "description": "Returns rendered text" },
+        { "command": "spl spl/container/whoami", "description": "Returns freetext (legacy)" },
+        { "command": "spl spl/container/whoami --meta=report", "description": "Returns JSON structure" }
+      ]
+    },
+    {
+      "name": "Creating AI-First Output",
+      "description": "For new scripts/methods, follow get-started pattern",
+      "commands": [
+        { "command": "module.output(data)", "description": "Return structured JSON by default" },
+        { "command": "if (human) ft.render(data)", "description": "Render for humans on --human flag" }
+      ]
+    }
+  ]
+}

@@ -41,41 +41,6 @@ spl selfeval-all tools --failFast
 
 ## Session Entry
 
-1. Read this file
-2. Run `spl get-started` for command reference
+1. Run `spl get-started` for operational reference
+2. Read this file for current project status
 3. Run `spl selfeval-all spl --failFast` to verify system health
-
----
-
-## Quick Reference
-
-```
-spl selfeval-all spl              # Validate entire tree
-spl selfeval-all spl --failFast   # Stop at first failure
-spl get-started                   # Command reference (topics: validation, crud, etc.)
-spl get-started validation        # Topic-specific help
-```
-
----
-
-## Session Tips
-
-### AI-First Principle
-
-Optimize for AI consumption. Use JSON for structured data, not markdown. Humans get rendered output, AI gets structured data.
-
-### Collab Mode
-
-Discuss before implementing. Splectrum has an organic approach - build, use, discover gaps, fix. Don't assume external conventions apply. If in doubt, ask.
-
-### Wrapper vs Method
-
-- `tools/git status` → Wrapper passthrough (args go to git)
-- `tools/git/whoami` → Standard splectrum method call
-
-### Fixing Schema Inheritance Drift
-
-```bash
-spl <container>/update --dryRun   # Preview changes
-spl <container>/update            # Apply fixes
-```

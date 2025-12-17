@@ -1,0 +1,21 @@
+{
+  "name": "scripts",
+  "purpose": "Established node scripts - fixtures for common operations",
+  "scripts": [
+    {
+      "name": "get-started",
+      "description": "AI-first command reference",
+      "file": "get-started.js"
+    },
+    {
+      "name": "selfeval-all",
+      "description": "Tree selfeval for container hierarchies",
+      "file": "selfeval-all.js"
+    },
+    {
+      "name": "status",
+      "description": "Node status and diagnostics",
+      "file": "status.js"
+    }
+  ]
+}

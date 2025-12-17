@@ -1,6 +1,6 @@
 **Requirements:** See `projects/01-preliminary-to-workplan/Principles_requirements_v1.0.0.md`
 
-# SPL2 Core Principles
+# Splectrum Core Principles
 
 ## The Three Pillars
 
