@@ -40,31 +40,87 @@ export function create(module) {
      * @param {string} level - Max level: 'topline'|'summary'|'detail'|'enriched'
      * @returns {string} - Freetext rendering
      */
-    renderWithLevels(report, level = 'summary') {
+    renderWithLevels(report, level = 'detail') {
       if (!report) return ''
-
-      const levelIdx = LEVEL_KEYS.indexOf(level)
-      const include = levelIdx >= 0 ? LEVEL_KEYS.slice(0, levelIdx + 1) : ['summary']
 
       const lines = []
 
-      // Report topline and summary
+      // Report topline always shown
       if (report.topline) lines.push(report.topline)
-      if (include.includes('summary') && report.summary) lines.push(`  ${report.summary}`)
 
-      // Each level
+      if (level === 'topline') {
+        return lines.join('\n')
+      }
+
+      // Summary level: compact grouped format
+      if (report.levels) {
+        const fail = []
+        const pass = []
+        const skip = []
+
+        for (const levelResult of report.levels) {
+          const name = levelResult.topline?.split(' | ')[0] || 'unknown'
+          const status = levelResult.topline?.split(' | ')[1]?.split(' ')[0] || ''
+
+          if (status === 'FAIL') {
+            // Include failed runner names
+            const failedRunners = (levelResult.runners || [])
+              .filter(r => !r.pass)
+              .map(r => r.topline?.split(' | ')[0])
+              .join(', ')
+            fail.push(failedRunners ? `${name} - ${failedRunners}` : name)
+          } else if (status === 'PASS') {
+            const runnerCount = levelResult.summary || ''
+            pass.push(runnerCount ? `${name} (${runnerCount.split(' ')[0]})` : name)
+          } else {
+            skip.push(name)
+          }
+        }
+
+        // FAIL first, then PASS, then SKIP - omit empty
+        if (fail.length > 0) lines.push(`  FAIL: ${fail.join(', ')}`)
+        if (pass.length > 0) lines.push(`  PASS: ${pass.join(', ')}`)
+        if (skip.length > 0) lines.push(`  SKIP: ${skip.join(', ')}`)
+      }
+
+      if (level === 'summary') {
+        return lines.join('\n')
+      }
+
+      // Detail level: show runner detail for FAIL only
+      // Enriched level: show runner detail for all
       if (report.levels) {
         for (const levelResult of report.levels) {
-          if (levelResult.topline) lines.push(`  ${levelResult.topline}`)
-          if (include.includes('summary') && levelResult.summary) {
-            lines.push(`    ${levelResult.summary}`)
-          }
+          if (!levelResult.runners || levelResult.runners.length === 0) continue
 
-          // Runners within each level (detail level and above)
-          if (include.includes('detail') && levelResult.runners) {
-            for (const runner of levelResult.runners) {
-              if (runner.topline) lines.push(`      ${runner.topline}`)
-              if (runner.summary) lines.push(`        ${runner.summary}`)
+          // Sort runners: FAIL first
+          const sortedRunners = [...levelResult.runners].sort((a, b) => {
+            if (!a.pass && b.pass) return -1
+            if (a.pass && !b.pass) return 1
+            return 0
+          })
+
+          const levelName = levelResult.topline?.split(' | ')[0] || ''
+          let hasOutput = false
+
+          for (const runner of sortedRunners) {
+            // Detail: FAIL only; Enriched: all
+            if (level === 'detail' && runner.pass) continue
+
+            if (!hasOutput) {
+              lines.push(`  ${levelName}`)
+              hasOutput = true
+            }
+
+            const status = runner.topline?.split(' | ')[1] || ''
+            const name = runner.topline?.split(' | ')[0] || ''
+            lines.push(`    ${name} | ${status} - ${runner.summary || ''}`)
+
+            // Show detail (e.g., failed test lines) if present
+            if (runner.detail) {
+              for (const line of runner.detail.split('\n')) {
+                lines.push(`      ${line}`)
+              }
             }
           }
         }

@@ -18,8 +18,8 @@ export function create(module) {
       } catch (e) {
         return {
           pass: true,
-          topline: 'tests | EMPTY',
-          summary: 'No _tests/index.json',
+          topline: 'tests | SKIP',
+          summary: 'no tests',
           files: []
         }
       }
@@ -29,8 +29,8 @@ export function create(module) {
       if (testFiles.length === 0) {
         return {
           pass: true,
-          topline: 'tests | EMPTY',
-          summary: 'No test files declared',
+          topline: 'tests | SKIP',
+          summary: 'no test files',
           files: []
         }
       }
@@ -111,12 +111,46 @@ export function create(module) {
 
       const allPass = fileResults.every(f => f.pass)
 
-      return {
+      // Build summary: filename (count), ...
+      // For pass: just total tests per file
+      // For fail: pass/total per file
+      const fileSummaries = fileResults.map(f => {
+        const testCount = f.tests?.length || 0
+        const passCount = f.tests?.filter(t => t.pass).length || 0
+        if (f.pass) {
+          return `${f.name} (${testCount})`
+        } else {
+          return `${f.name} (${passCount}/${testCount})`
+        }
+      })
+      const summary = fileSummaries.join(', ')
+
+      // For failures, build detail with failed test names and errors
+      let detail = null
+      if (!allPass) {
+        const failedLines = []
+        for (const file of fileResults) {
+          if (file.pass) continue
+          for (const test of (file.tests || [])) {
+            if (test.pass) continue
+            const error = test.detail || test.error || 'failed'
+            failedLines.push(`"${test.name}" - ${error}`)
+          }
+        }
+        if (failedLines.length > 0) {
+          detail = failedLines.join('\n')
+        }
+      }
+
+      const result = {
         pass: allPass,
         topline: `tests | ${allPass ? 'PASS' : 'FAIL'}`,
-        summary: `${passedTests}/${totalTests} tests in ${fileResults.length} files`,
+        summary,
         files: fileResults
       }
+      if (detail) result.detail = detail
+
+      return result
     }
   }
 }

@@ -20,8 +20,8 @@ export function create(module) {
       } catch (e) {
         return {
           pass: true,
-          topline: 'schemas data | EMPTY',
-          summary: 'No _schemas/index.json',
+          topline: 'schemas_data | SKIP',
+          summary: 'no schemas',
           files: []
         }
       }
@@ -90,8 +90,8 @@ export function create(module) {
       if (results.length === 0) {
         return {
           pass: true,
-          topline: 'schemas data | EMPTY',
-          summary: 'No schemas with validates field',
+          topline: 'schemas_data | SKIP',
+          summary: 'no data to validate',
           files: []
         }
       }

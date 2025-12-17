@@ -38,8 +38,8 @@ export function create(module) {
         }
         return {
           pass: true,
-          topline: 'lib | EMPTY',
-          summary: 'No _lib/index.json',
+          topline: 'lib | SKIP',
+          summary: 'no lib',
           files: []
         }
       }

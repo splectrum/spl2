@@ -13,8 +13,7 @@ The `selfeval` method validates container implementation against declared constr
 Consistent status words for all output:
 - **PASS** - check passed
 - **FAIL** - check failed
-- **SKIP** - intentionally skipped (e.g., root container)
-- **NONE** - not applicable / no data (e.g., no schemas)
+- **SKIP** - nothing to validate (e.g., no schemas, no tests) - presence checked elsewhere
 
 ### Output Format
 
@@ -24,9 +23,9 @@ tools/7zip | PASS (9/9)
 tools/7zip | FAIL (7/9) - container, tests
 ```
 
-**Summary line** - counts AND explicit failure list:
+**Summary line** - counts with explicit failure list:
 ```
-7 PASS, 2 FAIL (container, tests), 0 SKIP
+7 PASS, 2 FAIL (container, tests), 1 SKIP
 ```
 
 **Output order** - FAIL first, then PASS (failures are priority):
@@ -36,82 +35,100 @@ tools/7zip | FAIL (7/9) - container, tests
     container | FAIL - expected spl/api in stack
     tests | FAIL - 2/3 files (edge.json, null.json)
     handler | PASS
-    schemas | NONE - no schemas
-    lib | PASS - 3/3 files
+    schemas | SKIP - no schemas
+    lib | SKIP - no lib
 ```
 
 **Container levels preserved** - shows where runners are registered (type chain).
 
-**Clear "none" wording** - use "NONE - no schemas" not "EMPTY - no _schemas/index.json".
+**Clear wording** - use "SKIP - no schemas" not "EMPTY - no _schemas/index.json".
 
 ### Tests Runner Detail
 
-Lists every test file with pass/fail:
+Summary shows filename with test count. For failures, lists failed tests with errors:
+
+**Pass:**
 ```
-tests | FAIL - 2/3 files
-  auth.json | PASS - 5/5 cases
-  crud.json | PASS - 3/3 cases
-  edge.json | FAIL - 2/3 cases
-    case "null input" | FAIL - expected X, got Y
+tests | PASS - auth.json (5), crud.json (3)
 ```
+
+**Fail:**
+```
+tests | FAIL - edge.json (1/3)
+  "null input" - expected X, got Y
+  "empty array" - missing required field
+```
+
+### Meta Levels
+
+| Level | Shows |
+|-------|-------|
+| topline | `container \| STATUS (pass/total)` |
+| summary | + grouped level summary: `FAIL: x - a, b`, `PASS: y (n/n)`, `SKIP: z, w` |
+| detail | + runner detail for FAIL only |
+| enriched | + runner detail for all (FAIL first) |
+| report | raw JSON structure |
 
 ### Flags
 
-(Unchanged from v1.0.0)
-
 | Dimension | Flag | Values | Default |
 |-----------|------|--------|---------|
-| Meta level | `--meta` | topline, summary, detail, enriched, report | summary |
+| Meta level | `--meta` | topline, summary, detail, enriched, report | detail |
 | Report level | `--report` | topline, summary, detail, enriched | (none) |
 | Runner filter | `--runner` | comma-delimited runner names | all |
 | Dry run | `--dry-run` | boolean | false |
 | Fail fast | `--fail-fast` | boolean | false |
 
-### Example Output (summary level)
+### Example Output
 
-**Pass case:**
+**Summary (pass):**
 ```
 tools/7zip | PASS (9/9)
-  tools/7zip
-    (no runners)
-  spl/wrapper
-    (no runners)
-  spl/api
-    (no runners)
-  spl/container
-    container | PASS - 3/3 checks
-    handler | PASS
-    schemas | NONE - no schemas
-    lib | NONE - no lib
-    reqs | NONE - no reqs
-    final | PASS - 54 files
-    schemas_inheritance | PASS - 7 files
-    schemas_data | NONE - no schemas
-    tests | NONE - no tests
+  PASS: spl/container (9/9)
+  SKIP: tools/7zip, spl/wrapper, spl/api, spl/crud, spl/introspection
 ```
 
-**Fail case:**
+**Summary (fail):**
 ```
 tools/7zip | FAIL (7/9) - container, tests
+  FAIL: spl/container - container, tests
+  SKIP: tools/7zip, spl/wrapper, spl/api, spl/crud, spl/introspection
+```
+
+**Detail (fail) - default:**
+```
+tools/7zip | FAIL (7/9) - container, tests
+  FAIL: spl/container - container, tests
+  SKIP: tools/7zip, spl/wrapper, spl/api, spl/crud, spl/introspection
   spl/container
-    container | FAIL - expected spl/api in stack, got spl/foo
+    container | FAIL - expected spl/api in stack
     tests | FAIL - 1/3 files (edge.json)
-    handler | PASS
-    schemas | NONE - no schemas
+```
+
+**Enriched (fail):**
+```
+tools/7zip | FAIL (7/9) - container, tests
+  FAIL: spl/container - container, tests
+  SKIP: tools/7zip, spl/wrapper, spl/api, spl/crud, spl/introspection
+  spl/container
+    container | FAIL - expected spl/api in stack
+    tests | FAIL - 1/3 files (edge.json)
+    handler | PASS - 1/1 checks
+    schemas | SKIP - no schemas
     lib | PASS - 3/3 files
     reqs | PASS - 2/2 files
     final | PASS - 54 files
     schemas_inheritance | PASS - 7 files
-    schemas_data | NONE - no schemas
+    schemas_data | SKIP - no schemas
 ```
 
 ## Self-eval
 
-- [ ] Status vocabulary: PASS, FAIL, SKIP, NONE used consistently
+- [ ] Status vocabulary: PASS, FAIL, SKIP used consistently
 - [ ] Topline shows count and failure list: `name | FAIL (7/9) - runner1, runner2`
-- [ ] Summary shows counts with failure list: `7 PASS, 2 FAIL (x, y), 0 SKIP`
+- [ ] Summary shows counts with failure list: `7 PASS, 2 FAIL (x, y), 1 SKIP`
 - [ ] Output order: FAIL runners before PASS runners
-- [ ] NONE wording: "no schemas" not "no _schemas/index.json"
+- [ ] Clear wording: "no schemas" not "no _schemas/index.json"
 - [ ] Tests runner lists all test files with status
 - [ ] Container levels preserved in output
 

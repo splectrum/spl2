@@ -600,9 +600,9 @@ export function create(bootstrapModule) {
       const input = record?.headers?.spl?.request?.input || {}
       const meta = input.meta
 
-      if (meta === undefined || meta === true) return 'summary'
+      if (meta === undefined || meta === true) return 'detail'
       if (['topline', 'summary', 'detail', 'enriched', 'report'].includes(meta)) return meta
-      return 'summary'
+      return 'detail'
     },
 
     /**

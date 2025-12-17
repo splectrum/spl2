@@ -18,8 +18,8 @@ export function create(module) {
       } catch (e) {
         return {
           pass: true,
-          topline: 'reqs | EMPTY',
-          summary: 'No _reqs/index.json',
+          topline: 'reqs | SKIP',
+          summary: 'no reqs',
           files: []
         }
       }

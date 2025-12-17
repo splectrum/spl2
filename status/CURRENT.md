@@ -37,6 +37,16 @@ spl selfeval-all spl --failFast
   (all passing)
 ```
 
+### Observations / Corrections
+
+**Runner location** - _selfevals/index.json references files by name but they're in _lib/. Should be relative to container. (Correction needed)
+
+**Status semantics** - Use SKIP for "no data to run with" (can't run when nothing to run). Clearer than NONE.
+
+**instanceRunners** - For containers that have the type in their instantiates stack. Clarifies: runners = all descendants, instanceRunners = direct instances only.
+
+**Tests scope** - Add tests to the right type level. Tests at spl/container run for ALL containers - scope by placing at appropriate type.
+
 ---
 
 ## Session Entry

@@ -26,8 +26,8 @@ export function create(module) {
       if (!childrenList || childrenList.length === 0) {
         return {
           pass: true,
-          topline: 'api | EMPTY',
-          summary: 'No api declared',
+          topline: 'api | SKIP',
+          summary: 'no api',
           methods: []
         }
       }

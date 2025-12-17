@@ -64,8 +64,8 @@ export default async function(module) {
       // No runners at this level - skip with info
       levelResults.push({
         pass: true,
-        topline: `${levelName} | EMPTY`,
-        summary: 'No selfeval runners defined',
+        topline: `${levelName} | SKIP`,
+        summary: 'no runners',
         runners: []
       })
       continue
@@ -90,8 +90,8 @@ export default async function(module) {
     if (runners.length === 0) {
       levelResults.push({
         pass: true,
-        topline: `${levelName} | EMPTY`,
-        summary: 'No runners loaded',
+        topline: `${levelName} | SKIP`,
+        summary: 'no runners loaded',
         runners: []
       })
       continue
@@ -120,31 +120,41 @@ export default async function(module) {
   }
 
   // 6. Build combined report
-  const passCount = levelResults.filter(r => r.pass).length
+  // Count runners across all levels
+  let totalRunners = 0
+  let passedRunners = 0
+  const failedRunnerNames = []
 
-  // Build summary with failed runner/facet names
-  let summary
-  if (allPass) {
-    summary = `${passCount} levels passed`
-  } else {
-    // Collect failed runner names across all levels
-    const failedRunners = []
-    for (const level of levelResults) {
-      if (level.runners) {
-        for (const runner of level.runners) {
-          if (!runner.pass) {
-            failedRunners.push(runner.topline.split(' | ')[0])
-          }
+  for (const level of levelResults) {
+    if (level.runners) {
+      for (const runner of level.runners) {
+        totalRunners++
+        if (runner.pass) {
+          passedRunners++
+        } else {
+          failedRunnerNames.push(runner.topline.split(' | ')[0])
         }
       }
     }
-    const failedNames = failedRunners.join(', ')
-    summary = `failed facets: ${failedNames}`
   }
+
+  // Build topline with counts and failure list
+  let topline
+  if (allPass) {
+    topline = `${containerPath} | PASS (${passedRunners}/${totalRunners})`
+  } else {
+    topline = `${containerPath} | FAIL (${passedRunners}/${totalRunners}) - ${failedRunnerNames.join(', ')}`
+  }
+
+  // Build summary
+  const levelPassCount = levelResults.filter(r => r.pass).length
+  const summary = allPass
+    ? `${levelPassCount} levels passed`
+    : `failed: ${failedRunnerNames.join(', ')}`
 
   const report = {
     pass: allPass,
-    topline: `${containerPath} | ${allPass ? 'PASS' : 'FAIL'}`,
+    topline,
     summary,
     levels: levelResults
   }
