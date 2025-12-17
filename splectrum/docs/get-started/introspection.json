@@ -1,0 +1,33 @@
+{
+  "title": "Introspection",
+  "description": "Understand containers - identity, type chain, methods, children.",
+  "sections": [
+    {
+      "name": "Quick Queries (info)",
+      "commands": [
+        { "command": "spl spl/container/info --stack", "description": "Type stack (extends chain)" },
+        { "command": "spl spl/container/info --stack=instantiates", "description": "Instance chain" },
+        { "command": "spl spl/container/info --methods", "description": "Available methods" },
+        { "command": "spl spl/container/info --children", "description": "Allowed children" }
+      ]
+    },
+    {
+      "name": "Full Introspection (whoami)",
+      "commands": [
+        { "command": "spl spl/container/whoami", "description": "What is this container?" },
+        { "command": "spl spl/container/whoami --levels=all", "description": "Show full type chain" },
+        { "command": "spl spl/container --help", "description": "Show input flags" }
+      ]
+    },
+    {
+      "name": "Meta Levels",
+      "description": "Control output depth with --meta",
+      "options": [
+        { "flag": "--meta=topline", "description": "one-line summary" },
+        { "flag": "--meta=summary", "description": "purpose/description (default)" },
+        { "flag": "--meta=detail", "description": "full breakdown" },
+        { "flag": "--meta=report", "description": "raw JSON structure" }
+      ]
+    }
+  ]
+}

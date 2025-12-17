@@ -1,0 +1,34 @@
+{
+  "title": "Scripts",
+  "description": "Inline scripts and helpers for exploration.",
+  "sections": [
+    {
+      "name": "Inline Scripts",
+      "description": "Scripts must start with /* (comment preamble)",
+      "commands": [
+        { "command": "spl '/* tag */ module.output(\"hello\")'", "description": "Simple inline script" }
+      ]
+    },
+    {
+      "name": "ai.js Helpers",
+      "example": "spl '/* explore */\nconst ai = await module.require(\"lib/spl/script/ai.js\")\nmodule.output(ai.table(await ai.methods(\"spl/container\")))\n'",
+      "functions": [
+        { "name": "ai.stack(path, mode)", "description": "Type stack ('full', 'extends', 'instantiates')" },
+        { "name": "ai.methods(path)", "description": "List methods with definition source" },
+        { "name": "ai.children(path)", "description": "Allowed children" },
+        { "name": "ai.readJson(path, file)", "description": "Read JSON through resolution" },
+        { "name": "ai.exists(path)", "description": "Check if container exists" },
+        { "name": "ai.json(obj)", "description": "Pretty print JSON" },
+        { "name": "ai.table(arr)", "description": "Format array as table" }
+      ]
+    },
+    {
+      "name": "Script Files",
+      "description": "Scripts in splectrum/scripts/ can be run by name",
+      "commands": [
+        { "command": "spl selfeval-all spl", "description": "Runs scripts/selfeval-all.js" },
+        { "command": "spl get-started", "description": "Runs scripts/get-started.js" }
+      ]
+    }
+  ]
+}

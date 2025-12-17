@@ -1,54 +1,116 @@
 /*
- * scripts/get-started.js - Quick reference for common SPL commands
- * Usage: spl get-started
+ * scripts/get-started.js - Quick reference for SPL commands
+ * Usage: spl get-started [topic] [--raw]
+ *
+ * AI-first: reads from docs/get-started/*.json
+ * --raw returns JSON directly, default renders for humans
  */
-console.log(`SPL Quick Reference
-==================
+const fs = await module.require('fs')
+const path = await module.require('path')
 
-Quick Queries (info):
-  spl spl/container/info --stack        # Type stack (extends chain)
-  spl spl/container/info --stack=instantiates  # Instance chain
-  spl spl/container/info --methods      # Available methods
-  spl spl/container/info --children     # Allowed children
+const input = module.input()
+const topic = input['0'] || 'intro'
+const raw = input.raw === true
 
-Full Introspection (whoami):
-  spl spl/container/whoami              # What is this container?
-  spl spl/container/whoami --levels=all # Show full type chain
-  spl spl/container --help              # Show input flags
+const nodeRoot = module.getNodeRoot()
+const docsPath = path.join(nodeRoot, 'docs', 'get-started')
 
-Validation:
-  spl spl/container/selfeval            # Validate container (all levels)
-  spl selfeval-all spl/container        # Validate container + all descendants
-  spl selfeval-all spl --detail         # Show selfeval breakdown per container
-  spl selfeval-all spl --failFast       # Stop at first failure
+// List available topics
+function listTopics() {
+  try {
+    return fs.readdirSync(docsPath)
+      .filter(f => f.endsWith('.json'))
+      .map(f => f.replace('.json', ''))
+      .filter(t => t !== 'intro')
+  } catch (e) {
+    return []
+  }
+}
 
-Lifecycle (CRUD):
-  spl spl/foo/bar/create                # Create new container
-  spl spl/foo/update --dryRun           # Preview drift fixes
-  spl spl/foo/lift --resource=index.js  # Copy overlay resource for editing
-  spl spl/foo/delete                    # Remove container
+// Render JSON for humans
+function render(data) {
+  const lines = []
 
-Property Mutation (set):
-  spl spl/foo/set container.extends="spl/bar"
-  spl spl/foo/set container.instance.children.list+="new"
-  spl spl/foo/set container.instance.children.list-="old"
+  lines.push(data.title)
+  lines.push('='.repeat(data.title.length))
+  if (data.description) lines.push(data.description)
+  lines.push('')
 
-Inline Scripts:
-  spl '/* tag */ module.output("hello")'
+  // Intro format
+  if (data.topics) {
+    lines.push('Topics:')
+    for (const t of data.topics) {
+      lines.push(`  ${t.name} - ${t.description}`)
+    }
+    lines.push('')
+  }
 
-  # With ai.js helpers:
-  spl '/* explore */
-  const ai = await module.require("lib/spl/script/ai.js")
-  module.output(ai.table(await ai.methods("spl/container")))
-  '
+  if (data.examples) {
+    lines.push('Examples:')
+    for (const e of data.examples) {
+      lines.push(`  ${e.command}`)
+      lines.push(`    ${e.description}`)
+    }
+    lines.push('')
+  }
 
-ai.js helpers:
-  ai.stack(path, mode)     # Type stack ('full', 'extends', 'instantiates')
-  ai.methods(path)         # List methods with definition source
-  ai.children(path)        # Allowed children
-  ai.readJson(path, file)  # Read JSON through resolution
-  ai.exists(path)          # Check if container exists
-  ai.json(obj)             # Pretty print JSON
-  ai.table(arr)            # Format array as table`)
+  // Section format
+  if (data.sections) {
+    for (const section of data.sections) {
+      lines.push(section.name)
+      lines.push('-'.repeat(section.name.length))
+      if (section.description) lines.push(section.description)
 
-module.output({ status: 'ok' })
+      if (section.commands) {
+        for (const c of section.commands) {
+          lines.push(`  ${c.command}`)
+          lines.push(`    ${c.description}`)
+        }
+      }
+
+      if (section.options) {
+        for (const o of section.options) {
+          lines.push(`  ${o.flag} - ${o.description}`)
+        }
+      }
+
+      if (section.runners) {
+        for (const r of section.runners) {
+          lines.push(`  ${r.name} - ${r.description}`)
+        }
+      }
+
+      if (section.functions) {
+        for (const f of section.functions) {
+          lines.push(`  ${f.name}`)
+          lines.push(`    ${f.description}`)
+        }
+      }
+
+      lines.push('')
+    }
+  }
+
+  return lines.join('\n')
+}
+
+// Load topic file
+const topicFile = path.join(docsPath, `${topic}.json`)
+
+if (!fs.existsSync(topicFile)) {
+  const topics = listTopics()
+  console.log(`Unknown topic: ${topic}`)
+  console.log(`\nAvailable topics: ${topics.join(', ')}`)
+  module.output({ status: 'error', message: `Unknown topic: ${topic}`, topics })
+  return
+}
+
+const data = JSON.parse(fs.readFileSync(topicFile, 'utf8'))
+
+if (raw) {
+  console.log(JSON.stringify(data, null, 2))
+} else {
+  console.log(render(data))
+}
+
+module.output(data)

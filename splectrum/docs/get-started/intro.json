@@ -1,0 +1,16 @@
+{
+  "title": "SPL Quick Reference",
+  "description": "Welcome to SPL2. Run spl get-started <topic> for details.",
+  "topics": [
+    { "name": "introspection", "description": "whoami, info - what is this container?" },
+    { "name": "validation", "description": "selfeval, selfeval-all - is it correct?" },
+    { "name": "crud", "description": "create, update, lift, delete, set - lifecycle" },
+    { "name": "scripts", "description": "inline scripts, ai.js helpers" }
+  ],
+  "examples": [
+    { "command": "spl spl/container/whoami", "description": "What is this container?" },
+    { "command": "spl spl/container/selfeval", "description": "Validate container" },
+    { "command": "spl selfeval-all spl", "description": "Validate entire tree" },
+    { "command": "spl spl/foo/create", "description": "Create new container" }
+  ]
+}

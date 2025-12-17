@@ -1,0 +1,41 @@
+{
+  "title": "CRUD - Lifecycle Operations",
+  "description": "Create, update, and manage containers.",
+  "sections": [
+    {
+      "name": "Create",
+      "commands": [
+        { "command": "spl spl/foo/bar/create", "description": "Create new container" }
+      ]
+    },
+    {
+      "name": "Update (Fix Drift)",
+      "description": "Auto-syncs inherited fields while preserving extension fields.",
+      "commands": [
+        { "command": "spl spl/foo/update --dryRun", "description": "Preview drift fixes" },
+        { "command": "spl spl/foo/update", "description": "Apply fixes" }
+      ]
+    },
+    {
+      "name": "Lift (Copy for Editing)",
+      "description": "Copies inherited resource to current layer for customization.",
+      "commands": [
+        { "command": "spl spl/foo/lift --resource=index.js", "description": "Copy overlay resource for editing" }
+      ]
+    },
+    {
+      "name": "Delete",
+      "commands": [
+        { "command": "spl spl/foo/delete", "description": "Remove container" }
+      ]
+    },
+    {
+      "name": "Set (Property Mutation)",
+      "commands": [
+        { "command": "spl spl/foo/set container.extends=\"spl/bar\"", "description": "Set property" },
+        { "command": "spl spl/foo/set container.instance.children.list+=\"new\"", "description": "Add to array" },
+        { "command": "spl spl/foo/set container.instance.children.list-=\"old\"", "description": "Remove from array" }
+      ]
+    }
+  ]
+}

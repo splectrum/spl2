@@ -1,0 +1,34 @@
+{
+  "title": "Validation",
+  "description": "Verify containers are correctly structured.",
+  "sections": [
+    {
+      "name": "Single Container",
+      "commands": [
+        { "command": "spl spl/container/selfeval", "description": "Validate container (all levels)" },
+        { "command": "spl spl/container/selfeval --meta=detail", "description": "Show runner breakdown" },
+        { "command": "spl spl/container/selfeval --runner=reqs", "description": "Run specific runner only" }
+      ]
+    },
+    {
+      "name": "Container Tree",
+      "commands": [
+        { "command": "spl selfeval-all spl/container", "description": "Validate container + all descendants" },
+        { "command": "spl selfeval-all spl --detail", "description": "Show breakdown for each container" },
+        { "command": "spl selfeval-all spl --failFast", "description": "Stop at first failure (shows detail)" }
+      ]
+    },
+    {
+      "name": "What Selfeval Checks",
+      "runners": [
+        { "name": "lib", "description": "_lib files match manifest" },
+        { "name": "schemas", "description": "_schemas files match manifest, valid Avro" },
+        { "name": "handler", "description": "index.js exists and exports function" },
+        { "name": "reqs", "description": "_reqs files match manifest" },
+        { "name": "container", "description": "index.json matches schema" },
+        { "name": "schemas inheritance", "description": "inherited fields present" },
+        { "name": "tests", "description": "data-driven tests pass" }
+      ]
+    }
+  ]
+}
