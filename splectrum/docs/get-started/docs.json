@@ -1,0 +1,38 @@
+{
+  "title": "Updating get-started",
+  "description": "How to add or modify get-started topics.",
+  "sections": [
+    {
+      "name": "Adding a Topic",
+      "description": "No script changes needed - just add files:",
+      "commands": [
+        { "command": "1. Create docs/get-started/<topic>.json", "description": "Topic content file" },
+        { "command": "2. Add entry to intro.json topics array", "description": "Makes it discoverable" },
+        { "command": "3. Done", "description": "Script auto-discovers" }
+      ]
+    },
+    {
+      "name": "Topic Structure",
+      "description": "JSON with title, description, sections:",
+      "commands": [
+        { "command": "title", "description": "Topic title" },
+        { "command": "description", "description": "Brief description" },
+        { "command": "sections[]", "description": "Array of named sections" },
+        { "command": "sections[].commands[]", "description": "Command examples" },
+        { "command": "sections[].options[]", "description": "Flag options" },
+        { "command": "sections[].functions[]", "description": "Function refs" }
+      ]
+    },
+    {
+      "name": "Rendering",
+      "commands": [
+        { "command": "spl get-started <topic>", "description": "JSON output (AI-first)" },
+        { "command": "spl get-started <topic> --human", "description": "Rendered for humans" }
+      ]
+    },
+    {
+      "name": "Full Spec",
+      "description": "See _reqs/topic_structure_v1.0.0.md for complete structure documentation."
+    }
+  ]
+}

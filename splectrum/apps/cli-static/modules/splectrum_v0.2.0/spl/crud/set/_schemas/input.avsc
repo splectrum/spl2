@@ -1,0 +1,30 @@
+{
+  "type": "record",
+  "name": "spl.crud.set.input",
+  "doc": "Set container properties using dot-path syntax",
+  "fields": [
+    {
+      "name": "expression",
+      "type": "string",
+      "doc": "Property expression: facet.path=value, facet.path+=value, facet.path-=value"
+    },
+    {
+      "name": "dryRun",
+      "type": "boolean",
+      "default": false,
+      "doc": "Preview only, no action taken"
+    },
+    {
+      "name": "silent",
+      "type": "boolean",
+      "default": false,
+      "doc": "Omit narrative, data only"
+    },
+    {
+      "name": "help",
+      "type": "boolean",
+      "default": false,
+      "doc": "Show usage information"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "name": "schemas",
+  "purpose": "Set method input schema",
+  "files": {
+    "input.avsc": {}
+  }
+}

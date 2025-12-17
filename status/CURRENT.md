@@ -1,6 +1,6 @@
 # Current Status
 
-**Last Updated:** 2025-12-17
+**Last Updated:** 2025-12-18
 
 ---
 
@@ -11,30 +11,24 @@
 ### Current Focus
 
 **Next:**
-- Implement selfeval output improvements (req: selfeval_method_v1.1.0.md)
-  - Status vocabulary: PASS, FAIL, SKIP, NONE
-  - Topline with counts and failure list
-  - FAIL-first output ordering
-  - Tests runner lists all files
 - Distribute tests to specific containers (spl/api, spl/wrapper, etc.)
 - Create tools/gh wrapper
-- Design spl/source native API (submit, pr, release workflows)
 
 **Done This Session:**
-- get-started expansion: ai-first, index-json, reqs, wrappers, tools topics
-- freetext.js helper for doc rendering (lib/spl/script/freetext.js)
-- Scripts folder cleanup: removed help.js, test-avsc.js; added _reqs with versioned files
-- docs/get-started/_reqs for topic structure documentation
-- CLAUDE.md trimmed to 28 lines - single channel through `spl get-started`
-- SPL2 → Splectrum naming across surface docs
-- Fixed tools/7zip and tools/git selfeval failures (instantiates stack check)
-- selfeval_method_v1.1.0.md req for output improvements
+- All selfeval passes (21/21)
+- Registered spl/_lib/spl.js and spl/_schemas/input.avsc, output.avsc
+- Fixed spl/crud/set/_schemas/input.avsc registration
+- Improved selfeval freetext output (file/check level details)
+- Improved schema error messages (shows schema filename)
+- Removed old req version selfeval_method_v1.0.0.md
+- Cleaned up invalid fields from spl/method, spl/modules
+- Updated CLAUDE.md: mandatory session entry, never guess commands
 
 ### Known Failures
 
 ```
 spl selfeval-all spl --failFast
-  (all passing)
+  PASS | 21/21
 ```
 
 ### Observations / Corrections

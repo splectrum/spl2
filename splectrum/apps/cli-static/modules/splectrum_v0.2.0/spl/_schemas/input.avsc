@@ -4,18 +4,51 @@
   "doc": "Branch node input - adds batch capability",
   "fields": [
     {
+      "name": "dryRun",
+      "type": "boolean",
+      "default": false,
+      "doc": "Preview only, no action taken"
+    },
+    {
+      "name": "silent",
+      "type": "boolean",
+      "default": false,
+      "doc": "Omit narrative, data only"
+    },
+    {
+      "name": "help",
+      "type": "boolean",
+      "default": false,
+      "doc": "Show usage information"
+    },
+    {
       "name": "batch",
-      "type": ["null", {
-        "type": "array",
-        "items": {
-          "type": "record",
-          "name": "invocation",
-          "fields": [
-            { "name": "target", "type": "string", "doc": "Target path within scope" },
-            { "name": "input", "type": ["null", "string"], "default": null, "doc": "Input payload (JSON string)" }
-          ]
+      "type": [
+        "null",
+        {
+          "type": "array",
+          "items": {
+            "type": "record",
+            "name": "invocation",
+            "fields": [
+              {
+                "name": "target",
+                "type": "string",
+                "doc": "Target path within scope"
+              },
+              {
+                "name": "input",
+                "type": [
+                  "null",
+                  "string"
+                ],
+                "default": null,
+                "doc": "Input payload (JSON string)"
+              }
+            ]
+          }
         }
-      }],
+      ],
       "default": null,
       "doc": "Array of invocations to execute within scope"
     }

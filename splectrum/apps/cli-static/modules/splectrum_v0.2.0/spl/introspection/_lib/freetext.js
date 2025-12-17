@@ -122,6 +122,36 @@ export function create(module) {
                 lines.push(`      ${line}`)
               }
             }
+
+            // Show file-level details if present (e.g., lib, schemas runners)
+            if (runner.files) {
+              for (const file of runner.files) {
+                if (level === 'detail' && file.pass) continue
+                if (file.detail) {
+                  lines.push(`      ${file.name}: ${file.detail}`)
+                }
+                if (level === 'enriched' && file.enriched) {
+                  for (const line of file.enriched.split('\n')) {
+                    lines.push(`        ${line}`)
+                  }
+                }
+              }
+            }
+
+            // Show check-level details if present (e.g., container, handler runners)
+            if (runner.checks) {
+              for (const check of runner.checks) {
+                if (level === 'detail' && check.pass) continue
+                if (check.detail) {
+                  lines.push(`      ${check.name}: ${check.detail}`)
+                }
+                if (level === 'enriched' && check.enriched) {
+                  for (const line of check.enriched.split('\n')) {
+                    lines.push(`        ${line}`)
+                  }
+                }
+              }
+            }
           }
         }
       }

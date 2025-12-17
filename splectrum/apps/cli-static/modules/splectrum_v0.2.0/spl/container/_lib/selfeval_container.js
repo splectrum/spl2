@@ -83,19 +83,19 @@ export function create(module) {
         })
       }
 
-      // Check no extra fields
+      // Check no extra fields (schema validation)
       if (extraFields.length > 0) {
         checks.push({
-          name: 'extra',
+          name: 'schema',
           pass: false,
-          topline: 'extra | FAIL',
-          detail: `unexpected: ${extraFields.join(', ')}`
+          topline: 'schema | FAIL',
+          detail: `container.avsc: unexpected ${extraFields.join(', ')}`
         })
       } else {
         checks.push({
-          name: 'extra',
+          name: 'schema',
           pass: true,
-          topline: 'extra | PASS',
+          topline: 'schema | PASS',
           detail: 'no extra fields'
         })
       }

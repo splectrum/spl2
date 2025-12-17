@@ -1,9 +1,6 @@
 {
   "name": "spl/modules",
   "type": "Type",
-  "purpose": "Modules spot type - collection of module instances",
   "extends": "spl/container",
-  "instantiates": "spl/api",
-  "instanceChildren": "spl/module",
-  "api": {}
+  "instantiates": "spl/api"
 }

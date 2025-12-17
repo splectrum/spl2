@@ -1,3 +1,22 @@
 {
-  "files": {}
+  "files": {
+    "spl.js": {
+      "name": "spl",
+      "description": "Core splectrum utilities - faf, consumeLatest, error handling",
+      "exports": [
+        "faf",
+        "raiseAsyncError",
+        "getRecordId",
+        "getNodeRoot",
+        "input",
+        "output",
+        "extractOutput",
+        "completeRequest",
+        "raiseError",
+        "consumeLatest"
+      ]
+    }
+  },
+  "name": "lib",
+  "purpose": "Core splectrum utilities"
 }

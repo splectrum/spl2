@@ -1,0 +1,40 @@
+{
+  "title": "Inheritance",
+  "description": "Type and instance inheritance - extends and instantiates chains.",
+  "sections": [
+    {
+      "name": "Two Chains",
+      "description": "Containers inherit through two separate chains:",
+      "commands": [
+        { "command": "extends", "description": "Type inheritance - spl/wrapper extends spl/api" },
+        { "command": "instantiates", "description": "Instance inheritance - tools/7zip instantiates spl/wrapper" }
+      ]
+    },
+    {
+      "name": "Resource Fallback",
+      "description": "Resources (lib, schemas, reqs) resolve through inheritance. If not present locally, falls back to base type.",
+      "commands": [
+        { "command": "Local first", "description": "Check current container's _lib/, _schemas/, _reqs/" },
+        { "command": "Then base type", "description": "Walk extends chain until resource found" },
+        { "command": "Overlay pattern", "description": "Local resources override inherited ones" }
+      ]
+    },
+    {
+      "name": "Schema Inheritance",
+      "description": "input.avsc defines method arguments. Shown via --help and --usage.",
+      "commands": [
+        { "command": "No local schema", "description": "Inherits base type's input.avsc" },
+        { "command": "Local schema", "description": "Overrides base - must maintain backward compatibility" },
+        { "command": "Backward compatible", "description": "Extended types can add args, cannot remove base args" }
+      ]
+    },
+    {
+      "name": "Viewing Chains",
+      "commands": [
+        { "command": "spl foo/info --stack", "description": "Show extends chain" },
+        { "command": "spl foo/info --stack=instantiates", "description": "Show instantiates chain" },
+        { "command": "spl foo/whoami --levels=all", "description": "Full inheritance detail" }
+      ]
+    }
+  ]
+}

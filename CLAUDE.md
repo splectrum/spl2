@@ -22,7 +22,9 @@ Splectrum is a platform for AI to create and manage software solutions. AI-optim
 
 **Use splectrum tools:** Always prefer `spl` commands over raw bash/file operations.
 
-## Session Entry
+**Never guess commands:** If you don't know a command, consult `spl get-started` or ask. Do not invent or guess command names.
 
-1. `spl get-started` - operational reference
+## Session Entry (MANDATORY)
+
+1. `spl get-started` - operational reference (run this first, every session)
 2. `status/CURRENT.md` - current project, next tasks, known issues

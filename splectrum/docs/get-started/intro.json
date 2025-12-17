@@ -4,13 +4,15 @@
   "topics": [
     { "name": "ai-first", "description": "JSON default, --human for rendered - optimize for AI" },
     { "name": "index-json", "description": "universal entry point, spidering pattern" },
+    { "name": "inheritance", "description": "extends and instantiates chains, resource fallback" },
     { "name": "reqs", "description": "_reqs folders - desired state, local rules, versioned immutables" },
     { "name": "introspection", "description": "whoami, info - what is this container?" },
     { "name": "validation", "description": "selfeval, selfeval-all - is it correct?" },
     { "name": "crud", "description": "create, update, lift, delete, set - lifecycle" },
     { "name": "wrappers", "description": "external tool integration - passthrough vs method" },
     { "name": "tools", "description": "use spl tools/X not raw X - git, 7zip, etc." },
-    { "name": "scripts", "description": "inline scripts, ai.js, freetext.js helpers" }
+    { "name": "scripts", "description": "inline scripts, ai.js, freetext.js helpers" },
+    { "name": "docs", "description": "how to add/update get-started topics" }
   ],
   "examples": [
     { "command": "spl spl/container/whoami", "description": "What is this container?" },

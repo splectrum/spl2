@@ -1,6 +1,8 @@
 {
   "name": "spl",
   "instantiates": "spl/package",
+  "extends": null,
+  "type": null,
   "instance": {
     "children": {
       "type": "spl/api",
