@@ -158,20 +158,28 @@ export function create(module) {
                     topline: 'instantiates | FAIL',
                     detail: `${parentInstanceType} has no type.children.type`
                   })
-                } else if (identity.instantiates === expectedInstanceType) {
-                  checks.push({
-                    name: 'instantiates',
-                    pass: true,
-                    topline: 'instantiates | PASS',
-                    detail: `matches parent: ${expectedInstanceType}`
-                  })
                 } else {
-                  checks.push({
-                    name: 'instantiates',
-                    pass: false,
-                    topline: 'instantiates | FAIL',
-                    detail: `expected ${expectedInstanceType}, got ${identity.instantiates}`
-                  })
+                  // Check if expected type is in the instantiates stack of actual type
+                  const { stack } = module.buildTypeStack(identity.instantiates, 'instantiates')
+                  const isCompatible = stack.includes(expectedInstanceType)
+
+                  if (isCompatible) {
+                    checks.push({
+                      name: 'instantiates',
+                      pass: true,
+                      topline: 'instantiates | PASS',
+                      detail: identity.instantiates === expectedInstanceType
+                        ? `matches: ${expectedInstanceType}`
+                        : `${identity.instantiates} extends ${expectedInstanceType}`
+                    })
+                  } else {
+                    checks.push({
+                      name: 'instantiates',
+                      pass: false,
+                      topline: 'instantiates | FAIL',
+                      detail: `expected ${expectedInstanceType} in stack, got ${identity.instantiates}`
+                    })
+                  }
                 }
               }
             }

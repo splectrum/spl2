@@ -9,6 +9,7 @@
     { "name": "validation", "description": "selfeval, selfeval-all - is it correct?" },
     { "name": "crud", "description": "create, update, lift, delete, set - lifecycle" },
     { "name": "wrappers", "description": "external tool integration - passthrough vs method" },
+    { "name": "tools", "description": "use spl tools/X not raw X - git, 7zip, etc." },
     { "name": "scripts", "description": "inline scripts, ai.js, freetext.js helpers" }
   ],
   "examples": [

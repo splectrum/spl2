@@ -11,36 +11,36 @@
 ### Current Focus
 
 **Next:**
-- Fix tools/git and tools/7zip selfeval failures (instantiates mismatch)
+- Implement selfeval output improvements (req: selfeval_method_v1.1.0.md)
+  - Status vocabulary: PASS, FAIL, SKIP, NONE
+  - Topline with counts and failure list
+  - FAIL-first output ordering
+  - Tests runner lists all files
 - Distribute tests to specific containers (spl/api, spl/wrapper, etc.)
 - Create tools/gh wrapper
 - Design spl/source native API (submit, pr, release workflows)
 
 **Done This Session:**
-- Command runner container-relative paths: `module.getMethod().replace('/selfeval', command)`
-- selfeval-all.js script: tree selfeval for container + descendants
-  - `--detail` shows breakdown for all
-  - `--failFast` stops at first failure, shows detail for that container
-- Reqs for selfeval_tests_lib, selfeval_command_test_runner
-- Fixed report.js manifest (buildApi → buildChildren)
-- get-started refactored to AI-first JSON:
-  - `docs/get-started/*.json` - structured source files
-  - `spl get-started [topic]` - human-readable rendering
-  - `spl get-started [topic] --raw` - pure JSON output
-  - Topics: intro, introspection, validation, crud, scripts
+- get-started expansion: ai-first, index-json, reqs, wrappers, tools topics
+- freetext.js helper for doc rendering (lib/spl/script/freetext.js)
+- Scripts folder cleanup: removed help.js, test-avsc.js; added _reqs with versioned files
+- docs/get-started/_reqs for topic structure documentation
+- CLAUDE.md trimmed to 28 lines - single channel through `spl get-started`
+- SPL2 → Splectrum naming across surface docs
+- Fixed tools/7zip and tools/git selfeval failures (instantiates stack check)
+- selfeval_method_v1.1.0.md req for output improvements
 
 ### Known Failures
 
 ```
-spl selfeval-all tools --failFast
-  tools/7zip | FAIL - container: expected spl/api, got spl/wrapper
-  tools/git | FAIL - container: expected spl/api, got spl/wrapper
+spl selfeval-all spl --failFast
+  (all passing)
 ```
 
 ---
 
 ## Session Entry
 
-1. Run `spl get-started` for operational reference
+1. `spl get-started` - operational reference
 2. Read this file for current project status
-3. Run `spl selfeval-all spl --failFast` to verify system health
+3. `spl selfeval-all spl --failFast` - verify system health

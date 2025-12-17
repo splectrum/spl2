@@ -1,0 +1,34 @@
+{
+  "title": "Tools",
+  "description": "Use splectrum tool wrappers instead of raw commands. Enables auditing and consistency.",
+  "sections": [
+    {
+      "name": "Principle",
+      "description": "Always use spl tools/X instead of raw X. Splectrum wrappers pass through to the underlying tool but enable auditing, logging, and platform integration."
+    },
+    {
+      "name": "Git",
+      "commands": [
+        { "command": "spl tools/git status", "description": "Not: git status" },
+        { "command": "spl tools/git add -A", "description": "Not: git add -A" },
+        { "command": "spl tools/git commit -m \"msg\"", "description": "Not: git commit" },
+        { "command": "spl tools/git push", "description": "Not: git push" },
+        { "command": "spl tools/git log --oneline -5", "description": "Not: git log" }
+      ]
+    },
+    {
+      "name": "Archive",
+      "commands": [
+        { "command": "spl tools/7zip a archive.7z files", "description": "Not: 7z a" },
+        { "command": "spl tools/7zip x archive.7z", "description": "Not: 7z x" }
+      ]
+    },
+    {
+      "name": "Coming",
+      "description": "More wrappers will be added for commonly used tools",
+      "commands": [
+        { "command": "tools/gh", "description": "GitHub CLI (planned)" }
+      ]
+    }
+  ]
+}
