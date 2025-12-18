@@ -8,12 +8,5 @@
       "file": "selfeval_hierarchy.js"
     }
   },
-  "instanceRunners": {
-    "children": {
-      "name": "children",
-      "description": "Check child containers match instanceChildren constraint",
-      "file": "selfeval_children.js",
-      "instanceChildren": "spl/module"
-    }
-  }
+  "instanceRunners": {}
 }

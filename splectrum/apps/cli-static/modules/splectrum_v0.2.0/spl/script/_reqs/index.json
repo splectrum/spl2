@@ -23,9 +23,9 @@
       "file": "helper_lib.md"
     },
     {
-      "name": "freetext_lib",
-      "description": "Generic doc-style JSON renderer (freetext.js)",
-      "file": "freetext_lib_v1.0.0.md"
+      "name": "doc_lib",
+      "description": "Doc-style JSON renderer (doc.js)",
+      "file": "doc_lib_v1.0.0.md"
     }
   ]
 }

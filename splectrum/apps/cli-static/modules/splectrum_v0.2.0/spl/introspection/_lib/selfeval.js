@@ -100,18 +100,24 @@ export function create(module) {
     async loadRunnerFromType(runnerMeta, typePath) {
       // Resolve through overlay - _lib files are final so inherited from parent types
       const runnerPath = module.resolve(typePath, `_lib/${runnerMeta.file}`)
-      if (!runnerPath) return null
+      if (!runnerPath) {
+        throw new Error(`Runner not found: ${typePath}/_lib/${runnerMeta.file}`)
+      }
 
       try {
         const runnerModule = await import(runnerPath)
         // Runners use create() pattern - instantiate with module
-        if (runnerModule.create) {
-          const instance = runnerModule.create(module)
-          return instance.run || null
+        if (!runnerModule.create) {
+          throw new Error(`Runner missing create(): ${runnerMeta.file}`)
         }
-        return null
+        const instance = runnerModule.create(module)
+        if (!instance.run) {
+          throw new Error(`Runner missing run(): ${runnerMeta.file}`)
+        }
+        return instance.run
       } catch (e) {
-        return null
+        if (e.message.startsWith('Runner')) throw e
+        throw new Error(`Runner load failed: ${runnerMeta.file} - ${e.message}`)
       }
     }
   }

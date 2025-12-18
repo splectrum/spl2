@@ -6,6 +6,11 @@
       "name": "ai",
       "description": "AI/exploration helper utilities",
       "exports": ["readFile", "readJson", "stack", "methods", "children", "exists", "isMethod", "physicalMethod", "json", "table"]
+    },
+    "doc.js": {
+      "name": "doc",
+      "description": "Doc-style JSON renderer for scripts",
+      "exports": ["render"]
     }
   }
 }

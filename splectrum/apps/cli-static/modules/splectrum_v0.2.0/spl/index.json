@@ -7,15 +7,22 @@
     "children": {
       "type": "spl/api",
       "list": [
-        "introspection",
-        "crud",
-        "container",
         "api",
+        "app",
+        "cli",
+        "cli-static",
+        "cli-static-session",
+        "container",
+        "crud",
+        "http",
+        "introspection",
         "method",
-        "package",
         "module",
         "modules",
-        "http",
+        "package",
+        "request",
+        "runtime",
+        "script",
         "wrapper"
       ]
     }

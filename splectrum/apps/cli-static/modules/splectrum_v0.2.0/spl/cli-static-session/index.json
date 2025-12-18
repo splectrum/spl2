@@ -1,4 +1,10 @@
 {
   "name": "spl/cli-static-session",
-  "instantiates": "spl/api"
+  "instantiates": "spl/api",
+  "instance": {
+    "children": {
+      "type": "spl/method",
+      "list": ["start"]
+    }
+  }
 }

@@ -2,17 +2,5 @@
   "name": "selfevals",
   "purpose": "Selfeval runners for spl/api type",
   "runners": {},
-  "instanceRunners": {
-    "api": {
-      "name": "api",
-      "description": "Check api methods match folders",
-      "file": "selfeval_api.js"
-    },
-    "children": {
-      "name": "children",
-      "description": "Check child containers match instanceChildren type",
-      "file": "selfeval_children.js",
-      "instanceChildren": "spl/method"
-    }
-  }
+  "instanceRunners": {}
 }

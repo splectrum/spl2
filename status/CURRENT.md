@@ -1,6 +1,6 @@
 # Current Status
 
-**Last Updated:** 2025-12-18
+**Last Updated:** 2025-12-19
 
 ---
 
@@ -10,40 +10,48 @@
 
 ### Current Focus
 
-**COMPLETED: CRUD Resource Operations & Wrapper Lib Refactor**
+**COMPLETED: Selfeval Framework & Children Validation**
 
-Extended crud methods to support resource file operations:
-- `create --resource` - create new resource files
-- `read --resource` - read from work_module (wildcard support)
-- `write --resource` - write to existing resources
-- `delete --resource` - delete individual resources
-- `lift --resource` - now returns file contents
+Selfeval framework improvements:
+- Non-existing runners now throw errors (not silently skip)
+- Removed stale `selfeval_children.js` references
+- Removed redundant `selfeval_api.js` - stray folder check moved to `selfeval_container.js`
+- `selfeval_handler.js` recognizes `export function create()` pattern
+- `whoami --levels` now defaults to `all` (shows full type hierarchy)
 
-Wrapper lib refactor:
-- `spl/wrapper/_lib/wrapper.js` - shared execSync logic
-- `tools/git` and `tools/7zip` use inherited wrapper lib
-- Factory pattern documented in `get-started libs`
+Children registration fixes:
+- Added 7 missing children to `spl/index.json`
+- Fixed children registrations across multiple containers
+- Fixed lib index registrations for spl/cli, spl/script
+
+Phase 3 partial:
+- Created `spl/cli-static-session/_lib/watchers.js` (inbox/outbox watcher creators)
+- Refactored `start/index.js` to use lib
+
+Fixed final overlap:
+- Renamed `spl/script/_lib/freetext.js` to `doc.js` (avoid overlap with introspection)
+
+**First item to resolve:**
+- `!` character escaping in `spl crud write --content` - bash history expansion issue
 
 **Next tasks:**
-- Phase 3: Move npm requires from methods to libs, add selfeval validator
-- Create promote-script to publish scripts to splectrum node scripts folder
+- Phase 3: Continue moving npm requires from methods to libs
+- Add selfeval validator for method npm imports
+- Create promote-script to publish scripts
 - Create container map script
-- Link map script from get-started
 - Create tools/gh wrapper
 
 ### Recent Commit
 
 ```
-32c5e5d Project 13: crud read/write/delete --resource, wrapper lib refactor
+(pending)
 ```
-
-25 files changed. Reqs updated: spl_crud_instance_v1.1.0, Create_v1.1.0
 
 ### Known Failures
 
 ```
 spl selfeval-all spl --failFast
-  PASS | 23/23
+  PASS | 33/33
 ```
 
 ---

@@ -79,13 +79,36 @@ export default async function(module) {
 
     // Load runners from this level's _lib
     const runners = []
+    const loadErrors = []
     for (const name of selectedRunnerNames) {
       // Check both runners and instanceRunners
       const meta = registry.runners?.[name] || (isInstanceLevel ? registry.instanceRunners?.[name] : null)
       if (meta) {
-        const fn = await selfeval.loadRunnerFromType(meta, levelName)
-        if (fn) runners.push({ meta, fn })
+        try {
+          const fn = await selfeval.loadRunnerFromType(meta, levelName)
+          runners.push({ meta, fn })
+        } catch (e) {
+          loadErrors.push({ name, error: e.message })
+        }
       }
+    }
+
+    // Report load errors as failures
+    if (loadErrors.length > 0) {
+      const errorResults = loadErrors.map(({ name, error }) => ({
+        name,
+        pass: false,
+        topline: `${name} | FAIL`,
+        detail: error
+      }))
+      levelResults.push({
+        pass: false,
+        topline: `${levelName} | FAIL`,
+        summary: `${loadErrors.length} runner(s) failed to load`,
+        runners: errorResults
+      })
+      allPass = false
+      if (input.failFast) continue
     }
 
     if (runners.length === 0) {

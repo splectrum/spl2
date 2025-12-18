@@ -195,6 +195,46 @@ export function create(module) {
         }
       }
 
+      // Check for unregistered child folders (stray folders)
+      const childrenList = identity.instance?.children?.list || []
+      const declaredChildren = new Set(childrenList)
+      const strayFolders = []
+
+      try {
+        const entries = fs.readdirSync(containerFsPath, { withFileTypes: true })
+        for (const entry of entries) {
+          if (!entry.isDirectory()) continue
+          if (entry.name.startsWith('_')) continue  // Skip _lib, _reqs, etc.
+
+          const folderPath = path.join(containerFsPath, entry.name)
+
+          // Check if it looks like a child (has index.js or index.json)
+          let isChild = false
+          try { fs.statSync(path.join(folderPath, 'index.js')); isChild = true } catch (e) {}
+          try { fs.statSync(path.join(folderPath, 'index.json')); isChild = true } catch (e) {}
+
+          if (isChild && !declaredChildren.has(entry.name)) {
+            strayFolders.push(entry.name)
+          }
+        }
+      } catch (e) {}
+
+      if (strayFolders.length > 0) {
+        checks.push({
+          name: 'children',
+          pass: false,
+          topline: 'children | FAIL',
+          detail: `unregistered: ${strayFolders.join(', ')}`
+        })
+      } else if (childrenList.length > 0) {
+        checks.push({
+          name: 'children',
+          pass: true,
+          topline: 'children | PASS',
+          detail: 'no stray folders'
+        })
+      }
+
       const allPass = checks.every(c => c.pass)
       const passCount = checks.filter(c => c.pass).length
       const failedChecks = checks.filter(c => !c.pass)

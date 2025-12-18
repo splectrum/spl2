@@ -7,11 +7,6 @@
       "description": "Selfeval runner for lib facet - validates files and exports",
       "exports": ["run"]
     },
-    "selfeval_api.js": {
-      "name": "selfeval_api",
-      "description": "Selfeval runner for api facet - validates method folders",
-      "exports": ["run"]
-    },
     "selfeval_schemas.js": {
       "name": "selfeval_schemas",
       "description": "Selfeval runner for schemas facet - validates schema files",

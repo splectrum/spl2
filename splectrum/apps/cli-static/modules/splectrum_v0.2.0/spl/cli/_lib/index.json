@@ -1,4 +1,11 @@
 {
-  "type": "lib",
-  "purpose": "CLI entry point utilities - parses args, detects mode, handles errors"
+  "name": "lib",
+  "purpose": "CLI entry point utilities - parses args, detects mode, handles errors",
+  "files": {
+    "cli.js": {
+      "name": "cli",
+      "description": "CLI entry point utilities",
+      "exports": ["resolveNode", "detectMode", "isWrapper", "parseArgs", "rewriteHelp", "isExternalScriptFile", "loadExternalScriptFile", "validate", "resolveErrorTopic", "handleError"]
+    }
+  }
 }

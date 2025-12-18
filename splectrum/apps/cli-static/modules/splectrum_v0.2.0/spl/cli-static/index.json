@@ -1,5 +1,11 @@
 {
   "name": "spl/cli-static",
   "extends": "spl/app",
-  "instantiates": "spl/api"
+  "instantiates": "spl/api",
+  "instance": {
+    "children": {
+      "type": "spl/method",
+      "list": ["execute"]
+    }
+  }
 }

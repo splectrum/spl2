@@ -1,0 +1,11 @@
+{
+  "name": "lib",
+  "purpose": "Session watcher utilities",
+  "files": {
+    "watchers.js": {
+      "name": "watchers",
+      "description": "Inbox and outbox watcher creators for cli-static sessions",
+      "exports": ["ensureDirs", "createInboxWatcher", "createOutboxWatcher"]
+    }
+  }
+}

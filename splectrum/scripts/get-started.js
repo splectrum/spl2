@@ -7,7 +7,7 @@
  */
 const fs = await import('fs')
 const path = await import('path')
-const ft = await module.require('lib/spl/script/freetext.js')
+const doc = await module.require('lib/spl/script/doc.js')
 
 const input = module.input()
 const topic = input['0'] || 'intro'
@@ -44,7 +44,7 @@ if (!fs.existsSync(topicFile)) {
 const data = JSON.parse(fs.readFileSync(topicFile, 'utf8'))
 
 if (human) {
-  console.log(ft.render(data))
+  console.log(doc.render(data))
 } else {
   module.output(data)
 }

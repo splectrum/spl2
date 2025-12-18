@@ -2,46 +2,46 @@
 // Instantiates: spl/method
 
 export default async function(module) {
-  const lib = await module.require('lib/spl/introspection/whoami')
+  const lib = await module.require("lib/spl/introspection/whoami")
   const input = module.input()
 
   // Handle --usage: build instantiates stack to find input.avsc through instance chain
   if (input.usage) {
-    const { stack, instanceLevel } = await lib.buildTypeStack('instantiates')
+    const { stack, instanceLevel } = await lib.buildTypeStack("instantiates")
     const containerPath = stack[0]
 
     // Build all levels with schemas/input facet
     const levelResults = []
     for (let i = 0; i < stack.length; i++) {
       const level = stack[i]
-      const container = await lib.buildContainerAtLevel(level, 'detail', ['schemas/input'])
+      const container = await lib.buildContainerAtLevel(level, "detail", ["schemas/input"])
       if (container) {
-        const parts = container.topline.split(' | ')
-        const rest = parts.slice(1).join(' | ')
-        container.topline = rest ? `${parts[0]} [${i + 1}] | ${rest}` : `${parts[0]} [${i + 1}]`
+        const parts = container.topline.split(" | ")
+        const rest = parts.slice(1).join(" | ")
+        container.topline = rest ? parts[0] + " [" + (i + 1) + "] | " + rest : parts[0] + " [" + (i + 1) + "]"
         levelResults.push(container)
       }
     }
 
     // Find first level with input.avsc
     const levelWithSchema = levelResults.find(c => {
-      const schemasFacet = c.facets?.find(f => f.name === 'schemas')
-      return schemasFacet?.topline?.includes('input.avsc')
+      const schemasFacet = c.facets?.find(f => f.name === "schemas")
+      return schemasFacet?.topline?.includes("input.avsc")
     })
 
     if (!levelWithSchema) {
-      return module.output('No input schema found')
+      return module.output("No input schema found")
     }
 
     // Build report with just that level
     const report = {
-      topline: `${containerPath} [levels: ${stack.map((t, i) => `${i + 1} ${t}`).join(', ')}, instanceLevel: ${instanceLevel}]`,
+      topline: containerPath + " [levels: " + stack.map((t, i) => (i + 1) + " " + t).join(", ") + ", instanceLevel: " + instanceLevel + "]",
       levels: [levelWithSchema]
     }
 
     // Render with hide
-    const options = { hide: input.hide || 'topline,summary' }
-    const output = await lib.renderFreetext(report, 'detail', options)
+    const options = { hide: input.hide || "topline,summary" }
+    const output = await lib.renderFreetext(report, "detail", options)
     return module.output(output)
   }
 
@@ -55,25 +55,22 @@ export default async function(module) {
   // 2. Build type stack
   const { stack, instanceLevel } = await lib.buildTypeStack()
   const containerPath = stack[0]  // First element is the container itself
-  const levelsInfo = `${containerPath} [levels: ${stack.map((t, i) => `${i + 1} ${t}`).join(', ')}, instanceLevel: ${instanceLevel}]`
+  const levelsInfo = containerPath + " [levels: " + stack.map((t, i) => (i + 1) + " " + t).join(", ") + ", instanceLevel: " + instanceLevel + "]"
 
   // 3. Handle --levels flag alone (show available levels only)
-  if (levelsArg === true || levelsArg === '') {
+  if (levelsArg === true || levelsArg === "") {
     return module.output(levelsInfo)
   }
 
   // 4. Determine which levels to show
   let selectedLevels
 
-  if (!levelsArg) {
-    // No --levels flag: just show current container (first in stack)
-    selectedLevels = [stack[0]]
-  } else if (levelsArg === 'all') {
-    // --levels=all: show all levels
+  if (!levelsArg || levelsArg === "all") {
+    // Default: show all levels in type stack
     selectedLevels = stack
   } else {
     // --levels=spl/container,spl/api: show specific levels
-    const requested = levelsArg.split(',').map(l => l.trim())
+    const requested = levelsArg.split(",").map(l => l.trim())
     selectedLevels = stack.filter(l => requested.includes(l))
   }
 
@@ -85,16 +82,16 @@ export default async function(module) {
     const container = await lib.buildContainerAtLevel(levelName, detailLevel, facets)
     if (container) {
       // Insert level after name: "name | lineage" -> "name [level] | lineage"
-      const parts = container.topline.split(' | ')
-      const rest = parts.slice(1).join(' | ')
-      container.topline = rest ? `${parts[0]} [${levelIdx}] | ${rest}` : `${parts[0]} [${levelIdx}]`
+      const parts = container.topline.split(" | ")
+      const rest = parts.slice(1).join(" | ")
+      container.topline = rest ? parts[0] + " [" + levelIdx + "] | " + rest : parts[0] + " [" + levelIdx + "]"
       levelResults.push(container)
     }
   }
 
   // 6. Render output
   if (levelResults.length === 0) {
-    return module.output('No levels found')
+    return module.output("No levels found")
   }
 
   // Wrap in container with levels
@@ -103,7 +100,7 @@ export default async function(module) {
     levels: levelResults
   }
 
-  if (metaLevel === 'report') {
+  if (metaLevel === "report") {
     return module.output(JSON.stringify(report, null, 2), reportLevel ? report : null)
   }
 

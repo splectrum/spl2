@@ -1,8 +1,19 @@
 # CLAUDE.md - Splectrum
 
+## Session Entry (MANDATORY)
+
+Treat MANDATORY as MANDATORY, it is there for a reason.
+Do all this before doing anything else:
+
+1. `spl get-started crud` - file operations (create, read, write, delete resources)
+2. `spl get-started tools` - tool wrapper principles (use spl tools/X not raw X)
+3. Read `status/CURRENT.md` - current project, next tasks, known issues
+
 ## Quick Start
 
 ```bash
+spl get-started           # general operational reference
+spl get-started libs      # lib require pattern and factory model
 spl get-started           # Operational reference
 spl get-started <topic>   # Topic detail (ai-first, reqs, crud, etc.)
 ```
@@ -23,13 +34,3 @@ Splectrum is a platform for AI to create and manage software solutions. AI-optim
 **Use splectrum tools:** Always prefer `spl` commands over raw bash/file operations.
 
 **Never guess commands:** If you don't know a command, consult `spl get-started` or ask. Do not invent or guess command names.
-
-## Session Entry (MANDATORY)
-
-Run these commands at session start before doing anything else:
-
-1. `spl get-started crud` - file operations (create, read, write, delete resources)
-2. `spl get-started tools` - tool wrapper principles (use spl tools/X not raw X)
-3. `spl get-started libs` - lib require pattern and factory model
-4. `spl get-started` - general operational reference
-5. Read `status/CURRENT.md` - current project, next tasks, known issues
