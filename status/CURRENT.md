@@ -44,7 +44,7 @@ Fixed final overlap:
 ### Recent Commit
 
 ```
-(pending)
+658723d Project 13: selfeval framework, children validation, whoami levels default
 ```
 
 ### Known Failures
