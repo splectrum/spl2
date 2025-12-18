@@ -31,22 +31,13 @@ Key changes:
 - Link map script from get-started
 - Create tools/gh wrapper
 
-### Files Changed (uncommitted)
+### Recent Commit
 
-See `git status` for full list. Key changes:
+```
+cc6599d Project 13: require refactor - SPL-only module.require()
+```
 
-**Bootstrap/Module refactor:**
-- `lib/moduleBootstrap.js` - passes initial record instead of bootstrapModule
-- `_lib/module.js` - uses native imports, receives initial record
-
-**Libs (native import at top):**
-- 19 lib files switched from `module.require('fs')` to `import fs from 'fs'`
-
-**Methods (native import, will move to libs in Phase 3):**
-- 12 method files switched to native imports
-
-**Scripts (await import):**
-- `scripts/selfeval-all.js`, `get-started.js`, `status.js` use `await import()`
+47 files changed. Reqs updated: module_lib, module_bootstrap, cli_lib (all v1.1.0)
 
 ### Known Failures
 
