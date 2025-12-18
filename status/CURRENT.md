@@ -10,21 +10,21 @@
 
 ### Current Focus
 
-**COMPLETED: Require Refactor (Phase 1 & 2)**
+**COMPLETED: CRUD Resource Operations & Wrapper Lib Refactor**
 
-Separated SPL requires from npm requires. See `status/require_refactor_plan.md` for details.
+Extended crud methods to support resource file operations:
+- `create --resource` - create new resource files
+- `read --resource` - read from work_module (wildcard support)
+- `write --resource` - write to existing resources
+- `delete --resource` - delete individual resources
+- `lift --resource` - now returns file contents
 
-Phase 1 (DONE): All 33 files switched from `module.require('fs')` to native imports
-Phase 2 (DONE): module.js cleaned up, bootstrap passes initial record
+Wrapper lib refactor:
+- `spl/wrapper/_lib/wrapper.js` - shared execSync logic
+- `tools/git` and `tools/7zip` use inherited wrapper lib
+- Factory pattern documented in `get-started libs`
 
-Key changes:
-- `module.require()` is now SPL-only (scripts, libs, commands)
-- Native `import` for npm modules (fs, path, child_process, avsc)
-- `await import()` for scripts (dynamically evaluated)
-- Bootstrap passes initial record with `headers.spl.runtime.{nodeRoot, modulesDir}`
-- No runtime bootstrap dependency
-
-**Next: Phase 3 or other tasks**
+**Next tasks:**
 - Phase 3: Move npm requires from methods to libs, add selfeval validator
 - Create promote-script to publish scripts to splectrum node scripts folder
 - Create container map script
@@ -34,22 +34,24 @@ Key changes:
 ### Recent Commit
 
 ```
-cc6599d Project 13: require refactor - SPL-only module.require()
+32c5e5d Project 13: crud read/write/delete --resource, wrapper lib refactor
 ```
 
-47 files changed. Reqs updated: module_lib, module_bootstrap, cli_lib (all v1.1.0)
+25 files changed. Reqs updated: spl_crud_instance_v1.1.0, Create_v1.1.0
 
 ### Known Failures
 
 ```
 spl selfeval-all spl --failFast
-  PASS | 21/21
+  PASS | 23/23
 ```
 
 ---
 
 ## Session Entry
 
-1. `spl get-started` - operational reference
-2. Read this file for current project status
-3. `spl selfeval-all spl --failFast` - verify system health
+1. `spl get-started crud` - file operations
+2. `spl get-started tools` - tool wrappers
+3. `spl get-started libs` - lib require pattern
+4. Read this file for current project status
+5. `spl selfeval-all spl --failFast` - verify system health
