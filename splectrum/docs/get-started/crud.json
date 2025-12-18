@@ -1,11 +1,35 @@
 {
   "title": "CRUD - Lifecycle Operations",
-  "description": "Create, update, and manage containers.",
+  "description": "Create, read, write, update, and delete containers and resources.",
   "sections": [
     {
       "name": "Create",
+      "description": "Create containers or resource files in work_module.",
       "commands": [
-        { "command": "spl spl/foo/bar/create", "description": "Create new container" }
+        { "command": "spl spl/foo/bar/create", "description": "Create new container" },
+        { "command": "spl spl/foo/create --resource=_lib/helper.js", "description": "Create new resource file" }
+      ]
+    },
+    {
+      "name": "Lift (Copy for Editing)",
+      "description": "Copies inherited resource from overlay to work_module. Returns file contents.",
+      "commands": [
+        { "command": "spl spl/foo/lift --resource=index.js", "description": "Copy overlay resource, returns contents" }
+      ]
+    },
+    {
+      "name": "Read",
+      "description": "Read resource from work_module. Supports wildcards.",
+      "commands": [
+        { "command": "spl spl/foo/read --resource=index.js", "description": "Read specific file" },
+        { "command": "spl spl/foo/read --resource=_reqs/foo_v*.md", "description": "Wildcard - single match returns contents" }
+      ]
+    },
+    {
+      "name": "Write",
+      "description": "Write to existing resource in work_module. File must exist (use create first).",
+      "commands": [
+        { "command": "spl spl/foo/write --resource=index.js --content=\"...\"", "description": "Overwrite file contents" }
       ]
     },
     {
@@ -17,16 +41,11 @@
       ]
     },
     {
-      "name": "Lift (Copy for Editing)",
-      "description": "Copies inherited resource to current layer for customization.",
-      "commands": [
-        { "command": "spl spl/foo/lift --resource=index.js", "description": "Copy overlay resource for editing" }
-      ]
-    },
-    {
       "name": "Delete",
+      "description": "Remove containers or resources from work_module.",
       "commands": [
-        { "command": "spl spl/foo/delete", "description": "Remove container" }
+        { "command": "spl spl/foo/delete", "description": "Remove container (preserves _reqs)" },
+        { "command": "spl spl/foo/delete --resource=_lib/old.js", "description": "Remove single resource" }
       ]
     },
     {

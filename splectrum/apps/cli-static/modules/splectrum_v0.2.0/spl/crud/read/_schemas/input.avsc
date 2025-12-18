@@ -1,0 +1,31 @@
+{
+  "type": "record",
+  "name": "spl.crud.read.input",
+  "doc": "Read method input",
+  "fields": [
+    {
+      "name": "resource",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Resource path to read, supports wildcards (e.g., _reqs/foo_v*.md)"
+    },
+    {
+      "name": "dryRun",
+      "type": "boolean",
+      "default": false,
+      "doc": "Preview only, no action taken"
+    },
+    {
+      "name": "silent",
+      "type": "boolean",
+      "default": false,
+      "doc": "Omit narrative, data only"
+    },
+    {
+      "name": "help",
+      "type": "boolean",
+      "default": false,
+      "doc": "Show usage information"
+    }
+  ]
+}

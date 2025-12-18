@@ -16,52 +16,16 @@
 //   spl tools/git log --oneline -5
 //   spl tools/git commit -m "message with spaces"
 
-import { execSync } from 'child_process'
+const usageText =
+  'Usage: spl tools/git <git-args>\n\n' +
+  'Examples:\n' +
+  '  spl tools/git status              # Show status\n' +
+  '  spl tools/git log --oneline -5    # Recent commits\n' +
+  '  spl tools/git diff                # Show changes\n' +
+  '  spl tools/git --help              # Show git help\n' +
+  '  spl tools/git/whoami              # Show splectrum help'
 
 export default async function(module) {
-  const { args, dryRun, silent } = module.input()
-
-  // No args - show usage
-  if (!args) {
-    module.output(
-      'Usage: spl tools/git <git-args>\n\n' +
-      'Examples:\n' +
-      '  spl tools/git status              # Show status\n' +
-      '  spl tools/git log --oneline -5    # Recent commits\n' +
-      '  spl tools/git diff                # Show changes\n' +
-      '  spl tools/git --help              # Show git help\n' +
-      '  spl tools/git/whoami              # Show splectrum help',
-      { ok: true, usage: true }
-    )
-    return
-  }
-
-  const cmd = `git ${args}`
-
-  // Handle --dryRun
-  if (dryRun) {
-    module.output(`Would run: ${cmd}`, { ok: true, dryRun: true, command: cmd })
-    return
-  }
-
-  // Execute
-  try {
-    const stdout = execSync(cmd, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] })
-
-    if (!silent) {
-      module.output(stdout || '(no output)', { ok: true, exitCode: 0, command: cmd })
-    } else {
-      module.output(null, { ok: true, exitCode: 0, command: cmd, stdout })
-    }
-  } catch (err) {
-    const result = {
-      ok: false,
-      exitCode: err.status || 1,
-      command: cmd,
-      stdout: err.stdout || '',
-      stderr: err.stderr || err.message
-    }
-
-    module.output(`Error (exit ${result.exitCode}): ${result.stderr}`, result)
-  }
+  const wrapper = await module.require('lib/tools/git/wrapper.js')
+  wrapper.exec('git', usageText)
 }

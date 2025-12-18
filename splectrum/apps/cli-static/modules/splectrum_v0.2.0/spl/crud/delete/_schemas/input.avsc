@@ -1,0 +1,31 @@
+{
+  "type": "record",
+  "name": "spl.crud.delete.input",
+  "doc": "Delete method input",
+  "fields": [
+    {
+      "name": "resource",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Resource file to delete (e.g., _reqs/old_file.md)"
+    },
+    {
+      "name": "dryRun",
+      "type": "boolean",
+      "default": false,
+      "doc": "Preview only, no action taken"
+    },
+    {
+      "name": "silent",
+      "type": "boolean",
+      "default": false,
+      "doc": "Omit narrative, data only"
+    },
+    {
+      "name": "help",
+      "type": "boolean",
+      "default": false,
+      "doc": "Show usage information"
+    }
+  ]
+}

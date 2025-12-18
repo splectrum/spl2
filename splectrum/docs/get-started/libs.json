@@ -1,0 +1,40 @@
+{
+  "title": "Libs",
+  "description": "How to require lib files using module.require().",
+  "sections": [
+    {
+      "name": "Pattern",
+      "description": "Use lib/ prefix - never reference _lib directly.",
+      "commands": [
+        { "command": "module.require('lib/<container-path>')", "description": "Main lib file (no extension)" },
+        { "command": "module.require('lib/<container-path>/<file>.js')", "description": "Specific lib file (extension required)" }
+      ]
+    },
+    {
+      "name": "Resolution",
+      "commands": [
+        { "command": "lib/spl/wrapper", "description": "spl/wrapper/_lib/wrapper.js" },
+        { "command": "lib/spl/crud", "description": "spl/crud/_lib/crud.js" },
+        { "command": "lib/tools/git/wrapper.js", "description": "tools/git/_lib/wrapper.js" },
+        { "command": "lib/spl/container/selfeval.js", "description": "spl/container/_lib/selfeval.js" }
+      ]
+    },
+    {
+      "name": "Factory Pattern",
+      "description": "Libs export create(module) which returns an object with methods.",
+      "commands": [
+        { "command": "export function create(module) { return { ... } }", "description": "Lib exports factory function" },
+        { "command": "const lib = await module.require('lib/spl/crud')", "description": "Factory called automatically" },
+        { "command": "lib.someMethod()", "description": "Use returned methods" }
+      ]
+    },
+    {
+      "name": "Benefits",
+      "commands": [
+        { "command": "No path traversal", "description": "No ../ needed, absolute from module root" },
+        { "command": "Implementation transparency", "description": "_lib folder is hidden detail" },
+        { "command": "Inheritance", "description": "Libs resolve through instance stack" }
+      ]
+    }
+  ]
+}

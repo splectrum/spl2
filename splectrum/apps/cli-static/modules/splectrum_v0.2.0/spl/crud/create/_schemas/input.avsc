@@ -1,0 +1,31 @@
+{
+  "type": "record",
+  "name": "spl.crud.create.input",
+  "doc": "Create method input",
+  "fields": [
+    {
+      "name": "resource",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Resource file to create (e.g., _lib/wrapper.js)"
+    },
+    {
+      "name": "dryRun",
+      "type": "boolean",
+      "default": false,
+      "doc": "Preview only, no action taken"
+    },
+    {
+      "name": "silent",
+      "type": "boolean",
+      "default": false,
+      "doc": "Omit narrative, data only"
+    },
+    {
+      "name": "help",
+      "type": "boolean",
+      "default": false,
+      "doc": "Show usage information"
+    }
+  ]
+}

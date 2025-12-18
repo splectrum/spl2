@@ -12,6 +12,7 @@
     { "name": "wrappers", "description": "external tool integration - passthrough vs method" },
     { "name": "tools", "description": "use spl tools/X not raw X - git, 7zip, etc." },
     { "name": "scripts", "description": "inline scripts, ai.js, freetext.js helpers" },
+    { "name": "libs", "description": "lib/ prefix for requiring _lib files" },
     { "name": "docs", "description": "how to add/update get-started topics" }
   ],
   "examples": [

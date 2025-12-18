@@ -1,0 +1,5 @@
+{
+  "name": "spl/crud/read",
+  "instantiates": "spl/method",
+  "extends": null
+}

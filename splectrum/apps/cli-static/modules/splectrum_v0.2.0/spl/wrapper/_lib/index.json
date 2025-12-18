@@ -1,0 +1,7 @@
+{
+  "name": "lib",
+  "purpose": "Shared wrapper execution logic",
+  "files": {
+    "wrapper.js": "execSync-based command execution for tool wrappers"
+  }
+}

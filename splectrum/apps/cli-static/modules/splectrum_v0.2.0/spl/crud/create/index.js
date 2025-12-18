@@ -1,4 +1,4 @@
-// spl/crud/create - Create a new container
+// spl/crud/create - Create a new container or resource
 //
 // Creates a container in work_module by establishing its identity (index.json only).
 // The overlay provides everything else (handler, libs, schemas inherit from type).
@@ -8,8 +8,13 @@
 // - Parent must expect this child (in instance.children.list)
 // - Type determined via parent's type → type.children.type
 //
+// Resource creation: spl spl/wrapper/create --resource=_lib/wrapper.js
+// - Creates a resource file within an existing container
+// - Resource path must start with _lib/, _schemas/, or _reqs/
+//
 // Flags:
 //   --dryRun    Show what would be created without doing it
+//   --resource  Create a resource file instead of a container
 
 import fs from 'fs'
 import path from 'path'
@@ -19,6 +24,60 @@ export default async function(module) {
 
   const input = module.input()
   const dryRun = input.dryRun || false
+  const resource = input.resource || null
+
+  // Resource creation mode
+  if (resource) {
+    // Validate resource path
+    const validPrefixes = ['_lib/', '_schemas/', '_reqs/']
+    if (!validPrefixes.some(p => resource.startsWith(p))) {
+      module.output(
+        `Invalid resource path: ${resource}. Must start with: ${validPrefixes.join(', ')}`,
+        { error: 'invalid_resource_path', resource, validPrefixes }
+      )
+      return
+    }
+
+    // Get container path from method path (remove /create)
+    const methodPath = module.getMethod()
+    const containerPath = methodPath.replace(/\/create$/, '')
+
+    // Verify container exists
+    const containerIndexPath = module.resolve(containerPath, 'index.json')
+    if (!containerIndexPath) {
+      module.output(`Container not found: ${containerPath}`, { error: 'container_not_found', containerPath })
+      return
+    }
+
+    // Determine work module path
+    const workModulePath = await crud.getWorkModulePath()
+    if (!workModulePath) {
+      module.output('No work module found in hierarchy.json', { error: 'no_work_module' })
+      return
+    }
+
+    const resourceFsPath = path.join(workModulePath, containerPath, resource)
+
+    // Check if already exists (in overlay stack, not just work_module)
+    const existingPath = module.resolve(containerPath, resource)
+    if (existingPath) {
+      module.output(`Resource already exists: ${resource}`, { status: 'exists', containerPath, resource, existingPath })
+      return
+    }
+
+    // dryRun mode
+    if (dryRun) {
+      module.output(`Would create: ${containerPath}/${resource}`, { status: 'dry_run', containerPath, resource, resourceFsPath })
+      return
+    }
+
+    // Create parent directory and empty file
+    fs.mkdirSync(path.dirname(resourceFsPath), { recursive: true })
+    fs.writeFileSync(resourceFsPath, '', 'utf8')
+
+    module.output(`Created: ${containerPath}/${resource}`, { status: 'created', containerPath, resource, resourceFsPath })
+    return
+  }
 
   // Get the method path - this tells us what container to create
   // e.g., "spl/container/test/create" → create "spl/container/test"

@@ -4,8 +4,8 @@
   "requirements": [
     {
       "name": "create",
-      "description": "Create method specification",
-      "file": "Create_v1.0.0.md"
+      "description": "Create method specification (containers and resources)",
+      "file": "Create_v1.1.0.md"
     }
   ]
 }

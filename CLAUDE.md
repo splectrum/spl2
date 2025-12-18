@@ -26,5 +26,10 @@ Splectrum is a platform for AI to create and manage software solutions. AI-optim
 
 ## Session Entry (MANDATORY)
 
-1. `spl get-started` - operational reference (run this first, every session)
-2. `status/CURRENT.md` - current project, next tasks, known issues
+Run these commands at session start before doing anything else:
+
+1. `spl get-started crud` - file operations (create, read, write, delete resources)
+2. `spl get-started tools` - tool wrapper principles (use spl tools/X not raw X)
+3. `spl get-started libs` - lib require pattern and factory model
+4. `spl get-started` - general operational reference
+5. Read `status/CURRENT.md` - current project, next tasks, known issues

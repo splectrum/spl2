@@ -1,0 +1,37 @@
+{
+  "type": "record",
+  "name": "spl.crud.write.input",
+  "doc": "Write method input",
+  "fields": [
+    {
+      "name": "resource",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Resource path to write (e.g., index.js, _lib/helper.js)"
+    },
+    {
+      "name": "content",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Content to write (entire file contents)"
+    },
+    {
+      "name": "dryRun",
+      "type": "boolean",
+      "default": false,
+      "doc": "Preview only, no action taken"
+    },
+    {
+      "name": "silent",
+      "type": "boolean",
+      "default": false,
+      "doc": "Omit narrative, data only"
+    },
+    {
+      "name": "help",
+      "type": "boolean",
+      "default": false,
+      "doc": "Show usage information"
+    }
+  ]
+}

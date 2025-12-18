@@ -114,8 +114,11 @@ export default async function(module) {
   // Copy resource
   fs.copyFileSync(sourcePath, resourceTargetPath)
 
+  // Read contents for immediate use
+  const contents = fs.readFileSync(resourceTargetPath, 'utf8')
+
   module.output(
     `Lifted: ${resource}`,
-    { status: 'lifted', resource, sourcePath, targetPath: resourceTargetPath }
+    { status: 'lifted', resource, sourcePath, targetPath: resourceTargetPath, contents }
   )
 }
