@@ -3,11 +3,12 @@
 // Validates facet data files against their .avsc schemas.
 // Uses 'validates' field in _schemas/index.json to find data files.
 
+import fs from 'fs'
+import path from 'path'
+
 export function create(module) {
   return {
     async run(containerFsPath) {
-      const fs = await module.require('fs')
-      const path = await module.require('path')
       const avsc = await module.require('lib/spl/container/avsc.js')
 
       const schemasPath = path.join(containerFsPath, '_schemas')

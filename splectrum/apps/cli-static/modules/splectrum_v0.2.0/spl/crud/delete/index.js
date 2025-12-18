@@ -10,9 +10,10 @@
 // Flags:
 //   --dryRun    Show what would be deleted without doing it
 
+import fs from 'fs'
+import path from 'path'
+
 export default async function(module) {
-  const fs = await module.require('fs')
-  const path = await module.require('path')
   const crud = await module.require('lib/spl/crud')
 
   const input = module.input()

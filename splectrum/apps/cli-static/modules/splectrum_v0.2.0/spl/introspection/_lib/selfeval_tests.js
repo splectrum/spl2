@@ -3,11 +3,12 @@
 // Scans _tests/ folder for test files, executes tests using declared runners.
 // Each test specifies its runner, loaded on demand from test_runners/.
 
+import fs from 'fs'
+import path from 'path'
+
 export function create(module) {
   return {
     async run(containerFsPath) {
-      const fs = await module.require('fs')
-      const path = await module.require('path')
 
       const testsPath = path.join(containerFsPath, '_tests')
 

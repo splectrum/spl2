@@ -5,6 +5,9 @@
 //
 // Note: This lib is entrypoint infrastructure specific to spl.mjs.
 
+import fs from 'fs'
+import path from 'path'
+
 // Script preamble - inline scripts must start with this
 const SCRIPT_PREAMBLE = '/*'
 
@@ -18,34 +21,10 @@ function kebabToCamel(str) {
  * @param {Object} module - Module interface (record access via getData/getMetaData)
  * @returns {Object} - Bound CLI methods
  */
-export async function create(module) {
-  const fs = await module.require('fs')
-  const path = await module.require('path')
-
+export function create(module) {
   // Get record data and metadata from module
   const data = module.getData()
   const metadata = module.getMetaData()
-
-  // Internal: resolve script by name from scripts/ folder
-  function resolveScript(scriptName, nodeRoot) {
-    const scriptsDir = path.join(nodeRoot, 'scripts')
-
-    if (!fs.existsSync(scriptsDir) || !fs.statSync(scriptsDir).isDirectory()) {
-      return null
-    }
-
-    const withExt = path.join(scriptsDir, scriptName + '.js')
-    const withoutExt = path.join(scriptsDir, scriptName)
-
-    if (fs.existsSync(withExt) && fs.statSync(withExt).isFile()) {
-      return withExt
-    }
-    if (fs.existsSync(withoutExt) && fs.statSync(withoutExt).isFile()) {
-      return withoutExt
-    }
-
-    return null
-  }
 
   return {
     /**
@@ -81,66 +60,45 @@ export async function create(module) {
     },
 
     /**
-     * Detect invocation mode from first argument
-     * Reads: data.argv[0], metadata.spl.runtime.invokedFrom, metadata.spl.runtime.nodeRoot
-     * Writes: data.mode, data.resolvedPath
+     * Detect invocation mode from first argument (syntax-based, no existence checks)
+     *
+     * Mode classification:
+     * - /*       → inline script
+     * - ./ or ../ or /abs → file (external script)
+     * - no /     → script (internal, resolved later via module.resolveScript)
+     * - has /    → command
+     *
+     * Reads: data.argv[0]
+     * Writes: data.mode, data.scriptName (for script mode)
      */
     detectMode() {
       const firstArg = data.argv[0]
-      const invokedFrom = metadata.spl.runtime.invokedFrom
-      const nodeRoot = metadata.spl.runtime.nodeRoot
 
       if (!firstArg) {
         data.mode = 'command'
         return
       }
 
-      // 1. Inline script (starts with /*) - check before file paths since /* looks like absolute path
+      // 1. Inline script (starts with /*)
       if (firstArg.startsWith(SCRIPT_PREAMBLE)) {
-        data.mode = 'script'
+        data.mode = 'inline'
         return
       }
 
-      // 2. Explicit file path
+      // 2. Explicit file path (./, ../, or absolute)
       if (firstArg.startsWith('./') || firstArg.startsWith('../') || path.isAbsolute(firstArg)) {
-        const possiblePath = path.isAbsolute(firstArg)
-          ? firstArg
-          : path.join(invokedFrom, firstArg)
-
-        if (fs.existsSync(possiblePath) && fs.statSync(possiblePath).isFile()) {
-          // Check if path is inside nodeRoot (internal script)
-          if (nodeRoot && possiblePath.startsWith(nodeRoot + path.sep)) {
-            data.mode = 'library'
-            data.resolvedPath = possiblePath
-            return
-          }
-          // External file
-          data.mode = 'file'
-          data.resolvedPath = possiblePath
-          return
-        } else {
-          // Explicit file path but file not found - error
-          data.mode = 'file'
-          data.error = {
-            code: 'FILE_NOT_FOUND',
-            path: possiblePath,
-            exitCode: 1
-          }
-          return
-        }
+        data.mode = 'file'
+        return
       }
 
-      // 4. Library script
-      if (nodeRoot) {
-        const scriptPath = resolveScript(firstArg, nodeRoot)
-        if (scriptPath) {
-          data.mode = 'library'
-          data.resolvedPath = scriptPath
-          return
-        }
+      // 3. Script (no forward slash) - resolved later via module.resolveScript
+      if (!firstArg.includes('/')) {
+        data.mode = 'script'
+        data.scriptName = firstArg
+        return
       }
 
-      // 5. Default: command mode
+      // 4. Command (has forward slash)
       data.mode = 'command'
     },
 
@@ -304,19 +262,39 @@ export async function create(module) {
     },
 
     /**
-     * Load external script file content for inline execution
-     * Reads: data.resolvedPath
-     * Writes: data.script, data.mode (file → script), data.error
+     * Resolve and load external script file
+     * Reads: data.argv[0], metadata.spl.runtime.invokedFrom
+     * Writes: data.script, data.resolvedPath, data.mode (file → inline), data.error
      */
     loadExternalScriptFile() {
+      const firstArg = data.argv[0]
+      const invokedFrom = metadata.spl.runtime.invokedFrom
+
+      // Resolve path
+      const resolvedPath = path.isAbsolute(firstArg)
+        ? firstArg
+        : path.join(invokedFrom, firstArg)
+
+      // Check existence
+      if (!fs.existsSync(resolvedPath) || !fs.statSync(resolvedPath).isFile()) {
+        data.error = {
+          code: 'FILE_NOT_FOUND',
+          path: resolvedPath,
+          exitCode: 1
+        }
+        return
+      }
+
+      // Load content
       try {
-        const content = fs.readFileSync(data.resolvedPath, 'utf-8')
+        const content = fs.readFileSync(resolvedPath, 'utf-8')
         data.script = content
-        data.mode = 'script'
+        data.resolvedPath = resolvedPath
+        data.mode = 'inline'
       } catch (e) {
         data.error = {
           code: 'FILE_READ_ERROR',
-          path: data.resolvedPath,
+          path: resolvedPath,
           message: e.message,
           exitCode: 1
         }

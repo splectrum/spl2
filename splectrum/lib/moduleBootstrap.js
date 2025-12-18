@@ -1,8 +1,7 @@
 // moduleBootstrap.js - Bootstrap loader for module.js
 //
-// Creates a minimal bootstrap module that module.js can receive via standard
-// create(module) signature. The bootstrap module provides just enough for
-// module.js to initialize: nodeRoot, modulesDir, and platform imports.
+// Creates initial record with runtime config for module.js.
+// Uses standard record structure: { headers: { spl: { runtime: {...} } } }
 //
 // Platform compatibility: Uses import maps in package.json for Node/Bare switching.
 
@@ -19,29 +18,27 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const nodeRoot = path.join(__dirname, '..')
 
 // ============================================================================
-// Bootstrap Module
+// Initial Record Factory
 // ============================================================================
 
 /**
- * Create minimal bootstrap module for module.js initialization.
+ * Create initial record with runtime config for module.js.
  *
- * Provides:
- * - getNodeRoot() - node root path
- * - getModulesDir() - splectrum modules directory
- * - getAppAPI() - null (no app context at bootstrap)
- * - require(uri) - platform modules only (fs, path, etc.)
+ * Uses standard record structure:
+ * { headers: { spl: { runtime: { nodeRoot, modulesDir } } } }
+ *
+ * @param {string} modulesDir - Path to modules directory
+ * @returns {Object} - Initial record
  */
-function createBootstrapModule(modulesDir) {
+function createInitialRecord(modulesDir) {
   return {
-    getNodeRoot: () => nodeRoot,
-    getModulesDir: () => modulesDir,
-    getAppAPI: () => null,
-    getAppName: () => null,
-    getEnableAppOverlay: () => false,
-
-    // Platform modules only - package.json handles Node/Bare mapping
-    async require(uri) {
-      return import(uri).then(m => m.default ?? m)
+    headers: {
+      spl: {
+        runtime: {
+          nodeRoot,
+          modulesDir
+        }
+      }
     }
   }
 }
@@ -108,8 +105,8 @@ export async function loadModule(appName) {
     throw new Error('module.js not found in any layer')
   }
 
-  // Create bootstrap module and instantiate module.js
-  const bootstrapModule = createBootstrapModule(modulesDir)
+  // Create initial record and instantiate module.js
+  const initialRecord = createInitialRecord(modulesDir)
   const moduleLib = await import(modulePath)
-  return moduleLib.create(bootstrapModule)
+  return moduleLib.create(initialRecord)
 }

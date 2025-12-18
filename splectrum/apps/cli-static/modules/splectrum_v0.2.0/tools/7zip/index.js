@@ -16,8 +16,9 @@
 //   spl tools/7zip x archive.7z -o./output
 //   spl tools/7zip l archive.7z
 
+import { execSync } from 'child_process'
+
 export default async function(module) {
-  const { execSync } = await module.require('child_process')
   const { args, dryRun, silent } = module.input()
 
   // No args - show usage

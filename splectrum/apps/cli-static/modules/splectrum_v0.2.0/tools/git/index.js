@@ -16,8 +16,9 @@
 //   spl tools/git log --oneline -5
 //   spl tools/git commit -m "message with spaces"
 
+import { execSync } from 'child_process'
+
 export default async function(module) {
-  const { execSync } = await module.require('child_process')
   const { args, dryRun, silent } = module.input()
 
   // No args - show usage

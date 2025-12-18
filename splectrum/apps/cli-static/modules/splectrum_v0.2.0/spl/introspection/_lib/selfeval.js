@@ -10,22 +10,11 @@
 //   buildTypeStack(containerPath)  - build type stack for levels
 //   loadRegistryFromType(typePath) - load _selfevals from a type
 
+import fs from 'fs'
+import path from 'path'
+
 export function create(module) {
-  let _fs = null
-  let _path = null
-
-  const getFs = async () => {
-    if (!_fs) _fs = await module.require('fs')
-    return _fs
-  }
-
-  const getPath = async () => {
-    if (!_path) _path = await module.require('path')
-    return _path
-  }
-
-  const readJson = async (filePath) => {
-    const fs = await getFs()
+  const readJson = (filePath) => {
     try {
       return JSON.parse(fs.readFileSync(filePath, 'utf8'))
     } catch (e) {
@@ -34,8 +23,7 @@ export function create(module) {
   }
 
   // Get filesystem path for a container path
-  const getContainerFsPath = async (containerPath) => {
-    const path = await getPath()
+  const getContainerFsPath = (containerPath) => {
     const indexJsonPath = module.resolve(containerPath, 'index.json')
     if (indexJsonPath) {
       return path.dirname(indexJsonPath)
@@ -49,15 +37,13 @@ export function create(module) {
 
   return {
     // Load registry from _selfevals/index.json
-    async loadRegistry(containerFsPath) {
-      const path = await getPath()
-      const registry = await readJson(path.join(containerFsPath, '_selfevals', 'index.json'))
+    loadRegistry(containerFsPath) {
+      const registry = readJson(path.join(containerFsPath, '_selfevals', 'index.json'))
       return registry || { runners: {} }
     },
 
     // Load a runner by file path from _lib
     async loadRunner(runnerMeta, containerFsPath) {
-      const path = await getPath()
       const runnerPath = path.join(containerFsPath, '_lib', runnerMeta.file)
       try {
         const runnerModule = await import(runnerPath)
@@ -102,12 +88,11 @@ export function create(module) {
     },
 
     // Load registry from a type's _selfevals/index.json
-    async loadRegistryFromType(typePath) {
-      const path = await getPath()
-      const typeFsPath = await getContainerFsPath(typePath)
+    loadRegistryFromType(typePath) {
+      const typeFsPath = getContainerFsPath(typePath)
       if (!typeFsPath) return { runners: {} }
 
-      const registry = await readJson(path.join(typeFsPath, '_selfevals', 'index.json'))
+      const registry = readJson(path.join(typeFsPath, '_selfevals', 'index.json'))
       return registry || { runners: {} }
     },
 

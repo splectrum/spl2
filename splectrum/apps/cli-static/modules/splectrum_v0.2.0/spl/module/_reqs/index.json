@@ -15,7 +15,7 @@
     {
       "name": "module_lib",
       "description": "Module runtime lib contract",
-      "file": "module_lib_v1.0.0.md"
+      "file": "module_lib_v1.1.0.md"
     }
   ]
 }

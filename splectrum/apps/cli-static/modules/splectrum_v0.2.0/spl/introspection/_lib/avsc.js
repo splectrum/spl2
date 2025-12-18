@@ -4,20 +4,17 @@
 //   parseSchema(schemaPath)  - load and validate Avro schema file
 //   validate(type, value)    - validate value against parsed schema
 
-export function create(module) {
-  let _avsc = null
-  let _fs = null
+import avsc from 'avsc'
+import fs from 'fs'
 
+export function create(module) {
   return {
     // Parse schema file, return type or error
     async parseSchema(schemaPath) {
       try {
-        if (!_avsc) _avsc = await module.require('avsc')
-        if (!_fs) _fs = await module.require('fs')
-
-        const content = _fs.readFileSync(schemaPath, 'utf8')
+        const content = fs.readFileSync(schemaPath, 'utf8')
         const schema = JSON.parse(content)
-        const type = _avsc.Type.forSchema(schema)
+        const type = avsc.Type.forSchema(schema)
         return { ok: true, type }
       } catch (error) {
         return { ok: false, error: error.message }

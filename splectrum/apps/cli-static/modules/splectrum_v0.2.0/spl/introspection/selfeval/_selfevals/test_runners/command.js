@@ -5,12 +5,13 @@
 //   { runner: "command", command: "method", expect: { contains?, notContains?, equals? } }
 // Commands are relative to the container being tested (replaces 'selfeval' in method path).
 
+import { execSync } from 'child_process'
+
 export function create(module) {
   return {
     name: 'command',
 
     async run(test) {
-      const { execSync } = await module.require('child_process')
 
       // Derive command path from method path (spl/container/selfeval + /whoami -> spl/container/whoami)
       const commandPath = module.getMethod().replace('/selfeval', test.command)

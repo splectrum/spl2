@@ -6,11 +6,12 @@
 // Note: This runner validates instances, not the type. If run on spl/module
 // itself (the type definition), it skips since types define contracts, not implementations.
 
+import fs from 'fs'
+import path from 'path'
+
 export function create(module) {
   return {
     async run(containerFsPath) {
-      const fs = await module.require('fs')
-      const path = await module.require('path')
 
       // Read index.json to get container name
       const indexPath = path.join(containerFsPath, 'index.json')

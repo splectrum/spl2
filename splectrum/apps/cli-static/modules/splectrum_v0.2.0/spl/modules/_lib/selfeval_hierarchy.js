@@ -5,11 +5,12 @@
 // - Each layer has name and type
 // - Each layer folder exists
 
+import fs from 'fs'
+import path from 'path'
+
 export function create(module) {
   return {
     async run(containerFsPath) {
-      const fs = await module.require('fs')
-      const path = await module.require('path')
 
       // Read hierarchy.json
       let hierarchy

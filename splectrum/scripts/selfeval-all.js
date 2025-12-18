@@ -5,9 +5,9 @@
  * --detail   Show selfeval breakdown for each container
  * --failFast Stop at first failure
  */
-const { execSync } = await module.require('child_process')
-const fs = await module.require('fs')
-const path = await module.require('path')
+const { execSync } = await import('child_process')
+const fs = await import('fs')
+const path = await import('path')
 
 const input = module.input()
 const container = input['0']

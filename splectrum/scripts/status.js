@@ -2,8 +2,8 @@
  * scripts/status.js - Show node status
  * Usage: spl status [--verbose]
  */
-const fs = await module.require('fs')
-const path = await module.require('path')
+const fs = await import('fs')
+const path = await import('path')
 const input = module.input()
 
 const nodeRoot = module.getNodeRoot()

@@ -10,19 +10,43 @@
 
 ### Current Focus
 
-**Next:**
-- Distribute tests to specific containers (spl/api, spl/wrapper, etc.)
+**COMPLETED: Require Refactor (Phase 1 & 2)**
+
+Separated SPL requires from npm requires. See `status/require_refactor_plan.md` for details.
+
+Phase 1 (DONE): All 33 files switched from `module.require('fs')` to native imports
+Phase 2 (DONE): module.js cleaned up, bootstrap passes initial record
+
+Key changes:
+- `module.require()` is now SPL-only (scripts, libs, commands)
+- Native `import` for npm modules (fs, path, child_process, avsc)
+- `await import()` for scripts (dynamically evaluated)
+- Bootstrap passes initial record with `headers.spl.runtime.{nodeRoot, modulesDir}`
+- No runtime bootstrap dependency
+
+**Next: Phase 3 or other tasks**
+- Phase 3: Move npm requires from methods to libs, add selfeval validator
+- Create promote-script to publish scripts to splectrum node scripts folder
+- Create container map script
+- Link map script from get-started
 - Create tools/gh wrapper
 
-**Done This Session:**
-- All selfeval passes (21/21)
-- Registered spl/_lib/spl.js and spl/_schemas/input.avsc, output.avsc
-- Fixed spl/crud/set/_schemas/input.avsc registration
-- Improved selfeval freetext output (file/check level details)
-- Improved schema error messages (shows schema filename)
-- Removed old req version selfeval_method_v1.0.0.md
-- Cleaned up invalid fields from spl/method, spl/modules
-- Updated CLAUDE.md: mandatory session entry, never guess commands
+### Files Changed (uncommitted)
+
+See `git status` for full list. Key changes:
+
+**Bootstrap/Module refactor:**
+- `lib/moduleBootstrap.js` - passes initial record instead of bootstrapModule
+- `_lib/module.js` - uses native imports, receives initial record
+
+**Libs (native import at top):**
+- 19 lib files switched from `module.require('fs')` to `import fs from 'fs'`
+
+**Methods (native import, will move to libs in Phase 3):**
+- 12 method files switched to native imports
+
+**Scripts (await import):**
+- `scripts/selfeval-all.js`, `get-started.js`, `status.js` use `await import()`
 
 ### Known Failures
 
@@ -30,16 +54,6 @@
 spl selfeval-all spl --failFast
   PASS | 21/21
 ```
-
-### Observations / Corrections
-
-**Runner location** - _selfevals/index.json references files by name but they're in _lib/. Should be relative to container. (Correction needed)
-
-**Status semantics** - Use SKIP for "no data to run with" (can't run when nothing to run). Clearer than NONE.
-
-**instanceRunners** - For containers that have the type in their instantiates stack. Clarifies: runners = all descendants, instanceRunners = direct instances only.
-
-**Tests scope** - Add tests to the right type level. Tests at spl/container run for ALL containers - scope by placing at appropriate type.
 
 ---
 

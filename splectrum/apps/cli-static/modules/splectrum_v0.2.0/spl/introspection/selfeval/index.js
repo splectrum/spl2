@@ -4,6 +4,8 @@
 // Runs selfeval runners to check container implementation.
 // Flags: --meta, --report, --runner, --dry-run, --fail-fast, --levels
 
+import path from 'path'
+
 export default async function(module) {
   const input = module.input()
   const selfeval = await module.require('lib/spl/introspection/selfeval.js')
@@ -13,7 +15,6 @@ export default async function(module) {
   const metaLevel = module.getMetaLevel()
   const reportLevel = module.getReportLevel()
   const levelsArg = input.levels
-  const path = await module.require('path')
 
   // Get container path
   const containerPath = module.getMethod().split('/').slice(0, -1).join('/')

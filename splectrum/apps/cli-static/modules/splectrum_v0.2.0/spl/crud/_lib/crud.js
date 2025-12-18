@@ -3,20 +3,10 @@
 // Work module path resolution for CRUD operations.
 // Reads hierarchy.json to find the active work module dynamically.
 
+import fs from 'fs'
+import path from 'path'
+
 export function create(module) {
-  // Module cache
-  let _fs, _path
-
-  async function getFs() {
-    if (!_fs) _fs = await module.require('fs')
-    return _fs
-  }
-
-  async function getPath() {
-    if (!_path) _path = await module.require('path')
-    return _path
-  }
-
   return {
     /**
      * Get the path to the active work module
@@ -26,8 +16,6 @@ export function create(module) {
      * @returns {string|null} Full path to work module, or null if none found
      */
     async getWorkModulePath() {
-      const fs = await getFs()
-      const path = await getPath()
 
       const nodeRoot = module.getNodeRoot()
       const appAPI = module.getAppAPI()

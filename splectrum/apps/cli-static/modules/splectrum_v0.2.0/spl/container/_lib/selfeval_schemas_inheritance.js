@@ -3,11 +3,12 @@
 // Checks that schema files include all inherited fields from parent types.
 // On drift: reports fail with "run update to fix" message.
 
+import fs from 'fs'
+import path from 'path'
+
 export function create(module) {
   return {
     async run(containerFsPath) {
-      const fs = await module.require('fs')
-      const path = await module.require('path')
       const avsc = await module.require('lib/spl/container/avsc.js')
 
       // Read container identity to get type info

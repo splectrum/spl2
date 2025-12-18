@@ -3,11 +3,12 @@
 // Checks children declared in instance.children.list exist as folders,
 // and child folders are declared in the list.
 
+import fs from 'fs'
+import path from 'path'
+
 export function create(module) {
   return {
     async run(containerFsPath) {
-      const fs = await module.require('fs')
-      const path = await module.require('path')
 
       // Read container identity
       let identity

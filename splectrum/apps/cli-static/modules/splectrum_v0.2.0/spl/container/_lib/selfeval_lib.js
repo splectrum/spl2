@@ -3,11 +3,12 @@
 // Compares manifest exports vs actual exports for each lib file.
 // Checks both directions: declared exist, and existing are declared.
 
+import fs from 'fs'
+import path from 'path'
+
 export function create(module) {
   return {
     async run(containerFsPath) {
-      const fs = await module.require('fs')
-      const path = await module.require('path')
 
       const libPath = path.join(containerFsPath, '_lib')
 

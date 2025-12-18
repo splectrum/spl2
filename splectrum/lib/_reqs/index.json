@@ -3,7 +3,7 @@
     {
       "name": "module_bootstrap",
       "description": "Bootstrap loader for module.js initialization",
-      "file": "module_bootstrap_v1.0.0.md"
+      "file": "module_bootstrap_v1.1.0.md"
     }
   ]
 }

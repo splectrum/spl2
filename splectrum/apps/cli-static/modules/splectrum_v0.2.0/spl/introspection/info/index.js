@@ -15,8 +15,9 @@
 //   spl spl/container/info --methods
 //   spl spl/container/info --stack=instantiates --methods
 
+import fs from 'fs'
+
 export default async function(module) {
-  const fs = await module.require('fs')
   const input = module.input()
 
   // Get target container from method path

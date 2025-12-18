@@ -4,11 +4,12 @@
 // Final resources: _reqs/*.md, _lib/*.js, _tests/*.js
 // These should be unique across the entire type hierarchy.
 
+import fs from 'fs'
+import path from 'path'
+
 export function create(module) {
   return {
     async run(containerFsPath) {
-      const fs = await module.require('fs')
-      const path = await module.require('path')
       const selfeval = await module.require('lib/spl/container/selfeval.js')
 
       // Get container path from filesystem path

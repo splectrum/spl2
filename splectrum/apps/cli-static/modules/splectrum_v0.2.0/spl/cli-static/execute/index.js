@@ -9,10 +9,10 @@
 
 import * as readline from 'readline'
 import process from 'process'
+import fs from 'fs'
+import path from 'path'
 
 export default async function(module) {
-  const fs = await module.require('fs')
-  const path = await module.require('path')
   const nodeRoot = module.getNodeRoot()
 
   // 1. Load app state

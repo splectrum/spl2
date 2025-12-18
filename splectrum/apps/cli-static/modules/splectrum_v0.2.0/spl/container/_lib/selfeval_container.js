@@ -5,11 +5,12 @@
 // No extra fields allowed.
 // instantiates must match parent's type.children.type.
 
+import fs from 'fs'
+import path from 'path'
+
 export function create(module) {
   return {
     async run(containerFsPath) {
-      const fs = await module.require('fs')
-      const path = await module.require('path')
 
       const checks = []
 

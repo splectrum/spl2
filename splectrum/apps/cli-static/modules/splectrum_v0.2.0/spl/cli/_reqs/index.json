@@ -1,15 +1,11 @@
 {
-  "reqs": [
-    {
-      "name": "cli_lib",
-      "version": "1.0.0"
-    }
-  ],
+  "name": "reqs",
+  "purpose": "CLI lib requirements",
   "requirements": [
     {
       "name": "cli_lib",
-      "description": "CLI library for early app context",
-      "file": "cli_lib_v1.0.0.md"
+      "description": "CLI library with syntax-based mode detection",
+      "file": "cli_lib_v1.1.0.md"
     }
   ]
 }

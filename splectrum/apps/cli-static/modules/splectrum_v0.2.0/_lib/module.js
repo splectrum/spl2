@@ -4,8 +4,9 @@
 // Contains all utilities needed for basic operation plus overlay resolution.
 //
 // Bootstrap:
-//   1. moduleBootstrap.js creates minimal bootstrap module
-//   2. module.js receives bootstrap via create(module) - same signature as all libs
+//   1. moduleBootstrap.js creates initial record with runtime config:
+//      { headers: { spl: { runtime: { nodeRoot, modulesDir } } } }
+//   2. module.js receives record via create(initialRecord)
 //   3. spl.mjs calls bindRecord(record) to bind the request record
 //
 // After binding, methods receive: module (single arg)
@@ -14,6 +15,9 @@
 //
 // Platform compatibility: Uses import maps in package.json for Node/Bare switching.
 // See package.json "imports" field for mappings (fs -> bare-fs, etc.)
+
+import fs from 'fs'
+import path from 'path'
 
 // ============================================================================
 // Overlay Resolution
@@ -26,7 +30,7 @@ const appHierarchies = new Map()
 /**
  * Load splectrum hierarchy.json (lazy, cached)
  */
-function loadSplectrumHierarchy(modulesDir, fs, path) {
+function loadSplectrumHierarchy(modulesDir) {
   if (splectrumHierarchy) return splectrumHierarchy
 
   const hierarchyPath = path.join(modulesDir, 'hierarchy.json')
@@ -41,7 +45,7 @@ function loadSplectrumHierarchy(modulesDir, fs, path) {
 /**
  * Load app hierarchy.json (lazy, cached)
  */
-function loadAppHierarchy(appModulesDir, fs, path) {
+function loadAppHierarchy(appModulesDir) {
   if (appHierarchies.has(appModulesDir)) {
     return appHierarchies.get(appModulesDir)
   }
@@ -60,12 +64,12 @@ function loadAppHierarchy(appModulesDir, fs, path) {
 /**
  * Check a single path in app modules and splectrum modules
  */
-function checkPath(nodePath, subPath, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path) {
+function checkPath(nodePath, subPath, nodeRoot, appAPI, enableAppOverlay, modulesDir) {
   // 1. Check app modules first (if app overlay is enabled)
   if (enableAppOverlay && nodeRoot && appAPI) {
     const appName = appAPI.replace('spl/', '')
     const appModulesDir = path.join(nodeRoot, 'apps', appName, 'modules')
-    const appHierarchy = loadAppHierarchy(appModulesDir, fs, path)
+    const appHierarchy = loadAppHierarchy(appModulesDir)
 
     if (appHierarchy) {
       for (const layer of appHierarchy.layers) {
@@ -78,7 +82,7 @@ function checkPath(nodePath, subPath, nodeRoot, appAPI, enableAppOverlay, module
   }
 
   // 2. Fall back to splectrum modules
-  const h = loadSplectrumHierarchy(modulesDir, fs, path)
+  const h = loadSplectrumHierarchy(modulesDir)
   for (const layer of h.layers) {
     const filePath = path.join(modulesDir, layer.name, nodePath, subPath)
     if (fs.existsSync(filePath)) {
@@ -92,8 +96,8 @@ function checkPath(nodePath, subPath, nodeRoot, appAPI, enableAppOverlay, module
 /**
  * Read index.json from a container path
  */
-function readContainerIndex(containerPath, nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path) {
-  const indexPath = checkPath(containerPath, 'index.json', nodeRoot, appAPI, enableAppOverlay, modulesDir, fs, path)
+function readContainerIndex(containerPath, nodeRoot, appAPI, enableAppOverlay, modulesDir) {
+  const indexPath = checkPath(containerPath, 'index.json', nodeRoot, appAPI, enableAppOverlay, modulesDir)
   if (!indexPath) return null
   try {
     return JSON.parse(fs.readFileSync(indexPath, 'utf8'))
@@ -309,63 +313,56 @@ function findUniqueFilename(folder, filename, dedupe, fs, path) {
 // ============================================================================
 
 /**
- * Create module interface from bootstrap module.
+ * Create module interface from initial record.
  *
- * Same signature as all libs: create(module)
- * The bootstrap module provides minimal functionality for initialization.
+ * Receives initial record with runtime config from bootstrap:
+ *   { headers: { spl: { runtime: { nodeRoot, modulesDir } } } }
+ *
  * Call bindRecord() to bind a request record for full functionality.
  *
- * @param {Object} bootstrapModule - Bootstrap module from moduleBootstrap.js
+ * @param {Object} initialRecord - Initial record from moduleBootstrap.js
  * @returns {Object} - Module interface
  */
-export function create(bootstrapModule) {
-  // Platform modules - loaded via bootstrap, cached here
-  let _fs = null
-  let _path = null
-
-  const getFs = async () => {
-    if (!_fs) _fs = await bootstrapModule.require('fs')
-    return _fs
-  }
-
-  const getPath = async () => {
-    if (!_path) _path = await bootstrapModule.require('path')
-    return _path
-  }
-
+export function create(initialRecord) {
   // Record binding - starts null, set via bindRecord()
+  // Falls back to initialRecord for runtime values when null
   let record = null
 
-  // Context getters - delegate to bootstrap until record is bound
+  // Context getters - use record if bound, otherwise initialRecord
   const getNodeRoot = () => {
     if (record?.headers?.spl?.runtime?.nodeRoot) {
       return record.headers.spl.runtime.nodeRoot
     }
-    return bootstrapModule.getNodeRoot()
+    return initialRecord.headers.spl.runtime.nodeRoot
+  }
+
+  const getModulesDir = () => {
+    if (record?.headers?.spl?.runtime?.modulesDir) {
+      return record.headers.spl.runtime.modulesDir
+    }
+    if (initialRecord.headers.spl.runtime.modulesDir) {
+      return initialRecord.headers.spl.runtime.modulesDir
+    }
+    // Fallback: derive from nodeRoot
+    return path.join(getNodeRoot(), 'modules')
   }
 
   const getAppAPI = () => {
     if (record?.headers?.spl?.runtime?.appAPI) {
       return record.headers.spl.runtime.appAPI
     }
-    return bootstrapModule.getAppAPI()
+    return initialRecord.headers?.spl?.runtime?.appAPI || null
   }
 
   const getAppName = () => getAppAPI()?.replace('spl/', '')
 
   const getEnableAppOverlay = () => {
-    if (record) {
-      const appName = getAppName()
-      return appName ? record.headers.spl?.[appName]?.enableAppOverlay : false
+    const appName = getAppName()
+    if (!appName) return false
+    if (record?.headers?.spl?.[appName]?.enableAppOverlay !== undefined) {
+      return record.headers.spl[appName].enableAppOverlay
     }
-    return bootstrapModule.getEnableAppOverlay()
-  }
-
-  const getModulesDir = () => {
-    if (record?.headers?.spl?.runtime?.nodeRoot) {
-      return _path ? _path.join(record.headers.spl.runtime.nodeRoot, 'modules') : null
-    }
-    return bootstrapModule.getModulesDir()
+    return initialRecord.headers?.spl?.[appName]?.enableAppOverlay || false
   }
 
   // The module interface
@@ -375,13 +372,12 @@ export function create(bootstrapModule) {
     // ========================================================================
 
     /**
-     * Initialize platform modules (fs, path).
-     * Must be called before using resolve, faf, consumeLatest, etc.
-     * Typically called right after loadModule() returns.
+     * Initialize module.
+     * Previously loaded platform modules; now a no-op since we use native imports.
+     * Kept for API compatibility.
      */
     async init() {
-      await getFs()
-      await getPath()
+      // No-op: fs/path are now native imports at top of file
     },
 
     /**
@@ -395,14 +391,14 @@ export function create(bootstrapModule) {
 
     /**
      * Create a new module instance bound to a different record.
-     * Reuses the same bootstrap module and platform modules.
+     * Reuses the same initial record for runtime config.
      * Useful for processing multiple requests with separate state.
      * @param {Object} requestRecord - The request record for the new instance
      * @returns {Promise<Object>} - New module instance
      */
     async createForRecord(requestRecord) {
-      // Create new instance from same bootstrap
-      const newModule = create(bootstrapModule)
+      // Create new instance from same initial record
+      const newModule = create(initialRecord)
       await newModule.init()
       newModule.bindRecord(requestRecord)
       return newModule
@@ -413,32 +409,28 @@ export function create(bootstrapModule) {
     // ========================================================================
 
     /**
-     * Require a module - handles three types:
-     * 1. Platform modules: 'fs', 'path' - direct import (package.json handles mapping)
-     * 2. Splectrum libs: 'lib/spl' - returns bound lib instance
+     * Require SPL resources - handles:
+     * 1. Scripts: 'scriptname' (no slashes) - resolved via app overlay
+     * 2. Splectrum libs: 'lib/spl/...' - returns bound lib instance
      * 3. Commands: 'spl/container/whoami' - returns { invoke() }
+     * 4. Inline script: 'spl/script/inline' - from record
+     * 5. Script file: '/absolute/path' - file system
      *
-     * Also handles scripts:
-     * - 'spl/script/inline' - inline script from record
-     * - '/absolute/path' - script file
+     * SPL-only. For npm modules (fs, path, etc.), use native import.
      *
      * @param {string} uri - Module URI
      * @returns {Promise<Object>} - Loaded module, lib instance, or executable
      */
     async require(uri) {
-      const fs = await getFs()
-      const path = await getPath()
 
-      // 1. Platform modules and npm packages (no slashes)
-      //    - Platform modules: package.json import maps handle Node/Bare switching
-      //    - npm packages: need import attributes on Bare for Node.js compatibility
+      // 1. No slashes = script (resolved with app overlay)
       if (!uri.includes('/')) {
-        const isBare = typeof Bare !== 'undefined'
-        if (isBare) {
-          // On Bare, use import attributes for npm packages to get Node.js builtins mapped
-          return import(uri, { with: { imports: 'bare-node-runtime/imports' } }).then(m => m.default ?? m)
+        const scriptPath = this.resolveScript(uri)
+        if (!scriptPath) {
+          throw new Error(`Script not found: ${uri}`)
         }
-        return import(uri).then(m => m.default ?? m)
+        const scriptContent = fs.readFileSync(scriptPath, 'utf-8')
+        return this._createScriptExecutable(scriptContent)
       }
 
       // 2. Splectrum libs:
@@ -508,10 +500,9 @@ export function create(bootstrapModule) {
      * @returns {string|null} - Absolute path or null if not found
      */
     resolve(nodePath, filename) {
-      if (!_fs || !_path) return null
       const modulesDir = getModulesDir()
       if (!modulesDir) return null
-      return resolveOverlay(nodePath, filename, getNodeRoot(), getAppAPI(), getEnableAppOverlay(), modulesDir, _fs, _path)
+      return resolveOverlay(nodePath, filename, getNodeRoot(), getAppAPI(), getEnableAppOverlay(), modulesDir, fs, path)
     },
 
     /**
@@ -521,10 +512,52 @@ export function create(bootstrapModule) {
      * @returns {{ stack: string[], instanceLevel: number }} - Type stack and instance level
      */
     buildTypeStack(containerPath, stackType = 'full') {
-      if (!_fs || !_path) return { stack: [containerPath], instanceLevel: 1 }
       const modulesDir = getModulesDir()
       if (!modulesDir) return { stack: [containerPath], instanceLevel: 1 }
-      return buildTypeStackInternal(containerPath, getNodeRoot(), getAppAPI(), getEnableAppOverlay(), modulesDir, _fs, _path, stackType)
+      return buildTypeStackInternal(containerPath, getNodeRoot(), getAppAPI(), getEnableAppOverlay(), modulesDir, fs, path, stackType)
+    },
+
+    /**
+     * Resolve a script by name with app overlay support
+     * Checks: 1) app scripts first, 2) node scripts
+     *
+     * @param {string} scriptName - Script name (without .js extension)
+     * @returns {string|null} - Absolute path to script file or null if not found
+     */
+    resolveScript(scriptName) {
+      const nodeRoot = getNodeRoot()
+      if (!nodeRoot) return null
+
+      // Helper to check script existence
+      const checkScript = (scriptsDir) => {
+        if (!fs.existsSync(scriptsDir) || !fs.statSync(scriptsDir).isDirectory()) {
+          return null
+        }
+        const withExt = path.join(scriptsDir, scriptName + '.js')
+        const withoutExt = path.join(scriptsDir, scriptName)
+
+        if (fs.existsSync(withExt) && fs.statSync(withExt).isFile()) {
+          return withExt
+        }
+        if (fs.existsSync(withoutExt) && fs.statSync(withoutExt).isFile()) {
+          return withoutExt
+        }
+        return null
+      }
+
+      // 1. Check app scripts first (if app overlay enabled)
+      if (getEnableAppOverlay()) {
+        const appName = getAppName()
+        if (appName) {
+          const appScriptsDir = path.join(nodeRoot, 'apps', appName, 'scripts')
+          const appScript = checkScript(appScriptsDir)
+          if (appScript) return appScript
+        }
+      }
+
+      // 2. Fall back to node scripts
+      const nodeScriptsDir = path.join(nodeRoot, 'scripts')
+      return checkScript(nodeScriptsDir)
     },
 
     // ========================================================================
@@ -680,7 +713,7 @@ export function create(bootstrapModule) {
      */
     faf(destination, options = {}) {
       const nodeRoot = getNodeRoot()
-      if (!nodeRoot || !_fs || !_path) return null
+      if (!nodeRoot) return null
 
       // Clone immediately - record may mutate before async write completes
       const recordClone = JSON.parse(JSON.stringify(record))
@@ -690,23 +723,23 @@ export function create(bootstrapModule) {
       const filename = options.filename || `${timestamp}.json`
 
       // Resolve destination relative to node root
-      const destPath = _path.isAbsolute(destination)
+      const destPath = path.isAbsolute(destination)
         ? destination
-        : _path.join(nodeRoot, destination)
+        : path.join(nodeRoot, destination)
 
       // Ensure directory exists
-      _fs.mkdirSync(destPath, { recursive: true })
+      fs.mkdirSync(destPath, { recursive: true })
 
       // Find unique filename
-      const finalFilename = findUniqueFilename(destPath, filename, options.dedupe, _fs, _path)
+      const finalFilename = findUniqueFilename(destPath, filename, options.dedupe, fs, path)
 
-      const filePath = _path.join(destPath, finalFilename)
+      const filePath = path.join(destPath, finalFilename)
       const recordJson = JSON.stringify(recordClone, null, 2)
 
       if (options.sync) {
-        _fs.writeFileSync(filePath, recordJson, 'utf-8')
+        fs.writeFileSync(filePath, recordJson, 'utf-8')
       } else {
-        _fs.writeFile(filePath, recordJson, 'utf-8', (err) => {
+        fs.writeFile(filePath, recordJson, 'utf-8', (err) => {
           if (err) this.raiseAsyncError(err, { operation: 'faf', destination, filePath })
         })
       }
@@ -722,23 +755,23 @@ export function create(bootstrapModule) {
      */
     consumeLatest(topic) {
       const nodeRoot = getNodeRoot()
-      if (!nodeRoot || !_fs || !_path) return null
+      if (!nodeRoot) return null
 
-      const topicPath = _path.isAbsolute(topic)
+      const topicPath = path.isAbsolute(topic)
         ? topic
-        : _path.join(nodeRoot, topic)
+        : path.join(nodeRoot, topic)
 
-      if (!_fs.existsSync(topicPath)) return null
+      if (!fs.existsSync(topicPath)) return null
 
-      const files = _fs.readdirSync(topicPath)
+      const files = fs.readdirSync(topicPath)
         .filter(f => f.endsWith('.json'))
         .sort()
         .reverse()
 
       if (files.length === 0) return null
 
-      const latestPath = _path.join(topicPath, files[0])
-      const content = _fs.readFileSync(latestPath, 'utf-8')
+      const latestPath = path.join(topicPath, files[0])
+      const content = fs.readFileSync(latestPath, 'utf-8')
       return JSON.parse(content)
     },
 
@@ -806,7 +839,7 @@ export function create(bootstrapModule) {
      */
     raiseAsyncError(error, context = {}) {
       const nodeRoot = getNodeRoot()
-      if (!nodeRoot || !_fs || !_path) return
+      if (!nodeRoot) return
 
       const errorRecord = JSON.parse(JSON.stringify(record))
       errorRecord.headers.spl.error = {
@@ -818,14 +851,14 @@ export function create(bootstrapModule) {
         async: true
       }
 
-      const errorPath = _path.join(nodeRoot, 'runtime/error')
-      _fs.mkdirSync(errorPath, { recursive: true })
+      const errorPath = path.join(nodeRoot, 'runtime/error')
+      fs.mkdirSync(errorPath, { recursive: true })
 
       const filename = `${Date.now()}.json`
-      const finalFilename = findUniqueFilename(errorPath, filename, 'numeric-digit', _fs, _path)
+      const finalFilename = findUniqueFilename(errorPath, filename, 'numeric-digit', fs, path)
 
-      _fs.writeFile(
-        _path.join(errorPath, finalFilename),
+      fs.writeFile(
+        path.join(errorPath, finalFilename),
         JSON.stringify(errorRecord, null, 2),
         'utf-8',
         () => {}

@@ -4,9 +4,10 @@
 // Short-TTL mode: watchers self-destruct after processing one request.
 // Returns immediately - watchers run in background.
 
+import fs from 'fs'
+import path from 'path'
+
 export default async function(module) {
-  const fs = await module.require('fs')
-  const path = await module.require('path')
   const nodeRoot = module.getNodeRoot()
 
   // Load session state

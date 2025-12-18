@@ -5,8 +5,8 @@
  * AI-first: JSON output by default
  * --human renders for humans
  */
-const fs = await module.require('fs')
-const path = await module.require('path')
+const fs = await import('fs')
+const path = await import('path')
 const ft = await module.require('lib/spl/script/freetext.js')
 
 const input = module.input()

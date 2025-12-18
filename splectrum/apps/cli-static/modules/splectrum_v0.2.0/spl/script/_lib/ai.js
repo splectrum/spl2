@@ -9,20 +9,9 @@
 //   module.output(ai.json(ai.stack("spl/container")))
 //   '
 
+import fs from 'fs'
+
 export function create(module) {
-  let _fs = null
-  let _path = null
-
-  const getFs = async () => {
-    if (!_fs) _fs = await module.require('fs')
-    return _fs
-  }
-
-  const getPath = async () => {
-    if (!_path) _path = await module.require('path')
-    return _path
-  }
-
   return {
     // ========================================================================
     // File Reading
@@ -37,7 +26,6 @@ export function create(module) {
     async readFile(containerPath, relativePath) {
       const resolved = module.resolve(containerPath, relativePath)
       if (!resolved) return null
-      const fs = await getFs()
       try {
         return fs.readFileSync(resolved, 'utf8')
       } catch {

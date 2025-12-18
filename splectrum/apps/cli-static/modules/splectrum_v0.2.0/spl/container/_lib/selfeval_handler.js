@@ -2,11 +2,12 @@
 //
 // Checks index.js exists (via overlay) and exports a function.
 
+import fs from 'fs'
+import path from 'path'
+
 export function create(module) {
   return {
     async run(containerFsPath) {
-      const fs = await module.require('fs')
-      const path = await module.require('path')
 
       // Get container path from filesystem path
       const indexJson = JSON.parse(fs.readFileSync(path.join(containerFsPath, 'index.json'), 'utf8'))

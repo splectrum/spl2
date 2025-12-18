@@ -2,11 +2,11 @@
 //
 // Creates record first thing, uses module interface for execution.
 //
-// Invocation modes:
-//   1. Command:  spl spl/dev/cycle --name=env-123
-//   2. Inline:   spl "/* */ await spl.dev.cycle({ name: 'env-123' })"
-//   3. File:     spl ./workflow.js --env=prod
-//   4. Library:  spl status
+// Invocation modes (syntax-based):
+//   command:  spl spl/dev/cycle --name=env-123  (has /)
+//   script:   spl selfeval-all                   (no /)
+//   inline:   spl "/* */ module.output('hi')"    (starts with /*)
+//   file:     spl ./workflow.js --env=prod       (starts with ./ or ../)
 
 import { loadModule } from '../lib/moduleBootstrap.js'
 import process from 'process'
@@ -32,6 +32,7 @@ const record = {
   value: {
     argv: process.argv.slice(2),
     mode: null,
+    scriptName: null,
     resolvedPath: null,
     method: null,
     script: null,
@@ -81,10 +82,12 @@ switch (mode) {
   case 'command':
     record.headers.spl.request.method = record.value.method
     break
-  case 'library':
-    record.headers.spl.request.method = record.value.resolvedPath
-    break
   case 'script':
+    // Internal script - scriptName as method, app resolves via module.resolveScript()
+    record.headers.spl.request.method = record.value.scriptName
+    break
+  case 'inline':
+    // Inline script (/* ... */ or loaded from file)
     record.headers.spl.request.method = 'spl/script/inline'
     record.headers.spl.request.script = record.value.script ?? record.value.argv[0]
     break
