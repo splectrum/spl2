@@ -7,14 +7,15 @@ Do all this before doing anything else:
 
 1. `spl get-started crud` - file operations (create, read, write, delete resources)
 2. `spl get-started tools` - tool wrapper principles (use spl tools/X not raw X)
-3. Read `status/CURRENT.md` - current project, next tasks, known issues
+3. `spl get-started` - general operational reference
+4. Read `status/CURRENT.md` - current project, next tasks, known issues
+5. Speed is not important, quality is.
 
 ## Quick Start
 
 ```bash
-spl get-started           # general operational reference
-spl get-started libs      # lib require pattern and factory model
 spl get-started           # Operational reference
+spl get-started libs      # lib require pattern and factory model
 spl get-started <topic>   # Topic detail (ai-first, reqs, crud, etc.)
 ```
 

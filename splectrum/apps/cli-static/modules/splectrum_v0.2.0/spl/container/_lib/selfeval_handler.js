@@ -1,6 +1,7 @@
 // selfeval_handler.js - Selfeval runner for handler facet
 //
-// Checks index.js exists (via overlay) and exports a function.
+// Checks index.js exists (via overlay), exports a function,
+// and uses only module.require() for dependencies (no direct imports).
 
 import fs from "fs"
 import path from "path"
@@ -51,6 +52,30 @@ export function create(module) {
         pass: hasExport,
         topline: "export | " + (hasExport ? "PASS" : "FAIL"),
         detail: hasExport ? "exports function" : "no function export found"
+      })
+
+      // Check no import statements (must use module.require)
+      const importMatches = content.match(/^import\s+.+\s+from\s+['"].+['"]/gm) || []
+      const hasImports = importMatches.length > 0
+
+      checks.push({
+        name: "no-imports",
+        pass: !hasImports,
+        topline: "no-imports | " + (!hasImports ? "PASS" : "FAIL"),
+        detail: hasImports ? `found ${importMatches.length} import(s): ${importMatches.join(', ')}` : "no import statements"
+      })
+
+      // Check no direct require() calls (must use module.require)
+      // Match require('...') but not module.require('...')
+      const requirePattern = /(?<!module\.)require\s*\(\s*['"][^'"]+['"]\s*\)/g
+      const requireMatches = content.match(requirePattern) || []
+      const hasDirectRequire = requireMatches.length > 0
+
+      checks.push({
+        name: "no-require",
+        pass: !hasDirectRequire,
+        topline: "no-require | " + (!hasDirectRequire ? "PASS" : "FAIL"),
+        detail: hasDirectRequire ? `found ${requireMatches.length} require(s): ${requireMatches.join(', ')}` : "no direct require calls"
       })
 
       const allPass = checks.every(c => c.pass)

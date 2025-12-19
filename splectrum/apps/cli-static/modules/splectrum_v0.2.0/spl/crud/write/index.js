@@ -4,10 +4,12 @@
 // File must already exist (use create for new files).
 //
 // Invocation: spl spl/container/test/write --resource=index.js --content="..."
+//             spl spl/container/test/write --resource=index.js --base64="SGVsbG8="
 //
 // Flags:
 //   --resource  Resource path to write
 //   --content   Content to write (entire file contents)
+//   --base64    Base64-encoded content (alternative to --content, bypasses shell escaping)
 
 import fs from 'fs'
 import path from 'path'
@@ -17,7 +19,15 @@ export default async function(module) {
 
   const input = module.input()
   const resource = input.resource
-  const content = input.content
+  const base64Input = input.base64
+
+  // Resolve content: base64 takes precedence, then content flag
+  let content
+  if (base64Input) {
+    content = Buffer.from(base64Input, 'base64').toString('utf8')
+  } else {
+    content = input.content
+  }
 
   // --resource is required
   if (!resource) {
@@ -25,9 +35,9 @@ export default async function(module) {
     return
   }
 
-  // --content is required
+  // --content or --base64 is required
   if (content === undefined || content === null) {
-    module.output('--content flag required. Usage: spl <container>/write --resource=<name> --content="..."', { error: 'missing_content' })
+    module.output('--content or --base64 flag required. Usage: spl <container>/write --resource=<name> --content="..." or --base64="..."', { error: 'missing_content' })
     return
   }
 

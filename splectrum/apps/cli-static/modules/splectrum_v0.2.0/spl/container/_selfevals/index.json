@@ -46,6 +46,11 @@
       "name": "tests",
       "description": "Execute data-driven tests from _tests/ folder",
       "file": "selfeval_tests.js"
+    },
+    "reqs_coverage": {
+      "name": "reqs_coverage",
+      "description": "Check .js files have corresponding req files",
+      "file": "selfeval_reqs_coverage.js"
     }
   }
 }

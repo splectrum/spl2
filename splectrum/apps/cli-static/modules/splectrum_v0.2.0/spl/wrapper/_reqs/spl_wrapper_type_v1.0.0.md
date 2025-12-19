@@ -90,11 +90,12 @@ This separates splectrum-native APIs from external tool wrappers.
 
 ## Handler Pattern
 
-Wrapper handlers are trivial - cli.js does the heavy lifting:
+Wrapper handlers use a lib for shell execution - no direct imports in handlers:
 
+**Handler (index.js):**
 ```javascript
 export default async function(module) {
-  const { execSync } = await module.require('child_process')
+  const wrapper = await module.require('lib/spl/wrapper')
   const { args, dryRun, silent } = module.input()
 
   if (!args) {
@@ -102,22 +103,35 @@ export default async function(module) {
     return
   }
 
-  const cmd = `mytool ${args}`
+  wrapper.exec(module, 'mytool', args, { dryRun, silent })
+}
+```
 
-  if (dryRun) {
-    module.output(`Would run: ${cmd}`, { dryRun: true, command: cmd })
-    return
-  }
+**Lib (_lib/wrapper.js):**
+```javascript
+import { execSync } from 'child_process'
 
-  try {
-    const stdout = execSync(cmd, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] })
-    if (!silent) {
-      module.output(stdout || '(no output)', { ok: true, command: cmd })
-    } else {
-      module.output(null, { ok: true, command: cmd, stdout })
+export function create(module) {
+  return {
+    exec(module, tool, args, { dryRun, silent }) {
+      const cmd = `${tool} ${args}`
+
+      if (dryRun) {
+        module.output(`Would run: ${cmd}`, { dryRun: true, command: cmd })
+        return
+      }
+
+      try {
+        const stdout = execSync(cmd, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] })
+        if (!silent) {
+          module.output(stdout || '(no output)', { ok: true, command: cmd })
+        } else {
+          module.output(null, { ok: true, command: cmd, stdout })
+        }
+      } catch (err) {
+        module.output(`Error: ${err.stderr || err.message}`, { ok: false, error: err.message })
+      }
     }
-  } catch (err) {
-    module.output(`Error: ${err.stderr || err.message}`, { ok: false, error: err.message })
   }
 }
 ```
@@ -126,6 +140,8 @@ export default async function(module) {
 
 - [ ] Extends spl/api
 - [ ] Has _schemas/input.avsc with record type (args, dryRun, silent)
+- [ ] Handler uses `module.require('lib/...')` only (no direct imports)
+- [ ] Shell execution logic in _lib/ file
 - [ ] Documentation explains passthrough philosophy
 - [ ] Help behavior documented (--help to tool, /whoami for splectrum)
 

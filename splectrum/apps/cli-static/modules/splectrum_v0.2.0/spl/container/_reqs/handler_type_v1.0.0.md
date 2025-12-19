@@ -32,8 +32,10 @@ export default async function(module) {
 - Lines 3+: extended description, flags
 
 **Constraints:**
-- Only spl lib imports: `module.require('lib/...')` for libs
-- No direct platform imports in handlers
+- No `import` statements allowed
+- No direct `require()` calls allowed
+- Only `module.require('lib/...')` for dependencies
+- All npm/node dependencies must be in `_lib/` files
 - Comments explain flow: each major step has a brief comment
 
 **Resolver responsibility:**
@@ -47,7 +49,9 @@ export default async function(module) {
 - [ ] Exports default async function
 - [ ] Function signature is `(module)`
 - [ ] Header comment with container path and description
-- [ ] Only spl lib imports (no direct platform requires)
+- [ ] No `import` statements
+- [ ] No direct `require()` calls
+- [ ] All `module.require()` use `lib/` prefix
 - [ ] Major steps have brief comments
 
 ## Comments

@@ -1,0 +1,11 @@
+{
+  "name": "lib",
+  "purpose": "CLI static execute helpers",
+  "files": {
+    "execute.js": {
+      "name": "execute",
+      "description": "Inbox/outbox execution and user prompts",
+      "exports": ["executeAndWait", "promptConfirm", "buildPaths"]
+    }
+  }
+}

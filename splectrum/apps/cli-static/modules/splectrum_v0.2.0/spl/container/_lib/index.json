@@ -36,6 +36,11 @@
       "name": "selfeval_schemas_data",
       "description": "Selfeval runner for schema data validation",
       "exports": ["run"]
+    },
+    "selfeval_reqs_coverage.js": {
+      "name": "selfeval_reqs_coverage",
+      "description": "Selfeval runner for req coverage - checks .js files have reqs",
+      "exports": ["run"]
     }
   }
 }

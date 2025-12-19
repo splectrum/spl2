@@ -84,10 +84,12 @@ Writes to an existing resource in work_module.
 - Writes to work_module only
 - File must already exist (use create for new files)
 - Overwrites entire file contents
+- If `--base64` provided, decodes from base64 before writing
 
 **Flags:**
 - `--resource` - Resource path to write (e.g., index.js, _lib/helper.js)
-- `--content` - Content to write (or stdin)
+- `--content` - Content to write (entire file contents)
+- `--base64` - Base64-encoded content (alternative to --content, bypasses shell escaping)
 
 **Output:**
 - Status: ok, not_found, error
@@ -133,6 +135,7 @@ Removes container from work_module.
 - [ ] lift copies from overlay to work_module, returns contents
 - [ ] read returns contents from work_module
 - [ ] write updates existing file in work_module
+- [ ] write decodes base64 content when --base64 flag provided
 - [ ] update fixes drift and merges schemas
 - [ ] delete removes container preserving _reqs/
 

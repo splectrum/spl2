@@ -87,4 +87,4 @@ Enables selfevals:
 2. Test/selfeval data conforms to declared schemas
 3. Schema inheritance is valid (child has parent fields)
 
-Uses `module.require('avsc')` which works on both Node and Bare via import maps.
+Uses native `import avsc from 'avsc'` - libs use direct imports for npm packages.

@@ -25,19 +25,18 @@ module.output(JSON.stringify(result, null, 2))
 
 - `module.input()` - get input flags
 - `module.output(freetext, structured)` - set output
-- `module.require(uri)` - load modules/libs
+- `module.require('lib/...')` - splectrum libs only
 - `module.resolve(path, file)` - resolve file paths
 - `module.buildTypeStack(path, mode)` - get type stacks
-- `await module.require('fs')` - platform modules
-- `await module.require('lib/...')` - splectrum libs
+- `await import('fs')` - node/npm modules (use dynamic import)
 
 ## Examples
 
 ```bash
 # Read a file through resolution
 spl '/* read */
+const fs = await import("fs")
 const path = module.resolve("spl/container", "index.json")
-const fs = await module.require("fs")
 module.output(fs.readFileSync(path, "utf8"))
 '
 

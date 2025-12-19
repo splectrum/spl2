@@ -27,9 +27,10 @@
     },
     {
       "name": "Write",
-      "description": "Write to existing resource in work_module. File must exist (use create first).",
+      "description": "Write to existing resource in work_module. File must exist (use create first). Use --base64 for content with special characters (!, quotes, etc.) to bypass shell escaping.",
       "commands": [
-        { "command": "spl spl/foo/write --resource=index.js --content=\"...\"", "description": "Overwrite file contents" }
+        { "command": "spl spl/foo/write --resource=index.js --content=\"...\"", "description": "Overwrite file contents" },
+        { "command": "spl spl/foo/write --resource=index.js --base64=\"SGVsbG8h\"", "description": "Write base64-encoded content (bypasses shell escaping)" }
       ]
     },
     {

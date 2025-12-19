@@ -16,6 +16,12 @@
       "doc": "Content to write (entire file contents)"
     },
     {
+      "name": "base64",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Base64-encoded content (alternative to --content, bypasses shell escaping)"
+    },
+    {
       "name": "dryRun",
       "type": "boolean",
       "default": false,
