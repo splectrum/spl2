@@ -1,7 +1,7 @@
 # Current Status
 
 **Last Updated:** 2025-12-20
-**Last Commit:** 3c8eca9
+**Last Commit:** c41b96b
 
 ---
 
@@ -11,47 +11,32 @@
 
 ### Current Focus
 
-**IN PROGRESS: Req Coverage & Handler Migration**
+**COMPLETE: Req Coverage & Handler Migration**
 
-#### Completed This Session
+All 33 containers pass selfeval-all.
+
+#### Completed
 
 - All spl/crud/* handlers migrated (7 containers) - imports removed, libs created
 - Created missing reqs for: lift, crud, read, write, update, delete, set
 - Migrated introspection handlers: selfeval, info
 - Created reqs for: whoami, introspection libs, module, script, wrapper, container
 - Moved selfeval_final.js from spl/introspection to spl/container (structural fix)
-- **32/33 containers now pass reqs_coverage**
-
-#### Next Tasks (1 remaining)
-
-**Fix spl root container:**
-```bash
-spl spl/selfeval 2>&1
-# FAIL: spl_lib_v1.0.0.md: unregistered file
-```
-- Register spl_lib_v1.0.0.md in spl/_reqs/index.json
-
-**Then:**
-- Run `spl selfeval-all spl` to verify all pass
-- Commit changes
+- Registered spl_lib_v1.0.0.md in spl/_reqs/index.json
+- Fixed JSON output truncation in spl.mjs (nested arrays now display properly)
 
 ### Selfeval Status
 
 ```bash
-# Reqs coverage - 32/33 passing
-spl selfeval-all spl --runner=reqs_coverage
-
-# Full selfeval
+# All passing
 spl selfeval-all spl
+# PASS | 33 passed, 0 failed, 33 total
 ```
 
-### Issues to Address
+### Next Steps
 
-- `spl get-started crud --human` needed for readable command examples (JSON default hides them)
-
-### Uncommitted Changes
-
-Many files modified - handler migrations, lib creations, req files.
+- Review v0.2.0 release readiness
+- Consider additional documentation or polish
 
 ---
 
@@ -60,5 +45,3 @@ Many files modified - handler migrations, lib creations, req files.
 1. `spl get-started crud` - file operations
 2. `spl get-started tools` - tool wrappers
 3. Read this file for current project status
-4. Fix spl root container (register spl_lib_v1.0.0.md)
-5. `spl selfeval-all spl` - verify all pass
