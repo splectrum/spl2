@@ -14,12 +14,17 @@ export function create(module) {
      * @param {string} usageText - Usage text shown when no args provided
      */
     exec(toolName, usageText) {
-      const { args, dryRun, silent } = module.input()
+      let { args, dryRun, silent } = module.input()
 
       // No args - show usage
       if (!args) {
         module.output(usageText, { ok: true, usage: true })
         return
+      }
+
+      // Decode base64= prefix if present (bypasses shell escaping)
+      if (args.startsWith('base64=')) {
+        args = Buffer.from(args.slice(7), 'base64').toString('utf8')
       }
 
       const cmd = `${toolName} ${args}`

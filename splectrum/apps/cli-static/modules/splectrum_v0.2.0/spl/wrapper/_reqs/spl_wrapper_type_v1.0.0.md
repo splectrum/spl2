@@ -78,6 +78,21 @@ spl tools/git --dryRun commit -m "message"  # Shows: would run "git commit -m \"
 spl tools/git --silent status               # Returns JSON only, no narrative
 ```
 
+## Base64 Encoding
+
+When args start with `base64=`, the wrapper decodes the base64 string and uses the decoded value as args. This bypasses shell escaping issues for special characters.
+
+```bash
+# Encode: commit -m "Hello!"
+echo -n 'commit -m "Hello!"' | base64
+# Y29tbWl0IC1tICJIZWxsbyEi
+
+spl tools/git base64=Y29tbWl0IC1tICJIZWxsbyEi
+# Runs: git commit -m "Hello!"
+```
+
+This is useful when content contains characters that cause shell escaping problems (!, quotes, etc.).
+
 ## Location Convention
 
 Wrapper APIs go in the `tools/` package, not `spl/`:
@@ -142,6 +157,7 @@ export function create(module) {
 - [ ] Has _schemas/input.avsc with record type (args, dryRun, silent)
 - [ ] Handler uses `module.require('lib/...')` only (no direct imports)
 - [ ] Shell execution logic in _lib/ file
+- [ ] base64= prefix decoded before execution
 - [ ] Documentation explains passthrough philosophy
 - [ ] Help behavior documented (--help to tool, /whoami for splectrum)
 

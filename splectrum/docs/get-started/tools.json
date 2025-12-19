@@ -7,6 +7,13 @@
       "description": "Always use spl tools/X instead of raw X. Splectrum wrappers pass through to the underlying tool but enable auditing, logging, and platform integration."
     },
     {
+      "name": "Base64 Encoding",
+      "description": "Use base64= prefix to bypass shell escaping for special characters (!, quotes, etc.).",
+      "commands": [
+        { "command": "spl tools/git base64=Y29tbWl0IC1tICJIZWxsbyEi", "description": "Decodes to: commit -m \"Hello!\"" }
+      ]
+    },
+    {
       "name": "Git",
       "commands": [
         { "command": "spl tools/git status", "description": "Not: git status" },

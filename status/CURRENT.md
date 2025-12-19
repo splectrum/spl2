@@ -54,7 +54,9 @@ spl selfeval-all spl --runner=reqs_coverage  # 11 missing reqs
 
 ### Recent Changes
 
-All changes committed in 1f73f8a.
+- `spl/wrapper/_lib/wrapper.js` - added base64= prefix decoding
+- `spl/wrapper/_reqs/spl_wrapper_type_v1.0.0.md` - documented base64 encoding
+- `splectrum/docs/get-started/tools.json` - added base64 section
 
 ---
 
