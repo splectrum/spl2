@@ -1,7 +1,7 @@
 # Current Status
 
 **Last Updated:** 2025-12-19
-**Last Commit:** 1f73f8a
+**Last Commit:** dba51ef
 
 ---
 
@@ -13,9 +13,10 @@
 
 **IN PROGRESS: Req Coverage & Handler Migration**
 
-#### Completed (committed 1f73f8a)
+#### Completed
 
-- `--base64` flag for crud write (shell escaping bypass)
+- `--base64` flag for crud write (1f73f8a)
+- `base64=` prefix for tool wrappers (dba51ef)
 - Handler selfeval enforcement (no imports)
 - `selfeval_reqs_coverage.js` runner
 - Handler migrations: app/execute, cli-static/execute
@@ -54,9 +55,7 @@ spl selfeval-all spl --runner=reqs_coverage  # 11 missing reqs
 
 ### Recent Changes
 
-- `spl/wrapper/_lib/wrapper.js` - added base64= prefix decoding
-- `spl/wrapper/_reqs/spl_wrapper_type_v1.0.0.md` - documented base64 encoding
-- `splectrum/docs/get-started/tools.json` - added base64 section
+All committed.
 
 ---
 
