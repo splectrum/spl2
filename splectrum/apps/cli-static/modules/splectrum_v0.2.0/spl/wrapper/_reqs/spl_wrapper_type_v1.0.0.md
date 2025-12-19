@@ -80,7 +80,7 @@ spl tools/git --silent status               # Returns JSON only, no narrative
 
 ## Base64 Encoding
 
-When args start with `base64=`, the wrapper decodes the base64 string and uses the decoded value as args. This bypasses shell escaping issues for special characters.
+The `base64=` prefix provides base64-encoded args as an alternative to direct args. The wrapper decodes the value and uses it as the command args. This bypasses shell escaping issues for special characters.
 
 ```bash
 # Encode: commit -m "Hello!"

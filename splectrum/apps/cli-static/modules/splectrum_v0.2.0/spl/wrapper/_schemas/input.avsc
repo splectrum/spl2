@@ -23,8 +23,15 @@
     },
     {
       "name": "args",
-      "type": "string",
+      "type": ["null", "string"],
+      "default": null,
       "doc": "Passthrough arguments for wrapped tool (quoted, ready for shell)"
+    },
+    {
+      "name": "base64",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Base64-encoded args (alternative to --args, bypasses shell escaping)"
     }
   ]
 }
