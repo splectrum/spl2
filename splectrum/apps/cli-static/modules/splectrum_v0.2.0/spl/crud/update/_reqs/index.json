@@ -1,9 +1,16 @@
 {
+  "name": "reqs",
+  "purpose": "Update method requirements",
   "requirements": [
     {
       "name": "update_method",
       "description": "Update method for spl/container lifecycle",
       "file": "update_method_v1.0.0.md"
+    },
+    {
+      "name": "update_lib",
+      "description": "Update business logic lib",
+      "file": "update_lib_v1.0.0.md"
     }
   ]
 }

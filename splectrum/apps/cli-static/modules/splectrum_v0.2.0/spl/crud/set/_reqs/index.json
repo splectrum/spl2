@@ -1,0 +1,11 @@
+{
+  "name": "reqs",
+  "purpose": "Set method requirements",
+  "requirements": [
+    {
+      "name": "set_lib",
+      "description": "Set business logic lib",
+      "file": "set_lib_v1.0.0.md"
+    }
+  ]
+}

@@ -14,11 +14,9 @@
 //
 // Invocation: spl spl/foo/set container.extends="spl/bar"
 
-import fs from 'fs'
-import path from 'path'
-
 export default async function(module) {
   const crud = await module.require('lib/spl/crud')
+  const setLib = await module.require('lib/spl/crud/set')
 
   const input = module.input()
   const dryRun = input.dryRun || false
@@ -110,17 +108,17 @@ export default async function(module) {
     return
   }
 
-  const fileFsPath = path.join(workModulePath, targetPath, targetFile)
+  const fileFsPath = setLib.joinPath(workModulePath, targetPath, targetFile)
 
   // Read existing content or start with empty object
   let content = {}
-  if (fs.existsSync(fileFsPath)) {
-    content = JSON.parse(fs.readFileSync(fileFsPath, 'utf8'))
+  if (setLib.exists(fileFsPath)) {
+    content = setLib.readJson(fileFsPath)
   } else {
     // Check if we can resolve it from overlay (read-only)
     const resolvedPath = module.resolve(targetPath, targetFile)
     if (resolvedPath) {
-      content = JSON.parse(fs.readFileSync(resolvedPath, 'utf8'))
+      content = setLib.readJson(resolvedPath)
     }
   }
 
@@ -177,12 +175,10 @@ export default async function(module) {
   }
 
   // Ensure directory exists
-  const dirPath = path.dirname(fileFsPath)
-  if (!fs.existsSync(dirPath)) {
-    fs.mkdirSync(dirPath, { recursive: true })
-  }
+  const dirPath = setLib.getDirPath(fileFsPath)
+  setLib.ensureDir(dirPath)
 
-  fs.writeFileSync(fileFsPath, newContent + '\n', 'utf8')
+  setLib.writeJson(fileFsPath, content)
 
   module.output(`Updated ${targetPath}/${targetFile}: ${dotPath} ${operator} ${JSON.stringify(value)}`,
     { status: 'updated', targetPath, file: targetFile, path: dotPath, operator, value, content })

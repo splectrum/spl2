@@ -1,0 +1,11 @@
+{
+  "name": "reqs",
+  "purpose": "Info method requirements",
+  "requirements": [
+    {
+      "name": "info_lib",
+      "description": "Info business logic lib",
+      "file": "info_lib_v1.0.0.md"
+    }
+  ]
+}

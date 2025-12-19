@@ -9,11 +9,9 @@
 // Flags:
 //   --resource  Resource path to read, supports wildcards
 
-import fs from 'fs'
-import path from 'path'
-
 export default async function(module) {
   const crud = await module.require('lib/spl/crud')
+  const readLib = await module.require('lib/spl/crud/read')
 
   const input = module.input()
   const resource = input.resource
@@ -43,64 +41,43 @@ export default async function(module) {
     return
   }
 
-  const containerFsPath = path.join(workModulePath, containerPath)
+  const containerFsPath = readLib.getContainerFsPath(workModulePath, containerPath)
 
   // Check if container exists in work_module
-  if (!fs.existsSync(containerFsPath)) {
+  if (!readLib.containerExists(containerFsPath)) {
     module.output(`Container not found in work_module: ${containerPath}`, { error: 'container_not_found', containerPath })
     return
   }
 
   // Handle wildcards
   if (resource.includes('*')) {
-    const resourceDir = path.dirname(resource)
-    const resourcePattern = path.basename(resource)
-    const searchDir = path.join(containerFsPath, resourceDir)
+    const result = readLib.findMatchingFiles(containerFsPath, resource)
 
-    if (!fs.existsSync(searchDir)) {
+    if (!result.found || result.files.length === 0) {
       module.output(`Resource not found: ${resource}`, { status: 'not_found', resource, containerPath })
       return
     }
 
-    // Convert glob pattern to regex
-    const regexPattern = resourcePattern
-      .replace(/\./g, '\\.')
-      .replace(/\*/g, '.*')
-    const regex = new RegExp(`^${regexPattern}$`)
-
-    // Find matching files
-    const files = fs.readdirSync(searchDir)
-      .filter(f => regex.test(f))
-      .map(f => resourceDir === '.' ? f : `${resourceDir}/${f}`)
-      .sort()
-
-    if (files.length === 0) {
-      module.output(`Resource not found: ${resource}`, { status: 'not_found', resource, containerPath })
-      return
-    }
-
-    if (files.length > 1) {
-      module.output(`Multiple matches for: ${resource}`, { status: 'multiple', files, containerPath })
+    if (result.files.length > 1) {
+      module.output(`Multiple matches for: ${resource}`, { status: 'multiple', files: result.files, containerPath })
       return
     }
 
     // Single match - read it
-    const matchedFile = files[0]
-    const filePath = path.join(containerFsPath, matchedFile)
-    const contents = fs.readFileSync(filePath, 'utf8')
+    const matchedFile = result.files[0]
+    const fileResult = readLib.readFile(containerFsPath, matchedFile)
 
-    module.output(contents, { status: 'ok', file: matchedFile, containerPath })
+    module.output(fileResult.contents, { status: 'ok', file: matchedFile, containerPath })
     return
   }
 
   // No wildcards - direct read
-  const filePath = path.join(containerFsPath, resource)
+  const fileResult = readLib.readFile(containerFsPath, resource)
 
-  if (!fs.existsSync(filePath)) {
+  if (!fileResult.exists) {
     module.output(`Resource not found: ${resource}`, { status: 'not_found', resource, containerPath })
     return
   }
 
-  const contents = fs.readFileSync(filePath, 'utf8')
-  module.output(contents, { status: 'ok', file: resource, containerPath })
+  module.output(fileResult.contents, { status: 'ok', file: resource, containerPath })
 }

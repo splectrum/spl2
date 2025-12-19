@@ -15,9 +15,8 @@
 //   spl spl/container/info --methods
 //   spl spl/container/info --stack=instantiates --methods
 
-import fs from 'fs'
-
 export default async function(module) {
+  const infoLib = await module.require('lib/spl/introspection/info')
   const input = module.input()
 
   // Get target container from method path
@@ -58,17 +57,15 @@ export default async function(module) {
       const indexPath = module.resolve(typePath, 'index.json')
       if (!indexPath) continue
 
-      try {
-        const index = JSON.parse(fs.readFileSync(indexPath, 'utf8'))
-        const childList = index.instance?.children?.list || []
-        for (const name of childList) {
-          if (!seen.has(name)) {
-            seen.add(name)
-            methods.push({ name, definedAt: typePath })
-          }
+      const index = infoLib.readJson(indexPath)
+      if (!index) continue
+
+      const childList = index.instance?.children?.list || []
+      for (const name of childList) {
+        if (!seen.has(name)) {
+          seen.add(name)
+          methods.push({ name, definedAt: typePath })
         }
-      } catch (e) {
-        // skip invalid json
       }
     }
 
@@ -91,11 +88,9 @@ export default async function(module) {
     let schemas = null
 
     if (schemasIndexPath) {
-      try {
-        const schemasIndex = JSON.parse(fs.readFileSync(schemasIndexPath, 'utf8'))
+      const schemasIndex = infoLib.readJson(schemasIndexPath)
+      if (schemasIndex) {
         schemas = Object.keys(schemasIndex.files || {})
-      } catch (e) {
-        // skip
       }
     }
 
@@ -116,11 +111,9 @@ export default async function(module) {
     let children = null
 
     if (indexPath) {
-      try {
-        const index = JSON.parse(fs.readFileSync(indexPath, 'utf8'))
+      const index = infoLib.readJson(indexPath)
+      if (index) {
         children = index.instance?.children || null
-      } catch (e) {
-        // skip
       }
     }
 

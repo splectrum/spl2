@@ -1,0 +1,8 @@
+{
+  "files": {
+    "set.js": {
+      "description": "Set business logic",
+      "req": "set_lib_v1.0.0.md"
+    }
+  }
+}

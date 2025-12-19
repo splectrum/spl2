@@ -5,12 +5,14 @@
     "ai.js": {
       "name": "ai",
       "description": "AI/exploration helper utilities",
-      "exports": ["readFile", "readJson", "stack", "methods", "children", "exists", "isMethod", "physicalMethod", "json", "table"]
+      "exports": ["readFile", "readJson", "stack", "methods", "children", "exists", "isMethod", "physicalMethod", "json", "table"],
+      "req": "ai_lib_v1.0.0.md"
     },
     "doc.js": {
       "name": "doc",
       "description": "Doc-style JSON renderer for scripts",
-      "exports": ["render"]
+      "exports": ["render"],
+      "req": "doc_lib_v1.0.0.md"
     }
   }
 }

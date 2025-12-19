@@ -1,0 +1,9 @@
+{
+  "files": {
+    "create.js": {
+      "name": "create",
+      "description": "Create container/resource business logic",
+      "exports": ["createResource", "readIndex", "containerExists", "createContainer", "getContainerFsPath", "getIndexJsonPath"]
+    }
+  }
+}

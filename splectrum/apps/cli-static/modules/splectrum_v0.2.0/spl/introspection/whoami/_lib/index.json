@@ -1,7 +1,8 @@
 {
   "files": {
     "whoami.js": {
-      "exports": []
+      "description": "Whoami business logic",
+      "req": "whoami_lib_v1.0.0.md"
     }
   }
 }

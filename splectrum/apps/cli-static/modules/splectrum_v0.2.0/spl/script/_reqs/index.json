@@ -26,6 +26,11 @@
       "name": "doc_lib",
       "description": "Doc-style JSON renderer (doc.js)",
       "file": "doc_lib_v1.0.0.md"
+    },
+    {
+      "name": "ai_lib",
+      "description": "AI helper library",
+      "file": "ai_lib_v1.0.0.md"
     }
   ]
 }

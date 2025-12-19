@@ -41,6 +41,16 @@
       "name": "selfeval_command_test_runner",
       "description": "Test runner for spl command execution",
       "file": "selfeval_command_test_runner_v1.0.0.md"
+    },
+    {
+      "name": "selfeval_lib",
+      "description": "Selfeval framework library",
+      "file": "selfeval_lib_v1.0.0.md"
+    },
+    {
+      "name": "selfeval_tests_runner",
+      "description": "Data-driven tests runner",
+      "file": "selfeval_tests_runner_v1.0.0.md"
     }
   ]
 }

@@ -6,6 +6,11 @@
       "name": "selfeval_method",
       "description": "Selfeval method validation specification",
       "file": "selfeval_method_v1.1.0.md"
+    },
+    {
+      "name": "selfeval_command_test_runner",
+      "description": "Command execution test runner",
+      "file": "selfeval_command_test_runner_v1.0.0.md"
     }
   ]
 }

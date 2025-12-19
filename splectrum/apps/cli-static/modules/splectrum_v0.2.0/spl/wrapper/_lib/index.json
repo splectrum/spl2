@@ -2,6 +2,9 @@
   "name": "lib",
   "purpose": "Shared wrapper execution logic",
   "files": {
-    "wrapper.js": "execSync-based command execution for tool wrappers"
+    "wrapper.js": {
+      "description": "execSync-based command execution for tool wrappers",
+      "req": "wrapper_lib_v1.0.0.md"
+    }
   }
 }

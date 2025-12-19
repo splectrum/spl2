@@ -1,0 +1,274 @@
+// spl/crud/update/_lib/update.js - Update business logic
+//
+// Contains fs/path operations for update method.
+
+import fs from 'fs'
+import path from 'path'
+
+export function create(module) {
+  return {
+    /**
+     * Read JSON file
+     */
+    readJson(filePath) {
+      try {
+        return { ok: true, data: JSON.parse(fs.readFileSync(filePath, 'utf8')) }
+      } catch (e) {
+        return { ok: false, error: e.message }
+      }
+    },
+
+    /**
+     * Write JSON file
+     */
+    writeJson(filePath, data) {
+      fs.writeFileSync(filePath, JSON.stringify(data, null, 2) + '\n', 'utf8')
+    },
+
+    /**
+     * Check if file exists
+     */
+    fileExists(filePath) {
+      return fs.existsSync(filePath)
+    },
+
+    /**
+     * Get directory path
+     */
+    getDirPath(filePath) {
+      return path.dirname(filePath)
+    },
+
+    /**
+     * Join paths
+     */
+    joinPath(...parts) {
+      return path.join(...parts)
+    },
+
+    /**
+     * Fix index.json to match container.avsc schema
+     */
+    async fixContainerFacet(targetPath, targetIndex, targetIndexPath, dryRun) {
+      const changes = []
+
+      // Load container schema
+      const schemaPath = module.resolve('spl/container', '_schemas/container.avsc')
+      if (!schemaPath) {
+        return ['container: cannot find container.avsc schema']
+      }
+
+      const schemaResult = this.readJson(schemaPath)
+      if (!schemaResult.ok) {
+        return ['container: cannot parse container.avsc schema']
+      }
+      const schema = schemaResult.data
+
+      // Build allowed fields and defaults from schema
+      const allowedFields = []
+      const defaults = {}
+      for (const field of schema.fields) {
+        allowedFields.push(field.name)
+        if ('default' in field) {
+          defaults[field.name] = field.default
+        }
+      }
+
+      // Find extra fields to remove
+      const presentFields = Object.keys(targetIndex)
+      const extraFields = presentFields.filter(f => !allowedFields.includes(f))
+
+      // Find missing required fields (no default in schema)
+      const missingFields = allowedFields.filter(f => !(f in targetIndex) && !(f in defaults))
+
+      // Build new index
+      const newIndex = {}
+      for (const field of allowedFields) {
+        if (field in targetIndex) {
+          newIndex[field] = targetIndex[field]
+        } else if (field in defaults) {
+          newIndex[field] = defaults[field]
+        }
+      }
+
+      // Check if anything changed
+      const oldJson = JSON.stringify(targetIndex, null, 2)
+      const newJson = JSON.stringify(newIndex, null, 2)
+
+      if (oldJson === newJson) {
+        return []
+      }
+
+      // Record changes
+      if (extraFields.length > 0) {
+        changes.push(`container: removed fields: ${extraFields.join(', ')}`)
+      }
+      if (missingFields.length > 0) {
+        changes.push(`container: added required fields: ${missingFields.join(', ')}`)
+      }
+
+      // Apply changes
+      if (!dryRun) {
+        this.writeJson(targetIndexPath, newIndex)
+      }
+
+      return changes
+    },
+
+    /**
+     * Merge parent schema fields into child schemas
+     */
+    async mergeSchemaInheritance(targetPath, dryRun) {
+      const changes = []
+
+      // Get target's schemas directory
+      const targetSchemasPath = module.resolve(targetPath, '_schemas/index.json')
+      if (!targetSchemasPath) {
+        return [] // No schemas to merge
+      }
+
+      const targetSchemasDir = this.getDirPath(targetSchemasPath)
+      const schemasResult = this.readJson(targetSchemasPath)
+      if (!schemasResult.ok) {
+        return []
+      }
+      const schemasIndex = schemasResult.data
+
+      // Build type stack (instantiates chain - schema inheritance follows instance type structure)
+      const typeStack = module.buildTypeStack(targetPath, 'instantiates')
+      if (!typeStack || typeStack.stack.length <= 1) {
+        return [] // No parent types in stack
+      }
+
+      // Get parent type from stack (skip first element which is self)
+      const parentPath = typeStack.stack[1]
+
+      // Process each schema file
+      const filesField = schemasIndex.files || {}
+      const schemaFiles = Array.isArray(filesField) ? filesField : Object.keys(filesField)
+      for (const schemaFile of schemaFiles) {
+        // Find parent schema with same name
+        const parentSchemaPath = module.resolve(parentPath, `_schemas/${schemaFile}`)
+        if (!parentSchemaPath) {
+          continue // No parent schema to inherit from
+        }
+
+        const childSchemaPath = this.joinPath(targetSchemasDir, schemaFile)
+        if (!this.fileExists(childSchemaPath)) {
+          continue
+        }
+
+        const parentResult = this.readJson(parentSchemaPath)
+        const childResult = this.readJson(childSchemaPath)
+        if (!parentResult.ok || !childResult.ok) {
+          continue
+        }
+
+        // Merge parent fields into child
+        const mergeResult = this.mergeSchemaFields(parentResult.data, childResult.data)
+        if (!mergeResult.changed) {
+          continue
+        }
+
+        changes.push(`schemas: ${schemaFile} - ${mergeResult.description}`)
+
+        if (!dryRun) {
+          this.writeJson(childSchemaPath, mergeResult.schema)
+        }
+      }
+
+      return changes
+    },
+
+    /**
+     * Merge parent fields into child schema
+     */
+    mergeSchemaFields(parentSchema, childSchema) {
+      const parentFields = parentSchema.fields || []
+      const childFields = childSchema.fields || []
+
+      // Build child field map
+      const childFieldMap = {}
+      for (const field of childFields) {
+        childFieldMap[field.name] = field
+      }
+
+      // Track changes
+      const added = []
+      const updated = []
+
+      // Process parent fields
+      const newFields = []
+      for (const parentField of parentFields) {
+        const childField = childFieldMap[parentField.name]
+
+        if (!childField) {
+          // Add missing field
+          newFields.push({ ...parentField })
+          added.push(parentField.name)
+        } else {
+          // Check for drift and fix
+          let fieldUpdated = false
+          const mergedField = { ...childField }
+
+          // Fix type if different
+          if (JSON.stringify(parentField.type) !== JSON.stringify(childField.type)) {
+            mergedField.type = parentField.type
+            fieldUpdated = true
+          }
+
+          // Fix default if different
+          if (JSON.stringify(parentField.default) !== JSON.stringify(childField.default)) {
+            if ('default' in parentField) {
+              mergedField.default = parentField.default
+            } else {
+              delete mergedField.default
+            }
+            fieldUpdated = true
+          }
+
+          // Fix doc if different
+          if (parentField.doc !== childField.doc) {
+            if (parentField.doc) {
+              mergedField.doc = parentField.doc
+            } else {
+              delete mergedField.doc
+            }
+            fieldUpdated = true
+          }
+
+          newFields.push(mergedField)
+          if (fieldUpdated) {
+            updated.push(parentField.name)
+          }
+
+          delete childFieldMap[parentField.name]
+        }
+      }
+
+      // Add remaining child-specific fields
+      for (const childField of childFields) {
+        if (childFieldMap[childField.name]) {
+          newFields.push(childField)
+        }
+      }
+
+      if (added.length === 0 && updated.length === 0) {
+        return { changed: false }
+      }
+
+      const description = []
+      if (added.length > 0) description.push(`added: ${added.join(', ')}`)
+      if (updated.length > 0) description.push(`updated: ${updated.join(', ')}`)
+
+      return {
+        changed: true,
+        description: description.join('; '),
+        schema: {
+          ...childSchema,
+          fields: newFields
+        }
+      }
+    }
+  }
+}

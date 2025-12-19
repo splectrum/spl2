@@ -6,6 +6,11 @@
       "name": "lift",
       "description": "Lift method specification",
       "file": "Lift_v1.0.0.md"
+    },
+    {
+      "name": "lift_lib",
+      "description": "Lift business logic lib",
+      "file": "lift_lib_v1.0.0.md"
     }
   ]
 }

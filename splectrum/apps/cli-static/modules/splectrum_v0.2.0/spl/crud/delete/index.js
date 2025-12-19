@@ -16,11 +16,9 @@
 //   --resource  Delete a single resource file
 //   --dryRun    Show what would be deleted without doing it
 
-import fs from 'fs'
-import path from 'path'
-
 export default async function(module) {
   const crud = await module.require('lib/spl/crud')
+  const deleteLib = await module.require('lib/spl/crud/delete')
 
   const input = module.input()
   const resource = input.resource || null
@@ -47,11 +45,11 @@ export default async function(module) {
 
   // Resource deletion mode
   if (resource) {
-    const containerFsPath = path.join(workModulePath, containerPath)
-    const resourceFsPath = path.join(containerFsPath, resource)
+    const containerFsPath = deleteLib.joinPath(workModulePath, containerPath)
+    const resourceFsPath = deleteLib.joinPath(containerFsPath, resource)
 
     // Check if resource exists
-    if (!fs.existsSync(resourceFsPath)) {
+    if (!deleteLib.exists(resourceFsPath)) {
       module.output(`Resource not found: ${resource}`, { status: 'not_found', resource, containerPath })
       return
     }
@@ -63,20 +61,11 @@ export default async function(module) {
     }
 
     // Delete the resource
-    fs.unlinkSync(resourceFsPath)
+    deleteLib.deleteFile(resourceFsPath)
 
     // Remove empty parent directories (but not the container itself)
-    const resourceDir = path.dirname(resourceFsPath)
-    if (resourceDir !== containerFsPath) {
-      try {
-        const entries = fs.readdirSync(resourceDir)
-        if (entries.length === 0) {
-          fs.rmdirSync(resourceDir)
-        }
-      } catch (e) {
-        // Ignore errors cleaning up directories
-      }
-    }
+    const resourceDir = deleteLib.getDirPath(resourceFsPath)
+    deleteLib.cleanupEmptyDir(resourceDir, containerFsPath)
 
     module.output(`Deleted: ${containerPath}/${resource}`, { status: 'deleted', resource, containerPath })
     return
@@ -84,11 +73,11 @@ export default async function(module) {
 
   // Container deletion mode
   const targetPath = containerPath
-  const targetFsPath = path.join(workModulePath, targetPath)
-  const indexJsonPath = path.join(targetFsPath, 'index.json')
+  const targetFsPath = deleteLib.joinPath(workModulePath, targetPath)
+  const indexJsonPath = deleteLib.joinPath(targetFsPath, 'index.json')
 
   // Check if container exists in work_module
-  if (!fs.existsSync(indexJsonPath)) {
+  if (!deleteLib.exists(indexJsonPath)) {
     module.output(
       `Container not found in work_module: ${targetPath}`,
       { status: 'not_found', targetPath, targetFsPath }
@@ -100,12 +89,10 @@ export default async function(module) {
   const toDelete = []
   const toPreserve = []
 
-  if (fs.existsSync(targetFsPath)) {
-    const entries = fs.readdirSync(targetFsPath, { withFileTypes: true })
+  if (deleteLib.exists(targetFsPath)) {
+    const entries = deleteLib.readDir(targetFsPath)
 
     for (const entry of entries) {
-      const entryPath = path.join(targetFsPath, entry.name)
-
       if (entry.name === '_reqs') {
         // Preserve _reqs
         toPreserve.push(entry.name)
@@ -127,20 +114,19 @@ export default async function(module) {
 
   // Delete everything except _reqs
   for (const name of toDelete) {
-    const entryPath = path.join(targetFsPath, name)
-    const stat = fs.statSync(entryPath)
+    const entryPath = deleteLib.joinPath(targetFsPath, name)
 
-    if (stat.isDirectory()) {
-      fs.rmSync(entryPath, { recursive: true })
+    if (deleteLib.isDir(entryPath)) {
+      deleteLib.deleteDir(entryPath, true)
     } else {
-      fs.unlinkSync(entryPath)
+      deleteLib.deleteFile(entryPath)
     }
   }
 
   // Remove folder if empty (no _reqs)
   const folderRemoved = toPreserve.length === 0
   if (folderRemoved) {
-    fs.rmdirSync(targetFsPath)
+    deleteLib.deleteDir(targetFsPath)
   }
 
   module.output(

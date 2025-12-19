@@ -9,6 +9,7 @@
 //   runAll(containerFsPath, containerName, runners, opts)
 //   buildTypeStack(containerPath)  - build type stack for levels
 //   loadRegistryFromType(typePath) - load _selfevals from a type
+//   getContainerFsPath(containerPath) - get filesystem path for container
 
 import fs from 'fs'
 import path from 'path'
@@ -36,6 +37,9 @@ export function create(module) {
   }
 
   return {
+    // Expose getContainerFsPath for handlers to use
+    getContainerFsPath,
+
     // Load registry from _selfevals/index.json
     loadRegistry(containerFsPath) {
       const registry = readJson(path.join(containerFsPath, '_selfevals', 'index.json'))

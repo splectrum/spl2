@@ -1,0 +1,8 @@
+{
+  "files": {
+    "write.js": {
+      "description": "Write business logic",
+      "req": "write_lib_v1.0.0.md"
+    }
+  }
+}

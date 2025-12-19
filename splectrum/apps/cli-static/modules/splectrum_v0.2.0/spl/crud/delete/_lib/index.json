@@ -1,0 +1,8 @@
+{
+  "files": {
+    "delete.js": {
+      "description": "Delete business logic",
+      "req": "delete_lib_v1.0.0.md"
+    }
+  }
+}

@@ -131,6 +131,16 @@
       "name": "selfeval_schemas_inheritance_runner",
       "description": "Selfeval runner for schema inheritance validation",
       "file": "selfeval_schemas_inheritance_runner_v1.0.0.md"
+    },
+    {
+      "name": "selfeval_reqs_coverage_runner",
+      "description": "Selfeval runner for req coverage",
+      "file": "selfeval_reqs_coverage_runner_v1.0.0.md"
+    },
+    {
+      "name": "selfeval_schemas_data_runner",
+      "description": "Selfeval runner for schema data validation",
+      "file": "selfeval_schemas_data_runner_v1.0.0.md"
     }
   ]
 }

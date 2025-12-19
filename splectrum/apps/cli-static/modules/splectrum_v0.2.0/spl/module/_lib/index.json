@@ -5,7 +5,8 @@
     "selfeval_module.js": {
       "name": "selfeval_module",
       "description": "Selfeval runner for module.js implementation (validates instance provides module.js)",
-      "exports": ["run"]
+      "exports": ["run"],
+      "req": "selfeval_module_runner_v1.0.0.md"
     }
   }
 }

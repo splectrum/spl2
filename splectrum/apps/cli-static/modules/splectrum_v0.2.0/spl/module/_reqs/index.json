@@ -16,6 +16,11 @@
       "name": "module_lib",
       "description": "Module runtime lib contract",
       "file": "module_lib_v1.1.0.md"
+    },
+    {
+      "name": "selfeval_module_runner",
+      "description": "Selfeval runner for module validation",
+      "file": "selfeval_module_runner_v1.0.0.md"
     }
   ]
 }

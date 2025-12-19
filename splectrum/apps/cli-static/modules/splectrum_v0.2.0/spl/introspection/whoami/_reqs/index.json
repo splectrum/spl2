@@ -1,9 +1,16 @@
 {
+  "name": "reqs",
+  "purpose": "Whoami method requirements",
   "requirements": [
     {
       "name": "spl_container_whoami",
       "description": "Comprehensive container introspection",
       "file": "spl_container_whoami_v2.0.0.md"
+    },
+    {
+      "name": "whoami_lib",
+      "description": "Whoami business logic lib",
+      "file": "whoami_lib_v1.0.0.md"
     }
   ]
 }

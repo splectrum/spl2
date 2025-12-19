@@ -121,7 +121,11 @@ await appHandler.invoke()
 const metaoutput = record.headers.spl.request.metaoutput
 const output = record.headers.spl.request.output
 if (metaoutput) {
-  console.log(metaoutput)
+  if (typeof metaoutput === 'object') {
+    console.log(JSON.stringify(metaoutput, null, 2))
+  } else {
+    console.log(metaoutput)
+  }
 }
 if (output) {
   console.log(JSON.stringify(output, null, 2))

@@ -1,0 +1,8 @@
+{
+  "files": {
+    "update.js": {
+      "description": "Update business logic",
+      "req": "update_lib_v1.0.0.md"
+    }
+  }
+}

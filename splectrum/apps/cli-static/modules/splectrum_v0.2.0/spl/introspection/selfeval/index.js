@@ -4,8 +4,6 @@
 // Runs selfeval runners to check container implementation.
 // Flags: --meta, --report, --runner, --dry-run, --fail-fast, --levels
 
-import path from 'path'
-
 export default async function(module) {
   const input = module.input()
   const selfeval = await module.require('lib/spl/introspection/selfeval.js')
@@ -22,7 +20,7 @@ export default async function(module) {
   if (!indexJsonPath) {
     return module.output(`No container found: ${containerPath}`)
   }
-  const containerFsPath = path.dirname(indexJsonPath)
+  const containerFsPath = selfeval.getContainerFsPath(containerPath)
 
   // 2. Build type stack for levels support
   const { stack, instanceLevel } = selfeval.buildTypeStack(containerPath)

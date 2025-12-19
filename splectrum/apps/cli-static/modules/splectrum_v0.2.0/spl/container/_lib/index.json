@@ -5,42 +5,56 @@
     "selfeval_lib.js": {
       "name": "selfeval_lib",
       "description": "Selfeval runner for lib facet - validates files and exports",
-      "exports": ["run"]
+      "exports": ["run"],
+      "req": "selfeval_lib_runner_v1.0.0.md"
     },
     "selfeval_schemas.js": {
       "name": "selfeval_schemas",
       "description": "Selfeval runner for schemas facet - validates schema files",
-      "exports": ["run"]
+      "exports": ["run"],
+      "req": "selfeval_schemas_runner_v1.0.0.md"
     },
     "selfeval_handler.js": {
       "name": "selfeval_handler",
       "description": "Selfeval runner for handler facet - validates index.js exports function",
-      "exports": ["run"]
+      "exports": ["run"],
+      "req": "selfeval_handler_runner_v1.0.0.md"
     },
     "selfeval_reqs.js": {
       "name": "selfeval_reqs",
       "description": "Selfeval runner for reqs facet - validates req files",
-      "exports": ["run"]
+      "exports": ["run"],
+      "req": "selfeval_reqs_runner_v1.0.0.md"
     },
     "selfeval_container.js": {
       "name": "selfeval_container",
       "description": "Selfeval runner for container facet validation",
-      "exports": ["run"]
+      "exports": ["run"],
+      "req": "selfeval_container_runner_v1.0.0.md"
     },
     "selfeval_schemas_inheritance.js": {
       "name": "selfeval_schemas_inheritance",
       "description": "Selfeval runner for schema inheritance validation",
-      "exports": ["run"]
+      "exports": ["run"],
+      "req": "selfeval_schemas_inheritance_runner_v1.0.0.md"
     },
     "selfeval_schemas_data.js": {
       "name": "selfeval_schemas_data",
       "description": "Selfeval runner for schema data validation",
-      "exports": ["run"]
+      "exports": ["run"],
+      "req": "selfeval_schemas_data_runner_v1.0.0.md"
     },
     "selfeval_reqs_coverage.js": {
       "name": "selfeval_reqs_coverage",
       "description": "Selfeval runner for req coverage - checks .js files have reqs",
-      "exports": ["run"]
+      "exports": ["run"],
+      "req": "selfeval_reqs_coverage_runner_v1.0.0.md"
+    },
+    "selfeval_final.js": {
+      "name": "selfeval_final",
+      "description": "Selfeval runner for final resources overlap detection",
+      "exports": ["run"],
+      "req": "selfeval_final_runner_v1.0.0.md"
     }
   }
 }

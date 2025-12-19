@@ -11,6 +11,11 @@
       "name": "spl_crud_instance",
       "description": "CRUD API methods (create, lift, read, write, update, delete)",
       "file": "spl_crud_instance_v1.1.0.md"
+    },
+    {
+      "name": "crud_lib",
+      "description": "Shared CRUD utilities lib",
+      "file": "crud_lib_v1.0.0.md"
     }
   ]
 }

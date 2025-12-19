@@ -1,0 +1,11 @@
+{
+  "name": "reqs",
+  "purpose": "Read method requirements",
+  "requirements": [
+    {
+      "name": "read_lib",
+      "description": "Read business logic lib",
+      "file": "read_lib_v1.0.0.md"
+    }
+  ]
+}

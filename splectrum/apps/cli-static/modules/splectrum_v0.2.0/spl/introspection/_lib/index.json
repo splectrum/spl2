@@ -5,32 +5,32 @@
     "report.js": {
       "name": "report",
       "description": "Build four-level structures from flat facts for whoami output",
-      "exports": ["buildContainer", "buildChildren", "buildHandler", "buildSchemas", "buildLib", "buildReqs"]
+      "exports": ["buildContainer", "buildChildren", "buildHandler", "buildSchemas", "buildLib", "buildReqs"],
+      "req": "report_lib_v1.0.0.md"
     },
     "freetext.js": {
       "name": "freetext",
       "description": "Generic freetext renderer for four-level structured JSON",
-      "exports": ["render", "renderWithLevels"]
+      "exports": ["render", "renderWithLevels"],
+      "req": "freetext_lib_v1.0.0.md"
     },
     "selfeval.js": {
       "name": "selfeval",
       "description": "Selfeval framework - load registry, instantiate runners, execute validation",
-      "exports": ["loadRegistry", "loadRunner", "runAll", "buildTypeStack", "loadRegistryFromType", "loadRunnerFromType"]
-    },
-    "selfeval_final.js": {
-      "name": "selfeval_final",
-      "description": "Selfeval runner for final resources overlap detection",
-      "exports": ["run"]
+      "exports": ["loadRegistry", "loadRunner", "runAll", "buildTypeStack", "loadRegistryFromType", "loadRunnerFromType"],
+      "req": "selfeval_lib_v1.0.0.md"
     },
     "avsc.js": {
       "name": "avsc",
       "description": "Avro schema parsing, validation, and comparison",
-      "exports": ["parseSchema", "validate", "compareSchemas"]
+      "exports": ["parseSchema", "validate", "compareSchemas"],
+      "req": "avsc_lib_v1.1.0.md"
     },
     "selfeval_tests.js": {
       "name": "selfeval_tests",
       "description": "Selfeval runner for data-driven tests from _tests/ folder",
-      "exports": ["run"]
+      "exports": ["run"],
+      "req": "selfeval_tests_runner_v1.0.0.md"
     }
   }
 }

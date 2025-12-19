@@ -11,11 +11,9 @@
 //   --content   Content to write (entire file contents)
 //   --base64    Base64-encoded content (alternative to --content, bypasses shell escaping)
 
-import fs from 'fs'
-import path from 'path'
-
 export default async function(module) {
   const crud = await module.require('lib/spl/crud')
+  const writeLib = await module.require('lib/spl/crud/write')
 
   const input = module.input()
   const resource = input.resource
@@ -60,24 +58,22 @@ export default async function(module) {
     return
   }
 
-  const containerFsPath = path.join(workModulePath, containerPath)
+  const containerFsPath = writeLib.getContainerFsPath(workModulePath, containerPath)
 
   // Check if container exists in work_module
-  if (!fs.existsSync(containerFsPath)) {
+  if (!writeLib.containerExists(containerFsPath)) {
     module.output(`Container not found in work_module: ${containerPath}`, { error: 'container_not_found', containerPath })
     return
   }
 
-  const filePath = path.join(containerFsPath, resource)
-
   // File must exist (use create for new files)
-  if (!fs.existsSync(filePath)) {
+  if (!writeLib.resourceExists(containerFsPath, resource)) {
     module.output(`Resource not found: ${resource}. Use create --resource to create new files.`, { status: 'not_found', resource, containerPath })
     return
   }
 
   // Write the content
-  fs.writeFileSync(filePath, content, 'utf8')
+  writeLib.writeFile(containerFsPath, resource, content)
 
   module.output(`Written: ${resource}`, { status: 'ok', file: resource, containerPath })
 }

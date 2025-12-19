@@ -6,6 +6,11 @@
       "name": "delete",
       "description": "Delete method specification",
       "file": "Delete_v1.0.0.md"
+    },
+    {
+      "name": "delete_lib",
+      "description": "Delete business logic lib",
+      "file": "delete_lib_v1.0.0.md"
     }
   ]
 }

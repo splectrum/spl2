@@ -6,6 +6,11 @@
       "name": "spl_instance",
       "description": "SPL instance contents and structure",
       "file": "spl_instance_v1.0.0.md"
+    },
+    {
+      "name": "spl_lib",
+      "description": "Core splectrum utilities library",
+      "file": "spl_lib_v1.0.0.md"
     }
   ]
 }

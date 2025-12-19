@@ -1,0 +1,11 @@
+{
+  "name": "reqs",
+  "purpose": "Write method requirements",
+  "requirements": [
+    {
+      "name": "write_lib",
+      "description": "Write business logic lib",
+      "file": "write_lib_v1.0.0.md"
+    }
+  ]
+}

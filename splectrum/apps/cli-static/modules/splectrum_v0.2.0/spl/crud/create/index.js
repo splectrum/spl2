@@ -16,11 +16,9 @@
 //   --dryRun    Show what would be created without doing it
 //   --resource  Create a resource file instead of a container
 
-import fs from 'fs'
-import path from 'path'
-
 export default async function(module) {
   const crud = await module.require('lib/spl/crud')
+  const createLib = await module.require('lib/spl/crud/create')
 
   const input = module.input()
   const dryRun = input.dryRun || false
@@ -28,7 +26,6 @@ export default async function(module) {
 
   // Resource creation mode
   if (resource) {
-    // Validate resource path
     const validPrefixes = ['_lib/', '_schemas/', '_reqs/']
     if (!validPrefixes.some(p => resource.startsWith(p))) {
       module.output(
@@ -38,53 +35,40 @@ export default async function(module) {
       return
     }
 
-    // Get container path from method path (remove /create)
     const methodPath = module.getMethod()
     const containerPath = methodPath.replace(/\/create$/, '')
 
-    // Verify container exists
     const containerIndexPath = module.resolve(containerPath, 'index.json')
     if (!containerIndexPath) {
       module.output(`Container not found: ${containerPath}`, { error: 'container_not_found', containerPath })
       return
     }
 
-    // Determine work module path
     const workModulePath = await crud.getWorkModulePath()
     if (!workModulePath) {
       module.output('No work module found in hierarchy.json', { error: 'no_work_module' })
       return
     }
 
-    const resourceFsPath = path.join(workModulePath, containerPath, resource)
-
-    // Check if already exists (in overlay stack, not just work_module)
     const existingPath = module.resolve(containerPath, resource)
     if (existingPath) {
       module.output(`Resource already exists: ${resource}`, { status: 'exists', containerPath, resource, existingPath })
       return
     }
 
-    // dryRun mode
-    if (dryRun) {
-      module.output(`Would create: ${containerPath}/${resource}`, { status: 'dry_run', containerPath, resource, resourceFsPath })
-      return
+    const result = createLib.createResource(containerPath, resource, workModulePath, dryRun)
+    if (result.status === 'dry_run') {
+      module.output(`Would create: ${containerPath}/${resource}`, result)
+    } else {
+      module.output(`Created: ${containerPath}/${resource}`, result)
     }
-
-    // Create parent directory and empty file
-    fs.mkdirSync(path.dirname(resourceFsPath), { recursive: true })
-    fs.writeFileSync(resourceFsPath, '', 'utf8')
-
-    module.output(`Created: ${containerPath}/${resource}`, { status: 'created', containerPath, resource, resourceFsPath })
     return
   }
 
-  // Get the method path - this tells us what container to create
-  // e.g., "spl/container/test/create" → create "spl/container/test"
+  // Container creation mode
   const methodPath = module.getMethod()
   const segments = methodPath.split('/')
 
-  // Remove "create" from the end to get target container path
   if (segments[segments.length - 1] !== 'create') {
     module.output('Invalid invocation: method must end with /create', { error: 'invalid_invocation' })
     return
@@ -95,16 +79,13 @@ export default async function(module) {
   const childName = targetSegments[targetSegments.length - 1]
   const parentPath = targetSegments.slice(0, -1).join('/')
 
-  // Resolve parent's index.json
   const parentIndexPath = module.resolve(parentPath, 'index.json')
   if (!parentIndexPath) {
     module.output(`Parent container not found: ${parentPath}`, { error: 'parent_not_found', parentPath })
     return
   }
 
-  const parentIndex = JSON.parse(fs.readFileSync(parentIndexPath, 'utf8'))
-
-  // Validate child is expected by parent (from instance.children.list)
+  const parentIndex = createLib.readIndex(parentIndexPath)
   const expectedChildren = parentIndex.instance?.children?.list || []
 
   if (!expectedChildren.includes(childName)) {
@@ -116,21 +97,19 @@ export default async function(module) {
     return
   }
 
-  // Get parent's instance type to find type.children.type
   const parentInstanceType = parentIndex.instantiates
   if (!parentInstanceType) {
     module.output(`Parent "${parentPath}" has no instantiates field`, { error: 'no_instance_type', parentPath })
     return
   }
 
-  // Resolve instance type's index.json to get type.children.type
   const instanceTypeIndexPath = module.resolve(parentInstanceType, 'index.json')
   if (!instanceTypeIndexPath) {
     module.output(`Instance type not found: ${parentInstanceType}`, { error: 'instance_type_not_found', parentInstanceType })
     return
   }
 
-  const instanceTypeIndex = JSON.parse(fs.readFileSync(instanceTypeIndexPath, 'utf8'))
+  const instanceTypeIndex = createLib.readIndex(instanceTypeIndexPath)
   const childInstanceType = instanceTypeIndex.type?.children?.type
 
   if (!childInstanceType) {
@@ -138,19 +117,17 @@ export default async function(module) {
     return
   }
 
-  // Determine work module path for target
   const workModulePath = await crud.getWorkModulePath()
   if (!workModulePath) {
     module.output('No work module found in hierarchy.json', { error: 'no_work_module' })
     return
   }
 
-  const targetFsPath = path.join(workModulePath, targetPath)
-  const indexJsonPath = path.join(targetFsPath, 'index.json')
+  const targetFsPath = createLib.getContainerFsPath(workModulePath, targetPath)
+  const indexJsonPath = createLib.getIndexJsonPath(targetFsPath)
 
-  // Check if already exists
-  if (fs.existsSync(indexJsonPath)) {
-    const existingIndex = JSON.parse(fs.readFileSync(indexJsonPath, 'utf8'))
+  if (createLib.containerExists(indexJsonPath)) {
+    const existingIndex = createLib.readIndex(indexJsonPath)
     module.output(
       `Container already exists: ${targetPath}`,
       { status: 'exists', targetPath, existing: existingIndex }
@@ -158,28 +135,19 @@ export default async function(module) {
     return
   }
 
-  // Build the index.json content
   const indexContent = {
     name: targetPath,
     instantiates: childInstanceType,
     extends: null
   }
 
-  // dryRun mode - show what would be created
-  if (dryRun) {
+  const result = createLib.createContainer(targetPath, targetFsPath, indexContent, dryRun)
+  if (result.status === 'dry_run') {
     module.output(
-      `Would create: ${targetPath}\n  folder: ${targetFsPath}\n  index.json: ${JSON.stringify(indexContent, null, 2)}`,
-      { status: 'dry_run', targetPath, targetFsPath, indexContent }
+      `Would create: ${targetPath}\n  folder: ${targetFsPath}\n  index.json: ` + JSON.stringify(indexContent, null, 2),
+      result
     )
-    return
+  } else {
+    module.output(`Created: ${targetPath}`, result)
   }
-
-  // Create the container
-  fs.mkdirSync(targetFsPath, { recursive: true })
-  fs.writeFileSync(indexJsonPath, JSON.stringify(indexContent, null, 2) + '\n', 'utf8')
-
-  module.output(
-    `Created: ${targetPath}`,
-    { status: 'created', targetPath, targetFsPath, indexContent }
-  )
 }

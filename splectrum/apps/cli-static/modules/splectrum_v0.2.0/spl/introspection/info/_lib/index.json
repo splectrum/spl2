@@ -1,0 +1,8 @@
+{
+  "files": {
+    "info.js": {
+      "description": "Info business logic",
+      "req": "info_lib_v1.0.0.md"
+    }
+  }
+}
