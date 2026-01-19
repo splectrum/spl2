@@ -31,10 +31,48 @@
       ]
     },
     {
-      "name": "Coming",
-      "description": "More wrappers will be added for commonly used tools",
+      "name": "Docker",
       "commands": [
-        { "command": "tools/gh", "description": "GitHub CLI (planned)" }
+        { "command": "spl tools/docker ps", "description": "Not: docker ps" },
+        { "command": "spl tools/docker build -t app .", "description": "Not: docker build" },
+        { "command": "spl tools/docker run -d nginx", "description": "Not: docker run" }
+      ]
+    },
+    {
+      "name": "GitHub CLI",
+      "commands": [
+        { "command": "spl tools/gh pr list", "description": "Not: gh pr list" },
+        { "command": "spl tools/gh issue create --title \"Bug\"", "description": "Not: gh issue create" },
+        { "command": "spl tools/gh repo view", "description": "Not: gh repo view" }
+      ]
+    },
+    {
+      "name": "SSH",
+      "commands": [
+        { "command": "spl tools/ssh user@host", "description": "Not: ssh user@host" },
+        { "command": "spl tools/ssh user@host \"ls -la\"", "description": "Not: ssh user@host \"ls\"" }
+      ]
+    },
+    {
+      "name": "Rsync",
+      "commands": [
+        { "command": "spl tools/rsync -avz src/ dest/", "description": "Not: rsync -avz" },
+        { "command": "spl tools/rsync -avz src/ user@host:dest/", "description": "Not: rsync to remote" }
+      ]
+    },
+    {
+      "name": "FFmpeg",
+      "commands": [
+        { "command": "spl tools/ffmpeg -i in.mp4 out.webm", "description": "Not: ffmpeg -i" },
+        { "command": "spl tools/ffmpeg -i video.mp4 -vn audio.mp3", "description": "Extract audio" }
+      ]
+    },
+    {
+      "name": "Pear",
+      "commands": [
+        { "command": "spl tools/pear run pear://app", "description": "Not: pear run" },
+        { "command": "spl tools/pear dev .", "description": "Not: pear dev" },
+        { "command": "spl tools/pear stage myapp", "description": "Not: pear stage" }
       ]
     }
   ]

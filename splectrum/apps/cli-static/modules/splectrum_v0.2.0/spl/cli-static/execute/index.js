@@ -2,10 +2,12 @@
 //
 // App handler with proper inbox/outbox pattern:
 // 1. Load app state
-// 2. Start session (watchers running)
-// 3. Handle PAC if requested (dry-run, prompt, execute)
-// 4. Or: direct execution (FAF to inbox, wait on outbox)
-// 5. Return result to client
+// 2. FAF request to audit topic (entrance)
+// 3. Start session (watchers running)
+// 4. Handle PAC if requested (dry-run, prompt, execute)
+// 5. Or: direct execution (FAF to inbox, wait on outbox)
+// 6. FAF response to audit topic (exit)
+// 7. Return result to client
 
 export default async function(module) {
   const exec = await module.require('lib/spl/cli-static/execute')
@@ -14,6 +16,7 @@ export default async function(module) {
   // 1. Load app state
   const appRoot = 'apps/cli-static'
   const stateTopic = `${appRoot}/state`
+  const requestsTopic = `${appRoot}/requests`
   const appState = module.consumeLatest(stateTopic)
 
   if (!appState) {
@@ -24,10 +27,14 @@ export default async function(module) {
   const sessionConfig = appState.headers.spl['cli-static-session']
   const { inboxDir, outboxDir } = exec.buildPaths(nodeRoot, sessionConfig)
 
-  // 2. Snapshot original record before any modifications
+  // 2. FAF request record (entrance)
+  const timestamp = module.getMetaData().spl.request.timeReceived
+  module.faf(requestsTopic, { sync: true })
+
+  // 3. Snapshot original record before any modifications
   const originalRecord = module.snapshotRecord()
 
-  // 3. Start session helper (one-shot watchers)
+  // 4. Start session helper (one-shot watchers)
   const sessionStart = await module.require('spl/cli-static-session/start')
 
   async function startSession() {
@@ -35,7 +42,7 @@ export default async function(module) {
     module.restoreRecord(originalRecord)  // Clear session pollution
   }
 
-  // 4. Check for PAC flow
+  // 5. Check for PAC flow
   const input = module.input()
 
   if (input.pac) {
@@ -77,6 +84,9 @@ export default async function(module) {
     const result = await exec.executeAndWait(inboxDir, outboxDir)
     module.extractOutput(result)
   }
+
+  // 6. FAF response record (exit)
+  module.faf(requestsTopic, { sync: true, filename: `${timestamp}.response.json` })
 
   module.completeRequest()
 }

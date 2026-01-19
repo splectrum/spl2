@@ -142,10 +142,9 @@ vite.config.ts.timestamp-*
 projects/09-console-v5-stream-native/dev/events/
 projects/09-console-v5-stream-native/dev/*/extracted/
 
-# Dev bundle generated artifacts
-**/dev/v*/environments/
-**/dev/v*/splectrum/
-**/dev/v*/spl
-
 # Splectrum runtime data
 splectrum/runtime/
+splectrum/apps/cli-static/requests/
+
+# Project 10: Dev Env v0 Bundle - dev environment runtime
+projects/10-dev-env-v0-bundle-continued/dev/v0/

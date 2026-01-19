@@ -25,18 +25,19 @@
 
 **Principle:** Wrap tools that provide truly external capabilities. If JS can do it natively, prefer script helpers over wrappers.
 
-### Tier 1 - Core (truly external, no substitute)
-- [ ] `tools/git` - version control
-- [ ] `tools/docker` - container management
-- [ ] `tools/pear` - Holepunch Pear runtime (build, deploy, run, manage P2P nodes)
-- [ ] `tools/ssh` - remote operations
+### Tier 1 - Core (truly external, no substitute) — v0.2.0
+- [x] `tools/git` - version control
+- [x] `tools/docker` - container management
+- [x] `tools/pear` - Holepunch Pear runtime (build, deploy, run, manage P2P nodes)
+- [x] `tools/ssh` - remote operations
 
-### Tier 2 - Productivity (external capability or major ergonomics)
-- [ ] `tools/ffmpeg` - media processing
-- [ ] `tools/gh` - GitHub CLI (PRs, issues, releases, actions)
-- [ ] `tools/rsync` - efficient file sync/deployment
+### Tier 2 - Productivity (external capability or major ergonomics) — v0.2.0
+- [x] `tools/7zip` - archive management
+- [x] `tools/ffmpeg` - media processing
+- [x] `tools/gh` - GitHub CLI (PRs, issues, releases, actions)
+- [x] `tools/rsync` - efficient file sync/deployment
 
-### Tier 3 - Sysadmin (privileged, security boundary matters)
+### Tier 3 - Sysadmin (privileged, security boundary matters) — POSTPONED
 - [ ] `tools/apt` - package management (interactive)
 - [ ] `tools/systemctl` - service management
 - [ ] `tools/ps` - process list
@@ -47,7 +48,7 @@
 - [ ] `tools/cron` - scheduled tasks
 - [ ] `tools/journalctl` - system logs
 
-### Tier 4 - Niche (use-case dependent)
+### Tier 4 - Niche (use-case dependent) — POSTPONED
 - [ ] `tools/npm` - package management (consider JS programmatic API)
 - [ ] `tools/pandoc` - document conversion
 - [ ] `tools/imagemagick` - image manipulation
@@ -70,7 +71,7 @@ These don't need wrappers - use script helpers instead:
 
 ---
 
-## Script Helper Libraries
+## Script Helper Libraries — POSTPONED
 
 **Purpose:** JS-native capabilities for AI scripting - replacing shell tools with ergonomic JS helpers.
 

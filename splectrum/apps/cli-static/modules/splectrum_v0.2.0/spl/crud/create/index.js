@@ -6,7 +6,7 @@
 // Invocation: spl spl/container/test/create
 // - Called on the virtual container path (what you want to exist)
 // - Parent must expect this child (in instance.children.list)
-// - Type determined via parent's type → type.children.type
+// - Type: uses parent.instance.children.type if set, else parent's type.children.type
 //
 // Resource creation: spl spl/wrapper/create --resource=_lib/wrapper.js
 // - Creates a resource file within an existing container
@@ -97,24 +97,30 @@ export default async function(module) {
     return
   }
 
-  const parentInstanceType = parentIndex.instantiates
-  if (!parentInstanceType) {
-    module.output(`Parent "${parentPath}" has no instantiates field`, { error: 'no_instance_type', parentPath })
-    return
-  }
+  // Check for instance-level override first (parent.instance.children.type)
+  let childInstanceType = parentIndex.instance?.children?.type
 
-  const instanceTypeIndexPath = module.resolve(parentInstanceType, 'index.json')
-  if (!instanceTypeIndexPath) {
-    module.output(`Instance type not found: ${parentInstanceType}`, { error: 'instance_type_not_found', parentInstanceType })
-    return
-  }
-
-  const instanceTypeIndex = createLib.readIndex(instanceTypeIndexPath)
-  const childInstanceType = instanceTypeIndex.type?.children?.type
-
+  // If no override, get from the parent's instance type (type.children.type)
   if (!childInstanceType) {
-    module.output(`Instance type "${parentInstanceType}" has no type.children.type field`, { error: 'no_type_children', parentInstanceType })
-    return
+    const parentInstanceType = parentIndex.instantiates
+    if (!parentInstanceType) {
+      module.output(`Parent "${parentPath}" has no instantiates field`, { error: 'no_instance_type', parentPath })
+      return
+    }
+
+    const instanceTypeIndexPath = module.resolve(parentInstanceType, 'index.json')
+    if (!instanceTypeIndexPath) {
+      module.output(`Instance type not found: ${parentInstanceType}`, { error: 'instance_type_not_found', parentInstanceType })
+      return
+    }
+
+    const instanceTypeIndex = createLib.readIndex(instanceTypeIndexPath)
+    childInstanceType = instanceTypeIndex.type?.children?.type
+
+    if (!childInstanceType) {
+      module.output(`Instance type "${parentInstanceType}" has no type.children.type field`, { error: 'no_type_children', parentInstanceType })
+      return
+    }
   }
 
   const workModulePath = await crud.getWorkModulePath()

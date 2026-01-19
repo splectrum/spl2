@@ -15,9 +15,14 @@
 ### Twin Pair 1: Tool Coverage
 
 **Implementation:**
-- Replace non-spl tools with spl equivalents during this session
-- Test and improve existing spl tools as we use them
-- Learning through doing
+- Tier 1 (Core): docker, pear, ssh
+- Tier 2 (Productivity): ffmpeg, gh, rsync
+- Already done: git, 7zip
+
+**Postponed to future project:**
+- Tier 3 (Sysadmin): apt, systemctl, ps, kill, mount, iptables, useradd, cron, journalctl
+- Tier 4 (Niche): npm, pandoc, imagemagick, make
+- Scripting libraries (fs, http, data, etc.)
 
 **Template:**
 - Tool coverage requirements / patterns discovered
@@ -33,6 +38,8 @@
 
 ### Twin Pair 3: Release Doc Generator
 
+**Status: POSTPONED** - moved to next project
+
 **Implementation:**
 - Tool to generate documentation and analysis from releases
 - Run against v0.1.0 to validate
@@ -44,12 +51,14 @@
 
 ## Approach
 
-- Start with Twin Pair 1 (tool coverage) - natural entry point as we work
-- Twin Pair 2 can progress in parallel (request/response is infrastructure)
-- Twin Pair 3 builds on understanding from Pairs 1-2
+- Twin Pair 1 (tool coverage): Implement Tier 1 + Tier 2 wrappers
+- Twin Pair 2 (request/response): Formalize faf history tracking
+- Twin Pair 3: Postponed to next project
 
 ---
 
 ## Out of Scope
 
 - Session integration / CLAUDE.md workflow updates (app territory - next project)
+- Tier 3/4 tool wrappers (sysadmin, niche)
+- Scripting libraries (future polish)

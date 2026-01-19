@@ -1,0 +1,5 @@
+{
+  "name": "tools/ssh",
+  "instantiates": "spl/wrapper",
+  "extends": null
+}

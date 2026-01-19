@@ -1,0 +1,5 @@
+{
+  "name": "tools/docker",
+  "instantiates": "spl/wrapper",
+  "extends": null
+}

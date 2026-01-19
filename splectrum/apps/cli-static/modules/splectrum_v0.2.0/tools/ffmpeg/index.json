@@ -1,0 +1,5 @@
+{
+  "name": "tools/ffmpeg",
+  "instantiates": "spl/wrapper",
+  "extends": null
+}

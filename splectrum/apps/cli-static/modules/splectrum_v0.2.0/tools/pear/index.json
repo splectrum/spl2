@@ -1,0 +1,5 @@
+{
+  "name": "tools/pear",
+  "instantiates": "spl/wrapper",
+  "extends": null
+}

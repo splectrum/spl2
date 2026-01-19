@@ -1,6 +1,6 @@
 # Current Status
 
-**Last Updated:** 2025-12-20
+**Last Updated:** 2025-12-22
 **Last Commit:** c41b96b
 
 ---
@@ -11,19 +11,23 @@
 
 ### Current Focus
 
-**COMPLETE: Req Coverage & Handler Migration**
-
-All 33 containers pass selfeval-all.
+**Twin Pair 1: Tool Wrappers (Tier 1 + Tier 2)** — DONE
 
 #### Completed
+- Tier 1 (Core): git, docker, pear, ssh
+- Tier 2 (Productivity): 7zip, ffmpeg, gh, rsync
 
-- All spl/crud/* handlers migrated (7 containers) - imports removed, libs created
-- Created missing reqs for: lift, crud, read, write, update, delete, set
-- Migrated introspection handlers: selfeval, info
-- Created reqs for: whoami, introspection libs, module, script, wrapper, container
-- Moved selfeval_final.js from spl/introspection to spl/container (structural fix)
-- Registered spl_lib_v1.0.0.md in spl/_reqs/index.json
-- Fixed JSON output truncation in spl.mjs (nested arrays now display properly)
+All 9 tool wrappers pass selfeval.
+
+**Twin Pair 2: Request/Response Capture** — NEXT
+
+- Formalize faf history tracking on request/response
+
+#### Previously Completed
+
+- All 33 containers pass selfeval-all
+- Handler migration and req coverage complete
+- Fixed JSON output truncation in spl.mjs
 
 ### Selfeval Status
 
@@ -33,10 +37,11 @@ spl selfeval-all spl
 # PASS | 33 passed, 0 failed, 33 total
 ```
 
-### Next Steps
+### Postponed to Future Project
 
-- Review v0.2.0 release readiness
-- Consider additional documentation or polish
+- Twin Pair 3: Release Doc Generator
+- Tier 3/4 tool wrappers (sysadmin, niche)
+- Scripting libraries (fs, http, data, etc.)
 
 ---
 
